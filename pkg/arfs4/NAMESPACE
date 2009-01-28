@@ -1,0 +1,31 @@
+export(
+	makeDirStruct,
+	getFileInfo,
+	newFile,
+	readHeader,
+	readData,
+	writeData,
+	writeHeader,
+	arf	
+)
+
+exportClasses(
+	version,
+	settings,
+	nifti.fileinfo,
+	nifti.header,
+	fmri.data,
+	data,
+	model,
+	sequence,
+	analysis,
+	wald,
+	sims
+)
+
+exportMethods(
+
+)
+
+
+useDynLib(arfS4,ssqgauss,fderiv,inner_sandwich,gauss,outerprod)
