@@ -28,4 +28,4 @@ exportMethods(
 )
 
 
-useDynLib(arfS4,ssqgauss,fderiv,inner_sandwich,gauss,outerprod)
+useDynLib(arfS4,ssqgauss,fderiv,inner_sandwich,gauss,outerprod,outerprodtriangular,outerproddiagonal)

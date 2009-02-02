@@ -28,8 +28,14 @@ initialize <- function(path='',expname=NULL,fullSummary=T,createAverages=T) {
 		cat('  RCK method:',.settings.chk.method(settings),'\n')
 		cat('  RCK ranges:',.settings.chk.range(settings),'\n')
 		cat('\n')
+				
+		headinf <- readHeader(getFileInfo(.data.avgdatfile(arfdata)))
+		
 		cat(paste('[ *** ',toupper(.data.name(arfdata)),' *** ]\n',sep=''))
 		cat('\n')
+		cat(' dimensions:',.nifti.header.dims(headinf)[2],'x',.nifti.header.dims(headinf)[3],'\n')
+		cat(' datatype:',.nifti.header.data.type(headinf),'\n')
+		cat(' storagetype:',.nifti.header.filetype(headinf),'\n')
 		cat(' path:',.data.fullpath(arfdata),'\n')
 		cat(' trials:',.data.trials(arfdata),' ')
 		if(createAverages) cat('(averages calculated)\n') 

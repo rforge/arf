@@ -259,5 +259,50 @@ void ssqgauss(double *theta, double *dat, double *W, int *np, int *dimx, int *di
 
 }
 
+//(n*n) Outer product of vector length n (returns in triangular form)
+void outerprodtriangular(int *n, double *ivec, double *diag, double *offdiag)
+{
+  //n is length of vector
+  //ivec is input vector
+  //diag is vector of length n containing diagonals
+  //offdiag is vector of length n^2-n/2 containing lower trial offdiagonals
+
+  int i,j,a;
+  a=0;
+
+  //Create offdiagonals
+  for(i=0;i<(*n-1);i++) {
+    for(j=(i+1);j<(*n);j++) {
+	  offdiag[a]=ivec[i]*ivec[j];
+	  a=a+1;
+	}
+  }
+
+  //Create diagonals
+  a=0;
+  for(i=0;i<(*n);i++) {
+    diag[a]=ivec[i]*ivec[i];
+    a=a+1;
+  }
+}
+
+//(n*n) Outer product of vector length n (returns in diagonal form)
+void outerproddiagonal(int *n, double *ivec, double *diag)
+{
+  //n is length of vector
+  //ivec is input vector
+  //diag is vector of length n containing diagonals
+  //offdiag is vector of length n^2-n/2 containing lower trial offdiagonals
+
+  int i,j,a;
+  a=0;
+
+  //Create diagonals
+  a=0;
+  for(i=0;i<(*n);i++) {
+    diag[a]=ivec[i]*ivec[i];
+    a=a+1;
+  }
+}
 
 

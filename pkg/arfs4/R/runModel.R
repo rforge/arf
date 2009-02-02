@@ -11,9 +11,12 @@ runModel <- function(arfdata,modelseq) {
 		
 		arfmodel <- fitModel(arfdata,determineStart(readData(.data.avgdatfile(arfdata)),settings,model),model,settings)
 		arfmodel <- BIC(arfmodel)
-		arfmodel <- sandwich(arfmodel)
-		#arfmodel <- wald(arfmodel,new('wald'))
-		#model.valid(arfmodel)=TRUE
+		#arfmodel <- sandwich(arfmodel)
+		arfmodel <- sandwichDiagonal(arfmodel)
+		
+		arfmodel <- wald(arfmodel,new('wald'))
+		.model.valid(arfmodel)=TRUE
+
 		filename <- paste(.data.fullpath(arfdata),'/stats/arfmodel_',.model.modelname(arfmodel),'.rda',sep='')
 		.sequence.mnames(modelseq) <- c(.sequence.mnames(modelseq),filename)
 		save(arfmodel,file=filename)
@@ -31,7 +34,7 @@ runModel <- function(arfdata,modelseq) {
 			.sequence.valid(modelseq) <- c(.sequence.valid(modelseq),0)
 		}
 	
-		#displayFit(arfmodel)
+		displayFit(arfmodel)
 		
 		.sequence.minimum(modelseq) <- which.min(.sequence.fit(modelseq))
 		if(!.sequence.valid(modelseq)[.sequence.minimum(modelseq)]) .sequence.minimum(modelseq)=integer(0)
@@ -40,7 +43,7 @@ runModel <- function(arfdata,modelseq) {
 	
 	if(length(.sequence.minimum(modelseq))==0) warning('No best model found.')
 	
-	#displaySummary(modelseq)
+	displaySummary(modelseq)
 	
 	save(modelseq,file=paste(.data.fullpath(arfdata),'/stats/last_sequence.rda',sep=''))
 	
