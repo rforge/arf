@@ -11,8 +11,11 @@ runModel <- function(arfdata,modelseq) {
 		
 		arfmodel <- fitModel(arfdata,determineStart(readData(.data.avgdatfile(arfdata)),settings,model),model,settings)
 		arfmodel <- BIC(arfmodel)
-		#arfmodel <- sandwich(arfmodel)
-		arfmodel <- sandwichDiagonal(arfmodel)
+		
+		if(.settings.sw.type(settings)=='diag') arfmodel <- sandwichDiagonal(arfmodel)
+		if(.settings.sw.type(settings)=='tria') arfmodel <- sandwichTriangular(arfmodel)
+		if(.settings.sw.type(settings)=='full') arfmodel <- sandwichFull(arfmodel)
+		if(.settings.sw.type(settings)=='file') arfmodel <- sandwichFile(arfmodel)
 		
 		arfmodel <- wald(arfmodel,new('wald'))
 		.model.valid(arfmodel)=TRUE
@@ -88,7 +91,11 @@ runModelFast <- function(arfdata,modelseq) {
 	filename <- .sequence.mnames(modelseq)[which.min(.sequence.fit(modelseq))]
 	load(file=filename)
 		
-	arfmodel <- sandwich(arfmodel)
+	if(.settings.sw.type(settings)=='diag') arfmodel <- sandwichDiagonal(arfmodel)
+	if(.settings.sw.type(settings)=='tria') arfmodel <- sandwichTriangular(arfmodel)
+	if(.settings.sw.type(settings)=='full') arfmodel <- sandwich(arfmodel)
+	if(.settings.sw.type(settings)=='file') arfmodel <- sandwichFile(arfmodel)
+	
 	arfmodel <- wald(arfmodel,new('wald'))
 
 	save(arfmodel,file=filename)

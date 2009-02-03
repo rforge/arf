@@ -16,6 +16,9 @@ setMethod('show','settings',
 			cat('[rng]\n')
 			cat(' method:',object@chk.method,'\n')
 			cat(' ranges:',object@chk.range,'\n\n')
+			cat('[sw]\n')
+			cat(' type:',object@sw.type,'\n\n')
+			
 		}
 )
 

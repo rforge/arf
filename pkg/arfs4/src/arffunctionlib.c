@@ -1,12 +1,12 @@
 //Activated Region Fitting. Version 1 Build 1.
-//Copyright (c) 2008 Wouter Weeda.
+//Copyright (c) 2009 Wouter Weeda.
 
-//Libary offunctions for ARF
+//Libary of functions for ARF
 
 
 #include<R.h>
 #include<math.h>
-
+#include<stdio.h>
 
 //(n*p) first order derivative matrix
 void fderiv(int *n, int *p, int *dimx, int *dimy, double *theta, double *F)
@@ -50,6 +50,134 @@ void fderiv(int *n, int *p, int *dimx, int *dimy, double *theta, double *F)
 	}
 
 }
+
+//creates a mean residual file, call for every trial
+void meanResidualFile(int *n, double *trials, double *ivec) {
+
+	int row,col,i;
+	double x,y;
+
+	FILE *ftmp, *fres;
+
+	ftmp=fopen("residuals.arf","r");
+	fres=fopen("trialresiduals.arf","w");
+
+	i=0;
+	for(col=0;col<(*n);col++) {
+		for(row=0;row<(*n);row++) {
+			fread(&x,sizeof(double),1,ftmp);
+			y=x+(1/(trials[0]*trials[0]))*(ivec[row]*ivec[col]);
+			fwrite(&y,sizeof(double),1,fres);
+			i++;
+		}
+	}
+
+	fclose(ftmp);
+	fclose(fres);
+}
+
+//create new residual file
+void newResidualFile(int *n) {
+
+	int row,col;
+	double x;
+
+	FILE *f;
+
+	f=fopen("residuals.arf","w");
+
+	for(col=0;col<(*n);col++) {
+		for(row=0;row<(*n);row++) {
+			x=0e0;
+			fwrite(&x,sizeof(double),1,f);
+		}
+	}
+
+	fclose(f);
+}
+
+
+//(p*p) Inner sandwich part of the Sandwich Variance Estimator
+void inner_sandwichFile(int *n, int *p, double *F, double *W, double *B)
+{
+
+	//n is number of voxels
+	//p is number of parameters (is regions * 6)
+	//F is vector of length (n*p) containing Jacobian
+	//W is vector of length (n) containing weights from SSQ
+	//B is vector of length p*p containing inner sandwich part
+
+	int row, col,i;
+	double *Fmat, *FW, x;
+	FILE *f;
+
+	Fmat = (double *) R_alloc((*n)*(*p),sizeof(double));
+	FW = (double *) R_alloc((*n)*(*p),sizeof(double));
+
+
+	f=fopen("trialresiduals.arf","r+");
+
+
+	//zerofill FW (FW is F'W matrix product)
+	for(col=0;col<(*n);col++) {
+		for(row=0;row<(*p);row++) {
+			*(FW+(row+(col)*(*p))) = 0e0;
+		}
+	}
+
+
+	//zerofill Bmat (Bmat is p*p matrix with inner sandwich)
+	for(col=0;col<(*p);col++) {
+		for(row=0;row<(*p);row++) {
+			B[(row+(col)*(*p))]=0e0;
+		}
+	}
+
+
+	//Fill Fmat matrix with F vector
+	for(col=0;col<(*p);col++) {
+		for(row=0;row<(*n);row++) {
+			*(Fmat+(row+(col)*(*n))) = F[(row+(col)*(*n))];
+		}
+	}
+
+	//Create FW=W-1RW-1 (n*n weigthed Residual matrix)
+	for(col=0;col<(*n);col++) {
+		for(row=0;row<(*n);row++) {
+			fseek(f,sizeof(double)*(row+(col)*(*n)),SEEK_SET);
+			fread(&x,sizeof(double),1,f);
+			x=x/(W[row]*W[col]);
+			fseek(f,sizeof(double)*(row+(col)*(*n)),SEEK_SET);
+			fwrite(&x,sizeof(double),1,f);
+
+		}
+	}
+
+
+	//Create F'(WRW) matrix (with FW part)
+	for(col=0;col<(*n);col++) {
+		for(row=0;row<(*p);row++) {
+			for(i=0;i<(*n);i++) {
+				fseek(f,sizeof(double)*(i+(col)*(*n)),SEEK_SET);
+				fread(&x,sizeof(double),1,f);
+				*(FW+(row+(col)*(*p)))=*(FW+(row+(col)*(*p)))+*(Fmat+(i+(row)*(*n)))*x;
+			}
+		}
+	}
+
+
+	//Create B=(F'WRW)F matrix
+	for(col=0;col<(*p);col++) {
+		for(row=0;row<(*p);row++) {
+			for(i=0;i<(*n);i++) {
+				B[(row+(col)*(*p))]=B[(row+(col)*(*p))]+*(FW+(row+(i)*(*p)))**(Fmat+(i+(col)*(*n)));
+			}
+		}
+	}
+
+	fclose(f);
+}
+
 
 
 //(p*p) Inner sandwich part of the Sandwich Variance Estimator
@@ -130,11 +258,12 @@ void outerprod(int *n, double *ivec, double *out)
   //output is the outerproduct n*n outerproduct
 
 
-  int row,col;
-
+  int row,col,i;
+  i=0;
   for(col=0;col<(*n);col++) {
     for(row=0;row<(*n);row++) {
-    	out[(row+(col)*(*n))]=ivec[row]*ivec[col];
+    	out[i]=ivec[row]*ivec[col];
+    	i++;
 	}
   }
 

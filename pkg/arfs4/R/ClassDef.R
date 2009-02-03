@@ -12,8 +12,8 @@ setClass(
 		),
 		prototype=prototype(
 			version=1,
-			build=1,
-			update=2
+			build=2,
+			update=1
 		)
 )
 
@@ -27,7 +27,8 @@ setClass(
 		start.vector='numeric',		#vector containing startingvalues (if !start.method=='fixed' only t5 and t6 are used) vector is recycled for regions.
 		chk.method='character',		#which method is used to check the range of parameter values
 		chk.range='numeric',		#vector containing ranges for each parameter (vector is recycled for regions)		
-		warn='numeric'				#suppress warnings
+		warn='numeric',				#suppress warnings
+		sw.type='character'			#method to use with Residuals ('diag','tria','full','file')
 	),
 	prototype=prototype(
 		min.iterlim=1500,
@@ -36,7 +37,8 @@ setClass(
 		start.vector=c(0,0,0,0,.1,100),
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,-.9,-1e+64,0,0,0,0,.9,1e+64),
-		warn=-1
+		warn=-1,
+		sw.type='file'
 	)
 )
 

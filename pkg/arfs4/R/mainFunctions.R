@@ -27,6 +27,7 @@ initialize <- function(path='',expname=NULL,fullSummary=T,createAverages=T) {
 		cat('  SV values:',.settings.start.vector(settings),'\n')
 		cat('  RCK method:',.settings.chk.method(settings),'\n')
 		cat('  RCK ranges:',.settings.chk.range(settings),'\n')
+		cat('  Sandwich:',.settings.sw.type(settings),'\n')
 		cat('\n')
 				
 		headinf <- readHeader(getFileInfo(.data.avgdatfile(arfdata)))

@@ -108,6 +108,17 @@ standGen <- function(x, value) standardGeneric('.settings.warn<-')
 standMethod <- function(x, value) {x@warn<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
+classname <-'settings'
+funcname <-'.settings.sw.type'
+standGen <- function(object) standardGeneric('.settings.sw.type')
+standMethod <- function(object) object@sw.type
+setGeneric(funcname,standGen)
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.settings.sw.type<-'
+standGen <- function(x, value) standardGeneric('.settings.sw.type<-')
+standMethod <- function(x, value) {x@sw.type<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
 classname <-'nifti.fileinfo'
 funcname <-'.nifti.fileinfo.fullpath'
 standGen <- function(object) standardGeneric('.nifti.fileinfo.fullpath')

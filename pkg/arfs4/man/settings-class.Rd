@@ -17,6 +17,8 @@ Objects can be created by calls of the form \code{new("settings", ...)}.
     \item{\code{chk.method}:}{Which method is used to check if the solution is sensible (i.e. location falls within the map, parameter 5 not close to 1) }
     \item{\code{chk.range}:}{Range of valid values for parameters.}
     \item{\code{warn}:}{Suppress warnings? }
+    \item{\code{sw.type}:}{Which sandwich method to use: 'diag','tria','full', or 'file', (default='file') }
+
   }
 }
 \section{Methods}{
