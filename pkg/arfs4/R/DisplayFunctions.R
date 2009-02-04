@@ -116,3 +116,29 @@ displayInit <- function(settings) {
 		
 }
 
+
+displayDataModel <- function(arfmodel) {
+		
+	if(.model.valid(arfmodel)) {
+		
+		#open data for first trial to get dimensions and trial data
+		trialdata <- readData(.model.avgdatfile(arfmodel))
+		
+		
+		#set dimensions and data
+		dimx <- .fmri.data.dims(trialdata)[2]
+		dimy <- .fmri.data.dims(trialdata)[3]
+		data <- .fmri.data.datavec(trialdata)[1:(dimx*dimy)]
+		rm(trialdata)
+		
+		#calculate model based on parameter estimates
+		model <- .C('gauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*6),as.integer(dimx),as.integer(dimy),as.double(numeric(dimx*dimy)))[[5]]
+	
+		browser()
+		
+		
+		
+	} else warning('No valid model. Residuals not calculated.')
+	
+	return(TRUE)
+}

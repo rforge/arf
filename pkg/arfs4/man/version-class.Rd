@@ -3,7 +3,7 @@
 \alias{version-class}
 
 
-\title{Class "version" ~~~ }
+\title{Class "version"}
 \description{	Contains version information of the ARF package}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("version", ...)}.
@@ -22,12 +22,7 @@ Objects can be created by calls of the form \code{new("version", ...)}.
 
 	 }
 }
-\references{ }
+
 \author{ Wouter D. Weeda }
-\note{  }
 
- \seealso{ }
-\examples{
-
-}
 \keyword{classes}

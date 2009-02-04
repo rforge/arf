@@ -1,7 +1,7 @@
 Package: arfS4
 Type: Package
 Title: Activated Region Fitting, fMRI data analysis.
-Version: 1.2-1
+Version: 1.2-2
 Date: 2009-01-07
 Author: Wouter Weeda
 Maintainer: Wouter Weeda <w.d.weeda@gmail.com>

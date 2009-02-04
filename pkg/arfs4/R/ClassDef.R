@@ -13,7 +13,7 @@ setClass(
 		prototype=prototype(
 			version=1,
 			build=2,
-			update=1
+			update=2
 		)
 )
 

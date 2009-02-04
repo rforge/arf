@@ -1,6 +1,6 @@
 \name{arf}
 \alias{arf}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{ Activated Region Fitting }
 \description{
   A call to \code{arf} starts the ARF fitting procedure. It checks if the given \code{path} contains a "data" and a "weights" directory and creates the necessary S4 classes and average files
@@ -31,11 +31,6 @@ none. The S4 object of class \code{data} of each model can be accessed via the .
 \references{ Weeda, W.D., Waldorp, L.J., Christoffels, I., and Huizenga, H.M. (in press) Activated Region Fitting: A robust high-power method for fMRI analysis using parameterized regions of activation. Human Brain Mapping, 2009. }
 \author{ Wouter D.Weeda }
 
-\examples{
-
- 
-
-}	
 	
 \keyword{methods}
 

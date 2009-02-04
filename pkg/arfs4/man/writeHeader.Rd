@@ -12,19 +12,13 @@ writeHeader(headinf)
 \arguments{
   \item{headinf}{ An object of class 'nifti.header' }
 }
-\details{
-  
-}
+
 \value{
   returns TRUE if succeeded.
 }
-\references{  }
+
 \author{ Wouter D. Weeda }
-\note{ }
-\seealso{  }
-\examples{
- 
-}
+
 
 \keyword{ methods }
 

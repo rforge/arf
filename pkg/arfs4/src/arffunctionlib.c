@@ -52,24 +52,31 @@ void fderiv(int *n, int *p, int *dimx, int *dimy, double *theta, double *F)
 }
 
 //creates a mean residual file, call for every trial
-void meanResidualFile(int *n, double *trials, double *ivec) {
+void addResidualFile(int *n, double *trials, double *ivec) {
 
 	int row,col,i;
-	double x,y;
+	double x, *y, *vec;
 
 	FILE *ftmp, *fres;
+
+	vec = (double *) R_alloc((*n),sizeof(double));
+	y = (double *) R_alloc((*n),sizeof(double));
 
 	ftmp=fopen("residuals.arf","r");
 	fres=fopen("trialresiduals.arf","w");
 
-	i=0;
+
 	for(col=0;col<(*n);col++) {
+		i=0;
+		fseek(ftmp,sizeof(double)*((col)*(*n)),SEEK_SET);
+		fread(vec,sizeof(double),*n,ftmp);
+
 		for(row=0;row<(*n);row++) {
-			fread(&x,sizeof(double),1,ftmp);
-			y=x+(1/(trials[0]*trials[0]))*(ivec[row]*ivec[col]);
-			fwrite(&y,sizeof(double),1,fres);
+			*(y+i)=*(vec+i)+(1/(trials[0]*trials[0]))*(ivec[row]*ivec[col]);
 			i++;
 		}
+		fseek(fres,sizeof(double)*((col)*(*n)),SEEK_SET);
+		fwrite(y,sizeof(double),*n,fres);
 	}
 
 	fclose(ftmp);
@@ -79,18 +86,24 @@ void meanResidualFile(int *n, double *trials, double *ivec) {
 //create new residual file
 void newResidualFile(int *n) {
 
-	int row,col;
-	double x;
-
+	int row,col,i;
+	double x, *vec;
 	FILE *f;
+
+	vec = (double *) R_alloc((*n),sizeof(double));
+
 
 	f=fopen("residuals.arf","w");
 
+
 	for(col=0;col<(*n);col++) {
+		i=0;
 		for(row=0;row<(*n);row++) {
-			x=0e0;
-			fwrite(&x,sizeof(double),1,f);
+			*(vec+i)=0e0;
+			i++;
 		}
+		fseek(f,sizeof(double)*((col)*(*n)),SEEK_SET);
+		fwrite(vec,sizeof(double),*n,f);
 	}
 
 	fclose(f);
@@ -108,11 +121,12 @@ void inner_sandwichFile(int *n, int *p, double *F, double *W, double *B)
 	//B is vector of length p*p containing inner sandwich part
 
 	int row, col,i;
-	double *Fmat, *FW, x;
+	double *Fmat, *FW, x, *Rvec;
 	FILE *f;
 
 	Fmat = (double *) R_alloc((*n)*(*p),sizeof(double));
 	FW = (double *) R_alloc((*n)*(*p),sizeof(double));
+	Rvec = (double *) R_alloc((*n),sizeof(double));
 
 
 	f=fopen("trialresiduals.arf","r+");
@@ -143,24 +157,27 @@ void inner_sandwichFile(int *n, int *p, double *F, double *W, double *B)
 
 	//Create FW=W-1RW-1 (n*n weigthed Residual matrix)
 	for(col=0;col<(*n);col++) {
-		for(row=0;row<(*n);row++) {
-			fseek(f,sizeof(double)*(row+(col)*(*n)),SEEK_SET);
-			fread(&x,sizeof(double),1,f);
-			x=x/(W[row]*W[col]);
-			fseek(f,sizeof(double)*(row+(col)*(*n)),SEEK_SET);
-			fwrite(&x,sizeof(double),1,f);
 
+		fseek(f,sizeof(double)*((col)*(*n)),SEEK_SET);
+		fread(Rvec,sizeof(double),*n,f);
+
+		for(row=0;row<(*n);row++) {
+			*(Rvec+row)=*(Rvec+row)/(W[row]*W[col]);
 		}
+
+		fseek(f,sizeof(double)*((col)*(*n)),SEEK_SET);
+		fwrite(Rvec,sizeof(double),*n,f);
+
 	}
 
 
 	//Create F'(WRW) matrix (with FW part)
 	for(col=0;col<(*n);col++) {
 		for(row=0;row<(*p);row++) {
+			fseek(f,sizeof(double)*((col)*(*n)),SEEK_SET);
+			fread(Rvec,sizeof(double),*n,f);
 			for(i=0;i<(*n);i++) {
-				fseek(f,sizeof(double)*(i+(col)*(*n)),SEEK_SET);
-				fread(&x,sizeof(double),1,f);
-				*(FW+(row+(col)*(*p)))=*(FW+(row+(col)*(*p)))+*(Fmat+(i+(row)*(*n)))*x;
+				*(FW+(row+(col)*(*p)))=*(FW+(row+(col)*(*p)))+*(Fmat+(i+(row)*(*n)))**(Rvec+i);
 			}
 		}
 	}

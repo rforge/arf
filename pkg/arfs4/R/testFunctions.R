@@ -75,7 +75,7 @@ wald <- function(arfmodel,waldobject) {
 		.wald.stats(waldobject) <- matrix(0,.model.regions(arfmodel),4)
 		.wald.pvalues(waldobject) <- matrix(0,.model.regions(arfmodel),4)
 		.wald.df1(waldobject) <- rep(n,4)
-		.wald.df2(waldobject) <- c(1,1,3,1)
+		.wald.df2(waldobject) <- .wald.df1(waldobject)-rep(.model.regions(arfmodel)*6,4)
 		
 		#perform hypothesis tests for each region and for locations, extent and amplitude
 		for(region in 1:.model.regions(arfmodel)) {

@@ -12,9 +12,7 @@ getFileInfo(filename)
 \arguments{
   \item{filename}{ Name of the file to be checked.}
 }
-\details{
-  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
  Returns an S4 object of class \code{\linkS4class{nifti.header}}
 }
@@ -22,9 +20,6 @@ getFileInfo(filename)
 \author{ Wouter D. Weeda }
 
 
-\examples{
-
-}
 
 \keyword{ methods }
 

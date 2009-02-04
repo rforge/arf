@@ -2,7 +2,6 @@
 \docType{class}
 \alias{analysis-class}
 
-
 \title{Class "analysis" ~~~ }
 \description{The analysis class contains the designmatrix to test hypotheses between conditions and/or subjects using the objects defined in the modelobjects slot.}
 \section{Objects from the Class}{
@@ -27,9 +26,6 @@ Objects can be created by calls of the form \code{new("analysis", ...)}.
 \author{ Wouter D. Weeda }
 \note{ THIS CLASS IS NOT YET USED IN THE ARF PROCEDURE!}
 
- 
-\examples{
 
-}
 
 \keyword{classes}

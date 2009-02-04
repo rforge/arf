@@ -12,20 +12,15 @@ readData(filename)
 \arguments{
   \item{filename}{ Name of the file to open, can be .nii, .hdr, .img }
 }
-\details{
-  
-}
+
 \value{
  readData returns and S4 object of class \code{"\linkS4class{fmri.data}"}
 }
-\references{  }
-\author{ Wouter D. Weeda }
-\note{ }
-\seealso{ \code{"\linkS4class{fmri.data}"} }
-\examples{
 
- 
-}
+\author{ Wouter D. Weeda }
+
+\seealso{ \code{"\linkS4class{fmri.data}"} }
+
 
 \keyword{ methods }
 

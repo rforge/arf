@@ -3,7 +3,7 @@
 \alias{nifti.fileinfo-class}
 
 
-\title{Class "nifti.fileinfo" ~~~ }
+\title{Class "nifti.fileinfo" }
 \description{	 nifti.fileinof contains information necessary to open NIFTI/ANALYZE files.}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("nifti.fileinfo", ...)}.
@@ -25,12 +25,9 @@ Objects can be created by calls of the form \code{new("nifti.fileinfo", ...)}.
 
 	 }
 }
-\references{  }
+
 \author{ Wouter D. Weeda }
-\note{ }
 
 \seealso{ \code{"\linkS4class{nifti.fileinfo}"} }
-\examples{
 
-}
 \keyword{classes}

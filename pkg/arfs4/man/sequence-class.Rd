@@ -3,7 +3,7 @@
 \alias{sequence-class}
 
 
-\title{Class "sequence" ~~~ }
+\title{Class "sequence" }
 \description{	A sequence class contains information on the models in the sequence (number of regions, fit information, validness) and on which model in the sequence has the best fit.}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("sequence", ...)}.
@@ -25,12 +25,7 @@ Objects can be created by calls of the form \code{new("sequence", ...)}.
 
 	 }
 }
-\references{ }
+
 \author{ Wouter D. Weeda }
-\note{  }
 
-\seealso{ }
-\examples{
-
-}
 \keyword{classes}

@@ -3,7 +3,7 @@
 \alias{wald-class}
 
 
-\title{Class "wald" ~~~ }
+\title{Class "wald"}
 \description{ The Wald class contains information on the wald statistics and the designmatrix used.}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("wald", ...)}.
@@ -24,12 +24,7 @@ Objects can be created by calls of the form \code{new("wald", ...)}.
 
 	 }
 }
-\references{  }
+
 \author{ Wouter D. Weeda }
-\note{  }
 
-\seealso{ }
-\examples{
-
-}
 \keyword{classes}

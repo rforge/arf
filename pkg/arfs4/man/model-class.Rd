@@ -2,11 +2,11 @@
 \docType{class}
 \alias{model-class}
 
-\title{Class "model" ~~~ }
+\title{Class "model"}
 \description{The 'model' class contains all model information (plus information from the data class slots), convergence, fit, estimates, variances, statistics, etc. }
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("model", ...)}.
-	 ~~ describe objects here ~~ 
+
 }
 \section{Slots}{
 	 \describe{
@@ -44,10 +44,6 @@ Class \code{"\linkS4class{data}"}, directly.
 }
 
 \author{ Wouter D. Weeda }
- 
-\examples{
-
-}
 
 \keyword{classes}
 

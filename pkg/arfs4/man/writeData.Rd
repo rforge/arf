@@ -19,12 +19,8 @@ writeData(headinf, datavec)
 \value{
   returns TRUE if succeeded.
 }
-\references{  }
-\author{ Wouter D. Weeda }
-\note{ }
-\seealso{  }
-\examples{
-
 }
+\author{ Wouter D. Weeda }
+
 
 \keyword{methods}

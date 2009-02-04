@@ -23,8 +23,5 @@ makeDirStruct(rootdir = "", studyname = "undefined_experiment", numsubs = 1, sub
 }
 \author{ Wouter D. Weeda}
 
-\examples{
-
-}
 
 \keyword{ methods }

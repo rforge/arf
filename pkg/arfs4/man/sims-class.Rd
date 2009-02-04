@@ -3,11 +3,11 @@
 \alias{sims-class}
 
 
-\title{Class "sims" ~~~ }
+\title{Class "sims" }
 \description{	a 'sims' object contains information to perform simulations with ARF.}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("sims", ...)}.
-	 ~~ describe objects here ~~ 
+
 }
 \section{Slots}{
 	 \describe{
@@ -28,13 +28,7 @@ Objects can be created by calls of the form \code{new("sims", ...)}.
 
 	 }
 }
-\references{  }
+
 \author{ Wouter D. Weeda }
-\note{ }
 
- \seealso{ }
-	
-\examples{
-
-}
 \keyword{classes}

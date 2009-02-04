@@ -3,7 +3,7 @@
 \alias{settings-class}
 
 
-\title{Class "settings" ~~~ }
+\title{Class "settings"}
 \description{	Settings contains global information used by ARF (especially about starting value calculation and range checks).}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("settings", ...)}.
@@ -27,14 +27,8 @@ Objects can be created by calls of the form \code{new("settings", ...)}.
 
 	 }
 }
-\references{  }
+
 \author{ Wouter D. Weeda }
 \note{ A new 'settings' object is made in the call to \code{\link{arf}} if it does not already exist in .GlobalEnv }
 
-\seealso{
-
-}
-\examples{
-
-}
 \keyword{classes}

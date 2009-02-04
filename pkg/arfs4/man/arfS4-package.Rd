@@ -13,8 +13,8 @@ Activated Region Fitting (ARF) analyzes images of fMRI activation by fitting mul
 \tabular{ll}{
 Package: \tab arfS4\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2009-01-27\cr
+Version: \tab 1.2-2\cr
+Date: \tab 2009-02-03\cr
 License: \tab GPL\cr
 LazyLoad: \tab yes\cr
 Depends: \tab methods\cr

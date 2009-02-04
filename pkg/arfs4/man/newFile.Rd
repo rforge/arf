@@ -16,15 +16,8 @@ newFile(filename, templateHDR)
 \value{
  newFile returns an S4 object of class \code{\link{nifti.header-class}}
 }
-\references{  }
+
 \author{ Wouter D. Weeda }
-\note{ }
-\seealso{  }
-\examples{
-
- 
-
-}
 
 \keyword{ methods }
 

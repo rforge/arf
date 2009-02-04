@@ -18,13 +18,11 @@ readHeader(fileinf)
 \value{
   readHeader returns an S4 object of class 'nifti.header'
 }
-\references{  }
+
 \author{ Wouter D. Weeda }
-\note{ }
+ }
 \seealso{ \code{"\linkS4class{nifti.fileinfo}"}}
-\examples{
-  
-}
+
 
 \keyword{ methods }
 

@@ -73,13 +73,13 @@ meanResidualFile <- function(arfmodel) {
 		curwd=getwd()
 		setwd(paste(.model.fullpath(arfmodel),'/stats',sep=''))
 		invisible(.C('newResidualFile',as.integer(n)))
-		invisible(.C('meanResidualFile',as.integer(n),as.double(.model.trials(arfmodel)),as.double(data-model)))
+		invisible(.C('addResidualFile',as.integer(n),as.double(.model.trials(arfmodel)),as.double(data-model)))
 		file.copy('trialresiduals.arf','residuals.arf',over=T)
 		
 		#calculate resids for all trials
 		for(i in 2:.model.trials(arfmodel)) {
 			data <- .fmri.data.datavec(readData(.model.datafiles(arfmodel)[i]))[1:(dimx*dimy)]
-			invisible(.C('meanResidualFile',as.integer(n),as.double(.model.trials(arfmodel)),as.double(data-model)))
+			invisible(.C('addResidualFile',as.integer(n),as.double(.model.trials(arfmodel)),as.double(data-model)))
 			file.copy('trialresiduals.arf','residuals.arf',over=T)
 		}
 		file.remove('residuals.arf')
@@ -253,7 +253,7 @@ sandwichFile <- function(arfmodel) {
 		
 		#calculate the sandwich estimator (using the Hessian returned by nlm)
 		SW <- try(solve(.5*.model.hessian(arfmodel))%*%B%*%solve(.5*.model.hessian(arfmodel)),silen=T)
-		
+				
 		#check if alll went well and add to the arfmodel object
 		if(is.null(attr(SW,'class'))) {
 			.model.varcov(arfmodel) <- SW
@@ -348,7 +348,7 @@ sandwichDiagonal <- function(arfmodel) {
 				
 		#calculate the sandwich estimator (using the Hessian returned by nlm)
 		SW <- try(solve(.5*.model.hessian(arfmodel))%*%B%*%solve(.5*.model.hessian(arfmodel)),silen=T)
-						
+		
 		#check if alll went well and add to the arfmodel object
 		if(is.null(attr(SW,'class'))) {
 			.model.varcov(arfmodel) <- SW
