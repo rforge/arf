@@ -1,0 +1,29 @@
+export(
+	makeExp,
+	makeExpDirs,
+	readData,
+	writeData,
+	newModel,
+	fitModel,
+	loadRda,
+	loadExp
+)
+
+exportClasses(
+	experiment,
+	fmri.data,
+	data,
+	model,
+	sequence,
+	wald,
+	options
+)
+
+import(
+	methods,
+	graphics
+)
+
+
+
+useDynLib(arf3DS4,gauss,ssqgauss,innerSW,innerSWdiag,dfgaussFile,dftheta0,dftheta1,dftheta2,dftheta3,dftheta4,dftheta5,dftheta6,dftheta7,dftheta8,dftheta9,gaussFix,ssqgaussFix)

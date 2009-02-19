@@ -1,0 +1,105 @@
+#############################################
+# arf3DS4 S4 MODEL FUNCTIONS  	     		#
+# Copyright(c) 2009 Wouter D. Weeda			#
+# University of Amsterdam					#
+#############################################
+
+#newModel makes a modeldirectory based on data and experiment information and a modelname
+newModel <- function(arfdata,experiment,modelname,options=new('options'),overwrite=T) 
+{
+	#set separator
+	sp <- .Platform$file.sep
+	
+	#checks
+	if(!class(arfdata)=='data') stop('Input must be of class \'data\'')
+	if(modelname=='') stop('Modelname cannot be empty')
+		
+	#make new modelobject
+	model <- new('model',arfdata)
+	
+	#set modelname
+	.model.modelname(model) <- modelname 
+			
+	#path to modeldir
+	path <- paste(.data.fullpath(arfdata),sp,.experiment.modelDir(experiment),sp,modelname,sep='')
+	
+	if(file.exists(path) & overwrite==F) stop('Model directory already exists')
+	
+	dir.create(path,show=F)
+	.model.modelpath(model) <- path
+	
+	#path to modeldatadir
+	dir.create(paste(path,sp,.experiment.modeldatDir(experiment),sep=''),show=F)
+	.model.modeldatapath(model) <- paste(path,sp,.experiment.modeldatDir(experiment),sep='')
+	
+	#set filenames
+	.model.residualFile(model) <- .experiment.residualFile(experiment)
+	.model.derivativeFile(model) <- .experiment.derivativeFile(experiment)
+	.model.weightFile(model) <- .experiment.weightFile(experiment)
+	.model.modelFile(model) <- .experiment.modelRda(experiment)
+	.model.optionsFile(model) <- .experiment.optionsRda(experiment)
+	.model.modelDataFile(model) <- .experiment.modelDataFile(experiment)
+	.model.startFile(model) <- .experiment.startRda(experiment)
+	
+	#save model and options File and startvec
+	save(model,file=paste(path,sp,.model.modelFile(model),sep=''))
+	save(options,file=paste(path,sp,.model.optionsFile(model),sep=''))
+	startvec <- .options.start.vector(options)
+	save(startvec,file=paste(path,sp,.model.startFile(model),sep=''))
+	
+	
+	#updateModelNames in on dir up
+	updateModelNames(paste(sub(.model.modelname(model),'',.model.modelpath(model)),sp,.experiment.modelnamesRda(experiment),sep=''))
+		
+	return(invisible(model))
+}
+
+#update ModelNames in a ModelNamesFile
+updateModelNames <- function(filename) {
+	
+	#set separator
+	sp <- .Platform$file.
+	
+	#remove filename from to create path
+	mn <- strsplit(filename,sp)[[1]]
+	mn <- mn[length(mn)]
+	path <- sub(mn,'',filename)
+
+	#list all dirs in path (minus the modelnames file)
+	existingfiles <- list.files(path,full=F)
+	existingfiles <- existingfiles[-grep(mn,existingfiles)]
+
+	#save modelnames
+	save(existingfiles,file=filename)	
+	
+}
+
+#save the model to the model.Rda
+saveModel <- function(arfmodel) save(arfmodel,file=paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.modelFile(arfmodel),sep=''))
+
+#save the modelBinary
+saveModelBin <- function(arfmodel) {
+	
+	#set separator
+	sp <- .Platform$file.sep
+	
+	#get Header info from avgdatfile
+	headinf <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))
+	
+	#set fullpaths
+	.nifti.header.fullpath(headinf) <- .model.modeldatapath(arfmodel)
+	.nifti.header.filename(headinf) <- .model.modelDataFile(arfmodel)
+	.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
+	
+	#write the Data to the modelNiftiFile
+	writeData(headinf,.C('gauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*10),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
+	
+	return(arfmodel)
+	
+}
+
+#loadOptions loads the options object
+loadOptions <- function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.optionsFile(arfmodel),sep='')))
+
+#loadOptions loads the options object
+loadStart <- function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.startFile(arfmodel),sep='')))
