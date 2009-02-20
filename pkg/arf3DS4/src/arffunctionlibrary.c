@@ -378,6 +378,7 @@ void dfgaussFile(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, cha
 	grad = (double *) R_alloc((n),sizeof(double));
 	theta = (double *) R_alloc((10),sizeof(double));
 
+
 	FILE *f;
 	f=fopen(*filename,"w");
 

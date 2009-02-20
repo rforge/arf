@@ -35,6 +35,17 @@ loadRda <- function(file)
 	return(object)
 }
 
+#with global environment variable loaded, load Data
+loadData <- function(subject,condition,exp=.experiment)
+{
+	
+	sp <- .Platform$file.sep
+	
+	#set filename based on subject and condition
+	filename <- paste(.experiment.path(exp),sp,.experiment.subjectDir(exp),sp,.experiment.subjectPrefix(exp),subject,sp,.experiment.conditionDir(exp),sp,.experiment.conditionPrefix(exp),condition,sp,.experiment.dataDir(exp),sp,.experiment.dataRda(exp),sep='')
+	
+	return(invisible(loadRda(filename)))
+}
 
 #setDataObjects fills the DataObject within each subject/condition directory location of beta's weight's and averages.
 setAllObjects <- function(experiment,overwrite=F)

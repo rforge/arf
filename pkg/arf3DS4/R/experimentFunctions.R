@@ -236,12 +236,17 @@ makeExp <- function(path=getwd(),settings=new('settings'),tempsub=1,tempcond=1)
 loadExp <- function(filename)
 {
 	#load experiment
-	experiment <- loadRda(filename)
+	.experiment <- experiment <- loadRda(filename)
 	
 	#remove filename to obtain root-path
 	fn <- strsplit(filename,.Platform$file.sep)[[1]]
 	path <- sub(fn[length(fn)],'',filename)
+	path <- path.expand(path)
 	
+	save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))
+	load(paste(path,.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
+	file.remove(paste(path,.Platform$file.sep,'temp.Rda',sep=''))
+		
 	#change root for the experiment-file to the current root
 	experiment <- chngRootExp(path,quiet=T)
 	
@@ -250,6 +255,7 @@ loadExp <- function(filename)
 
 	#return loaded info 
 	if(allIsWell) cat('Loaded experiment',.experiment.name(experiment),'\n') else cat('Loaded experiment',.experiment.name(experiment),'with warnings!\n')
+		
 	return(invisible(experiment))
 		
 }

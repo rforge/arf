@@ -116,7 +116,7 @@ setClass(
 		start.vector=c(0,0,0,0,0,0,.1,.1,.1,100),
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,0,0,-.9,-.9,-.9,-1e+64,0,0,0,0,0,0,.9,.9,.9,1e+64),
-		sw.type='full'
+		sw.type='diag'
 	)
 )
 

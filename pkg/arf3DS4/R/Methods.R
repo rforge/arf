@@ -4,20 +4,29 @@
 # University of Amsterdam					#
 #############################################
 
+#setGenerics for functions
+setGeneric('plot')
+setGeneric('summary')
+
+
 setMethod('show','experiment',
 		function(object) {
-			cat('Name:      ',object@name,'\n')
-			cat('Path:      ',object@path,'\n')
-			cat('Subjects:  ',object@subject.num,'\n')
-			for(subs in object@subject.names) cat('  -',subs,'\n')
-			cat('Conditions:',object@condition.num,'\n')
-			for(conds in object@condition.names) cat('  -',conds,'\n')
+			
+			cat('** arf experiment **\n')
+			cat('name:      ',toupper(object@name),'\n',sep='')
+			cat('path:      ',object@path,'\n',sep='')
+			cat('subjects[',object@subject.num,']\n',sep='')
+			for(subs in object@subject.names) cat('  - ',subs,'\n',sep='')
+			cat('conditions[',object@condition.num,']\n',sep='')
+			for(conds in object@condition.names) cat('  - ',conds,'\n',sep='')
 			cat('\n')
 
 		}
 )
 
-setGeneric('plot')
+
+
+
 setMethod('plot',signature(x='fmri.data',y='missing'),
 	function(x,y,mrs=F) {
 		
@@ -37,7 +46,7 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 				
 	}		
 )
-setGeneric('summary')
+
 setMethod('summary','fmri.data',
 	function(object) {
 		cat(object@descrip,'\n')
@@ -46,3 +55,18 @@ setMethod('summary','fmri.data',
 		
 		
 )
+setMethod('show','data',
+		function(object) {
+			cat('** arf data **\n')
+			cat('name:          ',toupper(object@name),'\n')
+			cat('path:          ',object@fullpath,'\n')
+			cat('betafiles:     ',length(object@betafiles),'\n')
+			cat('weightfiles:   ',length(object@betafiles),'\n')
+			cat('avgbetafile:   ')
+			if(!file.exists(object@avgdatfile)) cat('not available\n') else cat('exists\n')
+			cat('avgweightfile: ')
+			if(!file.exists(object@avgWfile)) cat('not available\n') else cat('exists\n')
+			
+		}
+)
+
