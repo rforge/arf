@@ -75,6 +75,7 @@ void ssqgauss(double *theta, double *dat, double *W, int *np, int *dimx, int *di
 	//theta 10    = amplitude
 
 	p=0;
+	g=0e0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
@@ -966,6 +967,7 @@ void ssqgaussFix(double *theta, double *fixed, double *dat, double *W, int *np, 
 	//theta 10    = amplitude
 
 	p=0;
+	g=0e0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
