@@ -24,9 +24,6 @@ setMethod('show','experiment',
 		}
 )
 
-
-
-
 setMethod('plot',signature(x='fmri.data',y='missing'),
 	function(x,y,mrs=F) {
 		
@@ -63,9 +60,9 @@ setMethod('show','data',
 			cat('betafiles:     ',length(object@betafiles),'\n')
 			cat('weightfiles:   ',length(object@betafiles),'\n')
 			cat('avgbetafile:   ')
-			if(!file.exists(object@avgdatfile)) cat('not available\n') else cat('exists\n')
+			if(length(object@avgdatfile)>0)	if(!file.exists(object@avgdatfile)) cat('not available\n') else cat('exists\n')
 			cat('avgweightfile: ')
-			if(!file.exists(object@avgWfile)) cat('not available\n') else cat('exists\n')
+			if(length(object@avgWfile)>0) if(!file.exists(object@avgWfile)) cat('not available\n') else cat('exists\n')
 			
 		}
 )

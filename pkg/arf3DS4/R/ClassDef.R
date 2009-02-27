@@ -236,7 +236,7 @@ setClass(
 		magic = 'n+1',					#magicstring
 		data.type = 'double',			#type of data
 		data.signed = TRUE				#signed data
-	)	
+	)
 )
 
 ## fmri data class (inherits nifti.header)

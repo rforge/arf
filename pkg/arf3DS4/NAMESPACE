@@ -6,7 +6,10 @@ export(
 	newModel,
 	fitModel,
 	loadRda,
-	loadExp
+	loadExp,
+	blobMe,
+	simBlobs3D,
+	arfSim
 )
 
 exportClasses(
