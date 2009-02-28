@@ -111,7 +111,7 @@ blobMe <- function(dir,name,sims=10,regions=1,theta=c(9,9,9,2,3,2,.1,.2,.2,100),
 	loadExp(paste(path,sp,.experiment.expRda(experiment),sep=''))	
 }
 
-arfSim <- function(expfile,condpath,cnvec,regions=1,swmode='diag') {
+arfSim <- function(expfile,condpath,cnvec,regions=1,swmode='diag',waldcalc=F) {
 	
 	exp <- loadExp(expfile)
 	
@@ -132,7 +132,7 @@ arfSim <- function(expfile,condpath,cnvec,regions=1,swmode='diag') {
 		.model.sandwichmethod(arfmodel) <- swmode
 		
 		arfmodel <- varcov(arfmodel)
-		arfmodel <- wald(arfmodel)
+		if(waldcalc) arfmodel <- wald(arfmodel)
 		
 		saveModel(arfmodel)
 	}

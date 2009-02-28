@@ -190,7 +190,7 @@ void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char *
 
 			Bm[Brow][Bcol]=s;
 			Bm[Bcol][Brow]=s;
-			Rprintf("Done %d %d\n",Brow,Bcol);
+			//Rprintf("Done %d %d\n",Brow,Bcol);
 
 		}
 
@@ -234,7 +234,7 @@ void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char *
 		}
 
 		Bm[Brow][Brow]=s;
-		Rprintf("Done %d %d\n",Brow,Brow);
+		//Rprintf("Done %d %d\n",Brow,Brow);
 	}
 
 

@@ -193,7 +193,7 @@ wald <- function(arfmodel,waldobject=new('wald')) {
 	
 	#define function to calculate Wald statistic 
 	W <- function(a,A,C) t(a)%*%solve(A%*%C%*%t(A))%*%a
-	
+		
 	if(.model.valid(arfmodel)) {
 		
 		#if no design matrix is specified in the waldobject, make the default matrix (zero-filled) 
