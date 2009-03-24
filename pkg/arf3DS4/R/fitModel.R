@@ -62,11 +62,11 @@ fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.
 		arfmodel <- saveModelBin(arfmodel)
 				
 	} else {
-		.model.convergence(arfmodel) <- 'Internal error, no convergence. No ModelBin is saved.'
+		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
 		.model.valid(arfmodel) <- FALSE	
 	}
 	
-	if(!.model.valid(arfmodel)) .model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),.model.convergence(arfmodel),'\n',sep='') 
+	if(!.model.valid(arfmodel)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),.model.convergence(arfmodel)) 
 	
 	#save the modelInfo
 	saveModel(arfmodel)
@@ -186,11 +186,12 @@ fallOff <- function(vec,fwhm=2)
 	maxdim <- length(vec)
 	mindim <- 1
 	
+		
 	#check falloff to the right
 	i=0
 	while(vec[m+i]>falloffval) {
 		i=i+1;		
-		if((m+i)==maxdim) break()
+		if((m+i)>=maxdim) break()
 	}
 	if(i>1) i=i-1
 	
@@ -198,7 +199,7 @@ fallOff <- function(vec,fwhm=2)
 	j=0
 	while(vec[m-j]>falloffval) {
 		j=j+1;		
-		if((m-j)==mindim) break()
+		if((m-j)<=mindim) break()
 	}
 	if(j>1) j=j-1
 	

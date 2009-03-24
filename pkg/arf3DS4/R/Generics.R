@@ -724,6 +724,17 @@ standGen <- function(x, value) standardGeneric('.options.sw.type<-')
 standMethod <- function(x, value) {x@sw.type<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
+classname <-'options'
+funcname <-'.options.output.mode'
+standGen <- function(object) standardGeneric('.options.output.mode')
+standMethod <- function(object) object@output.mode
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.options.output.mode<-'
+standGen <- function(x, value) standardGeneric('.options.output.mode<-')
+standMethod <- function(x, value) {x@output.mode<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
 classname <-'nifti.fileinfo'
 funcname <-'.nifti.fileinfo.fullpath'
 standGen <- function(object) standardGeneric('.nifti.fileinfo.fullpath')

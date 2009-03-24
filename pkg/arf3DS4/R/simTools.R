@@ -123,7 +123,11 @@ arfSim <- function(expfile,condpath,cnvec,regions=1,swmode='diag',waldcalc=F) {
 		arfmodel <- newModel(arfdata,exp,paste('sim_',regions,'_region',sep=''))
 		.model.regions(arfmodel) <- regions
 		
-		arfmodel <- determineStartRect(arfmodel)
+		options=loadOptions(arfmodel)
+		
+		.options.start.maxfac(options)=3
+		
+		arfmodel <- determineStartRect(arfmodel,options=options)
 		arfmodel <- fitModel(arfmodel)
 		arfmodel <- BIC(arfmodel)
 		makeDerivs(arfmodel)

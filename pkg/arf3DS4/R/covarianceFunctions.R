@@ -88,15 +88,15 @@ varcov <- function(arfmodel)
 					.model.varcov(arfmodel) <- SW
 					.model.valid(arfmodel) <- TRUE
 				} else { #outersandiwch not good
-					.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'outerSandwich did not compute\n',sep='') 
+					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'outerSandwich did not compute.') 
 					.model.valid(arfmodel) <- FALSE
 				}
 			} else { #innersandiwch not good
-				.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'innerSandwich did not compute\n',sep='') 
+				.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'innerSandwich did not compute.') 
 				.model.valid(arfmodel) <- FALSE
 			}
 		} else { #hessian not good
-			.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'determinant of Hessian is zero!\n',sep='') 
+			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Hessian is singular.') 
 			.model.valid(arfmodel) <- FALSE
 		}
 	
@@ -104,7 +104,7 @@ varcov <- function(arfmodel)
 		.model.proctime(arfmodel)[1,2] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		
 	} else { #model not valid
-		.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'No valid model. var/cov not calculated\n',sep='')
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'No valid model. var/cov not calculated')
 		.model.valid(arfmodel) <- FALSE
 	}
 	
@@ -140,11 +140,11 @@ BIC <- function(arfmodel) {
 				cons <- try((2*(((n/2)*log(2*pi))+((1/2)*log(dtm))+((1/2)*(.model.minimum(arfmodel))))),silen=T) 
 				
 			} else { #logs not valid
-				.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'Error calculating logs. BIC not calculated\n',sep='')
+				.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Error calculating logs. BIC not calculated')
 				.model.valid(arfmodel) <- FALSE
 			}
 		} else { #determinant of W is not valid
-			.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'Invalid determinant. BIC not calculated\n',sep='')
+			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Invalid determinant. BIC not calculated')
 			.model.valid(arfmodel) <- FALSE
 		} 
 		
@@ -152,12 +152,12 @@ BIC <- function(arfmodel) {
 		if(is.numeric(cons)) {
 			.model.fit(arfmodel) <- cons + (log(.model.minimum(arfmodel))) + (((.model.regions(arfmodel)*10))*log(n))
 		} else { #constant is not a number
-			.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'Constant invalid. BIC not calculated\n',sep='')
+			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Constant invalid. BIC not calculated')
 			.model.valid(arfmodel) <- FALSE
 		} 
 		
 	} else	{
-		.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'No valid model. BIC not calculated\n',sep='')
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'No valid model. BIC not calculated')
 		.model.valid(arfmodel) <- FALSE
 	}
 	

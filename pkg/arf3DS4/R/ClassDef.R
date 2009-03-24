@@ -107,7 +107,10 @@ setClass(
 		start.vector='numeric',		#vector containing startingvalues (if !start.method=='fixed' only t5 and t6 are used) vector is recycled for regions.
 		chk.method='character',		#which method is used to check the range of parameter values
 		chk.range='numeric',		#vector containing ranges for each parameter (vector is recycled for regions)		
-		sw.type='character'			#method to use with Residuals ('diag','full')
+		sw.type='character',			#method to use with Residuals ('diag','full')
+		output.mode='character'
+
+
 	),
 	prototype=prototype(
 		min.iterlim=1500,
@@ -116,7 +119,8 @@ setClass(
 		start.vector=c(0,0,0,0,0,0,.1,.1,.1,100),
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,0,0,-.9,-.9,-.9,-1e+64,0,0,0,0,0,0,.9,.9,.9,1e+64),
-		sw.type='diag'
+		sw.type='diag',
+		output.mode=c('log','screen')
 	)
 )
 
