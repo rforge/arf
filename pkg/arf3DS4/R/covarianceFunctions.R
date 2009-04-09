@@ -60,8 +60,11 @@ varcov <- function(arfmodel)
 	
 		st_time <- Sys.time()
 		
+		dethess <- det(.model.hessian(arfmodel))
+		if(is.na(dethess)) dethess <- 0
+						
 		#check if hessian is good
-		if(det(.model.hessian(arfmodel))!=0) {
+		if(dethess !=0) {
 			
 			#read in the average weights data
 			weights <- readData(.model.avgWfile(arfmodel))
