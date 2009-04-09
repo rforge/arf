@@ -135,6 +135,9 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 	dimz <- .fmri.data.dims(fmridata)[4]
 	data <- .fmri.data.datavec(fmridata)[1:(dimx*dimy*dimz)]
 	rm(fmridata)
+
+	mindim=c(1,1,1)
+	maxdim=c(dimx,dimy,dimz)
 	
 	#set dims of the data
 	dim(data) <- c(dimx,dimy,dimz)
@@ -151,8 +154,7 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 		theta[1+(10*(reg-1))] <- m$x
 		theta[2+(10*(reg-1))] <- m$y
 		theta[3+(10*(reg-1))] <- m$z
-		
-		
+			
 		#caluclatefalloff
 		xf <- fallOff(data[,m$y,m$z],.options.start.maxfac(options))
 		yf <- fallOff(data[m$x,,m$z],.options.start.maxfac(options))
@@ -164,7 +166,19 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 		theta[6+(10*(reg-1))] <- round(mean(zf))
 		
 		#zero tha data
-		data[(m$x-xf[1]):(m$x+xf[2]),(m$y-yf[1]):(m$y+yf[2]),(m$z-zf[1]):(m$z+zf[2])]=(min(data)/2)
+		xvec <- (m$x-xf[1]):(m$x+xf[2])
+		yvec <- (m$y-yf[1]):(m$y+yf[2])
+		zvec <- (m$z-zf[1]):(m$z+zf[2])
+		
+		rmx <- which(xvec<mindim[1] | xvec>maxdim[1])
+		rmy <- which(yvec<mindim[2] | yvec>maxdim[2])
+		rmz <- which(zvec<mindim[3] | zvec>maxdim[3])
+	
+		if(length(rmx)>0 & length(rmx)<length(xvec)) xvec <- xvec[-rmx]
+		if(length(rmy)>0 & length(rmy)<length(yvec)) yvec <- yvec[-rmy]
+		if(length(rmz)>0 & length(rmz)<length(zvec)) zvec <- zvec[-rmz]	
+		
+		data[xvec,yvec,zvec]=(min(data)/2)
 	
 	}
 	
@@ -186,7 +200,6 @@ fallOff <- function(vec,fwhm=2)
 	maxdim <- length(vec)
 	mindim <- 1
 	
-		
 	#check falloff to the right
 	i=0
 	while(vec[m+i]>falloffval) {

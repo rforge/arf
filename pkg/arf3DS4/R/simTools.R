@@ -111,11 +111,10 @@ blobMe <- function(dir,name,sims=10,regions=1,theta=c(9,9,9,2,3,2,.1,.2,.2,100),
 	loadExp(paste(path,sp,.experiment.expRda(experiment),sep=''))	
 }
 
-arfSim <- function(expfile,condpath,cnvec,regions=1,swmode='diag',waldcalc=F) {
-	
-	exp <- loadExp(expfile)
-	
+arfSim <- function(exp,condpath,cnvec,regions=1,swmode='diag',waldcalc=F) {
+			
 	for(i in cnvec) {
+		cat('Processing condition-sim',i,'...')
 		fn <- paste(condpath,i,'/data/data.Rda',sep='')
 		arfdata <- loadRda(fn)
 		
@@ -139,6 +138,7 @@ arfSim <- function(expfile,condpath,cnvec,regions=1,swmode='diag',waldcalc=F) {
 		if(waldcalc) arfmodel <- wald(arfmodel)
 		
 		saveModel(arfmodel)
+		cat('ok\n')
 	}
 
 }
