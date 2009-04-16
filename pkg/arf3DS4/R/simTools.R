@@ -74,7 +74,7 @@ simBlobs3D <- function(betadir,weightdir,templatedata,model='gauss',regions=1,th
 	
 }
 
-blobMe <- function(dir,name,sims=10,regions=1,theta=c(9,9,9,2,3,2,.1,.2,.2,100),snr=10,trials=10) 
+blobMe <- function(dir,name,sims=10,regions=1,theta=c(9,9,9,2,3,2,.1,.2,.2,100),snr=10,trials=10,connectivity=F) 
 {
 
 	sp <- .Platform$file.sep
@@ -103,7 +103,8 @@ blobMe <- function(dir,name,sims=10,regions=1,theta=c(9,9,9,2,3,2,.1,.2,.2,100),
 			bdir <- paste(dn,sp,.settings.betaDir(settings),sep='')
 			wdir <- paste(dn,sp,.settings.weightsDir(settings),sep='')
 			
-			simBlobs3D(bdir,wdir,tempdata,model='gauss',regions=regions,theta=theta,snr=snr,noisesmooth=0,trials=trials,tslen=101)
+			if(connectivity)  simBlobsST(bdir,wdir,tempdata,model='gauss',regions=3,snr=snr,noisesmooth=0,trials=50,tslen=101)
+				else simBlobs3D(bdir,wdir,tempdata,model='gauss',regions=regions,theta=theta,snr=snr,noisesmooth=0,trials=trials,tslen=101)
 			
 		}
 	}
@@ -143,4 +144,99 @@ arfSim <- function(exp,condpath,cnvec,regions=1,swmode='diag',waldcalc=F) {
 
 }
 
+simBlobsST <- function(betadir,weightdir,templatedata,model='gauss',regions=3,theta=c(12,12,24,3,4,3,.1,.1,.3,100,32,32,6,2,2,5,.1,.2,.2,100,12,56,12,5,4,2,.4,.1,.2,100),snr=5,noisesmooth=0,trials=50,tslen=101) {
+	
+	require(MASS)
+	
+	.nifti.header.dims(templatedata)[5:7] <- 1
+	.nifti.header.dims(templatedata)[1] <- 3
+	
+	.nifti.header.dims(templatedata)[2] <- 64
+	.nifti.header.dims(templatedata)[3] <- 64
+	.nifti.header.dims(templatedata)[4] <- 32
+	
+	dimx <- .nifti.header.dims(templatedata)[2]
+	dimy <- .nifti.header.dims(templatedata)[3]
+	dimz <- .nifti.header.dims(templatedata)[4]
+	
+	n <- dimx*dimy*dimz
+	
+
+	#for connectivity
+	Sigma=matrix(c(33^2,24^2,0,24^2,33^2,0,0,0,33^2),3)
+	
+	thetamean=mvrnorm(n=50,mu=c(100,100,100),Sigma=Sigma)
+	
+	realamp=cbind(thetamean)
+	
+	print(cov(thetamean))
+	print(cor(thetamean))
+	
+	cat('Average SNR:',snr,'\n')
+	snr=snr/sqrt(trials)
+	cat('Single trial SNR:',snr,'\n')
+	
+	
+	for(trial in 1:trials) {
+		
+		#for connectivity
+		theta[10]=thetamean[trial,1]
+		theta[20]=thetamean[trial,2]
+		theta[30]=thetamean[trial,3]
+		
+		#make the model
+		newdata <- .C('gauss',as.double(theta),as.integer(regions*10),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(numeric(n)))[[6]]
+		maxbeta <- max(newdata)
+		
+		#fill matrices (recylce model for each timepoint)
+		datamat <- matrix(newdata,n,tslen,byrow=F)
+		errormat <- matrix(rnorm(tslen*n,0,maxbeta/snr)*sqrt(tslen),n,tslen)
+		
+		#make signal
+		signalmat=datamat+errormat
+		
+		#create vectors
+		signal <- apply(signalmat,1,mean)
+		weights <- apply(signalmat,1,sd)
+		
+		pathname <- betadir
+		.nifti.header.fullpath(templatedata) <- pathname
+		.nifti.header.filename(templatedata) <- paste('data',trial,sep='')
+		
+		if(.nifti.header.extension(templatedata)=='hdr') extension='img' else extension <- .nifti.header.extension(templatedata)
+		
+		#open files based on gzippedness 
+		if(.nifti.header.gzipped(templatedata)==TRUE) {
+			fn <- paste(pathname,.Platform$file.sep,'data',trial,'.',extension,'.gz',sep='')
+			#file.create(fn)
+		} else {
+			fn <-paste(pathname,.Platform$file.sep,'data',trial,'.',extension,sep='')
+			#file.create(fn)
+		}		
+		
+		writeData(templatedata,signal)
+		
+		pathname <- weightdir		
+		.nifti.header.fullpath(templatedata) <- pathname
+		.nifti.header.filename(templatedata) <- paste('data',trial,sep='')
+		
+		#open files based on gzippedness 
+		if(.nifti.header.gzipped(templatedata)==TRUE) {
+			fn <- paste(pathname,.Platform$file.sep,'data',trial,'.',extension,'.gz',sep='')
+			#file.create(fn)
+		} else {
+			fn <-paste(pathname,.Platform$file.sep,'data',trial,'.',extension,sep='')
+			#file.create(fn)
+		}		
+		
+		writeData(templatedata,weights)
+		cat('writing',fn,'\n')
+		
+		
+		
+	}
+	cat('\n\n\n')
+	#return(list(means=thetamean,cor=cor(thetamean),cov=cov(thetamean)))
+	return(signal)
+}
 
