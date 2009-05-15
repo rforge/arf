@@ -191,10 +191,13 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 #calculates mean falloff of a vector
 fallOff <- function(vec,fwhm=2) 
 {
+	#smooth vec with fwhm filter
+	vec <- fwhm.filter(vec,fwhm)
+	
 	#determine max of vector and falloff amount
 	m <- which.max(vec)
 	maxval <- max(vec)
-	falloffval <- maxval/fwhm
+	falloffval <- maxval/2
 	
 	#set min and max-dim elements
 	maxdim <- length(vec)
@@ -218,4 +221,18 @@ fallOff <- function(vec,fwhm=2)
 	
 	#return left and right values
 	return(c(j,i))
+}
+
+
+fwhm.filter <- function(vec,fwhm) {
+	
+	len=length(vec)
+	fl=50
+	filt=dnorm(1:100,mean=50,sd=fwhm)
+	
+	fdat <- convolve(vec,filt,type='open')
+	vec <- fdat[-c(1:(fl-1),(length(fdat)-(fl-1)):length(fdat))]
+		
+	return(vec)
+	
 }

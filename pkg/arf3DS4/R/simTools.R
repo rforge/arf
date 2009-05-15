@@ -9,9 +9,9 @@ simBlobs3D <- function(betadir,weightdir,templatedata,model='gauss',regions=1,th
 	.nifti.header.dims(templatedata)[5:7] <- 1
 	.nifti.header.dims(templatedata)[1] <- 3
 	
-	.nifti.header.dims(templatedata)[2] <- 18
-	.nifti.header.dims(templatedata)[3] <- 18
-	.nifti.header.dims(templatedata)[4] <- 18
+	.nifti.header.dims(templatedata)[2] <- 64
+	.nifti.header.dims(templatedata)[3] <- 64
+	.nifti.header.dims(templatedata)[4] <- 32
 		
 	dimx <- .nifti.header.dims(templatedata)[2]
 	dimy <- .nifti.header.dims(templatedata)[3]
@@ -125,7 +125,7 @@ arfSim <- function(exp,condpath,cnvec,regions=1,swmode='diag',waldcalc=F) {
 		
 		options=loadOptions(arfmodel)
 		
-		.options.start.maxfac(options)=3
+		.options.start.maxfac(options) <- 2
 		
 		arfmodel <- determineStartRect(arfmodel,options=options)
 		arfmodel <- fitModel(arfmodel)
