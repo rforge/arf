@@ -135,7 +135,7 @@ chngRootExp <- function(path=getwd(),quiet=F)
 }
 
 #makeExp creates an experiment-class object based on existing directories
-makeExp <- function(path=getwd(),settings=new('settings'),tempsub=1,tempcond=1) 
+makeExp <- function(path=getwd(),settings=new('settings'),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE) 
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -189,41 +189,52 @@ makeExp <- function(path=getwd(),settings=new('settings'),tempsub=1,tempcond=1)
 	cn <- paste(subc,sp,.experiment.conditionPrefix(experiment),.experiment.condition.names(experiment)[tempcond],sep='')
 	whichdirs <- file.info(list.files(cn,full=T))$isdir
 	fileList <- list.files(cn,full=F)[whichdirs]
+		
+	if(!auto) { 	
+		#set the data and model directories
+		cat('    the following directories have been found.\n')
+		wdir <- numeric(length(fileList))
+		if(length(fileList)<2) stop('Not enough directories found!')
+		names(wdir) <- c('data','models')
+		
+		for(i in 1:length(fileList)) cat('     [',i,'] ',fileList[i],'\n',sep='')
+		for(i in 1:2) wdir[i] <- as.numeric(readline(paste('    Please indicate the number corresponding to the',names(wdir)[i],'directory: ')))
+				
+		.experiment.dataDir(experiment) <- fileList[wdir[1]]
+		.experiment.modelDir(experiment) <- fileList[wdir[2]]
+		
+		#goto dataDir
+		cn <- paste(subc,sp,.experiment.conditionPrefix(experiment),.experiment.condition.names(experiment)[tempcond],sp,.experiment.dataDir(experiment),sep='')
+		whichdirs <- file.info(list.files(cn,full=T))$isdir
+		fileList <- list.files(cn,full=F)[whichdirs]
+		
+		cat('    the following directories have been found within data.\n')
+		wdir <- numeric(length(fileList))
+		if(length(fileList)<3) stop('Not enough directories found!')
+		names(wdir) <- c('average','beta','weights')
+		
+		
+		for(i in 1:length(fileList)) cat('     [',i,'] ',fileList[i],'\n',sep='')
+		for(i in 1:3) wdir[i] <- as.numeric(readline(paste('    Please indicate the number corresponding to the',names(wdir)[i],'directory: ')))
+		
+		.experiment.avgDir(experiment) <- fileList[wdir[1]]
+		.experiment.betaDir(experiment) <- fileList[wdir[2]]
+		.experiment.weightsDir(experiment) <- fileList[wdir[3]]
 	
-	#set the data and model directories
-	cat('    the following directories have been found.\n')
-	wdir <- numeric(length(fileList))
-	if(length(fileList)<2) stop('Not enough directories found!')
-	names(wdir) <- c('data','models')
+	} 
 	
-	for(i in 1:length(fileList)) cat('     [',i,'] ',fileList[i],'\n',sep='')
-	for(i in 1:2) wdir[i] <- as.numeric(readline(paste('    Please indicate the number corresponding to the',names(wdir)[i],'directory: ')))
-			
-	.experiment.dataDir(experiment) <- fileList[wdir[1]]
-	.experiment.modelDir(experiment) <- fileList[wdir[2]]
+	#make uniform weights when no weights exist
+	if(createWeights) makeWeights(experiment)
 	
-	#goto datatDir
-	cn <- paste(subc,sp,.experiment.conditionPrefix(experiment),.experiment.condition.names(experiment)[tempcond],sp,.experiment.dataDir(experiment),sep='')
-	whichdirs <- file.info(list.files(cn,full=T))$isdir
-	fileList <- list.files(cn,full=F)[whichdirs]
-	
-	cat('    the following directories have been found within data.\n')
-	wdir <- numeric(length(fileList))
-	if(length(fileList)<3) stop('Not enough directories found!')
-	names(wdir) <- c('average','beta','weights')
-	
-	
-	for(i in 1:length(fileList)) cat('     [',i,'] ',fileList[i],'\n',sep='')
-	for(i in 1:3) wdir[i] <- as.numeric(readline(paste('    Please indicate the number corresponding to the',names(wdir)[i],'directory: ')))
-	
-	.experiment.avgDir(experiment) <- fileList[wdir[1]]
-	.experiment.betaDir(experiment) <- fileList[wdir[2]]
-	.experiment.weightsDir(experiment) <- fileList[wdir[3]]
+	#setAllObjects
+	setAllObjects(experiment)
 	
 	#check the experiment dirs, if good save and exit. if not good stop
 	if(checkExp(experiment)) {
 		save(experiment,file=paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''))
 		cat('Experiment correctly set. Experiment saved to',paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''),'\n\n')
+		loadExp(paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''))
+		
 	} else {
 		stop('Experiment structure not valid,check warnings.')
 	}
@@ -258,4 +269,44 @@ loadExp <- function(filename)
 		
 	return(invisible(experiment))
 		
+}
+
+
+##updateExperiment is a wrapper for set all objects and LoadExp
+updateExp <- function(experiment=.experiment,overwrite=F) {
+	
+	#set separator
+	sp <- .Platform$file.sep
+	
+	#set all object of experiment
+	setAllObjects(experiment)
+	loadExp(paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
+	
+}
+
+
+#get FSL data from a FEAT directory
+getFSL <- function(experiment,subject,condition,featpath,subjectname,contrastnum) {
+	
+	sp=.Platform$file.sep
+	
+	cat('Subject:',subjectname,'\n')
+		
+	fns <- list.files(path=featpath,pattern=subjectname)
+	
+	rn=1
+	for(run in fns) {
+		
+		filename <- paste(featpath,sp,run,sp,'stats',sp,'tstat',contrastnum,'.nii.gz',sep='')
+		
+		
+		path <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sep='')
+		newfilename <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.betaDir(experiment),sp,rn,'tstat',contrastnum,'.nii.gz',sep='')
+		
+		cat(' ',filename,'->',newfilename,'\n')
+		file.copy(filename,newfilename,overwrite=T)
+				
+		rn=rn+1
+	}
+	
 }

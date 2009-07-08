@@ -5,7 +5,7 @@
 #############################################
 
 #newModel makes a modeldirectory based on data and experiment information and a modelname
-newModel <- function(arfdata,experiment,modelname,options=new('options'),overwrite=T) 
+newModel <- function(arfdata,modelname,experiment=.experiment,options=new('options'),overwrite=T) 
 {
 	#set separator
 	sp <- .Platform$file.sep

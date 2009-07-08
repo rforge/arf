@@ -451,6 +451,54 @@ headToName <- function(headinf)
 	
 	#return filename
 	return(filename)
+		
+}
+
+
+#resize nifti images 
+crop.volume <- function(filename,resizeToDim) {
+		
+	dat <- readData(filename)
 	
+	data_array <- .fmri.data.datavec(dat)
+	
+	x=.fmri.data.dims(dat)[2]
+	y=.fmri.data.dims(dat)[3]
+	z=.fmri.data.dims(dat)[4]
+	
+	nx=resizeToDim[2]
+	ny=resizeToDim[3]
+	nz=resizeToDim[4]
+	
+	dim(data_array) <- c(x,y,z)
+
+	if(nx>x | ny>y | nz>z) stop('can only crop images!')
+	
+	cat('Dims',.fmri.data.dims(dat),'>> ')
+	
+	newdata <- data_array
+	
+	if(nx<x) {
+		remx <- seq(nx+1,x,1)
+		newdata <- data_array[-remx,,]
+		.fmri.data.dims(dat)[2]=nx
+	} 
+	
+	if(ny<y) {
+		remy <- seq(ny+1,y,1)
+		newdata <- data_array[,-remy,]
+		.fmri.data.dims(dat)[3]=ny
+	} 
+	
+	if(nz<z) {
+		remz <- seq(nz+1,z,1)
+		newdata <- data_array[,,-remz]
+		.fmri.data.dims(dat)[4]=nz
+	} 
+	
+	cat(.fmri.data.dims(dat),'\n')
+	cat('filename',.fmri.data.filename(dat),'\n')	
+	
+	writeData(dat,as.vector(newdata))
 	
 }

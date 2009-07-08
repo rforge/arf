@@ -76,7 +76,7 @@ fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.
 }
 
 # createAverages averages the data and weightfiles 
-createAverages <- function(experiment,arfdat) {
+createAverages <- function(arfdat,experiment=.experiment) {
 
 	sp=.Platform$file.sep
 	
@@ -114,6 +114,17 @@ createAverages <- function(experiment,arfdat) {
 	.nifti.header.descrip(headinf) <- 'ARF average weights'
 	.data.avgWfile(arfdat) <- filename	
 	writeData(headinf,avgweight)
+	
+	#save t-image
+	filename <- paste(.data.fullpath(arfdat),sp,.experiment.dataDir(experiment),sp,.experiment.avgDir(experiment),sp,.experiment.avgtstatFile(experiment),'.',.nifti.header.extension(headinf),sep='')
+
+	if(.nifti.header.gzipped(headinf)==T) filename <- paste(filename,'.gz',sep='') 
+	headinf <- newFile(filename,headinf)
+	.nifti.header.descrip(headinf) <- 'ARF average t-stat'
+	writeData(headinf,avgdat/sqrt(avgweight))
+		
+	#save arfdatafile with updated weights
+	save(arfdat,file=paste(.data.fullpath(arfdat),sp,.experiment.dataDir(experiment),sp,.experiment.dataRda(experiment),sep=''))
 	
 	# return data class object	
 	return(invisible(arfdat))

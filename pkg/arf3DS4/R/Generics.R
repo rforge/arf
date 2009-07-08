@@ -318,6 +318,17 @@ standMethod <- function(x, value) {x@avgWFile<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'experiment'
+funcname <-'.experiment.avgtstatFile'
+standGen <- function(object) standardGeneric('.experiment.avgtstatFile')
+standMethod <- function(object) object@avgtstatFile
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.experiment.avgtstatFile<-'
+standGen <- function(x, value) standardGeneric('.experiment.avgtstatFile<-')
+standMethod <- function(x, value) {x@avgtstatFile<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'experiment'
 funcname <-'.experiment.modelDataFile'
 standGen <- function(object) standardGeneric('.experiment.modelDataFile')
 standMethod <- function(object) object@modelDataFile
@@ -590,6 +601,17 @@ setMethod(funcname,classname,standMethod)
 slotreplace <-'.settings.avgWFile<-'
 standGen <- function(x, value) standardGeneric('.settings.avgWFile<-')
 standMethod <- function(x, value) {x@avgWFile<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'settings'
+funcname <-'.settings.avgtstatFile'
+standGen <- function(object) standardGeneric('.settings.avgtstatFile')
+standMethod <- function(object) object@avgtstatFile
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.settings.avgtstatFile<-'
+standGen <- function(x, value) standardGeneric('.settings.avgtstatFile<-')
+standMethod <- function(x, value) {x@avgtstatFile<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'settings'

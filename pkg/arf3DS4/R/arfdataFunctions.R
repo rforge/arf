@@ -136,6 +136,8 @@ setAllObjects <- function(experiment,overwrite=F)
 	return(invisible(allIsWell))
 }
 
+
+
 ## checkFiles checks if the number of files and dimensions match
 checkFiles <- function(arfdat) {
 	
@@ -166,7 +168,11 @@ checkFiles <- function(arfdat) {
 			for(i in 2:length(filenames)) {
 				headinfo <- getFileInfo(filenames[i])
 				if(!identical(.nifti.header.dims(headinforef),.nifti.header.dims(headinfo))) {
-					warning('Dimensions of file', .data.filename(headinfo),'do not match with reference file',.data.filename(headinforef),'!')
+					warning('Dimensions of file ', .nifti.header.filename(headinfo),' do not match with reference file ',.nifti.header.filename(headinforef),'!')
+					cat('Dimensions of',.nifti.header.filename(headinfo),':',.nifti.header.dims(headinfo),'\n')
+					cat('Dimensions of',.nifti.header.filename(headinforef),':',.nifti.header.dims(headinforef),'\n')
+					
+					
 					allIsWell=F
 				}
 			}
@@ -178,4 +184,53 @@ checkFiles <- function(arfdat) {
 	
 }
 
+
+#makeWeights creates uniform weight files for use with t-stat images
+makeWeights <- function(experiment) {
+	
+	#set separator
+	sp <- .Platform$file.sep
+	
+	#set initial directory
+	subd <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sep='')
+	
+	#run through all dirs 
+	for(sdirs in 1:.experiment.subject.num(experiment)) {
+		
+		sn <- paste(subd,sp,.experiment.subjectPrefix(experiment),.experiment.subject.names(experiment)[sdirs],sep='')
+		subc <- paste(sn,sp,.experiment.conditionDir(experiment),sep='')
+				
+		for(cdirs in 1:.experiment.condition.num(experiment)) {
+			
+			cn <- paste(subc,sp,.experiment.conditionPrefix(experiment),.experiment.condition.names(experiment)[cdirs],sp,.experiment.dataDir(experiment),sp,.experiment.betaDir(experiment),sep='')
+			nf <- paste(subc,sp,.experiment.conditionPrefix(experiment),.experiment.condition.names(experiment)[cdirs],sp,.experiment.dataDir(experiment),sp,.experiment.weightsDir(experiment),sep='')
+			
+			#list files in betadir
+			tempfiles <- list.files(cn,full=T)
+		
+			#check if weightfiles exist
+			weightfiles <- list.files(nf,full=T)
+			
+			#check if files already exist in the weightdir 
+			if(length(tempfiles)!=length(weightfiles)) {
+				if(length(weightfiles)==0) {
+					
+					#for each datafile create appropriate weightfiles
+					for(fns in tempfiles) {
+						
+						tempdat <- readData(fns)
+						.fmri.data.fullpath(tempdat) <- paste(nf,sp,sep='')
+						.fmri.data.filename(tempdat) <- paste('weight_',.fmri.data.filename(tempdat),sep='')
+						
+						writeData(tempdat,rep(1,length(.fmri.data.datavec(tempdat))))
+					}
+				} else warning('some weightfiles already exist, no weights created.')
+				
+			} #if weightfiles exist do nothing
+			
+		}
+	}
+	
+		
+}
 

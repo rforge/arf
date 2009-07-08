@@ -45,6 +45,7 @@ setClass(
 			modeldatDir='character', 		#Residual/Derivatives/Weights directory
 			avgdatFile='character',			#averageDataFileName
 			avgWFile='character',			#averageWeightFileName
+			avgtstatFile='character',		#averagetstatFile
 			modelDataFile='character',		#name of modelDataiFile
 			modelnamesRda='character',		#modelNames file
 			residualFile='character',		#name of residual binary
@@ -73,6 +74,7 @@ setClass(
 			modeldatDir='data', 			#Residual/Derivatives/Weights directory	
 			avgdatFile='avgdata',			#averageDataFileName
 			avgWFile='avgweight',			#averageWeightFileName
+			avgtstatFile='avgtstat',
 			modelDataFile='avgmodel',		#name of modelNiftiFile
 			modelnamesRda='modelnames.Rda', #modelNames file
 			residualFile='residuals.bin',	#name of residual binary
