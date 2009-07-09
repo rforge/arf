@@ -102,6 +102,9 @@ makeExpDirs <- function(path='',name='default_experiment',subjectind=1,condition
 		}
 	}
 	
+	#save experiment
+	save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
+
 	#final check
 	if(!checkExp(experiment)) {
 		warning('Experiment did not pass checks! Check warnings!')
@@ -135,7 +138,11 @@ chngRootExp <- function(path=getwd(),quiet=F)
 }
 
 #makeExp creates an experiment-class object based on existing directories
+<<<<<<< .mine
+makeExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE) 
+=======
 makeExp <- function(path=getwd(),settings=new('settings'),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE) 
+>>>>>>> .r24
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -144,6 +151,9 @@ makeExp <- function(path=getwd(),settings=new('settings'),tempsub=1,tempcond=1,a
 	expname <- strsplit(path,.Platform$file.sep)[[1]]
 	expname <- expname[length(expname)]
 	
+	exp <-  list.files(path,pattern='Rda',full=T)
+	if(length(exp)==1) settings <- loadRda(exp) else settings <- new('settings') 
+		
 	#create new experimentclass
 	experiment <- new('experiment',settings)
 	.experiment.name(experiment) <- expname
@@ -233,8 +243,18 @@ makeExp <- function(path=getwd(),settings=new('settings'),tempsub=1,tempcond=1,a
 	if(checkExp(experiment)) {
 		save(experiment,file=paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''))
 		cat('Experiment correctly set. Experiment saved to',paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''),'\n\n')
+<<<<<<< .mine
 		loadExp(paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''))
 		
+		save('.experiment',file=paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''))
+		load(paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
+		file.remove(paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''))
+		
+		
+=======
+		loadExp(paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''))
+		
+>>>>>>> .r24
 	} else {
 		stop('Experiment structure not valid,check warnings.')
 	}
@@ -254,19 +274,19 @@ loadExp <- function(filename)
 	path <- sub(fn[length(fn)],'',filename)
 	path <- path.expand(path)
 	
-	save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))
-	load(paste(path,.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
-	file.remove(paste(path,.Platform$file.sep,'temp.Rda',sep=''))
-		
 	#change root for the experiment-file to the current root
 	experiment <- chngRootExp(path,quiet=T)
 	
 	#set and check all objects based on subjects/condition info and settings
 	allIsWell <- setAllObjects(experiment)
 
+	save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))
+	load(paste(path,.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
+	file.remove(paste(path,.Platform$file.sep,'temp.Rda',sep=''))
+	
 	#return loaded info 
 	if(allIsWell) cat('Loaded experiment',.experiment.name(experiment),'\n') else cat('Loaded experiment',.experiment.name(experiment),'with warnings!\n')
-		
+	
 	return(invisible(experiment))
 		
 }
