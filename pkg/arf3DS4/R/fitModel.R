@@ -19,11 +19,18 @@ ssq <- function(theta,datavec,weightvec,np,dimx,dimy,dimz) {
 
 ## fitModel calls the minimization routine (NLM)
 fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel))) {
-		
+	
+	sp <- .Platform$file.sep
+	
 	#start_time
 	st_time <- Sys.time()
 	
-	# call NLM (within a try-loop)
+	#clear the warnings and deriv + residualfilres
+	.model.warnings(arfmodel) <- ''
+	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
+	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
+	
+	#call NLM (within a try-loop)
 	nlm.output <- try(suppressWarnings(nlm(
 					ssq,
 					.model.startval(arfmodel),
@@ -35,7 +42,9 @@ fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.
 					dimz=.fmri.data.dims(dat)[4],
 					print.level=0,
 					hessian=T,
-					iterlim=.options.min.iterlim(options)
+					iterlim=.options.min.iterlim(options),
+					gradtol=.options.min.gradtol(options),
+					steptol=.options.min.steptol(options)
 					)),silen=T)
 	
 	#end_time
@@ -138,7 +147,7 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 	fmridata <- readData(.model.avgdatfile(arfmodel))
 	
 	#set theta to the default values (for all regions)
-	theta <- rep(startvec,.model.regions(arfmodel))
+	theta <- startvec
 			
 	#set dimensions and read in data
 	dimx <- .fmri.data.dims(fmridata)[2]

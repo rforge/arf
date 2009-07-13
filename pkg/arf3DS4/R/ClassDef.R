@@ -103,19 +103,23 @@ setClass(
 setClass(
 	Class='options',
 	representation=representation(
-		min.iterlim='numeric',		#NLM settings
+		min.iterlim='numeric',		#NLM iteration limit
+		min.gradtol='numeric',		#NLM gradient tolerance
+		min.steptol='numeric',		#NLM stepsize tolerance
 		start.method='character',	#which method of determining starting values is used
-		start.maxfac='numeric',
+		start.maxfac='numeric',		#fallOff factor in the determination of region width
 		start.vector='numeric',		#vector containing startingvalues (if !start.method=='fixed' only t5 and t6 are used) vector is recycled for regions.
 		chk.method='character',		#which method is used to check the range of parameter values
 		chk.range='numeric',		#vector containing ranges for each parameter (vector is recycled for regions)		
-		sw.type='character',			#method to use with Residuals ('diag','full')
-		output.mode='character'
+		sw.type='character',		#method to use with Residuals ('diag','full')
+		output.mode='character'		#output mode
 
 
 	),
 	prototype=prototype(
 		min.iterlim=1500,
+		min.gradtol=1e-6,		
+		min.steptol=1e-8,
 		start.method='rect',
 		start.maxfac=2,
 		start.vector=c(0,0,0,0,0,0,.1,.1,.1,100),

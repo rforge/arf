@@ -5,10 +5,15 @@
 #############################################
 
 #newModel makes a modeldirectory based on data and experiment information and a modelname
-newModel <- function(arfdata,modelname,experiment=.experiment,options=new('options'),overwrite=T) 
+newModel <- function(modelname='defaultmodel',regions=1,subject='',condition='',experiment=.experiment,options=new('options'),overwrite=T) 
 {
 	#set separator
 	sp <- .Platform$file.sep
+	
+	#load data from a condition
+	if(subject=='') subject <- .experiment.subject.names(experiment)[1]
+	if(condition=='') condition <- .experiment.condition.names(experiment)[1]
+	arfdata <- loadRda(paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.dataDir(experiment),sp,.experiment.dataRda(experiment),sep=''))
 	
 	#checks
 	if(!class(arfdata)=='data') stop('Input must be of class \'data\'')
@@ -41,17 +46,20 @@ newModel <- function(arfdata,modelname,experiment=.experiment,options=new('optio
 	.model.modelDataFile(model) <- .experiment.modelDataFile(experiment)
 	.model.startFile(model) <- .experiment.startRda(experiment)
 	
+	#set number of regions
+	.model.regions(model) <- regions
+	
 	#save model and options File and startvec
-	save(model,file=paste(path,sp,.model.modelFile(model),sep=''))
+	startval <- .model.startval(model) <- rep(.options.start.vector(options),.model.regions(model))
+	save(startval,file=paste(path,sp,.model.startFile(model),sep=''))
 	save(options,file=paste(path,sp,.model.optionsFile(model),sep=''))
-	startvec <- .options.start.vector(options)
-	save(startvec,file=paste(path,sp,.model.startFile(model),sep=''))
+	save(model,file=paste(path,sp,.model.modelFile(model),sep=''))
 	
 	
 	#updateModelNames in on dir up
 	updateModelNames(paste(sub(.model.modelname(model),'',.model.modelpath(model)),sp,.experiment.modelnamesRda(experiment),sep=''))
 		
-	return(invisible(model))
+	return(model)
 }
 
 #update ModelNames in a ModelNamesFile

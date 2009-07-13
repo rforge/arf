@@ -138,11 +138,7 @@ chngRootExp <- function(path=getwd(),quiet=F)
 }
 
 #makeExp creates an experiment-class object based on existing directories
-<<<<<<< .mine
 makeExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE) 
-=======
-makeExp <- function(path=getwd(),settings=new('settings'),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE) 
->>>>>>> .r24
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -151,6 +147,7 @@ makeExp <- function(path=getwd(),settings=new('settings'),tempsub=1,tempcond=1,a
 	expname <- strsplit(path,.Platform$file.sep)[[1]]
 	expname <- expname[length(expname)]
 	
+	#if experiment file exists open it, else create a new one
 	exp <-  list.files(path,pattern='Rda',full=T)
 	if(length(exp)==1) settings <- loadRda(exp) else settings <- new('settings') 
 		
@@ -243,18 +240,12 @@ makeExp <- function(path=getwd(),settings=new('settings'),tempsub=1,tempcond=1,a
 	if(checkExp(experiment)) {
 		save(experiment,file=paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''))
 		cat('Experiment correctly set. Experiment saved to',paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''),'\n\n')
-<<<<<<< .mine
 		loadExp(paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''))
 		
 		save('.experiment',file=paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''))
 		load(paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
 		file.remove(paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''))
-		
-		
-=======
-		loadExp(paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''))
-		
->>>>>>> .r24
+
 	} else {
 		stop('Experiment structure not valid,check warnings.')
 	}
@@ -264,16 +255,21 @@ makeExp <- function(path=getwd(),settings=new('settings'),tempsub=1,tempcond=1,a
 }
 
 #loadExp loads an experiment and sets all objects to the directory-root of where experiment.Rda was found
-loadExp <- function(filename)
+loadExp <- function(path=getwd())
 {
-	#load experiment
+	#set separator
+	sp <- .Platform$file.sep
+			
+	#set filename and load experiment
+	filename <- list.files(path,'.Rda',full=T)
+	if(length(filename)!=1) stop('No experiment rda file found or multiple rda files found.')
 	.experiment <- experiment <- loadRda(filename)
 	
 	#remove filename to obtain root-path
 	fn <- strsplit(filename,.Platform$file.sep)[[1]]
 	path <- sub(fn[length(fn)],'',filename)
 	path <- path.expand(path)
-	
+		
 	#change root for the experiment-file to the current root
 	experiment <- chngRootExp(path,quiet=T)
 	

@@ -12,7 +12,7 @@ setGeneric('summary')
 setMethod('show','experiment',
 	function(object) {
 		
-		cat('** arf experiment **\n')
+		cat('[ ARF experiment ]\n')
 		cat('name:      ',toupper(object@name),'\n',sep='')
 		cat('path:      ',object@path,'\n',sep='')
 		cat('subjects[',object@subject.num,']\n',sep='')
@@ -55,7 +55,7 @@ setMethod('summary','fmri.data',
 
 setMethod('show','data',
 		function(object) {
-			cat('** arf data **\n')
+			cat('[ ARF data ]\n')
 			cat('name:          ',toupper(object@name),'\n')
 			cat('path:          ',object@fullpath,'\n')
 			cat('betafiles:     ',length(object@betafiles),'\n')

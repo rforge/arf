@@ -681,6 +681,28 @@ standMethod <- function(x, value) {x@min.iterlim<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'options'
+funcname <-'.options.min.gradtol'
+standGen <- function(object) standardGeneric('.options.min.gradtol')
+standMethod <- function(object) object@min.gradtol
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.options.min.gradtol<-'
+standGen <- function(x, value) standardGeneric('.options.min.gradtol<-')
+standMethod <- function(x, value) {x@min.gradtol<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'options'
+funcname <-'.options.min.steptol'
+standGen <- function(object) standardGeneric('.options.min.steptol')
+standMethod <- function(object) object@min.steptol
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.options.min.steptol<-'
+standGen <- function(x, value) standardGeneric('.options.min.steptol<-')
+standMethod <- function(x, value) {x@min.steptol<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'options'
 funcname <-'.options.start.method'
 standGen <- function(object) standardGeneric('.options.start.method')
 standMethod <- function(object) object@start.method

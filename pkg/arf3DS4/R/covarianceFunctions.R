@@ -56,6 +56,10 @@ varcov <- function(arfmodel)
 	#set separator
 	sp <- .Platform$file.sep
 	
+	#check for deriv and resid
+	if(!file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) stop('Residuals not yet created. Cannot compute (co)variance matrix.')
+	if(!file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) stop('Derivatives not yet created. Cannot compute (co)variance matrix.')
+		
 	if(.model.valid(arfmodel)) {
 	
 		st_time <- Sys.time()
@@ -193,6 +197,10 @@ wald <- function(arfmodel,waldobject=new('wald')) {
 	## wald calculates Wald statistics for a fitted model
 	## input is and model object and waldobject (may be empty)
 	## output is an arfmodel object
+	
+	
+	if(length(.model.varcov(arfmodel))==0) stop('(co)variance matrix not yet calculated, cannot compute Wald statistics!')
+	
 	
 	#define function to calculate Wald statistic 
 	W <- function(a,A,C) t(a)%*%solve(A%*%C%*%t(A))%*%a

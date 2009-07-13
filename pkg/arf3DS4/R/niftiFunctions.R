@@ -7,7 +7,11 @@
 # getFileInfo sets file information (file path, location, extension, gzippedness and endianness)
 getFileInfo <- function(filename) 
 {
+	#set separator
 	sp <- .Platform$file.sep
+	
+	#check if only file else pre-append working directory
+	if(length(grep(sp,filename))==0) filename <- paste(getwd(),sp,filename,sep='')
 	
 	#check if file exists
 	if(!file.exists(filename)) stop(paste('File',filename,'does noet exist!'))
