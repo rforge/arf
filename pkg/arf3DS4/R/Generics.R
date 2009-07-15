@@ -164,6 +164,17 @@ standMethod <- function(x, value) {x@statsRda<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'experiment'
+funcname <-'.experiment.regRda'
+standGen <- function(object) standardGeneric('.experiment.regRda')
+standMethod <- function(object) object@regRda
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.experiment.regRda<-'
+standGen <- function(x, value) standardGeneric('.experiment.regRda<-')
+standMethod <- function(x, value) {x@regRda<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'experiment'
 funcname <-'.experiment.subjectPrefix'
 standGen <- function(object) standardGeneric('.experiment.subjectPrefix')
 standMethod <- function(object) object@subjectPrefix
@@ -249,6 +260,17 @@ setMethod(funcname,classname,standMethod)
 slotreplace <-'.experiment.avgDir<-'
 standGen <- function(x, value) standardGeneric('.experiment.avgDir<-')
 standMethod <- function(x, value) {x@avgDir<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'experiment'
+funcname <-'.experiment.regDir'
+standGen <- function(object) standardGeneric('.experiment.regDir')
+standMethod <- function(object) object@regDir
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.experiment.regDir<-'
+standGen <- function(x, value) standardGeneric('.experiment.regDir<-')
+standMethod <- function(x, value) {x@regDir<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'experiment'
@@ -450,6 +472,17 @@ standMethod <- function(x, value) {x@statsRda<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'settings'
+funcname <-'.settings.regRda'
+standGen <- function(object) standardGeneric('.settings.regRda')
+standMethod <- function(object) object@regRda
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.settings.regRda<-'
+standGen <- function(x, value) standardGeneric('.settings.regRda<-')
+standMethod <- function(x, value) {x@regRda<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'settings'
 funcname <-'.settings.subjectPrefix'
 standGen <- function(object) standardGeneric('.settings.subjectPrefix')
 standMethod <- function(object) object@subjectPrefix
@@ -535,6 +568,17 @@ setMethod(funcname,classname,standMethod)
 slotreplace <-'.settings.avgDir<-'
 standGen <- function(x, value) standardGeneric('.settings.avgDir<-')
 standMethod <- function(x, value) {x@avgDir<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'settings'
+funcname <-'.settings.regDir'
+standGen <- function(object) standardGeneric('.settings.regDir')
+standMethod <- function(object) object@regDir
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.settings.regDir<-'
+standGen <- function(x, value) standardGeneric('.settings.regDir<-')
+standMethod <- function(x, value) {x@regDir<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'settings'
@@ -777,6 +821,160 @@ setMethod(funcname,classname,standMethod)
 slotreplace <-'.options.output.mode<-'
 standGen <- function(x, value) standardGeneric('.options.output.mode<-')
 standMethod <- function(x, value) {x@output.mode<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.fullpath'
+standGen <- function(object) standardGeneric('.registration.fullpath')
+standMethod <- function(object) object@fullpath
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.fullpath<-'
+standGen <- function(x, value) standardGeneric('.registration.fullpath<-')
+standMethod <- function(x, value) {x@fullpath<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.filename'
+standGen <- function(object) standardGeneric('.registration.filename')
+standMethod <- function(object) object@filename
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.filename<-'
+standGen <- function(x, value) standardGeneric('.registration.filename<-')
+standMethod <- function(x, value) {x@filename<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.examp2high'
+standGen <- function(object) standardGeneric('.registration.examp2high')
+standMethod <- function(object) object@examp2high
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.examp2high<-'
+standGen <- function(x, value) standardGeneric('.registration.examp2high<-')
+standMethod <- function(x, value) {x@examp2high<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.high2stand'
+standGen <- function(object) standardGeneric('.registration.high2stand')
+standMethod <- function(object) object@high2stand
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.high2stand<-'
+standGen <- function(x, value) standardGeneric('.registration.high2stand<-')
+standMethod <- function(x, value) {x@high2stand<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.example'
+standGen <- function(object) standardGeneric('.registration.example')
+standMethod <- function(object) object@example
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.example<-'
+standGen <- function(x, value) standardGeneric('.registration.example<-')
+standMethod <- function(x, value) {x@example<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.highres'
+standGen <- function(object) standardGeneric('.registration.highres')
+standMethod <- function(object) object@highres
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.highres<-'
+standGen <- function(x, value) standardGeneric('.registration.highres<-')
+standMethod <- function(x, value) {x@highres<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.standard'
+standGen <- function(object) standardGeneric('.registration.standard')
+standMethod <- function(object) object@standard
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.standard<-'
+standGen <- function(x, value) standardGeneric('.registration.standard<-')
+standMethod <- function(x, value) {x@standard<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.Dex'
+standGen <- function(object) standardGeneric('.registration.Dex')
+standMethod <- function(object) object@Dex
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.Dex<-'
+standGen <- function(x, value) standardGeneric('.registration.Dex<-')
+standMethod <- function(x, value) {x@Dex<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.Dhi'
+standGen <- function(object) standardGeneric('.registration.Dhi')
+standMethod <- function(object) object@Dhi
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.Dhi<-'
+standGen <- function(x, value) standardGeneric('.registration.Dhi<-')
+standMethod <- function(x, value) {x@Dhi<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.Dst'
+standGen <- function(object) standardGeneric('.registration.Dst')
+standMethod <- function(object) object@Dst
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.Dst<-'
+standGen <- function(x, value) standardGeneric('.registration.Dst<-')
+standMethod <- function(x, value) {x@Dst<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.SXhi'
+standGen <- function(object) standardGeneric('.registration.SXhi')
+standMethod <- function(object) object@SXhi
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.SXhi<-'
+standGen <- function(x, value) standardGeneric('.registration.SXhi<-')
+standMethod <- function(x, value) {x@SXhi<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.Aex2hi'
+standGen <- function(object) standardGeneric('.registration.Aex2hi')
+standMethod <- function(object) object@Aex2hi
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.Aex2hi<-'
+standGen <- function(x, value) standardGeneric('.registration.Aex2hi<-')
+standMethod <- function(x, value) {x@Aex2hi<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.Ahi2st'
+standGen <- function(object) standardGeneric('.registration.Ahi2st')
+standMethod <- function(object) object@Ahi2st
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.Ahi2st<-'
+standGen <- function(x, value) standardGeneric('.registration.Ahi2st<-')
+standMethod <- function(x, value) {x@Ahi2st<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
+funcname <-'.registration.OXst'
+standGen <- function(object) standardGeneric('.registration.OXst')
+standMethod <- function(object) object@OXst
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.OXst<-'
+standGen <- function(x, value) standardGeneric('.registration.OXst<-')
+standMethod <- function(x, value) {x@OXst<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'nifti.fileinfo'
@@ -2584,6 +2782,17 @@ standMethod <- function(x, value) {x@avgWfile<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'model'
+funcname <-'.model.regfile'
+standGen <- function(object) standardGeneric('.model.regfile')
+standMethod <- function(object) object@regfile
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.model.regfile<-'
+standGen <- function(x, value) standardGeneric('.model.regfile<-')
+standMethod <- function(x, value) {x@regfile<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'model'
 funcname <-'.model.trials'
 standGen <- function(object) standardGeneric('.model.trials')
 standMethod <- function(object) object@trials
@@ -2658,6 +2867,17 @@ setMethod(funcname,classname,standMethod)
 slotreplace <-'.data.avgWfile<-'
 standGen <- function(x, value) standardGeneric('.data.avgWfile<-')
 standMethod <- function(x, value) {x@avgWfile<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'data'
+funcname <-'.data.regfile'
+standGen <- function(object) standardGeneric('.data.regfile')
+standMethod <- function(object) object@regfile
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.data.regfile<-'
+standGen <- function(x, value) standardGeneric('.data.regfile<-')
+standMethod <- function(x, value) {x@regfile<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'data'

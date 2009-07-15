@@ -83,6 +83,15 @@ setAllObjects <- function(experiment,overwrite=F)
 			#set Fullpath
 			.data.fullpath(data) <- path
 			
+			#set registration path
+			regfile <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sp,.experiment.regRda(experiment),sep='')
+			.data.regfile(data) <- regfile
+			
+			if(file.exists(regfile)) reg <- loadRda(regfile) else reg <- new('registration')
+			.registration.fullpath(reg) <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sep='')
+			.registration.filename(reg) <- .experiment.regRda(experiment)
+			save(reg,file=regfile)
+						
 			#betafiles
 			betafiles <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.betaDir(experiment),sep=''),full=T)
 			.data.betafiles(data) <- betafiles
@@ -125,6 +134,7 @@ setAllObjects <- function(experiment,overwrite=F)
 						.model.weightfiles(model) <- .data.weightfiles(data)
 						.model.avgdatfile(model) <- .data.avgdatfile(data)
 						.model.avgWfile(model) <- .data.avgWfile(data)
+						.model.regfile(model) <- .data.regfile(data)
 						save(model,file=paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
 						
 					}

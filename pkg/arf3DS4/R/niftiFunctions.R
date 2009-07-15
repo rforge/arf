@@ -20,20 +20,22 @@ getFileInfo <- function(filename)
 	fileinf=new('nifti.fileinfo')
 	
 	#split filename into path, name and extensions
-	fsplit=strsplit(tolower(filename),'\\.')[[1]]
-	fname=strsplit(fsplit[1],.Platform$file.sep)[[1]]	
+	fn <- strsplit(filename,sp)[[1]][length(strsplit(filename,sp)[[1]])]
+	fsplit_name <- strsplit(tolower(fn),'\\.')[[1]]
+	fsplit_path <- gsub(paste(sp,fn,sep=''),'',filename)
+	fname <- strsplit(fsplit_name[1],.Platform$file.sep)[[1]]	
 	
 	#set filename and path
 	.nifti.fileinfo.filename(fileinf) <- fname[length(fname)]
-	.nifti.fileinfo.fullpath(fileinf) <- gsub(.nifti.fileinfo.filename(fileinf),'',fsplit[1])
+	.nifti.fileinfo.fullpath(fileinf) <- fsplit_path
 	
 	#check gzippedness and set extension
-	if(fsplit[length(fsplit)]=='gz') {
+	if(fsplit_name[length(fsplit_name)]=='gz') {
 		.nifti.fileinfo.gzipped(fileinf) <- TRUE
-		.nifti.fileinfo.extension(fileinf) <- fsplit[length(fsplit)-1]	
+		.nifti.fileinfo.extension(fileinf) <- fsplit_name[length(fsplit_name)-1]	
 	} else {
 		.nifti.fileinfo.gzipped(fileinf) <- FALSE
-		.nifti.fileinfo.extension(fileinf) <- fsplit[length(fsplit)]
+		.nifti.fileinfo.extension(fileinf) <- fsplit_name[length(fsplit_name)]
 	}
 	
 	#check valid files if img/hdr pair and if IMG try and open header	
@@ -96,6 +98,39 @@ getFileInfo <- function(filename)
 	return(invisible(headinfo))
 	
 }
+
+#set header info accordomg to a templateHeader
+newFile <- function(filename,templateHDR) 
+{
+	##newFile creates a new file of the given filename (and directories it should be in if they not exist)
+	## input is a filename (full) and template headerinfo
+	## output is headerInfo of the newly created file
+	
+	sp <- .Platform$file.sep
+	
+	#split filename into path, name and extensions
+	fn <- strsplit(filename,sp)[[1]][length(strsplit(filename,sp)[[1]])]
+	fsplit_name <- strsplit(tolower(fn),'\\.')[[1]]
+	fsplit_path <- gsub(paste(sp,fn,sep=''),'',filename)
+	fname <- strsplit(fsplit_name[1],.Platform$file.sep)[[1]]	
+	
+	#set filename and path
+	.nifti.header.filename(templateHDR) <- fname[length(fname)]
+	.nifti.header.fullpath(templateHDR) <- fsplit_path
+	
+	#check gzippedness and set extension
+	if(fsplit_name[length(fsplit_name)]=='gz') {
+		.nifti.header.gzipped(templateHDR) <- TRUE
+		.nifti.header.extension(templateHDR) <- fsplit_name[length(fsplit_name)-1]	
+	} else {
+		.nifti.header.gzipped(templateHDR) <- FALSE
+		.nifti.header.extension(templateHDR) <- fsplit_name[length(fsplit_name)]
+	}
+	
+	# return header info object for created file
+	return(templateHDR)
+}
+
 
 # readHeader reads nifti header info from nii,img,hdr and gzipped exts.
 readHeader <- function(fileinf) 
@@ -401,36 +436,6 @@ writeDataPart <- function(con,headinf,datavec)
 
 }
 
-#set header info accordomg to a templateHeader
-newFile <- function(filename,templateHDR) 
-{
-	##newFile creates a new file of the given filename (and directories it should be in if they not exist)
-	## input is a filename (full) and template headerinfo
-	## output is headerInfo of the newly created file
-	
-	sp <- .Platform$file.sep
-	
-	#split filename into path, name and extensions
-	fsplit=strsplit(tolower(filename),'\\.')[[1]]
-	fname=strsplit(fsplit[1],'/')[[1]]	
-	
-	#set filename and path
-	.nifti.header.filename(templateHDR) <- fname[length(fname)]
-	.nifti.header.fullpath(templateHDR) <- gsub(.nifti.header.filename(templateHDR),'',fsplit[1])
-	
-	#check gzippedness and set extension
-	if(fsplit[length(fsplit)]=='gz') {
-		.nifti.header.gzipped(templateHDR) <- TRUE
-		.nifti.header.extension(templateHDR) <- fsplit[length(fsplit)-1]	
-	} else {
-		.nifti.header.gzipped(templateHDR) <- FALSE
-		.nifti.header.extension(templateHDR) <- fsplit[length(fsplit)]
-	}
-	
-	# return header info object for created file
-	return(templateHDR)
-}
-
 
 #turn header information to a filename
 headToName <- function(headinf) 
@@ -459,50 +464,3 @@ headToName <- function(headinf)
 }
 
 
-#resize nifti images 
-crop.volume <- function(filename,resizeToDim) {
-		
-	dat <- readData(filename)
-	
-	data_array <- .fmri.data.datavec(dat)
-	
-	x=.fmri.data.dims(dat)[2]
-	y=.fmri.data.dims(dat)[3]
-	z=.fmri.data.dims(dat)[4]
-	
-	nx=resizeToDim[2]
-	ny=resizeToDim[3]
-	nz=resizeToDim[4]
-	
-	dim(data_array) <- c(x,y,z)
-
-	if(nx>x | ny>y | nz>z) stop('can only crop images!')
-	
-	cat('Dims',.fmri.data.dims(dat),'>> ')
-	
-	newdata <- data_array
-	
-	if(nx<x) {
-		remx <- seq(nx+1,x,1)
-		newdata <- data_array[-remx,,]
-		.fmri.data.dims(dat)[2]=nx
-	} 
-	
-	if(ny<y) {
-		remy <- seq(ny+1,y,1)
-		newdata <- data_array[,-remy,]
-		.fmri.data.dims(dat)[3]=ny
-	} 
-	
-	if(nz<z) {
-		remz <- seq(nz+1,z,1)
-		newdata <- data_array[,,-remz]
-		.fmri.data.dims(dat)[4]=nz
-	} 
-	
-	cat(.fmri.data.dims(dat),'\n')
-	cat('filename',.fmri.data.filename(dat),'\n')	
-	
-	writeData(dat,as.vector(newdata))
-	
-}

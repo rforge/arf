@@ -31,6 +31,7 @@ setClass(
 			dataRda='character',			#name of dataobject in each datadir
 			modelRda='character',			#name of modeldatafile
 			statsRda='character',			#name of statsfile
+			regRda='character',
 			subjectPrefix='character', 		#subjects prefix
 			conditionPrefix='character', 	#condition prefix
 			modelPrefix='character',		#model prefix
@@ -39,6 +40,7 @@ setClass(
 			dataDir='character',			#data directory name
 			weightsDir='character',			#weights directory name
 			avgDir='character',				#avg directory name
+			regDir='character',
 			betaDir='character',			#beta directory
 			modelDir='character',			#model directory
 			statsDir='character',			#stats directory
@@ -60,6 +62,7 @@ setClass(
 			dataRda='data.Rda',				#name of dataobject in each data
 			modelRda='model.Rda',			#name of modelfile
 			statsRda='stats.Rda',			#name of statsfile
+			regRda='registration.Rda',
 			subjectPrefix='', 				#subjects prefix
 			conditionPrefix='', 			#condition prefix
 			subjectDir='subjects', 			#subjects prefix
@@ -68,13 +71,14 @@ setClass(
 			dataDir='data',					#data directory name
 			weightsDir='weights',			#weights directory name
 			avgDir='avg',					#avg directory name
+			regDir='reg',
 			betaDir='beta',					#beta directory
 			modelDir='models',				#model directory
 			statsDir='stats',				#stats directory
 			modeldatDir='data', 			#Residual/Derivatives/Weights directory	
 			avgdatFile='avgdata',			#averageDataFileName
 			avgWFile='avgweight',			#averageWeightFileName
-			avgtstatFile='avgtstat',
+			avgtstatFile='avgtstat',		#average tstat filename
 			modelDataFile='avgmodel',		#name of modelNiftiFile
 			modelnamesRda='modelnames.Rda', #modelNames file
 			residualFile='residuals.bin',	#name of residual binary
@@ -83,6 +87,28 @@ setClass(
 
 		)
 )
+
+## arf/FSL registration class
+setClass(
+		Class='registration',
+		representation=representation(
+				fullpath='character',
+				filename='character',
+				examp2high='character',
+				high2stand='character',
+				example='character',
+				highres='character',
+				standard='character',
+				Dex='matrix',
+				Dhi='matrix',
+				Dst='matrix',
+				SXhi ='matrix',
+				Aex2hi='matrix', 
+				Ahi2st ='matrix',
+				OXst ='matrix'
+				)
+		
+		)
 
 ## arf experiment class (containing, rootdirectories, condition numbers etc. and preferred sequences)
 setClass(
@@ -270,6 +296,7 @@ setClass(
 		weightfiles='character',	#vector of char containing weight datafiles
 		avgdatfile='character',		#filename of average data
 		avgWfile='character',		#filename of average weights
+		regfile='character',	
 		trials='numeric'			#number of trials
 	)
 )

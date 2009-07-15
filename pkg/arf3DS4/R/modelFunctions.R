@@ -109,5 +109,9 @@ saveModelBin <- function(arfmodel) {
 #loadOptions loads the options object
 loadOptions <- function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.optionsFile(arfmodel),sep='')))
 
-#loadOptions loads the options object
+#loadStart loads the Start object
 loadStart <- function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.startFile(arfmodel),sep='')))
+
+#loadReg
+loadReg <- function(arfmodel) return(loadRda(.model.regfile(arfmodel),sep=''))
+

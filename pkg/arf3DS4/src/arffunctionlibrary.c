@@ -82,33 +82,36 @@ void ssqgauss(double *theta, double *dat, double *W, int *np, int *dimx, int *di
 
 				f=0; //f becomes the sum of all regions  (zeroed every region)
 
-				for(reg=0;reg<(*np);reg=reg+10) {
-					//parameter coordinates
-					theta_x=theta[reg+0];
-					theta_y=theta[reg+1];
-					theta_z=theta[reg+2];
+				if(dat[p]!=0) {
+					for(reg=0;reg<(*np);reg=reg+10) {
 
-					//sigma matrix
-					sig_x=pow(theta[reg+3],2);
-					sig_xy=theta[reg+6]*theta[reg+4]*theta[reg+3];
-					sig_xz=theta[reg+7]*theta[reg+5]*theta[reg+3];
-					sig_y=pow(theta[reg+4],2);
-					sig_yz=theta[reg+8]*theta[reg+4]*theta[reg+5];
-					sig_z=pow(theta[reg+5],2);
+						//parameter coordinates
+						theta_x=theta[reg+0];
+						theta_y=theta[reg+1];
+						theta_z=theta[reg+2];
+
+						//sigma matrix
+						sig_x=pow(theta[reg+3],2);
+						sig_xy=theta[reg+6]*theta[reg+4]*theta[reg+3];
+						sig_xz=theta[reg+7]*theta[reg+5]*theta[reg+3];
+						sig_y=pow(theta[reg+4],2);
+						sig_yz=theta[reg+8]*theta[reg+4]*theta[reg+5];
+						sig_z=pow(theta[reg+5],2);
 
 
-					//determinant of sigma
-					det_sig=sig_x*sig_y*sig_z-sig_x*sig_yz*sig_yz-sig_xy*sig_xy*sig_z+sig_xy*sig_xz*sig_yz+sig_xz*sig_xy*sig_yz-sig_xz*sig_y*sig_xz;
-					if(det_sig < 0) det_sig=0;
+						//determinant of sigma
+						det_sig=sig_x*sig_y*sig_z-sig_x*sig_yz*sig_yz-sig_xy*sig_xy*sig_z+sig_xy*sig_xz*sig_yz+sig_xz*sig_xy*sig_yz-sig_xz*sig_y*sig_xz;
+						if(det_sig < 0) det_sig=0;
 
-					//(x-pc)
-					dif_x=(x-theta_x);
-					dif_y=(y-theta_y);
-					dif_z=(z-theta_z);
+						//(x-pc)
+						dif_x=(x-theta_x);
+						dif_y=(y-theta_y);
+						dif_z=(z-theta_z);
 
-					//add to f gaussian value for each region
-					f=f+theta[reg+9]*(1/(pow(sqrt(2*M_PI),3)*sqrt(det_sig)))*exp(-.5*(dif_x*(dif_x*(sig_y*sig_z-sig_yz*sig_yz)+dif_y*(sig_yz*sig_xz-sig_xy*sig_z)+dif_z*(sig_xy*sig_yz-sig_y*sig_xz))/det_sig+dif_y*(dif_x*(sig_xz*sig_yz-sig_z*sig_xy)+dif_y*(sig_x*sig_z-sig_xz*sig_xz)+dif_z*(sig_xy*sig_xz-sig_x*sig_yz))/det_sig+dif_z*(dif_x*(sig_xy*sig_yz-sig_xz*sig_y)+dif_y*(sig_xz*sig_xy-sig_yz*sig_x)+dif_z*(sig_x*sig_y-sig_xy*sig_xy))/det_sig));
+						//add to f gaussian value for each region
+						f=f+theta[reg+9]*(1/(pow(sqrt(2*M_PI),3)*sqrt(det_sig)))*exp(-.5*(dif_x*(dif_x*(sig_y*sig_z-sig_yz*sig_yz)+dif_y*(sig_yz*sig_xz-sig_xy*sig_z)+dif_z*(sig_xy*sig_yz-sig_y*sig_xz))/det_sig+dif_y*(dif_x*(sig_xz*sig_yz-sig_z*sig_xy)+dif_y*(sig_x*sig_z-sig_xz*sig_xz)+dif_z*(sig_xy*sig_xz-sig_x*sig_yz))/det_sig+dif_z*(dif_x*(sig_xy*sig_yz-sig_xz*sig_y)+dif_y*(sig_xz*sig_xy-sig_yz*sig_x)+dif_z*(sig_x*sig_y-sig_xy*sig_xy))/det_sig));
 
+					}
 				}
 
 				//sum (data-model)^2 over voxels and weight

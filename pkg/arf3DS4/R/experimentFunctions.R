@@ -33,6 +33,7 @@ checkExp <- function(experiment)
 			if(!file.exists(paste(cn,sp,.experiment.dataDir(experiment),sp,.experiment.betaDir(experiment),sep=''))) {warning(paste('In:',cn,sp,.experiment.dataDir(experiment),' betaDir does not exits or does not match settings',sep=''));allIsWell=F}
 			if(!file.exists(paste(cn,sp,.experiment.dataDir(experiment),sp,.experiment.weightsDir(experiment),sep=''))) {warning(paste('In:',cn,sp,.experiment.dataDir(experiment),' weightsDir does not exits or does not match settings',sep=''));allIsWell=F}
 			if(!file.exists(paste(cn,sp,.experiment.dataDir(experiment),sp,.experiment.avgDir(experiment),sep=''))) {warning(paste('In:',cn,sp,.experiment.dataDir(experiment),' avgDir does not exits or does not match settings',sep=''));allIsWell=F}
+			if(!file.exists(paste(cn,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sep=''))) {warning(paste('In:',cn,sp,.experiment.regDir(experiment),' avgDir does not exits or does not match settings',sep=''));allIsWell=F}
 			
 		}
 	}
@@ -43,7 +44,7 @@ checkExp <- function(experiment)
 
 # makeExpDirs creates a directory structure given the path, number of subjects, conditions and a settings object
 # by default creates a structure in the working directory with 1 subject 1 condition and default settings
-makeExpDirs <- function(path='',name='default_experiment',subjectind=1,conditionind=1,settings=new('settings'))
+makeExpDirs <- function(path=getwd(),name='default_experiment',subjectind=1,conditionind=1,settings=new('settings'))
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -98,6 +99,8 @@ makeExpDirs <- function(path='',name='default_experiment',subjectind=1,condition
 			dir.create(paste(dn,sp,.settings.betaDir(settings),sep=''),show=F)
 			dir.create(paste(dn,sp,.settings.weightsDir(settings),sep=''),show=F)
 			dir.create(paste(dn,sp,.settings.avgDir(settings),sep=''),show=F)
+			dir.create(paste(dn,sp,.settings.regDir(settings),sep=''),show=F)
+			
 		
 		}
 	}
@@ -217,16 +220,18 @@ makeExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TR
 		
 		cat('    the following directories have been found within data.\n')
 		wdir <- numeric(length(fileList))
-		if(length(fileList)<3) stop('Not enough directories found!')
-		names(wdir) <- c('average','beta','weights')
+		if(length(fileList)<4) stop('Not enough directories found!')
+		names(wdir) <- c('average','beta','reg','weights')
 		
 		
 		for(i in 1:length(fileList)) cat('     [',i,'] ',fileList[i],'\n',sep='')
-		for(i in 1:3) wdir[i] <- as.numeric(readline(paste('    Please indicate the number corresponding to the',names(wdir)[i],'directory: ')))
+		for(i in 1:4) wdir[i] <- as.numeric(readline(paste('    Please indicate the number corresponding to the',names(wdir)[i],'directory: ')))
 		
 		.experiment.avgDir(experiment) <- fileList[wdir[1]]
 		.experiment.betaDir(experiment) <- fileList[wdir[2]]
-		.experiment.weightsDir(experiment) <- fileList[wdir[3]]
+		.experiment.regDir(experiment) <- fileList[wdir[3]]
+		.experiment.weightsDir(experiment) <- fileList[wdir[4]]
+		
 	
 	} 
 	
@@ -240,7 +245,7 @@ makeExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TR
 	if(checkExp(experiment)) {
 		save(experiment,file=paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''))
 		cat('Experiment correctly set. Experiment saved to',paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''),'\n\n')
-		loadExp(paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''))
+		loadExp(paste(.experiment.path(experiment),sep=''))
 		
 		save('.experiment',file=paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''))
 		load(paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
@@ -296,7 +301,7 @@ updateExp <- function(experiment=.experiment,overwrite=F) {
 	
 	#set all object of experiment
 	setAllObjects(experiment)
-	loadExp(paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
+	loadExp(paste(.experiment.path(experiment),sep=''))
 	
 }
 
