@@ -140,6 +140,37 @@ createAverages <- function(arfdat,experiment=.experiment) {
 	
 }
 
+createAllAverages <- function(experiment=.experiment) {
+	
+	#set filesep
+	sp <- .Platform$file.sep
+	
+
+	#set subjects and conditions
+	subs <- .experiment.subject.names(experiment)
+	conds <- .experiment.condition.names(experiment)
+	
+	#run through all subs and conds
+	for(subject in subs) {
+		for(condition in conds) {
+			
+			#make filename
+			filename <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.dataDir(experiment),sp,.experiment.dataRda(experiment),sep='')
+			
+			#check and create, else warning
+			if(file.exists(filename)) {
+				createAverages(loadRda(filename))
+			} else {
+				warning(paste(filename,'does not exist. Avg not created'))
+			}
+		}
+		
+	}
+	
+	return(invisible(TRUE))
+}
+
+
 # determineStartRect calculates starting values for regions (rectangular mode)
 determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loadOptions(arfmodel)) {
 

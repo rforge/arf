@@ -178,6 +178,7 @@ checkFiles <- function(arfdat) {
 			for(i in 2:length(filenames)) {
 				headinfo <- getFileInfo(filenames[i])
 				if(!identical(.nifti.header.dims(headinforef),.nifti.header.dims(headinfo))) {
+					cat(.data.name(arfdat),'\n')
 					warning('Dimensions of file ', .nifti.header.filename(headinfo),' do not match with reference file ',.nifti.header.filename(headinforef),'!')
 					cat('Dimensions of',.nifti.header.filename(headinfo),':',.nifti.header.dims(headinfo),'\n')
 					cat('Dimensions of',.nifti.header.filename(headinforef),':',.nifti.header.dims(headinforef),'\n')

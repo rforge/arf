@@ -281,28 +281,17 @@ loadExp <- function(path=getwd())
 	#set and check all objects based on subjects/condition info and settings
 	allIsWell <- setAllObjects(experiment)
 
+	#save experiments
 	save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))
 	load(paste(path,.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
 	file.remove(paste(path,.Platform$file.sep,'temp.Rda',sep=''))
-	
+	save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
+		
 	#return loaded info 
 	if(allIsWell) cat('Loaded experiment',.experiment.name(experiment),'\n') else cat('Loaded experiment',.experiment.name(experiment),'with warnings!\n')
 	
 	return(invisible(experiment))
 		
-}
-
-
-##updateExperiment is a wrapper for set all objects and LoadExp
-updateExp <- function(experiment=.experiment,overwrite=F) {
-	
-	#set separator
-	sp <- .Platform$file.sep
-	
-	#set all object of experiment
-	setAllObjects(experiment)
-	loadExp(paste(.experiment.path(experiment),sep=''))
-	
 }
 
 
