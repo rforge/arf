@@ -35,10 +35,10 @@ loadRda <- function(file)
 	return(object)
 }
 
-#with global environment variable loaded, load Data
+#with global environment variable loaded, load Data based on subject and condition
 loadData <- function(subject,condition,exp=.experiment)
 {
-	
+	#set separator
 	sp <- .Platform$file.sep
 	
 	#set filename based on subject and condition
@@ -83,15 +83,11 @@ setAllObjects <- function(experiment,overwrite=F)
 			#set Fullpath
 			.data.fullpath(data) <- path
 			
-			#set registration path
-			regfile <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sp,.experiment.regRda(experiment),sep='')
-			.data.regfile(data) <- regfile
+			#set registration path and check if registration dirs are available
+			.data.regDir(data) <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sep='') 
+			.data.regRda(data) <- .experiment.regRda(experiment)
+			allIsWell <- checkRegs(data,overwrite=overwrite)
 			
-			if(file.exists(regfile)) reg <- loadRda(regfile) else reg <- new('registration')
-			.registration.fullpath(reg) <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sep='')
-			.registration.filename(reg) <- .experiment.regRda(experiment)
-			save(reg,file=regfile)
-						
 			#betafiles
 			betafiles <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.betaDir(experiment),sep=''),full=T)
 			.data.betafiles(data) <- betafiles
@@ -107,7 +103,7 @@ setAllObjects <- function(experiment,overwrite=F)
 			#set number of trials (warn if beta/weight mismatch)
 			if(length(betafiles)!=length(weightfiles)) {warning('Betafiles - Weightfiles mismatch!');allIsWell=F}
 			.data.trials(data) <- length(betafiles)  		
-			
+						
 			#checkFileIntegrity
 			if(!checkFiles(data)) {warning('checkFiles returns false. Check warnings!');allIsWell=F}
 			
@@ -134,7 +130,8 @@ setAllObjects <- function(experiment,overwrite=F)
 						.model.weightfiles(model) <- .data.weightfiles(data)
 						.model.avgdatfile(model) <- .data.avgdatfile(data)
 						.model.avgWfile(model) <- .data.avgWfile(data)
-						.model.regfile(model) <- .data.regfile(data)
+						.model.regDir(model) <- .data.regDir(data)
+						.model.regRda(model) <- .data.regRda(data)
 						save(model,file=paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
 						
 					}

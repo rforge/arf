@@ -4,7 +4,7 @@
 # University of Amsterdam					#
 #############################################
 
-#resize nifti images 
+#resize nifti images (crops last slices to destination dimensions)
 crop.volume <- function(filename,resizeToDim) {
 	
 	dat <- readData(filename)
@@ -72,6 +72,84 @@ read.FSL.mat <- function(filename)
 	return(invisible(mat))
 }
 
+
+#createRegs creates registration files for each 
+createRegs <- function(arfdata) {
+	
+	#set separator
+	sp <- .Platform$file.sep
+	
+	#make new registration object
+	registration <- new('registration')
+	
+	#get betafiles plus path of registration
+	filelist <- .data.betafiles(arfdata)
+	path <- .data.regDir(arfdata)
+	
+	#check betafile integrity and make paths in regDir
+	for(filename in filelist) {
+		if(file.exists(filename)) {
+			
+			#get info from betafile and set linkedfile
+			info <- getFileInfo(filename)
+			dirname <- .nifti.fileinfo.filename(info)
+			
+			#create dir and create regfilename
+			if(!file.exists(paste(path,sp,dirname,sep=''))) dir.create(paste(path,sp,dirname,sep=''))
+			
+			.registration.linkedfile(registration) <- filename
+			.registration.fullpath(registration) <- paste(path,sp,.nifti.fileinfo.filename(info),sep='')
+			.registration.filename(registration) <- .data.regRda(arfdata)
+			
+			#save objects
+			save(registration,file=paste(.registration.fullpath(registration),sp,.registration.filename(registration),sep=''))
+						
+		} else warning('No betafile found to match reg to')
+	}
+	
+}
+
+#checkRegs checks the integrity of the registrationRda's and sets fullpath based on the experiment - data
+checkRegs <- function(arfdata,overwrite=F) {
+	
+	#set separator
+	sp <- .Platform$file.sep
+	
+	#allisWell
+	allIsWell = TRUE
+	
+	#get betafiles plus path of registration
+	filelist <- .data.betafiles(arfdata)
+	path <- .data.regDir(arfdata)
+	
+	#check betafile integrity and make paths in regDir
+	for(filename in filelist) {
+		if(file.exists(filename)) {
+			
+			#get info from betafile and set linkedfile
+			info <- getFileInfo(filename)
+			fn <- paste(path,sp,.nifti.fileinfo.filename(info),sp,.data.regRda(arfdata),sep='')
+			
+			if(file.exists(fn)) {
+			
+				#set correct paths
+				registration = loadRda(fn)
+				.registration.linkedfile(registration) <- filename
+				.registration.fullpath(registration) <- paste(path,sp,.nifti.fileinfo.filename(info),sep='')
+				.registration.filename(registration) <- .data.regRda(arfdata)
+			
+				#save objects
+				save(registration,file=paste(.registration.fullpath(registration),sp,.registration.filename(registration),sep=''))
+			} 
+		} else {
+			warning('No betafile found to match reg to')
+			allIsWell = FALSE
+		}
+	}
+	return(allIsWell)	
+}
+
+#setRegfiles fills the registration object with the correct matrices and nifti images (uses FSL standard as default)
 setRegFiles <- function(registration,examp2high='example_func2highres.mat',high2stand='highres2standard.mat',example_func='example_func.nii.gz',highres='highres.nii.gz',standard='standard.nii.gz') 
 {
 	
@@ -87,49 +165,76 @@ setRegFiles <- function(registration,examp2high='example_func2highres.mat',high2
 	.registration.standard(registration) <- standard
 	if(!file.exists(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.standard(registration),sep=''))) stop('standard does not exist')
 	
+	#save regfile object
 	save(registration,file=paste(.registration.fullpath(registration),.Platform$file.sep,.registration.filename(registration),sep=''))
 	
+	#return registration object
 	return(invisible(registration))
 }
 
+#setRegparams reads in registration parameters from the files in registration object and sets appropriate matrices
 setRegParams <- function(registration) 
 {
+	#load registration volumes
 	examp = readData(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.example(registration),sep=''))
 	highres = readData(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.highres(registration),sep=''))
 	standard = readData(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.standard(registration),sep=''))
 	
+	#Set pixdim matrices
 	.registration.Dex(registration) = diag(c(.fmri.data.pixdim(examp)[2:4],1))
 	.registration.Dhi(registration) = diag(c(.fmri.data.pixdim(highres)[2:4],1))
 	.registration.Dst(registration) = diag(c(.fmri.data.pixdim(standard)[2:4],1))
 	
+	#set x-axis swap matrix
 	.registration.SXhi(registration) = diag(c(-1,1,1,1))
 	.registration.SXhi(registration)[1,4] = .fmri.data.dims(highres)[2]-1
 	
+	#set affine transformation matrices
 	.registration.Aex2hi(registration) = read.FSL.mat(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.examp2high(registration),sep=''))
 	.registration.Ahi2st(registration) = read.FSL.mat(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.high2stand(registration),sep=''))
 	
+	#set origin offset matrix
 	.registration.OXst(registration) = rbind(.fmri.data.srow_x(standard),.fmri.data.srow_y(standard),.fmri.data.srow_z(standard),c(0,0,0,1))	
 	
+	#save object
 	save(registration,file=paste(.registration.fullpath(registration),.Platform$file.sep,.registration.filename(registration),sep=''))
+	
 	return(invisible(registration))
 	
 }
 
 
+#arfToMNI converts arf-native voxel locations to MNI_152 standard coordinates
 arfToMNI <- function(xyz_coor,registration) 
 {
 		
 	xyz = c(xyz_coor,1)
-			
+	
+	#examp_vox to mm
 	examp_mm = .registration.Dex(registration)%*%xyz
+	
+	#examp_mm to high_mm
 	high_mm = .registration.Aex2hi(registration)%*%examp_mm
+	
+	#high_mm to high_vox
 	high_vox = solve(.registration.Dhi(registration))%*%high_mm
+	
+	#x-axis flipped
 	high_vox_flipped = .registration.SXhi(registration)%*%high_vox
+	
+	#high_vox to high_mm
 	high_mm_flipped = .registration.Dhi(registration)%*%high_vox_flipped
+	
+	#high_mm to standard_mm
 	stand_mm_flipped = .registration.Ahi2st(registration)%*%high_mm_flipped
+	
+	#standard_mm to standard_vox 
 	stand_vox_flipped = solve(.registration.Dst(registration))%*%stand_mm_flipped
+	
+	#standard_vox to MNI (origin offset)
 	stand_mni_flipped = .registration.OXst(registration)%*%stand_vox_flipped
 	
+	#return MNI
 	return(stand_mni_flipped[-length(stand_mni_flipped)])
 		
 }

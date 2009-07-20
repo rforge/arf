@@ -25,11 +25,16 @@ fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.
 	#start_time
 	st_time <- Sys.time()
 	
+	#check if averages exist else stop
+	if(!file.exists(.model.avgdatfile(arfmodel))) stop('Averages do not exist, please run createAverages')
+	if(!file.exists(.model.avgWfile(arfmodel))) stop('Averages do not exist, please run createAverages')
+	
 	#clear the warnings and deriv + residualfilres
 	.model.warnings(arfmodel) <- ''
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
 	
+		
 	#call NLM (within a try-loop)
 	nlm.output <- try(suppressWarnings(nlm(
 					ssq,

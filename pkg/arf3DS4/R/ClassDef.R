@@ -15,8 +15,8 @@ setClass(
 		),
 		prototype=prototype(
 			version=1,
-			build=1,
-			update=3
+			build=2,
+			update=1
 		)
 )
 
@@ -94,6 +94,7 @@ setClass(
 		representation=representation(
 				fullpath='character',
 				filename='character',
+				linkedfile='character',
 				examp2high='character',
 				high2stand='character',
 				example='character',
@@ -284,7 +285,18 @@ setClass(
 	)
 )
 
+## wald statistics class
+setClass(
+		Class='wald',
+		representation=representation(
+				design='matrix',	#design
+				stats='matrix',		#statistic
+				df1='numeric',		#df1
+				df2='numeric',		#df2
+				pvalues='matrix'	#pvalues
+		)
 
+)
 
 ## arf data class (containing info on the locations of the data and weightfiles, the dimensions, number of trials, and relevant nifti parameters.)
 setClass(
@@ -296,7 +308,8 @@ setClass(
 		weightfiles='character',	#vector of char containing weight datafiles
 		avgdatfile='character',		#filename of average data
 		avgWfile='character',		#filename of average weights
-		regfile='character',	
+		regDir='character',			#directory of registration dirs
+		regRda='character',			#filename of registration file 
 		trials='numeric'			#number of trials
 	)
 )
@@ -335,7 +348,8 @@ setClass(
 	),
 	prototype=prototype(
 			valid=FALSE,
-			proctime=matrix(0,1,2)
+			proctime=matrix(0,1,2),
+			wald=new('wald')
 	)
 )
 
@@ -356,20 +370,6 @@ setClass(
 			current=1,
 			minimum=0
 	)
-)
-
-
-## wald statistics class
-setClass(
-	Class='wald',
-	representation=representation(
-		design='matrix',	#design
-		stats='matrix',		#statistic
-		df1='numeric',		#df1
-		df2='numeric',		#df2
-		pvalues='matrix'	#pvalues
-	)
-	
 )
 
 
