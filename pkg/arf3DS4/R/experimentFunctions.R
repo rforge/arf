@@ -277,7 +277,7 @@ loadExp <- function(path=getwd())
 	fn <- strsplit(filename,.Platform$file.sep)[[1]]
 	path <- sub(fn[length(fn)],'',filename)
 	path <- path.expand(path)
-		
+	
 	#change root for the experiment-file to the current root
 	.experiment <- experiment <- chngRootExp(path,quiet=T)
 	

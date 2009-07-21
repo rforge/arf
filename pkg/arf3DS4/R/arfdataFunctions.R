@@ -86,7 +86,7 @@ setAllObjects <- function(experiment,overwrite=F)
 			#set registration path and check if registration dirs are available
 			.data.regDir(data) <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sep='') 
 			.data.regRda(data) <- .experiment.regRda(experiment)
-			allIsWell <- checkRegs(data,overwrite=overwrite)
+			regIsWell <- checkRegs(data,overwrite=overwrite)
 			
 			#betafiles
 			betafiles <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.betaDir(experiment),sep=''),full=T)
