@@ -63,7 +63,7 @@ setAllObjects <- function(experiment,overwrite=F)
 		for(conds in 1:.experiment.condition.num(experiment)) {
 			
 			#locate main path of datafiles structure
-			path <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,.experiment.subject.names(experiment)[subs],sp,.experiment.conditionDir(experiment),sp,.experiment.condition.names(experiment)[conds],sep='')
+			path <- paste(.experiment.path(experiment),.experiment.subjectDir(experiment),sp,.experiment.subject.names(experiment)[subs],sp,.experiment.conditionDir(experiment),sp,.experiment.condition.names(experiment)[conds],sep='')
 						
 			#create a new data file or read from the old one
 			if(overwrite) {		
@@ -88,6 +88,10 @@ setAllObjects <- function(experiment,overwrite=F)
 			.data.regRda(data) <- .experiment.regRda(experiment)
 			regIsWell <- checkRegs(data,overwrite=overwrite)
 			
+			#set functional path and checck if available
+			
+		
+	
 			#betafiles
 			betafiles <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.betaDir(experiment),sep=''),full=T)
 			.data.betafiles(data) <- betafiles
@@ -200,7 +204,7 @@ makeWeights <- function(experiment) {
 	sp <- .Platform$file.sep
 	
 	#set initial directory
-	subd <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sep='')
+	subd <- paste(.experiment.path(experiment),.experiment.subjectDir(experiment),sep='')
 	
 	#run through all dirs 
 	for(sdirs in 1:.experiment.subject.num(experiment)) {

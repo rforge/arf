@@ -8,12 +8,61 @@
 ssq <- function(theta,datavec,weightvec,np,dimx,dimy,dimz) {
 	## ssq is the objective function (sums-of-squares)
 	## it calls the external C-funtion 'ssq'
-	## input are theta (paramters), datavec, weightvec, number of regions, and dim x and dim y
+	## input are theta (parameters), datavec, weightvec, number of regions, and dim x and dim y
 	## output is a vector of parameter estimates (double)
 	
-	nlmdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))
+	nlmdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[8]]
 	
-	return(invisible(nlmdat[[8]]))	
+	#cat(nlmdat)
+	#if(!is.nan(nlmdat) & !is.na(nlmdat)) if(nlmdat==-1) nlmdat=NaN
+	#cat(nlmdat,'\n')		
+	
+	#x=seq(0,np,10)[-length(seq(0,np,10))]
+	
+	#for(i in x) {
+	#	sig_x=theta[4+i]^2
+	#	sig_xy=theta[7+i]*theta[5+i]*theta[4+i];
+	#	sig_xz=theta[8+i]*theta[6+i]*theta[4+i];
+	#	sig_y=theta[5+i]^2
+	#	sig_yz=theta[9+i]*theta[5+i]*theta[6+i];
+	#	sig_z=theta[6+i]^2
+	
+	#	det_sig=sig_x*sig_y*sig_z-sig_x*sig_yz*sig_yz-sig_xy*sig_xy*sig_z+sig_xy*sig_xz*sig_yz+sig_xz*sig_xy*sig_yz-sig_xz*sig_y*sig_xz;
+	
+	#	if(theta[4+i] < 0 | theta[5+i] < 0  | theta[6+i] < 0) nlmdat=NaN
+	#	if(theta[7+i] < (-.99) | theta[8+i] < (-.99)  | theta[9+i] < (-.99)) nlmdat=NaN
+	#	if(theta[7+i] > (.99) | theta[8+i]  > (.99)  | theta[9+i] > (.99)) nlmdat=NaN
+		
+		
+	#	cat(det_sig,' ')
+	#}
+
+	#cat(nlmdat,'\n')
+	
+	#browser()
+	return(invisible(nlmdat))	
+	
+}
+
+#modePred returns an array with modelpredictions for the model or the startingvalues
+modelPred <- function(arfmodel,which=c('model','start')) {
+	
+	which <- match.arg(which[1],c('model','start'))
+	
+	if(which=='model') theta <- .model.estimates(arfmodel) else theta <- .model.startval(arfmodel)
+	
+	dat <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))
+	dimx <- .nifti.header.dims(dat)[2]
+	dimy <- .nifti.header.dims(dat)[3]
+	dimz <- .nifti.header.dims(dat)[4]
+	
+	np <- .model.regions(arfmodel)*10
+		
+	model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
+	
+	dim(model) <- c(dimx,dimy,dimz)
+	
+	return(model)
 	
 }
 
@@ -45,12 +94,12 @@ fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.
 					dimx=.fmri.data.dims(dat)[2],
 					dimy=.fmri.data.dims(dat)[3],
 					dimz=.fmri.data.dims(dat)[4],
-					print.level=0,
+					print.level=2,
 					hessian=T,
 					iterlim=.options.min.iterlim(options),
 					gradtol=.options.min.gradtol(options),
 					steptol=.options.min.steptol(options)
-					)),silen=T)
+					)),silen=F)
 	
 	#end_time
 	en_time <- Sys.time()
@@ -77,7 +126,8 @@ fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.
 				
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
-		.model.valid(arfmodel) <- FALSE	
+		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
+		.model.valid(arfmodel) <- FALSE
 	}
 	
 	if(!.model.valid(arfmodel)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),.model.convergence(arfmodel)) 

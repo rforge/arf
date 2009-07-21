@@ -127,7 +127,7 @@ chngRootExp <- function(path=getwd(),quiet=F)
 	experiment <- loadRda(list.files(path,'.Rda',full=T))
 	
 	#set the correct path
-	.experiment.path(experiment)=path
+	.experiment.path(experiment) <- path.expand(path)
 	
 	#check the experiment dirs, if good save and exit. if not good stop
 	if(checkExp(experiment)) {
@@ -157,7 +157,7 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 	#create new experimentclass
 	experiment <- new('experiment',settings)
 	.experiment.name(experiment) <- expname
-	.experiment.path(experiment) <- path
+	.experiment.path(experiment) <- path.expand(path)
 	
 	cat('[',toupper(expname),']\n')
 	cat(' Experiment root:',path,'\n')

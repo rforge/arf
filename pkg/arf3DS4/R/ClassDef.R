@@ -16,8 +16,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=2,
-		update=5,
-		svnrev=33
+		update=6,
+		svnrev=34
 	)
 )
 
@@ -167,7 +167,7 @@ setClass(
 		min.steptol=1e-8,
 		start.method='rect',
 		start.maxfac=2,
-		start.vector=c(0,0,0,0,0,0,.1,.1,.1,100),
+		start.vector=c(0,0,0,0,0,0,.1,.2,-.1,100),
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,0,0,-.9,-.9,-.9,-1e+64,0,0,0,0,0,0,.9,.9,.9,1e+64),
 		sw.type='diag',
@@ -314,11 +314,7 @@ setClass(
 		stats='matrix',		#statistic
 		df1='numeric',		#df1
 		df2='numeric',		#df2
-		pvalues='matrix',	#pvalues
-		version='ANY'
-	),
-	prototype=prototype(
-		version=new('version')
+		pvalues='matrix'	#pvalues
 	)
 )
 
