@@ -1,25 +1,47 @@
 export(
-	makeExp,
+	setExp,
 	makeExpDirs,
+	loadExp,
+	getFSL,
+	getFileInfo,
 	readData,
 	writeData,
-	newModel,
+	crop.volume,
+	createRegs,
+	setRegFiles,
+	setRegParams,
+	arfToMNI,
 	fitModel,
+	createAverages,
+	createAllAverages,
+	determineStartRect,
+	newModel,
+	saveModel,
+	loadOptions,
+	loadStart,
+	loadReg,
 	loadRda,
-	loadExp,
-	blobMe,
-	simBlobs3D,
-	arfSim
+	loadData,
+	makeDerivs,
+	makeResiduals,
+	varcov,
+	BIC,
+	wald
 )
 
 exportClasses(
+	version,
+	settings,
 	experiment,
+	registration,
+	functional,
+	options,
+	nifti.fileinfo,
+	nifti.header,
 	fmri.data,
 	data,
 	model,
-	sequence,
-	wald,
-	options
+	wald
 )
 
 import(

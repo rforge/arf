@@ -140,8 +140,8 @@ chngRootExp <- function(path=getwd(),quiet=F)
 	return(invisible(experiment))
 }
 
-#makeExp creates an experiment-class object based on existing directories
-makeExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE) 
+#setExp creates an experiment-class object based on existing directories
+setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE) 
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -264,7 +264,10 @@ loadExp <- function(path=getwd())
 {
 	#set separator
 	sp <- .Platform$file.sep
-			
+	
+	#check if only dir else pre-append working directory
+	if(length(grep(sp,path))==0) path <- paste(getwd(),sp,path,sep='')
+	
 	#set filename and load experiment
 	filename <- list.files(path,'.Rda',full=T)
 	if(length(filename)!=1) stop('No experiment rda file found or multiple rda files found.')
@@ -276,7 +279,7 @@ loadExp <- function(path=getwd())
 	path <- path.expand(path)
 		
 	#change root for the experiment-file to the current root
-	experiment <- chngRootExp(path,quiet=T)
+	.experiment <- experiment <- chngRootExp(path,quiet=T)
 	
 	#set and check all objects based on subjects/condition info and settings
 	allIsWell <- setAllObjects(experiment)

@@ -4,126 +4,143 @@
 # University of Amsterdam					#
 #############################################
 
-
 ## arf version class (version is set here)
 setClass(
-		Class='version',
-		representation=representation(
-			version='numeric',
-			build='numeric',
-			update='numeric'
-		),
-		prototype=prototype(
-			version=1,
-			build=2,
-			update=1
-		)
+	Class='version',
+	representation=representation(
+		version='numeric',
+		build='numeric',
+		update='numeric',
+		svnrev='numeric'
+	),
+	prototype=prototype(
+		version=1,
+		build=2,
+		update=4,
+		svnrev=30
+	)
 )
-
 
 ## arf settings class (containing all standard directory names)
 setClass(
-		Class='settings',
-		representation=representation(
-			expRda='character',				#name of experimentobject
-			optionsRda='character',			#name of optionsobject
-			startRda='character',			#name of startvec file
-			dataRda='character',			#name of dataobject in each datadir
-			modelRda='character',			#name of modeldatafile
-			statsRda='character',			#name of statsfile
-			regRda='character',
-			subjectPrefix='character', 		#subjects prefix
-			conditionPrefix='character', 	#condition prefix
-			modelPrefix='character',		#model prefix
-			subjectDir='character', 		#subjects prefix
-			conditionDir='character', 		#condition prefix
-			dataDir='character',			#data directory name
-			weightsDir='character',			#weights directory name
-			avgDir='character',				#avg directory name
-			regDir='character',
-			betaDir='character',			#beta directory
-			modelDir='character',			#model directory
-			statsDir='character',			#stats directory
-			modeldatDir='character', 		#Residual/Derivatives/Weights directory
-			avgdatFile='character',			#averageDataFileName
-			avgWFile='character',			#averageWeightFileName
-			avgtstatFile='character',		#averagetstatFile
-			modelDataFile='character',		#name of modelDataiFile
-			modelnamesRda='character',		#modelNames file
-			residualFile='character',		#name of residual binary
-			derivativeFile='character',		#name of derivative binary
-			weightFile='character'
-			
-		),
-		prototype=prototype(
-			expRda='experiment.Rda',		#name of experimentobject
-			optionsRda='options.Rda',		#name of optionsobject
-			startRda='start.Rda',			#startvec
-			dataRda='data.Rda',				#name of dataobject in each data
-			modelRda='model.Rda',			#name of modelfile
-			statsRda='stats.Rda',			#name of statsfile
-			regRda='registration.Rda',
-			subjectPrefix='', 				#subjects prefix
-			conditionPrefix='', 			#condition prefix
-			subjectDir='subjects', 			#subjects prefix
-			conditionDir='conditions', 		#condition prefix
-			modelPrefix='model',			#model prefix
-			dataDir='data',					#data directory name
-			weightsDir='weights',			#weights directory name
-			avgDir='avg',					#avg directory name
-			regDir='reg',
-			betaDir='beta',					#beta directory
-			modelDir='models',				#model directory
-			statsDir='stats',				#stats directory
-			modeldatDir='data', 			#Residual/Derivatives/Weights directory	
-			avgdatFile='avgdata',			#averageDataFileName
-			avgWFile='avgweight',			#averageWeightFileName
-			avgtstatFile='avgtstat',		#average tstat filename
-			modelDataFile='avgmodel',		#name of modelNiftiFile
-			modelnamesRda='modelnames.Rda', #modelNames file
-			residualFile='residuals.bin',	#name of residual binary
-			derivativeFile='derivs.bin',	#name of derivative binary
-			weightFile='weights.bin'
-
+	Class='settings',
+	representation=representation(
+		expRda='character',				#name of experimentobject
+		optionsRda='character',			#name of optionsobject
+		startRda='character',			#name of startvec file
+		dataRda='character',			#name of dataobject in each datadir
+		modelRda='character',			#name of modeldatafile
+		statsRda='character',			#name of statsfile
+		regRda='character',
+		subjectPrefix='character', 		#subjects prefix
+		conditionPrefix='character', 	#condition prefix
+		modelPrefix='character',		#model prefix
+		subjectDir='character', 		#subjects prefix
+		conditionDir='character', 		#condition prefix
+		dataDir='character',			#data directory name
+		weightsDir='character',			#weights directory name
+		avgDir='character',				#avg directory name
+		regDir='character',
+		betaDir='character',			#beta directory
+		modelDir='character',			#model directory
+		statsDir='character',			#stats directory
+		modeldatDir='character', 		#Residual/Derivatives/Weights directory
+		avgdatFile='character',			#averageDataFileName
+		avgWFile='character',			#averageWeightFileName
+		avgtstatFile='character',		#averagetstatFile
+		modelDataFile='character',		#name of modelDataiFile
+		modelnamesRda='character',		#modelNames file
+		residualFile='character',		#name of residual binary
+		derivativeFile='character',		#name of derivative binary
+		weightFile='character',
+		version='ANY'
+	),
+	prototype=prototype(
+		expRda='experiment.Rda',		#name of experimentobject
+		optionsRda='options.Rda',		#name of optionsobject
+		startRda='start.Rda',			#startvec
+		dataRda='data.Rda',				#name of dataobject in each data
+		modelRda='model.Rda',			#name of modelfile
+		statsRda='stats.Rda',			#name of statsfile
+		regRda='registration.Rda',
+		subjectPrefix='', 				#subjects prefix
+		conditionPrefix='', 			#condition prefix
+		subjectDir='subjects', 			#subjects prefix
+		conditionDir='conditions', 		#condition prefix
+		modelPrefix='model',			#model prefix
+		dataDir='data',					#data directory name
+		weightsDir='weights',			#weights directory name
+		avgDir='avg',					#avg directory name
+		regDir='reg',
+		betaDir='beta',					#beta directory
+		modelDir='models',				#model directory
+		statsDir='stats',				#stats directory
+		modeldatDir='data', 			#Residual/Derivatives/Weights directory	
+		avgdatFile='avgdata',			#averageDataFileName
+		avgWFile='avgweight',			#averageWeightFileName
+		avgtstatFile='avgtstat',		#average tstat filename
+		modelDataFile='avgmodel',		#name of modelNiftiFile
+		modelnamesRda='modelnames.Rda', #modelNames file
+		residualFile='residuals.bin',	#name of residual binary
+		derivativeFile='derivs.bin',	#name of derivative binary
+		weightFile='weights.bin',
+		version=new('version')
 		)
 )
 
 ## arf/FSL registration class
 setClass(
-		Class='registration',
-		representation=representation(
-				fullpath='character',
-				filename='character',
-				linkedfile='character',
-				examp2high='character',
-				high2stand='character',
-				example='character',
-				highres='character',
-				standard='character',
-				Dex='matrix',
-				Dhi='matrix',
-				Dst='matrix',
-				SXhi ='matrix',
-				Aex2hi='matrix', 
-				Ahi2st ='matrix',
-				OXst ='matrix'
-				)
-		
-		)
+	Class='registration',
+	representation=representation(
+		fullpath='character',
+		filename='character',
+		linkedfile='character',
+		examp2high='character',
+		high2stand='character',
+		example='character',
+		highres='character',
+		standard='character',
+		Dex='matrix',
+		Dhi='matrix',
+		Dst='matrix',
+		SXhi ='matrix',
+		Aex2hi='matrix', 
+		Ahi2st ='matrix',
+		OXst ='matrix',
+		version='ANY'
+	),
+	prototype=prototype(
+		version=new('version')
+	)
+)
+
+## arf/FSL functional_data class
+setClass(
+	Class='functional',
+	representation=representation(
+		fullpath='character',
+		filename='character',
+		linkeddataRda='character',
+		version='ANY'
+	),
+	prototype=prototype(
+		version=new('version')
+	)
+)
+
 
 ## arf experiment class (containing, rootdirectories, condition numbers etc. and preferred sequences)
 setClass(
-		Class='experiment',
-		contains='settings',
-		representation=representation(
-				path='character', 			#rootdirectory of experiment
-				name='character',			#experiment name
-				subject.num='numeric',		#number of subjects
-				subject.names='character',	#names of subjects
-				condition.num='numeric',	#number of conditions
-				condition.names='character' #names of condition directories
-		
-		)
+	Class='experiment',
+	contains='settings',
+	representation=representation(
+		path='character', 			#rootdirectory of experiment
+		name='character',			#experiment name
+		subject.num='numeric',		#number of subjects
+		subject.names='character',	#names of subjects
+		condition.num='numeric',	#number of conditions
+		condition.names='character' #names of condition directories
+	)
 )
 
 ## arf (general) settings class (containing general settings on NLM, starting values and range checks)
@@ -139,7 +156,8 @@ setClass(
 		chk.method='character',		#which method is used to check the range of parameter values
 		chk.range='numeric',		#vector containing ranges for each parameter (vector is recycled for regions)		
 		sw.type='character',		#method to use with Residuals ('diag','full')
-		output.mode='character'		#output mode
+		output.mode='character',	#output mode
+		version='ANY'
 
 
 	),
@@ -153,7 +171,8 @@ setClass(
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,0,0,-.9,-.9,-.9,-1e+64,0,0,0,0,0,0,.9,.9,.9,1e+64),
 		sw.type='diag',
-		output.mode=c('log','screen')
+		output.mode=c('log','screen'),
+		version=new('version')
 	)
 )
 
@@ -166,13 +185,15 @@ setClass(
 		filetype='character',		#type (nifti or analyze)
 		extension='character',		#extension (.nii, .hdr/.img)
 		gzipped='logical',			#gzipped or not
-		endian='character'			#endian
+		endian='character',			#endian
+		version='ANY'
 	),
 	prototype=prototype(
 		gzipped=TRUE,
 		extension='nii',
 		filetype='nifti',
-		endian=.Platform$endian
+		endian=.Platform$endian,
+		version=new('version')
 	)
 )
 
@@ -243,7 +264,7 @@ setClass(
 		datatype = 16,			#storage data type
 		bitpix = 32,			#bits per pixel
 		slice_start = 0,		
-		pixdim = c(1,3,3,3,2.8,0,0,0),
+		pixdim = c(1,1,1,1,1,0,0,0),
 		vox_offset = 0,			#offset of data in .nii file
 		scl_slope = 1,
 		scl_inter = 0,
@@ -266,9 +287,9 @@ setClass(
 		qoffset_x = 0,
 		qoffset_y = 0,
 		qoffset_z = 0,
-		srow_x = c(3,0,0,0),
-		srow_y = c(0,3,0,0),
-		srow_z = c(0,0,3,0),
+		srow_x = c(1,0,0,0),
+		srow_y = c(0,1,0,0),
+		srow_z = c(0,0,1,0),
 		intent_name = 'ArfBlobsimdata',	#meaning of data
 		magic = 'n+1',					#magicstring
 		data.type = 'double',			#type of data
@@ -287,15 +308,18 @@ setClass(
 
 ## wald statistics class
 setClass(
-		Class='wald',
-		representation=representation(
-				design='matrix',	#design
-				stats='matrix',		#statistic
-				df1='numeric',		#df1
-				df2='numeric',		#df2
-				pvalues='matrix'	#pvalues
-		)
-
+	Class='wald',
+	representation=representation(
+		design='matrix',	#design
+		stats='matrix',		#statistic
+		df1='numeric',		#df1
+		df2='numeric',		#df2
+		pvalues='matrix',	#pvalues
+		version='ANY'
+	),
+	prototype=prototype(
+		version=new('version')
+	)
 )
 
 ## arf data class (containing info on the locations of the data and weightfiles, the dimensions, number of trials, and relevant nifti parameters.)
@@ -310,7 +334,11 @@ setClass(
 		avgWfile='character',		#filename of average weights
 		regDir='character',			#directory of registration dirs
 		regRda='character',			#filename of registration file 
-		trials='numeric'			#number of trials
+		trials='numeric',			#number of trials
+		version='ANY'
+	),
+	prototype=prototype(
+		version=new('version')
 	)
 )
 
@@ -352,53 +380,3 @@ setClass(
 			wald=new('wald')
 	)
 )
-
-
-
-## arf sequence class (containing info (fit, valid) on a sequence of models)
-setClass(
-	Class='sequence',
-	representation=representation(
-		current='numeric',			#current number of regions in model
-		regions='numeric',			#vector of regions to fit (can be sequential or any other combination)
-		mnames='character',			#vector of names of models
-		fit='numeric',				#vector of fit measures (to evaluate best fit)
-		minimum='numeric',			#which region has the minimum
-		valid='numeric'				#vector of validity of solutions (all estimates and variances ok)
-	),
-	prototype=prototype(
-			current=1,
-			minimum=0
-	)
-)
-
-
-## arf analysis class (not yet implemented)
-setClass(
-		Class='analysis',
-		representation=representation(
-				name='character',			#name of the analysis
-				modelobjects='ANY',			#names of model objects in the analysis
-				designmatrix='numeric',		#designmatrix of analysis
-				rfx='logical'				#perform random-effects analysis?
-		)
-)
-
-
-## arf sims class (only for simulation of data) (not yet implemented)
-setClass(
-		Class='sims',
-		representation=representation(
-				numsims='numeric',			#number of simulations
-				numtrials='numeric',		#number of trials
-				theta='numeric',			#vector of parameter values to simulate
-				shapemodel='character',		#which shape model of signal
-				noisemodel='character',		#which noise calc method
-				noiseFWHM='numeric',		#FWHM of noise
-				imageFWHM='numeric',		#FWHM of signal+noise smoother		
-				sequence='numeric',			#sequence of regions to be fit
-				SNR='numeric'				#which signal to noise ratio is used?
-		)
-)
-
-
