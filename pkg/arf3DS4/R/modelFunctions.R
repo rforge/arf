@@ -18,7 +18,7 @@ newModel <- function(modelname='defaultmodel',regions=1,subject='',condition='',
 	#checks
 	if(!class(arfdata)=='data') stop('Input must be of class \'data\'')
 	if(modelname=='') stop('Modelname cannot be empty')
-	browser()	
+	
 	#make new modelobject
 	model <- new('model',arfdata)
 

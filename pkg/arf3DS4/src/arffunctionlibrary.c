@@ -375,8 +375,6 @@ void dfgaussFile(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, cha
 	void dftheta8();
 	void dftheta9();
 
-
-
 	int i,n=(*dimx)*(*dimy)*(*dimz), reg;
 	double *grad, *theta;
 	grad = (double *) R_alloc((n),sizeof(double));
@@ -416,6 +414,88 @@ void dfgaussFile(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, cha
 	}
 
 	fclose(f);
+}
+
+void dfssq(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, double *data, double *model, double *weights, double *ssqgrad)
+{
+
+	void dftheta0();
+	void dftheta1();
+	void dftheta2();
+	void dftheta3();
+	void dftheta4();
+	void dftheta5();
+	void dftheta6();
+	void dftheta7();
+	void dftheta8();
+	void dftheta9();
+
+
+
+	int i,j,n=(*dimx)*(*dimy)*(*dimz), reg;
+	double *grad, *theta;
+	grad = (double *) R_alloc((n),sizeof(double));
+	theta = (double *) R_alloc((10),sizeof(double));
+
+
+	for(reg=0;reg<(*np);reg=reg+10) {
+
+		for(i=0;i<10;i++) {
+			*(theta+i)=*(thetavec+reg+i);
+		}
+
+		dftheta0(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+0)=0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+0)=*(ssqgrad+reg+0)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+0)=*(ssqgrad+reg+0)*-2;
+
+		dftheta1(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+1)=0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+1)=*(ssqgrad+reg+1)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+1)=*(ssqgrad+reg+1)*-2;
+
+		dftheta2(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+2)=0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+2)=*(ssqgrad+reg+2)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+2)=*(ssqgrad+reg+2)*-2;
+
+		dftheta3(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+3)=0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+3)=*(ssqgrad+reg+3)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+3)=*(ssqgrad+reg+3)*-2;
+
+		dftheta4(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+4)=0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+4)=*(ssqgrad+reg+4)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+4)=*(ssqgrad+reg+4)*-2;
+
+		dftheta5(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+5)=0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+5)=*(ssqgrad+reg+5)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+5)=*(ssqgrad+reg+5)*-2;
+
+		dftheta6(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+6)=0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+6)=*(ssqgrad+reg+6)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+6)=*(ssqgrad+reg+6)*-2;
+
+		dftheta7(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+7)=0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+7)=*(ssqgrad+reg+7)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+7)=*(ssqgrad+reg+7)*-2;
+
+		dftheta8(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+8)=0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+8)=*(ssqgrad+reg+8)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+8)=*(ssqgrad+reg+8)*-2;
+
+		dftheta9(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+9)=0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+9)=*(ssqgrad+reg+9)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+9)=*(ssqgrad+reg+9)*-2;
+	}
+
+
 }
 
 void dftheta0(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {

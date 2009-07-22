@@ -240,4 +240,81 @@ arfToMNI <- function(xyz_coor,registration)
 }
 
 
+#createFuncs creates registration files for each 
+createFuncs <- function(arfdata) {
+	
+	#set separator
+	sp <- .Platform$file.sep
+	
+	#make new registration object
+	functional<- new('functional')
+	
+	#get betafiles plus path of registration
+	filelist <- .data.betafiles(arfdata)
+	path <- .data.funcDir(arfdata)
+	
+	#check betafile integrity and make paths in regDir
+	for(filename in filelist) {
+		if(file.exists(filename)) {
+			
+			#get info from betafile and set linkedfile
+			info <- getFileInfo(filename)
+			dirname <- .nifti.fileinfo.filename(info)
+			
+			#create dir and create regfilename
+			if(!file.exists(paste(path,sp,dirname,sep=''))) dir.create(paste(path,sp,dirname,sep=''))
+			
+			.functional.linkedfile(functional) <- filename
+			.functional.fullpath(functional) <- paste(path,sp,.nifti.fileinfo.filename(info),sep='')
+			.functional.filename(functional) <- .data.funcRda(arfdata)
+			
+			#save objects
+			save(functional,file=paste(.functional.fullpath(functional),sp,.functional.filename(functional),sep=''))
+			
+		} else warning('No betafile found to match functional data to')
+	}
+	
+}
+
+#checkRegs checks the integrity of the registrationRda's and sets fullpath based on the experiment - data
+checkFuncs <- function(arfdata,overwrite=F) {
+	
+	#set separator
+	sp <- .Platform$file.sep
+	
+	#allisWell
+	allIsWell = TRUE
+	
+	#get betafiles plus path of registration
+	filelist <- .data.betafiles(arfdata)
+	path <- .data.funcDir(arfdata)
+	
+	#check betafile integrity and make paths in regDir
+	for(filename in filelist) {
+		if(file.exists(filename)) {
+			
+			#get info from betafile and set linkedfile
+			info <- getFileInfo(filename)
+			fn <- paste(path,sp,.nifti.fileinfo.filename(info),sp,.data.funcRda(arfdata),sep='')
+			
+			if(file.exists(fn)) {
+				
+				#set correct paths
+				functional = loadRda(fn)
+				.functional.linkedfile(functional) <- filename
+				.functional.fullpath(functional) <- paste(path,sp,.nifti.fileinfo.filename(info),sep='')
+				.functional.filename(functional) <- .data.funcRda(arfdata)
+				
+				#save objects
+				save(functional,file=paste(.functional.fullpath(functional),sp,.functional.filename(functional),sep=''))
+			
+			} 
+		} else {
+			warning('No betafile found to match functional data to')
+			allIsWell = FALSE
+		}
+	}
+	return(allIsWell)	
+}
+
 

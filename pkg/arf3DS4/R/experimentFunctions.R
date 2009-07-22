@@ -100,6 +100,8 @@ makeExpDirs <- function(path=getwd(),name='default_experiment',subjectind=1,cond
 			dir.create(paste(dn,sp,.settings.weightsDir(settings),sep=''),show=F)
 			dir.create(paste(dn,sp,.settings.avgDir(settings),sep=''),show=F)
 			dir.create(paste(dn,sp,.settings.regDir(settings),sep=''),show=F)
+			dir.create(paste(dn,sp,.settings.funcDir(settings),sep=''),show=F)
+			
 			
 		
 		}
@@ -146,6 +148,12 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 	#set separator
 	sp <- .Platform$file.sep
 	
+	#check if only dir else pre-append working directory
+	if(length(grep(sp,path))==0) path <- paste(getwd(),sp,path,sep='')
+	
+	#set path separator at end
+	path <- file.path(dirname(path),basename(path),'')
+	
 	#set expname
 	expname <- strsplit(path,.Platform$file.sep)[[1]]
 	expname <- expname[length(expname)]
@@ -157,7 +165,7 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 	#create new experimentclass
 	experiment <- new('experiment',settings)
 	.experiment.name(experiment) <- expname
-	.experiment.path(experiment) <- path.expand(path)
+	.experiment.path(experiment) <- path
 	
 	cat('[',toupper(expname),']\n')
 	cat(' Experiment root:',path,'\n')
@@ -220,15 +228,16 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 		
 		cat('    the following directories have been found within data.\n')
 		wdir <- numeric(length(fileList))
-		if(length(fileList)<4) stop('Not enough directories found!')
-		names(wdir) <- c('average','beta','reg','weights')
+		if(length(fileList)<5) stop('Not enough directories found!')
+		names(wdir) <- c('average','beta','func','reg','weights')
 		
 		
 		for(i in 1:length(fileList)) cat('     [',i,'] ',fileList[i],'\n',sep='')
-		for(i in 1:4) wdir[i] <- as.numeric(readline(paste('    Please indicate the number corresponding to the',names(wdir)[i],'directory: ')))
+		for(i in 1:5) wdir[i] <- as.numeric(readline(paste('    Please indicate the number corresponding to the',names(wdir)[i],'directory: ')))
 		
 		.experiment.avgDir(experiment) <- fileList[wdir[1]]
 		.experiment.betaDir(experiment) <- fileList[wdir[2]]
+		.experiment.funcDir(experiment) <- fileList[wdir[3]]
 		.experiment.regDir(experiment) <- fileList[wdir[3]]
 		.experiment.weightsDir(experiment) <- fileList[wdir[4]]
 		
@@ -243,10 +252,11 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 	
 	#check the experiment dirs, if good save and exit. if not good stop
 	if(checkExp(experiment)) {
-		save(experiment,file=paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''))
-		cat('Experiment correctly set. Experiment saved to',paste(.experiment.path(experiment),sp,.settings.expRda(settings),sep=''),'\n\n')
+		save(experiment,file=paste(.experiment.path(experiment),.settings.expRda(settings),sep=''))
+		cat('Experiment correctly set. Experiment saved to',paste(.experiment.path(experiment),.settings.expRda(settings),sep=''),'\n')
 		loadExp(paste(.experiment.path(experiment),sep=''))
 		
+		.experiment <- experiment
 		save('.experiment',file=paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''))
 		load(paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
 		file.remove(paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''))

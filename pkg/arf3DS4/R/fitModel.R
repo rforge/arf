@@ -5,44 +5,30 @@
 #############################################
 
 
-ssq <- function(theta,datavec,weightvec,np,dimx,dimy,dimz) {
+ssq.nlm <- function(theta,datavec,weightvec,np,dimx,dimy,dimz) {
 	## ssq is the objective function (sums-of-squares)
 	## it calls the external C-funtion 'ssq'
 	## input are theta (parameters), datavec, weightvec, number of regions, and dim x and dim y
 	## output is a vector of parameter estimates (double)
 	
+
 	nlmdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[8]]
 	
-	#cat(nlmdat)
-	#if(!is.nan(nlmdat) & !is.na(nlmdat)) if(nlmdat==-1) nlmdat=NaN
-	#cat(nlmdat,'\n')		
+	if(!is.na(nlmdat) & !is.nan(nlmdat)) {
+		if(nlmdat!=Inf) {
+			model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
+			gradient <- .C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]]
+			attr(nlmdat,'gradient') <- gradient
+		} else nlmdat=NaN
+	}
 	
-	#x=seq(0,np,10)[-length(seq(0,np,10))]
-	
-	#for(i in x) {
-	#	sig_x=theta[4+i]^2
-	#	sig_xy=theta[7+i]*theta[5+i]*theta[4+i];
-	#	sig_xz=theta[8+i]*theta[6+i]*theta[4+i];
-	#	sig_y=theta[5+i]^2
-	#	sig_yz=theta[9+i]*theta[5+i]*theta[6+i];
-	#	sig_z=theta[6+i]^2
-	
-	#	det_sig=sig_x*sig_y*sig_z-sig_x*sig_yz*sig_yz-sig_xy*sig_xy*sig_z+sig_xy*sig_xz*sig_yz+sig_xz*sig_xy*sig_yz-sig_xz*sig_y*sig_xz;
-	
-	#	if(theta[4+i] < 0 | theta[5+i] < 0  | theta[6+i] < 0) nlmdat=NaN
-	#	if(theta[7+i] < (-.99) | theta[8+i] < (-.99)  | theta[9+i] < (-.99)) nlmdat=NaN
-	#	if(theta[7+i] > (.99) | theta[8+i]  > (.99)  | theta[9+i] > (.99)) nlmdat=NaN
-		
-		
-	#	cat(det_sig,' ')
-	#}
-
-	#cat(nlmdat,'\n')
-	
-	#browser()
 	return(invisible(nlmdat))	
 	
 }
+
+
+
+
 
 #modePred returns an array with modelpredictions for the model or the startingvalues
 modelPred <- function(arfmodel,which=c('model','start')) {
@@ -67,7 +53,7 @@ modelPred <- function(arfmodel,which=c('model','start')) {
 }
 
 ## fitModel calls the minimization routine (NLM)
-fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel))) {
+fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel))) {
 	
 	sp <- .Platform$file.sep
 	
@@ -86,7 +72,7 @@ fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.
 		
 	#call NLM (within a try-loop)
 	nlm.output <- try(suppressWarnings(nlm(
-					ssq,
+					ssq.nlm,
 					.model.startval(arfmodel),
 					datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 					weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
@@ -94,12 +80,13 @@ fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.
 					dimx=.fmri.data.dims(dat)[2],
 					dimy=.fmri.data.dims(dat)[3],
 					dimz=.fmri.data.dims(dat)[4],
-					print.level=2,
+					print.level=0,
 					hessian=T,
+					check.analyticals=F,
 					iterlim=.options.min.iterlim(options),
 					gradtol=.options.min.gradtol(options),
 					steptol=.options.min.steptol(options)
-					)),silen=F)
+					)),silen=T)
 	
 	#end_time
 	en_time <- Sys.time()
@@ -125,7 +112,7 @@ fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.
 		arfmodel <- saveModelBin(arfmodel)
 				
 	} else {
-		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
+		.model.convergence(arfmodel) <- 'Internal error (probably Infinite gradient), no convergence.'
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}
@@ -138,6 +125,8 @@ fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.
 	#return arf model object	
 	return(invisible(arfmodel))
 }
+
+
 
 # createAverages averages the data and weightfiles 
 createAverages <- function(arfdat,experiment=.experiment) {

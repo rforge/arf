@@ -87,11 +87,15 @@ setAllObjects <- function(experiment,overwrite=F)
 			.data.regDir(data) <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sep='') 
 			.data.regRda(data) <- .experiment.regRda(experiment)
 			regIsWell <- checkRegs(data,overwrite=overwrite)
+			if(!regIsWell) warning('Registration files not yet linked. Run createRegs.')
 			
-			#set functional path and checck if available
 			
-		
-	
+			#set functional path and check if available
+			.data.funcDir(data) <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.funcDir(experiment),sep='')
+			.data.funcRda(data) <- .experiment.funcRda(experiment)
+			 funcIsWell <- checkFuncs(data,overwrite=overwrite)
+			if(!funcIsWell) warning('Functional files not yet linked. Run createFuncs.')
+						
 			#betafiles
 			betafiles <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.betaDir(experiment),sep=''),full=T)
 			.data.betafiles(data) <- betafiles

@@ -16,8 +16,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=2,
-		update=6,
-		svnrev=34
+		update=7,
+		svnrev=35
 	)
 )
 
@@ -32,6 +32,7 @@ setClass(
 		modelRda='character',			#name of modeldatafile
 		statsRda='character',			#name of statsfile
 		regRda='character',
+		funcRda='character',
 		subjectPrefix='character', 		#subjects prefix
 		conditionPrefix='character', 	#condition prefix
 		modelPrefix='character',		#model prefix
@@ -41,6 +42,7 @@ setClass(
 		weightsDir='character',			#weights directory name
 		avgDir='character',				#avg directory name
 		regDir='character',
+		funcDir='character',
 		betaDir='character',			#beta directory
 		modelDir='character',			#model directory
 		statsDir='character',			#stats directory
@@ -63,6 +65,7 @@ setClass(
 		modelRda='model.Rda',			#name of modelfile
 		statsRda='stats.Rda',			#name of statsfile
 		regRda='registration.Rda',
+		funcRda='functional.Rda',
 		subjectPrefix='', 				#subjects prefix
 		conditionPrefix='', 			#condition prefix
 		subjectDir='subjects', 			#subjects prefix
@@ -72,6 +75,7 @@ setClass(
 		weightsDir='weights',			#weights directory name
 		avgDir='avg',					#avg directory name
 		regDir='reg',
+		funcDir='func',
 		betaDir='beta',					#beta directory
 		modelDir='models',				#model directory
 		statsDir='stats',				#stats directory
@@ -120,7 +124,8 @@ setClass(
 	representation=representation(
 		fullpath='character',
 		filename='character',
-		linkeddataRda='character',
+		linkedfile='character',
+		functionaldata='character',
 		version='ANY'
 	),
 	prototype=prototype(
@@ -164,7 +169,7 @@ setClass(
 	prototype=prototype(
 		min.iterlim=1500,
 		min.gradtol=1e-6,		
-		min.steptol=1e-8,
+		min.steptol=1e-6,
 		start.method='rect',
 		start.maxfac=2,
 		start.vector=c(0,0,0,0,0,0,.1,.2,-.1,100),
@@ -330,6 +335,8 @@ setClass(
 		avgWfile='character',		#filename of average weights
 		regDir='character',			#directory of registration dirs
 		regRda='character',			#filename of registration file 
+		funcDir='character',
+		funcRda='character',
 		trials='numeric',			#number of trials
 		version='ANY'
 	),
