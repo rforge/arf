@@ -157,7 +157,7 @@ BIC <- function(arfmodel) {
 		
 		#check if constant is a number and calculate BIC
 		if(is.numeric(cons)) {
-			.model.fit(arfmodel) <- cons + (log(.model.minimum(arfmodel))) + (((.model.regions(arfmodel)*10))*log(n))
+			.model.fit(arfmodel)[1,1]  <- cons + (log(.model.minimum(arfmodel))) + (((.model.regions(arfmodel)*10))*log(n))
 		} else { #constant is not a number
 			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Constant invalid. BIC not calculated')
 			.model.valid(arfmodel) <- FALSE
@@ -165,6 +165,39 @@ BIC <- function(arfmodel) {
 		
 	} else	{
 		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'No valid model. BIC not calculated')
+		.model.valid(arfmodel) <- FALSE
+	}
+	
+	return(invisible(arfmodel))
+	
+}
+
+#RMSEA calculates root mean square errors of models
+RMSEA <- function(arfmodel) {
+	
+	#check model validity
+	if(.model.valid(arfmodel)) {
+		
+		Wdata <- readData(.model.avgWfile(arfmodel))
+		n <- .fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4]
+		
+		#Hotellings T
+		HTs = .model.trials(arfmodel)*.model.minimum(arfmodel)
+		
+		#noncentrality parameter	
+		ncp = max(c((HTs-((n-(.model.regions(arfmodel)*10))/.model.trials(arfmodel))),0))
+		
+		#check if ncp < 0
+		if(ncp<0) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Noncentrality parameter smaller than zero, ncp is set to zero')
+		
+		#calculate RMSEA
+		eps = sqrt(ncp/(n-(.model.regions(arfmodel)*10)))
+
+		if(.version.update(.model.version(mod1))>7) .model.fit(arfmodel)[1,2] = eps else cat('RMSEA=',eps,'not saved in versions prior to build 1.2-7\n') 
+		
+	} else {
+		#if not good warn
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'No valid model. RMSEA not calculated')
 		.model.valid(arfmodel) <- FALSE
 	}
 	

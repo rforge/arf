@@ -16,8 +16,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=2,
-		update=7,
-		svnrev=35
+		update=8,
+		svnrev=36
 	)
 )
 
@@ -152,9 +152,14 @@ setClass(
 setClass(
 	Class='options',
 	representation=representation(
-		min.iterlim='numeric',		#NLM iteration limit
-		min.gradtol='numeric',		#NLM gradient tolerance
-		min.steptol='numeric',		#NLM stepsize tolerance
+		nlm.gradtol='numeric',		#NLM gradient tolerance
+		nlm.steptol='numeric',		#NLM stepsize tolerance
+		opt.method='character',		#optim method
+		opt.lower='numeric',		#optim lowerbound
+		opt.upper='numeric',		#optim upperbound
+		min.analyticalgrad='logical', #use analytical gradient
+		min.iterlim='numeric',		#minimization iteration limit
+		min.routine='character',	#which routine is used
 		start.method='character',	#which method of determining starting values is used
 		start.maxfac='numeric',		#fallOff factor in the determination of region width
 		start.vector='numeric',		#vector containing startingvalues (if !start.method=='fixed' only t5 and t6 are used) vector is recycled for regions.
@@ -167,9 +172,14 @@ setClass(
 
 	),
 	prototype=prototype(
+		nlm.gradtol=1e-6,		#NLM gradient tolerance
+		nlm.steptol=1e-3,		#NLM stepsize tolerance
+		opt.method='BFGS',	
+		opt.lower=-Inf,			
+		opt.upper=Inf,		
+		min.analyticalgrad=T, 
 		min.iterlim=1500,
-		min.gradtol=1e-6,		
-		min.steptol=1e-6,
+		min.routine='optim',
 		start.method='rect',
 		start.maxfac=2,
 		start.vector=c(0,0,0,0,0,0,.1,.2,-.1,100),
@@ -370,7 +380,7 @@ setClass(
 		sandwichmethod='character',	#sandwichmethod
 		varcov='matrix',			#variance covariance matrix (full form)
 		warnings='character',		#warnings (pos def var/covar etc.)
-		fit='numeric',				#fit value (BIC)
+		fit='matrix',				#fit value 
 		wald='ANY',					#object of class 'wald'
 		regions='numeric',			#number of fitted regions
 		startval='numeric',			#vector of starting values
@@ -379,7 +389,8 @@ setClass(
 	),
 	prototype=prototype(
 			valid=FALSE,
-			proctime=matrix(0,1,2),
+			proctime=matrix(0,1,2,dimnames=list(c(''),c('mintime','swtime'))),
+			fit=matrix(0,1,2,dimnames=list(c(''),c('BIC','RMSEA'))),
 			wald=new('wald')
 	)
 )

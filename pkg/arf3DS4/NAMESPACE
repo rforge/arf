@@ -12,6 +12,8 @@ export(
 	setRegParams,
 	arfToMNI,
 	fitModelNlm,
+	fitModelOptim,
+	fitModel,
 	createAverages,
 	createAllAverages,
 	determineStartRect,
@@ -26,6 +28,7 @@ export(
 	makeResiduals,
 	varcov,
 	BIC,
+	RMSEA,
 	wald
 )
 

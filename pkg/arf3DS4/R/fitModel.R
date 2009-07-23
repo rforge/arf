@@ -5,29 +5,32 @@
 #############################################
 
 
-ssq.nlm <- function(theta,datavec,weightvec,np,dimx,dimy,dimz) {
+ssq <- function(theta,datavec,weightvec,np,dimx,dimy,dimz,analyticalgrad=T) {
 	## ssq is the objective function (sums-of-squares)
 	## it calls the external C-funtion 'ssq'
 	## input are theta (parameters), datavec, weightvec, number of regions, and dim x and dim y
 	## output is a vector of parameter estimates (double)
 	
 
-	nlmdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[8]]
+	ssqdat <- try(.C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[8]],silen=T)
 	
-	if(!is.na(nlmdat) & !is.nan(nlmdat)) {
-		if(nlmdat!=Inf) {
-			model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
-			gradient <- .C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]]
-			attr(nlmdat,'gradient') <- gradient
-		} else nlmdat=NaN
+	if(analyticalgrad) {
+		grad = try(gradient(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T),silen=T)
+		attr(ssqdat,'gradient') <- grad
 	}
 	
-	return(invisible(nlmdat))	
+	return(invisible(ssqdat))	
 	
 }
 
 
-
+#gradient returns the analytical gradient of the ssq to the thetaparameters
+gradient <- function(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T) {
+	
+	model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
+	return(.C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]])
+	
+}
 
 
 #modePred returns an array with modelpredictions for the model or the startingvalues
@@ -52,8 +55,16 @@ modelPred <- function(arfmodel,which=c('model','start')) {
 	
 }
 
-## fitModel calls the minimization routine (NLM)
-fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel))) {
+## fitModel is a wrapper for NLM and optim based on the options
+fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
+	
+	if(.options.min.routine=='nlm') fitModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
+		else fitModelOptim(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 		
+	
+}
+
+## fitModelNlm calls the minimization routine (NLM)
+fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
 	
 	sp <- .Platform$file.sep
 	
@@ -72,7 +83,7 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 		
 	#call NLM (within a try-loop)
 	nlm.output <- try(suppressWarnings(nlm(
-					ssq.nlm,
+					try(ssq,silen=try.silen),
 					.model.startval(arfmodel),
 					datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 					weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
@@ -80,13 +91,14 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 					dimx=.fmri.data.dims(dat)[2],
 					dimy=.fmri.data.dims(dat)[3],
 					dimz=.fmri.data.dims(dat)[4],
-					print.level=0,
+					analyticalgrad=.options.min.analyticalgrad(options),
+					print.level=printlevel,
 					hessian=T,
 					check.analyticals=F,
 					iterlim=.options.min.iterlim(options),
-					gradtol=.options.min.gradtol(options),
-					steptol=.options.min.steptol(options)
-					)),silen=T)
+					gradtol=.options.nlm.gradtol(options),
+					steptol=.options.nlm.steptol(options)
+					)),silen=try.silen)
 	
 	#end_time
 	en_time <- Sys.time()
@@ -95,10 +107,10 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 	if(is.null(attr(nlm.output,'class'))) {
 		if(nlm.output$code==1) .model.convergence(arfmodel) <- paste('Gradient close to zero. Converged in ',nlm.output$iterations,' iterations.',sep='')
 		if(nlm.output$code==2) .model.convergence(arfmodel) <- paste('Iterates within tolerance. Converged in ',nlm.output$iterations,' iterations.',sep='')
-		if(nlm.output$code==3) .model.convergence(arfmodel) <- 'No lower point found. No convergence.'
+		if(nlm.output$code==3) .model.convergence(arfmodel) <- 'No lower point found. Convergence may be local minimum.'
 		if(nlm.output$code==4) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.'
 		if(nlm.output$code==5) .model.convergence(arfmodel) <- 'Stepmax exceeded five times. No convergence.'
-		if(nlm.output$code <= 2) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
+		if(nlm.output$code <= 3) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 		
 		#set model objects
 		.model.minimum(arfmodel) <- nlm.output$minimum
@@ -113,6 +125,87 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 				
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error (probably Infinite gradient), no convergence.'
+		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
+		.model.valid(arfmodel) <- FALSE
+	}
+	
+	if(!.model.valid(arfmodel)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),.model.convergence(arfmodel)) 
+	
+	#save the modelInfo
+	saveModel(arfmodel)
+	
+	#return arf model object	
+	return(invisible(arfmodel))
+}
+
+
+## fitModelOptim calls the minimization routine (OPTIM)
+fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
+	
+	sp <- .Platform$file.sep
+	
+	#start_time
+	st_time <- Sys.time()
+	
+	#check if averages exist else stop
+	if(!file.exists(.model.avgdatfile(arfmodel))) stop('Averages do not exist, please run createAverages')
+	if(!file.exists(.model.avgWfile(arfmodel))) stop('Averages do not exist, please run createAverages')
+	
+	#clear the warnings and deriv + residualfilres
+	.model.warnings(arfmodel) <- ''
+	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
+	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
+	
+	
+	if(.options.min.analyticalgrad(options)) {
+		gradfunc=gradient
+		angrad=FALSE
+	} else gradfunc=NULL
+	
+	#runoptim	
+	optim.output <- try(suppressWarnings(optim(
+						.model.startval(arfmodel),
+						try(ssq,silen=try.silen),
+						gradfunc,
+						datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
+						weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
+						np=.model.regions(arfmodel)*10,
+						dimx=.fmri.data.dims(dat)[2],
+						dimy=.fmri.data.dims(dat)[3],
+						dimz=.fmri.data.dims(dat)[4],
+						analyticalgrad=angrad,
+						method=.options.opt.method(options),
+						control=list(trace=printlevel,maxit=.options.min.iterlim(options)),
+						hessian=T
+					)),silen=try.silen)
+
+	#end_time
+	en_time <- Sys.time()
+
+	# check for internal errors and set relevant arf model values
+	if(is.null(attr(optim.output,'class'))) {
+		if(optim.output$convergence==0) .model.convergence(arfmodel) <- paste('Optim converged in ',optim.output$counts[1],' iterations.',sep='')
+		if(optim.output$convergence==1) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.'
+		
+		if(optim.output$convergence==10) .model.convergence(arfmodel) <- 'Degeneracy of the Nelder-Mead Simplex'
+		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',optim.output$message,sep='')
+		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',optim.output$message,sep='')
+		
+		if(optim.output$convergence <= 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
+		
+		#set model objects
+		.model.minimum(arfmodel) <- optim.output$value
+		.model.hessian(arfmodel) <- optim.output$hessian
+		.model.estimates(arfmodel) <- optim.output$par
+		.model.iterates(arfmodel) <- optim.output$counts[1]
+		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
+		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
+		
+		#save the ModelBinary
+		arfmodel <- saveModelBin(arfmodel)
+		
+	} else {
+		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}
