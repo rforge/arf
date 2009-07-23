@@ -33,7 +33,6 @@ checkExp <- function(experiment)
 			if(!file.exists(paste(cn,sp,.experiment.dataDir(experiment),sp,.experiment.betaDir(experiment),sep=''))) {warning(paste('In:',cn,sp,.experiment.dataDir(experiment),' betaDir does not exits or does not match settings',sep=''));allIsWell=F}
 			if(!file.exists(paste(cn,sp,.experiment.dataDir(experiment),sp,.experiment.weightsDir(experiment),sep=''))) {warning(paste('In:',cn,sp,.experiment.dataDir(experiment),' weightsDir does not exits or does not match settings',sep=''));allIsWell=F}
 			if(!file.exists(paste(cn,sp,.experiment.dataDir(experiment),sp,.experiment.avgDir(experiment),sep=''))) {warning(paste('In:',cn,sp,.experiment.dataDir(experiment),' avgDir does not exits or does not match settings',sep=''));allIsWell=F}
-			if(!file.exists(paste(cn,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sep=''))) {warning(paste('In:',cn,sp,.experiment.regDir(experiment),' avgDir does not exits or does not match settings',sep=''));allIsWell=F}
 			
 		}
 	}
@@ -52,6 +51,9 @@ makeExpDirs <- function(path=getwd(),name='default_experiment',subjectind=1,cond
 	#check if path exists
 	if(path=='') path=paste(getwd(),sp,name,sep='') else path=paste(path,sp,name,sep='')
 	if(!file.exists(path)) dir.create(path,recursive=T)
+	
+	#set path separator at end
+	path <- file.path(dirname(path),basename(path),'')
 	
 	#create new experimentclass
 	experiment <- new('experiment',settings)
@@ -129,7 +131,10 @@ chngRootExp <- function(path=getwd(),quiet=F)
 	experiment <- loadRda(list.files(path,'.Rda',full=T))
 	
 	#set the correct path
-	.experiment.path(experiment) <- path.expand(path)
+	path <- path.expand(path)
+	path <- file.path(dirname(path),basename(path),'')
+	
+	.experiment.path(experiment) <- path
 	
 	#check the experiment dirs, if good save and exit. if not good stop
 	if(checkExp(experiment)) {
@@ -143,7 +148,7 @@ chngRootExp <- function(path=getwd(),quiet=F)
 }
 
 #setExp creates an experiment-class object based on existing directories
-setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE) 
+setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrite=F) 
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -248,7 +253,7 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 	if(createWeights) makeWeights(experiment)
 	
 	#setAllObjects
-	setAllObjects(experiment)
+	setAllObjects(experiment,overwrite)
 	
 	#check the experiment dirs, if good save and exit. if not good stop
 	if(checkExp(experiment)) {
@@ -287,6 +292,7 @@ loadExp <- function(path=getwd())
 	fn <- strsplit(filename,.Platform$file.sep)[[1]]
 	path <- sub(fn[length(fn)],'',filename)
 	path <- path.expand(path)
+	path <- file.path(dirname(path),basename(path),'')
 	
 	#change root for the experiment-file to the current root
 	.experiment <- experiment <- chngRootExp(path,quiet=T)

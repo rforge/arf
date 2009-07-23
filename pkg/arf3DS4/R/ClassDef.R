@@ -16,8 +16,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=2,
-		update=8,
-		svnrev=36
+		update=9,
+		svnrev=37
 	)
 )
 
@@ -96,14 +96,14 @@ setClass(
 setClass(
 	Class='registration',
 	representation=representation(
-		fullpath='character',
-		filename='character',
-		linkedfile='character',
-		examp2high='character',
-		high2stand='character',
-		example='character',
-		highres='character',
-		standard='character',
+		fullpath='character',		#fullpath of regfile
+		filename='character',		#filename of regfile
+		linkedfile='character',		#link to betafile
+		examp2high='character',		#examp2high ASCII mat (affine transform)
+		high2stand='character',		#high2standard ASCII mat (affine transform)
+		example='character',		#example.nii.gz (corr to betafile)
+		highres='character',		#highres.nii.gz (subject anatomical scan)
+		standard='character',		#standard.nii.gz (FSL MNI152)
 		Dex='matrix',
 		Dhi='matrix',
 		Dst='matrix',
@@ -122,10 +122,10 @@ setClass(
 setClass(
 	Class='functional',
 	representation=representation(
-		fullpath='character',
-		filename='character',
-		linkedfile='character',
-		functionaldata='character',
+		fullpath='character',			#fullpath of functionalvolume
+		filename='character',			#filename of functionalvolume
+		linkedfile='character',			#link to betafile
+		functionaldata='character',		#file with stimulus_timings
 		version='ANY'
 	),
 	prototype=prototype(
@@ -174,13 +174,13 @@ setClass(
 	prototype=prototype(
 		nlm.gradtol=1e-6,		#NLM gradient tolerance
 		nlm.steptol=1e-3,		#NLM stepsize tolerance
-		opt.method='BFGS',	
-		opt.lower=-Inf,			
-		opt.upper=Inf,		
-		min.analyticalgrad=T, 
-		min.iterlim=1500,
-		min.routine='optim',
-		start.method='rect',
+		opt.method='BFGS',		#optim method
+		opt.lower=-Inf,			#L-BFGS-U lower bound
+		opt.upper=Inf,			#L-BFGS-U upper bound
+		min.analyticalgrad=T, 	#use analytical gradient
+		min.iterlim=5000,		#iteration limit
+		min.routine='optim',	#which routine
+		start.method='rect',	
 		start.maxfac=2,
 		start.vector=c(0,0,0,0,0,0,.1,.2,-.1,100),
 		chk.method='imagedim',
@@ -366,12 +366,12 @@ setClass(
 		modeldatapath='character',  #path to the modeldata dir
 		residualFile='character',	#Residual Filename
 		derivativeFile='character',	#Derivative Filename
-		weightFile='character',
+		weightFile='character',		#weightfilename
 		modelDataFile='character',	#niftifilename
 		fullmodelDataFile='character',#full niftifilename
 		modelFile='character',		#modelFilename
 		optionsFile='character',	#optionsFilename
-		startFile='character',		#
+		startFile='character',		#startvalueFilename
 		convergence='character', 	#convergence information
 		iterates='numeric',			#number of iterations
 		minimum='numeric',			#minimum of objective function

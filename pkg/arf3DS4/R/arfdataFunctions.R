@@ -89,7 +89,6 @@ setAllObjects <- function(experiment,overwrite=F)
 			regIsWell <- checkRegs(data,overwrite=overwrite)
 			if(!regIsWell) warning('Registration files not yet linked. Run createRegs.')
 			
-			
 			#set functional path and check if available
 			.data.funcDir(data) <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.funcDir(experiment),sep='')
 			.data.funcRda(data) <- .experiment.funcRda(experiment)
@@ -140,6 +139,8 @@ setAllObjects <- function(experiment,overwrite=F)
 						.model.avgWfile(model) <- .data.avgWfile(data)
 						.model.regDir(model) <- .data.regDir(data)
 						.model.regRda(model) <- .data.regRda(data)
+						.model.funcDir(model) <- .data.funcDir(data)
+						.model.funcRda(model) <- .data.funcRda(data)
 						save(model,file=paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
 						
 					}
@@ -195,7 +196,7 @@ checkFiles <- function(arfdat) {
 		}	
 	}
 	
-	#return object of class data
+	#return logical
 	return(invisible(allIsWell))
 	
 }
@@ -243,10 +244,7 @@ makeWeights <- function(experiment) {
 				} else warning('some weightfiles already exist, no weights created.')
 				
 			} #if weightfiles exist do nothing
-			
 		}
 	}
-	
-		
 }
 

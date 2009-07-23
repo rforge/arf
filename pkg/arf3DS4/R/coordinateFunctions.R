@@ -142,7 +142,7 @@ checkRegs <- function(arfdata,overwrite=F) {
 				save(registration,file=paste(.registration.fullpath(registration),sp,.registration.filename(registration),sep=''))
 			} 
 		} else {
-			warning('No betafile found to match reg to')
+			#warning('No betafile found to match reg to')
 			allIsWell = FALSE
 		}
 	}
@@ -310,7 +310,7 @@ checkFuncs <- function(arfdata,overwrite=F) {
 			
 			} 
 		} else {
-			warning('No betafile found to match functional data to')
+			#warning('No betafile found to match functional data to')
 			allIsWell = FALSE
 		}
 	}

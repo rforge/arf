@@ -193,7 +193,7 @@ RMSEA <- function(arfmodel) {
 		#calculate RMSEA
 		eps = sqrt(ncp/(n-(.model.regions(arfmodel)*10)))
 
-		if(.version.update(.model.version(mod1))>7) .model.fit(arfmodel)[1,2] = eps else cat('RMSEA=',eps,'not saved in versions prior to build 1.2-7\n') 
+		if(.version.update(.model.version(arfmodel))>7) .model.fit(arfmodel)[1,2] = eps else cat('RMSEA=',eps,'not saved in versions prior to build 1.2-7\n') 
 		
 	} else {
 		#if not good warn

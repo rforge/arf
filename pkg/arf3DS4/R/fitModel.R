@@ -58,7 +58,7 @@ modelPred <- function(arfmodel,which=c('model','start')) {
 ## fitModel is a wrapper for NLM and optim based on the options
 fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
 	
-	if(.options.min.routine=='nlm') fitModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
+	if(.options.min.routine(options)=='nlm') fitModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 		else fitModelOptim(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 		
 	
 }
@@ -67,6 +67,8 @@ fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.
 fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
 	
 	sp <- .Platform$file.sep
+	
+	.options.min.routine(options) <- 'nlm'
 	
 	#start_time
 	st_time <- Sys.time()
@@ -143,6 +145,8 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
 	
 	sp <- .Platform$file.sep
+	
+	.options.min.routine(options) <- 'optim'
 	
 	#start_time
 	st_time <- Sys.time()
