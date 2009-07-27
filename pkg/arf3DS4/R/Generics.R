@@ -945,6 +945,17 @@ standMethod <- function(x, value) {x@sw.type<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'options'
+funcname <-'.options.adjust.n'
+standGen <- function(object) standardGeneric('.options.adjust.n')
+standMethod <- function(object) object@adjust.n
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.options.adjust.n<-'
+standGen <- function(x, value) standardGeneric('.options.adjust.n<-')
+standMethod <- function(x, value) {x@adjust.n<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'options'
 funcname <-'.options.output.mode'
 standGen <- function(object) standardGeneric('.options.output.mode')
 standMethod <- function(object) object@output.mode

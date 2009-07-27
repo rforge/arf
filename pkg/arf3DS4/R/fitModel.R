@@ -72,6 +72,16 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 	
 	#start_time
 	st_time <- Sys.time()
+
+	#get starting values
+	if(.options.start.method(options)=='rect') {
+		arfmodel <- determineStartRect(arfmodel)
+	}
+	
+	if(.options.start.method(options)=='load') {
+		.model.startval(arfmodel) <- loadStart(arfmodel)
+	}
+	
 	
 	#check if averages exist else stop
 	if(!file.exists(.model.avgdatfile(arfmodel))) stop('Averages do not exist, please run createAverages')
@@ -150,6 +160,16 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	
 	#start_time
 	st_time <- Sys.time()
+	
+	#get starting values
+	if(.options.start.method(options)=='rect') {
+		arfmodel <- determineStartRect(arfmodel)
+	}
+	
+	if(.options.start.method(options)=='load') {
+		.model.startval(arfmodel) <- loadStart(arfmodel)
+	}
+	
 	
 	#check if averages exist else stop
 	if(!file.exists(.model.avgdatfile(arfmodel))) stop('Averages do not exist, please run createAverages')
@@ -357,6 +377,11 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 		theta[5+(10*(reg-1))] <- round(mean(yf))
 		theta[6+(10*(reg-1))] <- round(mean(zf))
 		
+		#check widths for zeroes
+		theta[4+(10*(reg-1))][theta[4+(10*(reg-1))]<=0]=1 
+		theta[5+(10*(reg-1))][theta[5+(10*(reg-1))]<=0]=1 
+		theta[6+(10*(reg-1))][theta[6+(10*(reg-1))]<=0]=1 
+		
 		#zero tha data
 		xvec <- (m$x-xf[1]):(m$x+xf[2])
 		yvec <- (m$y-yf[1]):(m$y+yf[2])
@@ -415,7 +440,7 @@ fallOff <- function(vec,fwhm=2)
 	return(c(j,i))
 }
 
-
+#smooth a datavector using FWHM filter (used in startval detect)
 fwhm.filter <- function(vec,fwhm) {
 	
 	len=length(vec)

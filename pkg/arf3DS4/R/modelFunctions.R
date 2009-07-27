@@ -62,6 +62,7 @@ newModel <- function(modelname='defaultmodel',regions=1,subject='',condition='',
 	return(model)
 }
 
+
 #update ModelNames in a ModelNamesFile
 updateModelNames <- function(filename) {
 	
@@ -114,4 +115,14 @@ loadStart <- function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),
 
 #loadReg
 loadReg <- function(arfmodel) return(loadRda(.model.regfile(arfmodel),sep=''))
+
+#load a model based on subject and conditions
+loadModel <- function(modelname,subject,condition,experiment=.experiment) {
+	
+	sp <- .Platform$file.sep
+	return(loadRda(paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.modelDir(experiment),sp,modelname,sp,.experiment.modelRda(experiment),sep='')))
+		
+}
+
+	
 

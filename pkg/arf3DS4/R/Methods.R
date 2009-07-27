@@ -44,14 +44,6 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 	}		
 )
 
-setMethod('summary','fmri.data',
-	function(object) {
-		cat(object@descrip,'\n')
-
-	}		
-		
-		
-)
 
 setMethod('show','data',
 		function(object) {
@@ -74,7 +66,6 @@ setMethod('show','model',
 			cat(paste('[ ARF ',tolower(object@modelname),' ]\n',sep=''))
 			cat(' file:    ',object@modelDataFile,'\n')
 			cat(' regions: ',object@regions,'\n')
-			cat(' startvec:',object@startval,'\n')
 			cat(' mintime: ',object@proctime[1],'\n')
 			cat(' swctime: ',object@proctime[2],'\n')
 			cat(' valid:   ',object@valid,'\n')
@@ -86,15 +77,14 @@ setMethod('show','model',
 			if(object@valid==T) {
 				cat(' modelinfo:\n')
 				cat(' ',object@convergence,'\n')
-				cat('  BIC:       ',object@fit,'\n')
+				cat('  fit (BIC,RMSEA):',object@fit,'\n')
 				cat('  minimum:   ',object@minimum,'\n')
 				cat('  estimates:\n')
 				for(reg in 1:object@regions) {
-					cat('  ',sprintf('[%d]  (%2.0f,%2.0f,%2.0f)',reg,mod@estimates[1+(10*(reg-1))],mod@estimates[2+(10*(reg-1))],mod@estimates[3+(10*(reg-1))]))
-					cat(' ',sprintf('[%4.1f %4.1f %4.1f ~ %2.1f %2.1f %2.1f]',mod@estimates[4+(10*(reg-1))],mod@estimates[5+(10*(reg-1))],mod@estimates[6+(10*(reg-1))],mod@estimates[7+(10*(reg-1))],mod@estimates[8+(10*(reg-1))],mod@estimates[9+(10*(reg-1))]))
-					cat(' ',sprintf('[%4.0f]',mod@estimates[10+(10*(reg-1))]),'\n')	
+					cat('  ',sprintf('[%3d]  (%3.0f,%3.0f,%3.0f)',reg,object@estimates[1+(10*(reg-1))],object@estimates[2+(10*(reg-1))],object@estimates[3+(10*(reg-1))]))
+					cat(' ',sprintf('[%5.1f %5.1f %5.1f ~ %5.1f %5.1f %5.1f]',object@estimates[4+(10*(reg-1))],object@estimates[5+(10*(reg-1))],object@estimates[6+(10*(reg-1))],object@estimates[7+(10*(reg-1))],object@estimates[8+(10*(reg-1))],object@estimates[9+(10*(reg-1))]))
+					cat(' ',sprintf('[%7.0f]',object@estimates[10+(10*(reg-1))]),'\n')	
 				}
-				#cat('  s.e.:      ',sqrt(diag(object@varcov)),'\n')
 				
 			}
 			

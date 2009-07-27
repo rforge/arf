@@ -15,9 +15,9 @@ setClass(
 	),
 	prototype=prototype(
 		version=1,
-		build=2,
-		update=9,
-		svnrev=37
+		build=3,
+		update=0,
+		svnrev=39
 	)
 )
 
@@ -160,12 +160,13 @@ setClass(
 		min.analyticalgrad='logical', #use analytical gradient
 		min.iterlim='numeric',		#minimization iteration limit
 		min.routine='character',	#which routine is used
-		start.method='character',	#which method of determining starting values is used
+		start.method='character',	#which method of determining starting values is used ('rect','load','none')
 		start.maxfac='numeric',		#fallOff factor in the determination of region width
 		start.vector='numeric',		#vector containing startingvalues (if !start.method=='fixed' only t5 and t6 are used) vector is recycled for regions.
 		chk.method='character',		#which method is used to check the range of parameter values
 		chk.range='numeric',		#vector containing ranges for each parameter (vector is recycled for regions)		
 		sw.type='character',		#method to use with Residuals ('diag','full')
+		adjust.n='logical',			#adjust the number of voxels used in BIC and Wald to the number of 'brain' voxels, iso full dimensions.
 		output.mode='character',	#output mode
 		version='ANY'
 
@@ -186,6 +187,7 @@ setClass(
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,0,0,-.9,-.9,-.9,-1e+64,0,0,0,0,0,0,.9,.9,.9,1e+64),
 		sw.type='diag',
+		adjust.n=TRUE,
 		output.mode=c('log','screen'),
 		version=new('version')
 	)

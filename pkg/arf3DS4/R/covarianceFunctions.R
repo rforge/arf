@@ -116,13 +116,15 @@ varcov <- function(arfmodel)
 	}
 	
 	
+	#save the model file
+	saveModel(arfmodel)
 	
 	#return the varcov
 	return(invisible(arfmodel))
 }
 
 #calculate the BIC
-BIC <- function(arfmodel) {
+BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 	## BIC calculates the Bayesian Information Fit criterion
 	## input is an object of arfmodel
 	## output is an object of arfmodel
@@ -132,8 +134,15 @@ BIC <- function(arfmodel) {
 		#read in weights, used in constant
 		Wdata <- readData(.model.avgWfile(arfmodel))
 		
-		n <- .fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4]
-		W <- .fmri.data.datavec(Wdata)[1:n]
+		if(.options.adjust.n(options)) {
+			Adata <- readData(.model.avgdatfile(arfmodel))
+			n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
+			W <- .fmri.data.datavec(Wdata)[1:(.fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4])]
+			
+		} else {
+			n <- .fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4]
+			W <- .fmri.data.datavec(Wdata)[1:n]
+		}
 		
 		#calculate the determinant of the weights
 		dtm <- prod(W)
@@ -168,18 +177,26 @@ BIC <- function(arfmodel) {
 		.model.valid(arfmodel) <- FALSE
 	}
 	
+	#save the model file
+	saveModel(arfmodel)
+	
 	return(invisible(arfmodel))
 	
 }
 
 #RMSEA calculates root mean square errors of models
-RMSEA <- function(arfmodel) {
+RMSEA <- function(arfmodel,options=loadOptions(arfmodel)) {
 	
 	#check model validity
 	if(.model.valid(arfmodel)) {
 		
-		Wdata <- readData(.model.avgWfile(arfmodel))
-		n <- .fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4]
+		#set number of voxels
+		Adata <- readData(.model.avgdatfile(arfmodel))
+		if(.options.adjust.n(options)) {
+			n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
+		} else {
+			n <- .fmri.data.dims(Adata)[2]*.fmri.data.dims(Adata)[3]*.fmri.data.dims(Adata)[4]
+		}
 		
 		#Hotellings T
 		HTs = .model.trials(arfmodel)*.model.minimum(arfmodel)
@@ -200,6 +217,9 @@ RMSEA <- function(arfmodel) {
 		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'No valid model. RMSEA not calculated')
 		.model.valid(arfmodel) <- FALSE
 	}
+	
+	#save the model file
+	saveModel(arfmodel)
 	
 	return(invisible(arfmodel))
 	
@@ -226,7 +246,7 @@ detSigmaDeriv <- function(theta)
 }
 
 #calculate Wald statistics 
-wald <- function(arfmodel,waldobject=new('wald')) {
+wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) {
 	## wald calculates Wald statistics for a fitted model
 	## input is and model object and waldobject (may be empty)
 	## output is an arfmodel object
@@ -243,9 +263,14 @@ wald <- function(arfmodel,waldobject=new('wald')) {
 		#if no design matrix is specified in the waldobject, make the default matrix (zero-filled) 
 		if(dim(.wald.design(waldobject))[1]==0) .wald.design(waldobject) <- matrix(0,.model.regions(arfmodel),5)
 		
-		# get dimensions
-		dims <- .nifti.header.dims(readHeader(getFileInfo(.model.avgdatfile(arfmodel))))
-		n <- dims[2]*dims[3]*dims[4]
+		# get dimensions (set number of voxels)
+		Adata <- readData(.model.avgdatfile(arfmodel))
+		
+		if(.options.adjust.n(options)) {
+			n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
+		} else {
+			n <- .fmri.data.dims(Adata)[2]*.fmri.data.dims(Adata)[3]*.fmri.data.dims(Adata)[4]
+		}
 		
 		#set relevant matrix sizes and dfs
 		.wald.stats(waldobject) <- matrix(0,.model.regions(arfmodel),5)
@@ -295,6 +320,9 @@ wald <- function(arfmodel,waldobject=new('wald')) {
 		}	
 		
 		.model.wald(arfmodel) <- waldobject	
+		
+		#save the model file
+		saveModel(arfmodel)
 		
 	} else	warning('No valid model. wald statistics not calculated.')
 	

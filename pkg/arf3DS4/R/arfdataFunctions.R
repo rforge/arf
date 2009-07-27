@@ -143,6 +143,13 @@ setAllObjects <- function(experiment,overwrite=F)
 						.model.funcRda(model) <- .data.funcRda(data)
 						save(model,file=paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
 						
+						#overwrite options file if applicable
+						if(overwrite) {
+							options <- new('options')
+							save(options,file=paste(.model.modelpath(model),sp,.model.optionsFile(model),sep=''))						
+						}
+						
+						
 					}
 				}
 			}
