@@ -339,3 +339,28 @@ getFSL <- function(experiment,subject,condition,featpath,subjectname,contrastnum
 	}
 	
 }
+
+#checks the version of the ARF code (check if curversion larger than given version)
+checkVersion <- function(curversion,version=1,build=0,update=0) 
+{
+	allIsWell=FALSE
+		
+	if(version < .version.version(curversion)) {
+		allIsWell=TRUE
+	} else {
+		if(version == .version.version(curversion)) {
+			if(build < .version.build(curversion)) {
+				allIsWell=TRUE
+			} else {
+				if(build == .version.build(curversion)) {
+					if(update < .version.update(curversion)) {
+						allIsWell=TRUE
+					}						
+				}
+			}	
+		}
+	}
+	
+	return(allIsWell)
+	
+}

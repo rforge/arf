@@ -82,7 +82,8 @@ void ssqgauss(double *theta, double *dat, double *W, int *np, int *dimx, int *di
 
 				f=0; //f becomes the sum of all regions  (zeroed every region)
 
-				if(dat[p]!=0) {
+				if(dat[p]!=0e0) {
+
 					for(reg=0;reg<(*np);reg=reg+10) {
 
 						//parameter coordinates
