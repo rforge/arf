@@ -322,6 +322,10 @@ writeData <- function(headinf,datavec)
 		con <- file(fn,open='wb')	
 	}
 	
+	#set correct cal_min and cal_max
+	.nifti.header.cal_max(headinf) = max(datavec)
+	.nifti.header.cal_min(headinf) = min(datavec)
+		
 	# for nii files write header and data in one connection (set offset of data as 352)
 	if(extension=='nii') {
 		.nifti.header.vox_offset(headinf) <- 352

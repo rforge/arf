@@ -144,7 +144,7 @@ arfSim <- function(exp,condpath,cnvec,regions=1,swmode='diag',waldcalc=F) {
 
 }
 
-simBlobsST <- function(betadir,weightdir,templatedata,model='gauss',regions=3,theta=c(12,12,24,3,4,3,.1,.1,.3,100,32,32,6,2,2,5,.1,.2,.2,100,12,56,12,5,4,2,.4,.1,.2,100),snr=5,noisesmooth=0,trials=50,tslen=101) {
+simBlobsST <- function(betadir,weightdir,templatedata,model='gauss',regions=3,theta=c(12,12,24,3,4,3,.1,.1,.3,100,32,32,6,2,2,5,.1,.2,.2,30,12,56,12,5,4,2,.4,.1,.2,100),snr=5,noisesmooth=0,trials=50,tslen=101) {
 	
 	require(MASS)
 	
@@ -163,9 +163,11 @@ simBlobsST <- function(betadir,weightdir,templatedata,model='gauss',regions=3,th
 	
 
 	#for connectivity
-	Sigma=matrix(c(33^2,24^2,0,24^2,33^2,0,0,0,33^2),3)
+	Sigma=matrix(c(33^2,24^2,15^2,24^2,33^2,5^2,15^2,5^2,33^2),3)
 	
-	thetamean=mvrnorm(n=50,mu=c(100,100,100),Sigma=Sigma)
+	print(Sigma)
+	
+	thetamean=mvrnorm(n=50,mu=c(100,30,100),Sigma=Sigma)
 	
 	realamp=cbind(thetamean)
 	

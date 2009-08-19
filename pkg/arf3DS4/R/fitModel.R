@@ -12,10 +12,10 @@ ssq <- function(theta,datavec,weightvec,np,dimx,dimy,dimz,analyticalgrad=T) {
 	## output is a vector of parameter estimates (double)
 	
 
-	ssqdat <- try(.C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[8]],silen=T)
+	ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[8]]
 	
 	if(analyticalgrad) {
-		grad = try(gradient(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T),silen=T)
+		grad = gradient(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T)
 		attr(ssqdat,'gradient') <- grad
 	}
 	
@@ -28,24 +28,36 @@ ssq <- function(theta,datavec,weightvec,np,dimx,dimy,dimz,analyticalgrad=T) {
 gradient <- function(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T) {
 	
 	model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
-	return(.C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]])
+	grad <- try(.C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=F)
+		
+	if(!is.null(attr(grad,'class'))) grad=rep(-Inf,np)
+	
+	return(grad)
 	
 }
 
 
-#modePred returns an array with modelpredictions for the model or the startingvalues
-modelPred <- function(arfmodel,which=c('model','start')) {
+#modelPred returns an array with modelpredictions for the model or the startingvalues, or ask for a specific region
+modelPred <- function(arfmodel,which=c('model','start','ask')) {
 	
-	which <- match.arg(which[1],c('model','start'))
+	which <- match.arg(which[1],c('model','start','ask'))
 	
-	if(which=='model') theta <- .model.estimates(arfmodel) else theta <- .model.startval(arfmodel)
+	np <- .model.regions(arfmodel)*10
+	
+	if(which=='model') theta <- .model.estimates(arfmodel) 
+	if(which=='start') theta <- .model.startval(arfmodel)
+	if(which=='ask') {
+		wh = as.numeric(readline(paste(' Estimates for which region? ')))
+		theta = .model.estimates(arfmodel)[(((wh-1)*10)+1):(((wh-1)*10)+10)]
+		np = 10
+	}
+	
+	cat(theta,'\n')
 	
 	dat <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))
 	dimx <- .nifti.header.dims(dat)[2]
 	dimy <- .nifti.header.dims(dat)[3]
 	dimz <- .nifti.header.dims(dat)[4]
-	
-	np <- .model.regions(arfmodel)*10
 		
 	model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
 	
@@ -54,6 +66,8 @@ modelPred <- function(arfmodel,which=c('model','start')) {
 	return(model)
 	
 }
+
+
 
 ## fitModel is a wrapper for NLM and optim based on the options
 fitModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
@@ -189,7 +203,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 						.model.startval(arfmodel),
-						try(ssq,silen=try.silen),
+						ssq,
 						gradfunc,
 						datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 						weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
@@ -201,7 +215,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 						method=.options.opt.method(options),
 						control=list(trace=printlevel,maxit=.options.min.iterlim(options)),
 						hessian=T
-					)),silen=try.silen)
+					)),silen=F)
 
 	#end_time
 	en_time <- Sys.time()

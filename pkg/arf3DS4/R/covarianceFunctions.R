@@ -330,3 +330,47 @@ wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 	
 }
 
+
+mcpCorrect <- function(fmridata,type=c('bonferroni','FDR','uncorrected'),alpha=.05,q=.05,cv=1) 
+{
+	
+	
+	veclen <- length(.fmri.data.datavec(fmridata))
+	n <- length(.fmri.data.datavec(fmridata)[.fmri.data.datavec(fmridata)!=0])
+	df <- n-1
+	
+	which <- match.arg(type[1],c('bonferroni','FDR','uncorrected'))
+		
+	if(which=='bonferroni') {
+		
+		adj.p = alpha/n
+		sigvec = numeric(veclen)
+		sigvec[adj.p>(1-pt(.fmri.data.datavec(fmridata),df))]=1
+	}
+	
+	if(which=='FDR') {
+		
+		fdr.value = sort(1-pt(.fmri.data.datavec(fmridata),df))
+		i = 1
+		while(fdr.value[i]<=((i*q)/(n*cv))) i = i + 1
+		i = max(i-1,i)
+		fdr=fdr.value[i]
+		sigvec=numeric(veclen)
+		sigvec[fdr>(1-pt(.fmri.data.datavec(fmridata),df))]=1
+	}
+	
+	
+	if(which=='uncorrected') {
+		
+		adj.p = alpha
+		sigvec = numeric(veclen)
+		sigvec[adj.p>(1-pt(.fmri.data.datavec(fmridata),df))]=1
+		
+	}
+	
+	
+	.fmri.data.datavec(fmridata) <- sigvec
+	
+	return(fmridata)
+	
+}
