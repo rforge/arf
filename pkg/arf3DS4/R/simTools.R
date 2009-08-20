@@ -23,11 +23,12 @@ simBlobs3D <- function(betadir,weightdir,templatedata,model='gauss',regions=1,th
 		
 		#make the model
 		newdata <- .C('gauss',as.double(theta),as.integer(regions*10),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(numeric(n)))[[6]]
+		
+		#square model
 		#newdata <- array(0,dim=c(dimx,dimy,dimz))
+		#newdata[20:40,20:40,10:20]=100
 		
-		#newdata[20:40,20:40,10:20]=10000
-		
-		
+		#alternative maxbeta	
 		#y=newdata
 		#dim(y) = c(dimx,dimy,dimz)
 		#maxbeta <- mean(y[(theta[1]-box):(theta[1]+box),(theta[2]-box):(theta[2]+box),(theta[3]-box):(theta[3]+box)])
