@@ -16,8 +16,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=3,
-		update=2,
-		svnrev=41
+		update=3,
+		svnrev=42
 	)
 )
 
@@ -345,6 +345,7 @@ setClass(
 		weightfiles='character',	#vector of char containing weight datafiles
 		avgdatfile='character',		#filename of average data
 		avgWfile='character',		#filename of average weights
+		avgtstatFile='character',	#filename of avgtstatFile
 		regDir='character',			#directory of registration dirs
 		regRda='character',			#filename of registration file 
 		funcDir='character',

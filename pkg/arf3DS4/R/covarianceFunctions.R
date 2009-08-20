@@ -331,21 +331,25 @@ wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 }
 
 
-mcpCorrect <- function(fmridata,type=c('bonferroni','FDR','uncorrected'),alpha=.05,q=.05,cv=1) 
+mcpCorrect <- function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,sig.steps=10) 
 {
 	
 	
 	veclen <- length(.fmri.data.datavec(fmridata))
 	n <- length(.fmri.data.datavec(fmridata)[.fmri.data.datavec(fmridata)!=0])
 	df <- n-1
+	pseq = seq(sig.steps,1,-1)
 	
 	which <- match.arg(type[1],c('bonferroni','FDR','uncorrected'))
 		
 	if(which=='bonferroni') {
 		
 		adj.p = alpha/n
+		pvec = adj.p / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-		sigvec[adj.p>(1-pt(.fmri.data.datavec(fmridata),df))]=1
+		
+		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(.fmri.data.datavec(fmridata),df))]=1/pseq[i]
+			
 	}
 	
 	if(which=='FDR') {
@@ -355,17 +359,24 @@ mcpCorrect <- function(fmridata,type=c('bonferroni','FDR','uncorrected'),alpha=.
 		while(fdr.value[i]<=((i*q)/(n*cv))) i = i + 1
 		i = max(i-1,i)
 		fdr=fdr.value[i]
-		sigvec=numeric(veclen)
-		sigvec[fdr>(1-pt(.fmri.data.datavec(fmridata),df))]=1
+		pvec = fdr / seq(1,sig.steps)
+		sigvec = numeric(veclen)
+		
+		
+		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(.fmri.data.datavec(fmridata),df))]=1/pseq[i]
+	
 	}
 	
 	
 	if(which=='uncorrected') {
 		
 		adj.p = alpha
+		pvec = adj.p / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-		sigvec[adj.p>(1-pt(.fmri.data.datavec(fmridata),df))]=1
+			
+		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(.fmri.data.datavec(fmridata),df))]=1/pseq[i]
 		
+
 	}
 	
 	
