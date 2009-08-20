@@ -23,23 +23,34 @@ simBlobs3D <- function(betadir,weightdir,templatedata,model='gauss',regions=1,th
 		
 		#make the model
 		newdata <- .C('gauss',as.double(theta),as.integer(regions*10),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(numeric(n)))[[6]]
+		#newdata <- array(0,dim=c(dimx,dimy,dimz))
 		
-		y=newdata
-		dim(y) = c(dimx,dimy,dimz)
-		maxbeta <- mean(y[(theta[1]-box):(theta[1]+box),(theta[2]-box):(theta[2]+box),(theta[3]-box):(theta[3]+box)])
+		#newdata[20:40,20:40,10:20]=10000
 		
-		#maxbeta <- max(newdata)
+		
+		#y=newdata
+		#dim(y) = c(dimx,dimy,dimz)
+		#maxbeta <- mean(y[(theta[1]-box):(theta[1]+box),(theta[2]-box):(theta[2]+box),(theta[3]-box):(theta[3]+box)])
+		
+		maxbeta <- max(newdata)
 		
 		#fill matrices (recylce model for each timepoint)
 		datamat <- matrix(newdata,n,tslen,byrow=F)
-		errormat <- matrix(rnorm(tslen*n,0,maxbeta/snr)*sqrt(tslen),n,tslen)
+		errormat <- matrix(rnorm(tslen*n,0,maxbeta/snr)*sqrt(tslen-1),n,tslen)
 		
 		#make signal
 		signalmat=datamat+errormat
 		
 		#create vectors
+		#signal
 		signal <- apply(signalmat,1,mean)
-		weights <- apply(signalmat,1,sd)^2
+		
+		#weights
+		std_dev <- apply(signalmat,1,sd)
+		std_err <- std_dev/sqrt(tslen-1)
+		variance <- std_err^2
+		weights <- variance
+		
 		
 		pathname <- betadir
 		.nifti.header.fullpath(templatedata) <- pathname
