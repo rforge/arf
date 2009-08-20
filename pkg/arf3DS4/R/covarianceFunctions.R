@@ -150,8 +150,8 @@ BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 		#check if determinant is valid
 		if(!is.na(dtm) & !is.nan(dtm)) {
 			if(is.numeric(try(log(n))) & is.numeric(try(log(dtm))) & is.numeric(log(.model.minimum(arfmodel)))) {
-				if(log(dtm)==-Inf) {dtm=1e-323;.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'Determinant (in BIC) was -Inf, set to minimum value 1e-323.\n',sep='')}
-				if(log(dtm)==Inf) {dtm=1e308;.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'Determinant (in BIC) was Inf, set to maximum value 1e308.\n',sep='')}
+				if(log(dtm)==-Inf) {dtm=1e-323;.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'Determinant (in BIC) was -Inf, set to minimum value 1e-323.',sep='')}
+				if(log(dtm)==Inf) {dtm=1e308;.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'Determinant (in BIC) was Inf, set to maximum value 1e308.',sep='')}
 				
 				cons <- try((2*(((n/2)*log(2*pi))+((1/2)*log(dtm))+((1/2)*(.model.minimum(arfmodel))))),silen=T) 
 				
@@ -210,7 +210,7 @@ RMSEA <- function(arfmodel,options=loadOptions(arfmodel)) {
 		#calculate RMSEA
 		eps = sqrt(ncp/(n-(.model.regions(arfmodel)*10)))
 
-		if(checkVersion(.model.version(arfmodel),1,2,7)) .model.fit(arfmodel)[1,2] = eps else cat('versioncheckreturnsfalse\n')
+		if(checkVersion(.model.version(arfmodel),1,2,7)) .model.fit(arfmodel)[1,2] = eps else .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'RMSEA not calculated for models prior to v1.2-7')
 		
 	} else {
 		#if not good warn
@@ -331,13 +331,12 @@ wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 }
 
 
-mcpCorrect <- function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,sig.steps=10) 
+mcpCorrect <- function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,df=100,sig.steps=10) 
 {
 	
 	
 	veclen <- length(.fmri.data.datavec(fmridata))
 	n <- length(.fmri.data.datavec(fmridata)[.fmri.data.datavec(fmridata)!=0])
-	df <- n-1
 	pseq = seq(sig.steps,1,-1)
 	
 	which <- match.arg(type[1],c('bonferroni','FDR','uncorrected'))

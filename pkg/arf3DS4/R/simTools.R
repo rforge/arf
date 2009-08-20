@@ -4,7 +4,7 @@
 # University of Amsterdam					#
 #############################################
 
-simBlobs3D <- function(betadir,weightdir,templatedata,model='gauss',regions=1,theta=c(9,9,9,3,2,2,.1,.3,.2,100),snr=10,noisesmooth=0,trials=10,tslen=101) {
+simBlobs3D <- function(betadir,weightdir,templatedata,model='gauss',regions=1,theta=c(9,9,9,3,2,2,.1,.3,.2,100),snr=10,noisesmooth=0,trials=10,tslen=101,box=2) {
 	
 	.nifti.header.dims(templatedata)[5:7] <- 1
 	.nifti.header.dims(templatedata)[1] <- 3
@@ -23,7 +23,12 @@ simBlobs3D <- function(betadir,weightdir,templatedata,model='gauss',regions=1,th
 		
 		#make the model
 		newdata <- .C('gauss',as.double(theta),as.integer(regions*10),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(numeric(n)))[[6]]
-		maxbeta <- max(newdata)
+		
+		y=newdata
+		dim(y) = c(dimx,dimy,dimz)
+		maxbeta <- mean(y[(theta[1]-box):(theta[1]+box),(theta[2]-box):(theta[2]+box),(theta[3]-box):(theta[3]+box)])
+		
+		#maxbeta <- max(newdata)
 		
 		#fill matrices (recylce model for each timepoint)
 		datamat <- matrix(newdata,n,tslen,byrow=F)
@@ -34,7 +39,7 @@ simBlobs3D <- function(betadir,weightdir,templatedata,model='gauss',regions=1,th
 		
 		#create vectors
 		signal <- apply(signalmat,1,mean)
-		weights <- apply(signalmat,1,sd)
+		weights <- apply(signalmat,1,sd)^2
 		
 		pathname <- betadir
 		.nifti.header.fullpath(templatedata) <- pathname
