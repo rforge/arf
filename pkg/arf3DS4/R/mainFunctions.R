@@ -17,6 +17,8 @@ processModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mo
 	}
 	
 	#fit the model
+	arfmodel = determineStartRect(arfmodel)
+	
 	arfmodel <- fitModel(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen)
 	if(pr) cat(' ',.model.convergence(arfmodel),'\n',sep='')
 	

@@ -215,7 +215,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 						method=.options.opt.method(options),
 						control=list(trace=printlevel,maxit=.options.min.iterlim(options)),
 						hessian=T
-					)),silen=F)
+					)),silen=try.silen)
 
 	#end_time
 	en_time <- Sys.time()

@@ -1,9 +1,10 @@
-//Activated Region Fitting. Version 2 Build 1.
+//Activated Region Fitting. Version 2 Build 2.
 //Copyright (c) 2009 Wouter Weeda.
 //Libary of functions for ARF
 
 
 #include<R.h>
+#include<Rmath.h>
 #include<math.h>
 #include<stdio.h>
 
@@ -1111,3 +1112,48 @@ void ssqgaussFix(double *theta, double *fixed, double *dat, double *W, int *np, 
 	//set ss to g
 	ss[0]=g;
 }
+
+void simTS(double *model, double *mb, double *snr, int *tslen, int *numvox, double *signal, double *weight)
+{
+
+	int c,r,p;
+	double *tsvec,sigma,tssum,varsum,signal_mean,signal_sd,signal_se,signal_weight,sq_tslen,err;
+
+	tsvec = (double *) R_alloc(*tslen,sizeof(double));
+
+	sigma = *mb / *snr;
+	sq_tslen = sqrt((double) *tslen - 1);
+
+	GetRNGstate();
+
+	for(r=0;r<(*numvox);r++) {
+
+		tssum=0e0;
+		for(c=0;c<(*tslen);c++) {
+			err = rnorm(0e0,sigma);
+			tsvec[c]=model[r]+err*sq_tslen;
+			tssum = tssum + tsvec[c];
+		}
+
+		signal_mean = tssum/(*tslen);
+
+		varsum=0e0;
+		for(c=0;c<(*tslen);c++) {
+			varsum = varsum + pow(tsvec[c]-signal_mean,2);
+		}
+
+		signal_sd = sqrt(varsum);
+		signal_se = signal_sd / sq_tslen;
+		signal_weight = pow(signal_se,2);
+
+		signal[r]=signal_mean;
+		weight[r]=signal_weight;
+
+	}
+
+	PutRNGstate();
+
+}
+
+
+
