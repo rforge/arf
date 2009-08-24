@@ -254,7 +254,6 @@ wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 	
 	if(length(.model.varcov(arfmodel))==0) stop('(co)variance matrix not yet calculated, cannot compute Wald statistics!')
 	
-	
 	#define function to calculate Wald statistic 
 	W <- function(a,A,C) t(a)%*%solve(A%*%C%*%t(A))%*%a
 		

@@ -35,7 +35,7 @@ simBlobs3D <- function(betadir,weightdir,templatedata,model=c('gauss','square','
 			newdata = as.vector(newdata)
 		}
 		if(model=='snr0') {
-			newdata <- rep(0,n)
+			newdata <- rep(1e-8,n)
 		}
 		
 		
@@ -49,7 +49,10 @@ simBlobs3D <- function(betadir,weightdir,templatedata,model=c('gauss','square','
 			maxbeta <- mean(y[(theta[1]-box):(theta[1]+box),(theta[2]-box):(theta[2]+box),(theta[3]-box):(theta[3]+box)])
 		}
 		
-		if(model=='snr0') maxbeta <- 1
+		if(model=='snr0') {
+			maxbeta <- 1e+8
+			tsnr=1e-8
+		}
 		
 		#call .C routine for signal and weights
 		sigweight = .C('simTS',as.double(newdata),as.double(maxbeta),as.double(tsnr),as.integer(tslen),as.integer(n),as.double(numeric(n)),as.double(numeric(n)))
@@ -100,9 +103,14 @@ checkSNR <- function(snr,trials=10,tslen=101,smooth=F) {
 	makeExpDirs('~/Desktop','snrcheck','testsubject','testcondition')
 	exp = suppressWarnings(loadExp('~/Desktop/snrcheck'))
 	fn = paste('~/Desktop/snrcheck/subjects/testsubject/conditions/testcondition/data/')
-		
-	simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='square',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max')) 
-		
+	
+	if(snr!=0) {
+		simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='square',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max')) 
+	} else {
+		simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='snr0',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max'))
+	}
+	
+	
 	setExp('~/Desktop/snrcheck',over=T)
 	exp = loadExp('~/Desktop/snrcheck')
 	createAllAverages(exp)
@@ -120,7 +128,7 @@ checkSNR <- function(snr,trials=10,tslen=101,smooth=F) {
 		
 		dim(tvec) = dims
 		
-		b=1
+		b=4
 		
 		mean_signal = mean(tvec[(12-b):(12+b),(12-b):(12+b),(8-b):(8+b)])
 		sd_noise = sd(tvec[(56-b):(56+b),(56-b):(56+b),(28-b):(28+b)])

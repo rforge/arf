@@ -275,10 +275,12 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 }
 
 #loadExp loads an experiment and sets all objects to the directory-root of where experiment.Rda was found
-loadExp <- function(path=getwd())
+loadExp <- function(path=getwd(),fast=F)
 {
 	#set separator
 	sp <- .Platform$file.sep
+	
+	allIsWell = TRUE
 	
 	#check if only dir else pre-append working directory
 	if(length(grep(sp,path))==0) path <- paste(getwd(),sp,path,sep='')
@@ -288,23 +290,25 @@ loadExp <- function(path=getwd())
 	if(length(filename)!=1) stop('No experiment rda file found or multiple rda files found.')
 	.experiment <- experiment <- loadRda(filename)
 	
-	#remove filename to obtain root-path
-	fn <- strsplit(filename,.Platform$file.sep)[[1]]
-	path <- sub(fn[length(fn)],'',filename)
-	path <- path.expand(path)
-	path <- file.path(dirname(path),basename(path),'')
+	if(!fast) {
+		#remove filename to obtain root-path
+		fn <- strsplit(filename,.Platform$file.sep)[[1]]
+		path <- sub(fn[length(fn)],'',filename)
+		path <- path.expand(path)
+		path <- file.path(dirname(path),basename(path),'')
+		
+		#change root for the experiment-file to the current root
+		.experiment <- experiment <- chngRootExp(path,quiet=T)
+		
+		#set and check all objects based on subjects/condition info and settings
+		allIsWell <- setAllObjects(experiment)
 	
-	#change root for the experiment-file to the current root
-	.experiment <- experiment <- chngRootExp(path,quiet=T)
-	
-	#set and check all objects based on subjects/condition info and settings
-	allIsWell <- setAllObjects(experiment)
-
-	#save experiments
-	save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))
-	load(paste(path,.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
-	file.remove(paste(path,.Platform$file.sep,'temp.Rda',sep=''))
-	save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
+		#save experiments
+		save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))
+		load(paste(path,.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
+		file.remove(paste(path,.Platform$file.sep,'temp.Rda',sep=''))
+		save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
+	} else cat('Fast-')
 		
 	#return loaded info 
 	if(allIsWell) cat('Loaded experiment',.experiment.name(experiment),'\n') else cat('Loaded experiment',.experiment.name(experiment),'with warnings!\n')

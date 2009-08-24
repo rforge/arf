@@ -11,7 +11,6 @@ ssq <- function(theta,datavec,weightvec,np,dimx,dimy,dimz,analyticalgrad=T) {
 	## input are theta (parameters), datavec, weightvec, number of regions, and dim x and dim y
 	## output is a vector of parameter estimates (double)
 	
-
 	ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[8]]
 	
 	if(analyticalgrad) {
@@ -30,7 +29,7 @@ gradient <- function(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T)
 	model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
 	grad <- try(.C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=F)
 		
-	if(!is.null(attr(grad,'class'))) grad=rep(-Inf,np)
+	if(!is.null(attr(grad,'class'))) grad=rep(Inf,np) 
 	
 	return(grad)
 	
@@ -198,7 +197,10 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	if(.options.min.analyticalgrad(options)) {
 		gradfunc=gradient
 		angrad=FALSE
-	} else gradfunc=NULL
+	} else {
+		gradfunc=NULL
+		angrad=FALSE
+	}
 	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
