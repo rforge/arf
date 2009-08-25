@@ -56,4 +56,4 @@ import(
 	graphics
 )
 
-useDynLib(arf3DS4,gauss,ssqgauss,dfssq,innerSW,innerSWdiag,dfgaussFile,dftheta0,dftheta1,dftheta2,dftheta3,dftheta4,dftheta5,dftheta6,dftheta7,dftheta8,dftheta9,gaussFix,ssqgaussFix,simTS)
+useDynLib(arf3DS4,gauss,ssqgauss,dfssq,innerSW,innerSWdiag,approxHessian,dfgaussFile,dftheta0,dftheta1,dftheta2,dftheta3,dftheta4,dftheta5,dftheta6,dftheta7,dftheta8,dftheta9,gaussFix,ssqgaussFix,simTS)

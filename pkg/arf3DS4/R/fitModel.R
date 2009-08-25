@@ -144,10 +144,44 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 		.model.iterates(arfmodel) <- nlm.output$iterations
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
-		
+					
 		#save the ModelBinary
 		arfmodel <- saveModelBin(arfmodel)
+		
+		if(.model.valid(arfmodel)) {
+			#save the weights in a binary file
+			weights <- readData(.model.avgWfile(arfmodel))
+			con <- file(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep=''),'wb')
+			writeBin(.fmri.data.datavec(weights),con,double())
+			close(con)
+			
+			#make Derivatives 
+			makeDerivs(arfmodel)
+			
+			#create residuals
+			makeResiduals(arfmodel)
+			
+			if(.options.min.analyticalgrad(options)) {
+				df_fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
+				w_fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.weightFile(arfmodel),sep='')
+				n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
+				p = .model.regions(arfmodel)*10
+				hessian <- try(.C('approxHessian',as.integer(p),as.integer(n),as.character(df_fn),as.character(w_fn),as.double(numeric(p*p))),silen=try.silen)
 				
+				if(is.null(attr(hessian,'class'))) {
+					hessian <- hessian[[5]]
+					dim(hessian) = c(p,p)
+					.model.hessian(arfmodel) <- hessian 	
+				} else {
+					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Could not approximate Hessian with analytical gradient.')
+					.model.valid(arfmodel) <- FALSE
+					
+				}
+			}
+			
+		}
+		
+		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error (probably Infinite gradient), no convergence.'
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
@@ -226,7 +260,6 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	if(is.null(attr(optim.output,'class'))) {
 		if(optim.output$convergence==0) .model.convergence(arfmodel) <- paste('Optim converged in ',optim.output$counts[1],' iterations.',sep='')
 		if(optim.output$convergence==1) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.'
-		
 		if(optim.output$convergence==10) .model.convergence(arfmodel) <- 'Degeneracy of the Nelder-Mead Simplex'
 		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',optim.output$message,sep='')
 		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',optim.output$message,sep='')
@@ -235,14 +268,47 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 		
 		#set model objects
 		.model.minimum(arfmodel) <- optim.output$value
-		.model.hessian(arfmodel) <- optim.output$hessian
 		.model.estimates(arfmodel) <- optim.output$par
+		.model.hessian(arfmodel) <- optim.output$hessian
 		.model.iterates(arfmodel) <- optim.output$counts[1]
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		
 		#save the ModelBinary
 		arfmodel <- saveModelBin(arfmodel)
+	
+		if(.model.valid(arfmodel)) {
+			#save the weights in a binary file
+			weights <- readData(.model.avgWfile(arfmodel))
+			con <- file(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep=''),'wb')
+			writeBin(.fmri.data.datavec(weights),con,double())
+			close(con)
+			
+			#make Derivatives 
+			makeDerivs(arfmodel)
+			
+			#create residuals
+			makeResiduals(arfmodel)
+			
+			if(.options.min.analyticalgrad(options)) {
+				df_fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
+				w_fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.weightFile(arfmodel),sep='')
+				n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
+				p = .model.regions(arfmodel)*10
+				hessian <- try(.C('approxHessian',as.integer(p),as.integer(n),as.character(df_fn),as.character(w_fn),as.double(numeric(p*p))),silen=try.silen)
+				
+				if(is.null(attr(hessian,'class'))) {
+					hessian <- hessian[[5]]
+					dim(hessian) = c(p,p)
+					.model.hessian(arfmodel) <- hessian 	
+				} else {
+					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Could not approximate Hessian with analytical gradient.')
+					.model.valid(arfmodel) <- FALSE
+					
+				}
+			}
+			
+		}
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'

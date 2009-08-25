@@ -64,23 +64,17 @@ varcov <- function(arfmodel)
 	
 		st_time <- Sys.time()
 		
-		dethess <- det(.model.hessian(arfmodel))
-		if(is.na(dethess)) dethess <- 0
-						
+		#try to invert hessian
+		hessian <- try(solve(.model.hessian(arfmodel)),silen=T)
+				
 		#check if hessian is good
-		if(dethess !=0) {
-			
-			#read in the average weights data
+		if(is.null(attr(hessian,'class')))  {
 			weights <- readData(.model.avgWfile(arfmodel))
-			
-			#save the weights in a binary file
-			con <- file(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep=''),'wb')
-			writeBin(.fmri.data.datavec(weights),con,double())
-			close(con)
+			n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
 			
 			#perform the inner_sandwich procedure
-			if(.model.sandwichmethod(arfmodel)=='diag') B <- try(.C('innerSWdiag',as.integer(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]),as.integer(.model.regions(arfmodel)*10),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*10)^2)))[[7]],silen=T)
-			if(.model.sandwichmethod(arfmodel)=='full') B <- try(.C('innerSW',as.integer(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]),as.integer(.model.regions(arfmodel)*10),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*10)^2)))[[7]],silen=T)
+			if(.model.sandwichmethod(arfmodel)=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*10),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*10)^2)))[[7]],silen=T)
+			if(.model.sandwichmethod(arfmodel)=='full') B <- try(.C('innerSW',as.integer(n),as.integer(.model.regions(arfmodel)*10),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*10)^2)))[[7]],silen=T)
 			
 			#check if innersandwich works
 			if(is.null(attr(B,'class'))) {
@@ -383,3 +377,40 @@ mcpCorrect <- function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.
 	return(fmridata)
 	
 }
+
+readDerivs <- function(arfmodel) {
+	
+	sp = .Platform$file.sep
+	
+	fn = paste(.model.modeldatapath(arfmodel),sp,.model.fullmodelDataFile(arfmodel),sep='')
+	dat = readData(fn)
+	n = .fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4]
+	rm(dat)
+	
+	p = .model.regions(arfmodel)*10
+	fn = paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')
+
+	if(file.exists(fn)) {
+		con <- file(fn,open='rb')		
+		dfvec <- readBin(con,double(),n=n*p,size=.Machine$sizeof.longlong,endian=.Platform$endian)
+		dim(dfvec) = c(n,p)
+		close(con)
+		return(dfvec)
+	}
+	
+	return(NULL)
+	
+}
+
+approxHessian <- function(arfmodel) {
+	
+	df = readDerivs(arfmodel)
+	W = .fmri.data.datavec(readData(.model.avgWfile(arfmodel)))
+	
+	hessian = 2 * (t(df)%*%(df*(1/W)))
+	
+	return(hessian)
+	
+	
+}
+ 

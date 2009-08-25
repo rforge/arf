@@ -16,8 +16,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=3,
-		update=6,
-		svnrev=49
+		update=7,
+		svnrev=50
 	)
 )
 
@@ -178,7 +178,7 @@ setClass(
 		opt.method='BFGS',		#optim method
 		opt.lower=-Inf,			#L-BFGS-U lower bound
 		opt.upper=Inf,			#L-BFGS-U upper bound
-		min.analyticalgrad=F, 	#use analytical gradient
+		min.analyticalgrad=T, 	#use analytical gradient
 		min.iterlim=5000,		#iteration limit
 		min.routine='optim',	#which routine
 		start.method='rect',	

@@ -363,6 +363,75 @@ void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 
 }
 
+
+void approxHessian(int *np, int *n, char **dffile, char **wfile, double *hessian) {
+
+	int r,c,j,k;
+	double hess[*np][*np], *cdf, *W, *rdf;
+	FILE *fderiv, *fweight;
+
+	cdf = (double *) R_alloc(*n,sizeof(double));
+	rdf = (double *) R_alloc(*n,sizeof(double));
+	W = (double *) R_alloc(*n,sizeof(double));
+
+	fweight=fopen(*wfile,"r");
+ 	fread(W,sizeof(double),*n,fweight);
+ 	fclose(fweight);
+
+	fderiv=fopen(*dffile,"r");
+
+	//diag loop
+	for(r=0;r<(*np);r++) {
+
+		fseek(fderiv,sizeof(double)*(r**n),SEEK_SET);
+		fread(rdf,sizeof(double),*n,fderiv);
+
+		hess[r][r] = 0e0;
+
+		for(j=0;j<(*n);j++) {
+			hess[r][r]=hess[r][r]+(rdf[j]*(rdf[j]/W[j]));
+		}
+
+	}
+
+
+	//off diag loop
+	for(r=0;r<(*np-1);r++) {
+
+		fseek(fderiv,sizeof(double)*(r**n),SEEK_SET);
+		fread(rdf,sizeof(double),*n,fderiv);
+
+		for(c=r+1;c<(*np);c++) {
+
+			fseek(fderiv,sizeof(double)*(c**n),SEEK_SET);
+			fread(cdf,sizeof(double),*n,fderiv);
+
+			hess[r][c] = 0e0;
+			hess[c][r] = 0e0;
+
+			for(j=0;j<(*n);j++) {
+				hess[r][c]=hess[r][c]+(rdf[j]*(cdf[j]/W[j]));
+				hess[c][r]=hess[c][r]+(rdf[j]*(cdf[j]/W[j]));
+
+			}
+
+		}
+
+	}
+
+
+	k=0;
+	for(c=0;c<(*np);c++) {
+		for(r=0;r<(*np);r++) {
+			*(hessian+k)=2*hess[r][c];
+			k++;
+		}
+	}
+
+	fclose(fderiv);
+
+}
+
 void dfgaussFile(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, char **filename)
 {
 
