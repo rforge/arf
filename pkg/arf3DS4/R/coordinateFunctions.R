@@ -5,7 +5,7 @@
 #############################################
 
 #resize nifti images (crops last slices to destination dimensions)
-crop.volume <- function(filename,resizeToDim) {
+cropVolume <- function(filename,resizeToDim) {
 	
 	dat <- readData(filename)
 	

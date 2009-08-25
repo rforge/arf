@@ -1,6 +1,6 @@
-\name{makeWeights}
+\name{cropVolume}
 \Rdversion{1.1}
-\alias{makeWeights}
+\alias{cropVolume}
 \docType{data}
 \title{
 %%   ~~ data name/kind ... ~~
@@ -8,10 +8,10 @@
 \description{
 %%  ~~ A concise (1-5 lines) description of the dataset. ~~
 }
-\usage{data(makeWeights)}
+\usage{data(cropVolume)}
 \format{
   The format is:
- chr "makeWeights"
+ chr "cropVolume"
 }
 \details{
 %%  ~~ If necessary, more details than the __description__ above ~~
@@ -23,7 +23,7 @@
 %%  ~~ possibly secondary sources and usages ~~
 }
 \examples{
-data(makeWeights)
-## maybe str(makeWeights) ; plot(makeWeights) ...
+data(cropVolume)
+## maybe str(cropVolume) ; plot(cropVolume) ...
 }
 \keyword{datasets}

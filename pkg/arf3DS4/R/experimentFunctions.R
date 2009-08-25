@@ -274,8 +274,8 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 	
 }
 
-#loadExp loads an experiment and sets all objects to the directory-root of where experiment.Rda was found
-loadExp <- function(path=getwd(),fast=F)
+#loadExp loads an experiment and if FAST=F sets all objects to the directory-root of where experiment.Rda was found
+loadExp <- function(path=getwd(),fast=T,overwrite=F)
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -301,14 +301,15 @@ loadExp <- function(path=getwd(),fast=F)
 		.experiment <- experiment <- chngRootExp(path,quiet=T)
 		
 		#set and check all objects based on subjects/condition info and settings
-		allIsWell <- setAllObjects(experiment)
+		allIsWell <- setAllObjects(experiment,over=overwrite)
 	
-		#save experiments
-		save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))
-		load(paste(path,.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
-		file.remove(paste(path,.Platform$file.sep,'temp.Rda',sep=''))
-		save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
-	} else cat('Fast-')
+	} else 
+	
+	#save experiments
+	save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))
+	load(paste(path,.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
+	file.remove(paste(path,.Platform$file.sep,'temp.Rda',sep=''))
+	save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
 		
 	#return loaded info 
 	if(allIsWell) cat('Loaded experiment',.experiment.name(experiment),'\n') else cat('Loaded experiment',.experiment.name(experiment),'with warnings!\n')

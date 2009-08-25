@@ -1,6 +1,6 @@
-\name{readHeader}
+\name{mcpCorrect}
 \Rdversion{1.1}
-\alias{readHeader}
+\alias{mcpCorrect}
 \docType{data}
 \title{
 %%   ~~ data name/kind ... ~~
@@ -8,10 +8,10 @@
 \description{
 %%  ~~ A concise (1-5 lines) description of the dataset. ~~
 }
-\usage{data(readHeader)}
+\usage{data(mcpCorrect)}
 \format{
   The format is:
- chr "readHeader"
+ chr "mcpCorrect"
 }
 \details{
 %%  ~~ If necessary, more details than the __description__ above ~~
@@ -23,7 +23,7 @@
 %%  ~~ possibly secondary sources and usages ~~
 }
 \examples{
-data(readHeader)
-## maybe str(readHeader) ; plot(readHeader) ...
+data(mcpCorrect)
+## maybe str(mcpCorrect) ; plot(mcpCorrect) ...
 }
 \keyword{datasets}

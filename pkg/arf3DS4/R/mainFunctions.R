@@ -31,14 +31,6 @@ processModel <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mo
 		if(pr) cat('  BIC  :',round(.model.fit(arfmodel)[1]),'\n')
 		if(pr) cat('  RMSEA:',round(.model.fit(arfmodel)[2],1),'\n')
 		
-		if(pr) cat(' calculating derivatives...')
-		md = makeDerivs(arfmodel)
-		if(md) {if(pr) {cat('ok\n')}} else {if(pr) {cat('fail\n')}} 
-		
-		if(pr) cat(' calculating residuals...')
-		rd = makeResiduals(arfmodel)
-		if(rd) {if(pr) {cat('ok\n')}} else {if(pr) {cat('fail\n')}} 
-		
 		if(pr) cat(' calculating variance/covariance matrix...')
 		arfmodel = varcov(arfmodel)
 		if(.model.valid(arfmodel)) {if(pr) {cat('ok\n')}} else {if(pr) {cat('fail\n')}} 
