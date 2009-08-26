@@ -13,23 +13,22 @@ Activated Region Fitting (ARF) is an analysis method for fMRI data. The method u
 \tabular{ll}{
 Package: \tab arf3DS4\cr
 Type: \tab Package\cr
-Version: \tab 1.3-8\cr
-Date: \tab 2009-08-25\cr
+Version: \tab 1.3-9\cr
+Date: \tab 2009-08-26\cr
 Depends: \tab R (>= 2.9.1), methods\cr
 URL: \tab http://arf.r-forge.r-project.org/\cr
 License: \tab GNU (GPL)\cr
 LazyLoad: \tab yes\cr
 Repository: \tab R-Forge\cr
 Repository/R-Forge/Project: \tab arf\cr
-Repository/R-Forge/Revision: \tab 52\cr
-Publication: \tab 2009-08-25 17:01:08\cr
-Packaged: \tab 2009-08-25 17:01:08; rforge\cr
-Built: \tab R 2.9.1; universal-apple-darwin8.11.1; 2009-08-25 17:01:08; unix\cr
+Repository/R-Forge/Revision: \tab 53\cr
+Publication: \tab 2009-08-26 16:19:54\cr
+Packaged: \tab 2009-08-26 16:19:54; rforge\cr
+Built: \tab R 2.9.1; universal-apple-darwin8.11.1; 2009-08-26 16:19:54; unix\cr
 }
 To get a feeling of the arf3DS4 package, it is recommended to read the manual first. More details can also be found in the ARF paper (see reference section).
 arf3DS4 stores all its data in a predefined directory structure, this is mainly because of the size of fMRI data files. To save memory the data is often not stored directly in an R object, but the location where the files can be found is stored instead. 
 Information of the directory structure is stored in the S4 class experiment and can be customized (by adjusting the S4 settings class). The fmri data files are stored in the S4 class fmri.data (wich includes the classes nifti.header and nifti.fileinfo). A set of fmri data files belonging to one condition in the experiment are stored in the S4 class data. To this data an ARF model can be fitted, the model information is stored in the S4 class model. Setting the options of the model fitting procedure etc. is done via the S4 class options. A valid ARF model contains hypothesis tests of its parameters, these are in the S4 class wald. Finally an ARF model can be registered to standard MNI space via the S4 registration class and to the functional data via the S4 functional class. Slots of the classes can be accessed and replaced using standard accessor and replacement functions.  
-
 Index:
 \preformatted{
 Experiment functions:
@@ -37,7 +36,6 @@ setExp                  set an experiment based on files in the data directories
 makeExpDirs             make an ARF directory structure
 loadExp					load an ARF experiment
 getFSL					copy FSL data to an ARF experiment
-
 fMRI data functions:
 getFileInfo				get information of a NIFTI/ANALYZE file
 readData				read NIFTI/ANALYZE data
@@ -48,7 +46,6 @@ setRegFiles				set registration files (for use with standard brain atlases)
 setRegParams			set transformation matrices based on registration files (for use with standard brain atlases)
 createFuncs				create functional directories (not yet implemented)
 arfToMNI				convert ARF native coordinates to MNI standard coordinates
-
 ARF model functions:
 fitModelNlm				fit an ARF model with nlm()
 fitModelOptim           fit an ARF model with optim()
@@ -61,14 +58,12 @@ newModel				create a new ARF model based on ARF data
 saveModel				save the ARF model
 loadModel				load ARF model files
 modelPred				get model predictions
-
 Generic arf functions:
 loadOptions				load an ARF options file
 loadStart				load starting values from an ARF model
 loadReg					load registration files
 loadRda					load .Rda files	
 loadData				load ARF data files
-
 Variance/covariance related functions:
 makeDerivs				make analytical derivatives
 makeResiduals			make residuals

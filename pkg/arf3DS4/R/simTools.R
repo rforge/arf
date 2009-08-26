@@ -35,7 +35,7 @@ simBlobs3D <- function(betadir,weightdir,templatedata,model=c('gauss','square','
 			newdata = as.vector(newdata)
 		}
 		if(model=='snr0') {
-			newdata <- rep(1e-8,n)
+			newdata <- rep(0,n)
 		}
 		
 		
@@ -50,8 +50,8 @@ simBlobs3D <- function(betadir,weightdir,templatedata,model=c('gauss','square','
 		}
 		
 		if(model=='snr0') {
-			maxbeta <- 1e+8
-			tsnr=1e-8
+			maxbeta <- 1
+			tsnr=1
 		}
 		
 		#call .C routine for signal and weights
@@ -105,7 +105,9 @@ checkSNR <- function(snr,trials=10,tslen=101,smooth=F) {
 	fn = paste('~/Desktop/snrcheck/subjects/testsubject/conditions/testcondition/data/')
 	
 	if(snr!=0) {
-		simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='square',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max')) 
+		#simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='square',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max')) 
+		simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='gauss',theta=c(12,12,8,1,2,1,.1,.1,.1,100000),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max'))
+	
 	} else {
 		simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='snr0',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max'))
 	}
@@ -130,21 +132,35 @@ checkSNR <- function(snr,trials=10,tslen=101,smooth=F) {
 		
 		b=4
 		
-		mean_signal = mean(tvec[(12-b):(12+b),(12-b):(12+b),(8-b):(8+b)])
+		#mean_signal = mean(tvec[(12-b):(12+b),(12-b):(12+b),(8-b):(8+b)])
+		mean_signal = max(tvec)
 		sd_noise = sd(tvec[(56-b):(56+b),(56-b):(56+b),(28-b):(28+b)])
 	
 		st_snr = mean_signal/sd_noise
 		cat('Trial',i,'SNR=',st_snr,' (',snr/sqrt(trials),')\n')
 	}
 
-	dat = readData(paste(fn,'avg/avgtstat.nii.gz',sep=''))
-	dat = dat@datavec
-	dim(dat) = dims
+	bet = readData(paste(fn,'avg/avgdata.nii.gz',sep=''))
+	W = readData(paste(fn,'avg/avgweight.nii.gz',sep=''))
+	new_dat = bet@datavec / sqrt(W@datavec)
+	dim(new_dat) = dims
 	
-	mean_signal = mean(dat[(12-b):(12+b),(12-b):(12+b),(8-b):(8+b)])
-	sd_noise = sd(dat[(56-b):(56+b),(56-b):(56+b),(28-b):(28+b)])
+	tval_dat = readData(paste(fn,'avg/avgtstat.nii.gz',sep=''))
+	tval_dat = tval_dat@datavec
+	dim(tval_dat) = dims
 	
+		
+	quartz(width=4,height=8)
+	layout(matrix(1:2,,1))
+	hist(tval_dat)
+	hist(new_dat)
+	
+	
+	#mean_signal = mean(dat[(12-b):(12+b),(12-b):(12+b),(8-b):(8+b)])
+	sd_noise = sd(tval_dat[(56-b):(56+b),(56-b):(56+b),(28-b):(28+b)])
+	mean_signal = max(dat)
 	overall_snr = mean_signal/sd_noise
+	
 	cat('Overall SNR=',overall_snr,' (',snr,')\n')
 	
 }

@@ -400,7 +400,7 @@ readDerivs <- function(arfmodel) {
 }
 
 #approxHessian calculates the approximate hessian (used only to check C code)
-approxHessian <- function(arfmodel) {
+approxHessianR <- function(arfmodel) {
 	
 	df = readDerivs(arfmodel)
 	W = .fmri.data.datavec(readData(.model.avgWfile(arfmodel)))

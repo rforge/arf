@@ -1186,7 +1186,7 @@ void simTS(double *model, double *mb, double *snr, int *tslen, int *numvox, doub
 {
 
 	int c,r,p;
-	double *tsvec,sigma,tssum,varsum,signal_mean,signal_sd,signal_se,signal_weight,sq_tslen,err;
+	double *tsvec,sigma,tssum,varsum,signal_var,signal_mean,signal_sd,signal_se,signal_weight,sq_tslen,err;
 
 	tsvec = (double *) R_alloc(*tslen,sizeof(double));
 
@@ -1211,7 +1211,9 @@ void simTS(double *model, double *mb, double *snr, int *tslen, int *numvox, doub
 			varsum = varsum + pow(tsvec[c]-signal_mean,2);
 		}
 
-		signal_sd = sqrt(varsum);
+		signal_var = varsum/(*tslen - 1);
+
+		signal_sd = sqrt(signal_var);
 		signal_se = signal_sd / sq_tslen;
 		signal_weight = pow(signal_se,2);
 
