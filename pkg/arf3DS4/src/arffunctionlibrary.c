@@ -128,6 +128,22 @@ void ssqgauss(double *theta, double *dat, double *W, int *np, int *dimx, int *di
 	ss[0]=g;
 }
 
+void ssqdata(double *dat, double *W, int *n, double *ss)
+{
+
+	int i;
+	double g;
+
+	g=0e0;
+	for(i=0;i<(*n);i++) {
+		if(dat[i]!=0e0) {
+			g=g+pow((dat[i]),2)*(1/W[i]);
+		}
+	}
+
+	ss[0]=g;
+}
+
 
 void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, double *B)
 {

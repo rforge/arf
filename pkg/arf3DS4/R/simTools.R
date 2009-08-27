@@ -105,9 +105,8 @@ checkSNR <- function(snr,trials=10,tslen=101,smooth=F) {
 	fn = paste('~/Desktop/snrcheck/subjects/testsubject/conditions/testcondition/data/')
 	
 	if(snr!=0) {
-		#simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='square',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max')) 
-		simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='gauss',theta=c(12,12,8,1,2,1,.1,.1,.1,100000),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max'))
-	
+		simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='square',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max')) 
+		
 	} else {
 		simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='snr0',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max'))
 	}
@@ -132,8 +131,7 @@ checkSNR <- function(snr,trials=10,tslen=101,smooth=F) {
 		
 		b=4
 		
-		#mean_signal = mean(tvec[(12-b):(12+b),(12-b):(12+b),(8-b):(8+b)])
-		mean_signal = max(tvec)
+		mean_signal = mean(tvec[(12-b):(12+b),(12-b):(12+b),(8-b):(8+b)])
 		sd_noise = sd(tvec[(56-b):(56+b),(56-b):(56+b),(28-b):(28+b)])
 	
 		st_snr = mean_signal/sd_noise
@@ -156,9 +154,8 @@ checkSNR <- function(snr,trials=10,tslen=101,smooth=F) {
 	hist(new_dat)
 	
 	
-	#mean_signal = mean(dat[(12-b):(12+b),(12-b):(12+b),(8-b):(8+b)])
+	mean_signal = mean(tval_dat[(12-b):(12+b),(12-b):(12+b),(8-b):(8+b)])
 	sd_noise = sd(tval_dat[(56-b):(56+b),(56-b):(56+b),(28-b):(28+b)])
-	mean_signal = max(dat)
 	overall_snr = mean_signal/sd_noise
 	
 	cat('Overall SNR=',overall_snr,' (',snr,')\n')

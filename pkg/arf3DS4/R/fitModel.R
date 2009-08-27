@@ -10,8 +10,13 @@ ssq <- function(theta,datavec,weightvec,np,dimx,dimy,dimz,analyticalgrad=T) {
 	## it calls the external C-funtion 'ssq'
 	## input are theta (parameters), datavec, weightvec, number of regions, and dim x and dim y
 	## output is a vector of parameter estimates (double)
+
+	cat('theta=',round(theta,2),'\n')
 	
 	ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[8]]
+	cat('ssq=',ssqdat,'\n\n')
+	
+
 	
 	if(analyticalgrad) {
 		grad = gradient(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T)
@@ -29,11 +34,14 @@ gradient <- function(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T)
 	model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
 	grad <- try(.C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=F)
 		
+	cat('grad=',grad,'\n')
 	if(!is.null(attr(grad,'class'))) grad=rep(Inf,np) 
 	
 	return(grad)
 	
 }
+
+
 
 
 #modelPred returns an array with modelpredictions for the model or the startingvalues, or ask for a specific region
@@ -192,7 +200,7 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 	
 	#save the modelInfo
 	saveModel(arfmodel)
-	
+
 	#return arf model object	
 	return(invisible(arfmodel))
 }
@@ -236,6 +244,11 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 		angrad=FALSE
 	}
 	
+	.model.startval(arfmodel)=c(32,32,12,10,10,10,.1,.1,.1,10000)
+
+	#get ssq scale
+	ss_data = .C('ssqdata',as.double(.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])]),as.double(.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])]),as.integer(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4]),as.double(numeric(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])))[[4]]
+	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 						.model.startval(arfmodel),
@@ -249,7 +262,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 						dimz=.fmri.data.dims(dat)[4],
 						analyticalgrad=angrad,
 						method=.options.opt.method(options),
-						control=list(trace=printlevel,maxit=.options.min.iterlim(options)),
+						control=list(trace=printlevel,maxit=.options.min.iterlim(options),fnscale=ss_data),
 						hessian=T
 					)),silen=try.silen)
 
@@ -320,6 +333,13 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	
 	#save the modelInfo
 	saveModel(arfmodel)
+	
+	
+	#for(i in seq(1,10,.1)) {
+	#	ssq(.model.startval(arfmodel)+c(i,0,0,0,0,0,0,0,0,0),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.regions(arfmodel)*10,.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],TRUE)
+	#	
+	#}
+	
 	
 	#return arf model object	
 	return(invisible(arfmodel))

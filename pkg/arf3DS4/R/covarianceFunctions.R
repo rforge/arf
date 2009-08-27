@@ -147,7 +147,8 @@ BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 				if(log(dtm)==-Inf) {dtm=1e-323;.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'Determinant (in BIC) was -Inf, set to minimum value 1e-323.',sep='')}
 				if(log(dtm)==Inf) {dtm=1e308;.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'Determinant (in BIC) was Inf, set to maximum value 1e308.',sep='')}
 				
-				cons <- try((2*(((n/2)*log(2*pi))+((1/2)*log(dtm))+((1/2)*(.model.minimum(arfmodel))))),silen=T) 
+				#cons <- try((2*(((n/2)*log(2*pi))+((1/2)*log(dtm))+((1/2)*(.model.minimum(arfmodel))))),silen=T)
+				cons = 0; 
 				
 			} else { #logs not valid
 				.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Error calculating logs. BIC not calculated')
@@ -160,7 +161,8 @@ BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 		
 		#check if constant is a number and calculate BIC
 		if(is.numeric(cons)) {
-			.model.fit(arfmodel)[1,1]  <- cons + (log(.model.minimum(arfmodel))) + (((.model.regions(arfmodel)*10))*log(n))
+			#.model.fit(arfmodel)[1,1]  <- cons + (log(.model.minimum(arfmodel))) + (((.model.regions(arfmodel)*10))*log(n))
+			.model.fit(arfmodel)[1,1]  <- (n*log(.model.minimum(arfmodel))/n) + (((.model.regions(arfmodel)*10))*log(n))
 		} else { #constant is not a number
 			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Constant invalid. BIC not calculated')
 			.model.valid(arfmodel) <- FALSE
