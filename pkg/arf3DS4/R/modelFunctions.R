@@ -113,6 +113,11 @@ loadOptions <- function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel
 #loadStart loads the Start object
 loadStart <- function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.startFile(arfmodel),sep='')))
 
+
+#save startingvalues
+saveStart <- function(startval,arfmodel) save(startval,file=paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.startFile(arfmodel),sep=''))  	
+
+
 #loadReg
 loadReg <- function(arfmodel) return(loadRda(.model.regfile(arfmodel),sep=''))
 
@@ -123,6 +128,4 @@ loadModel <- function(modelname,subject,condition,experiment=.experiment) {
 	return(loadRda(paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.modelDir(experiment),sp,modelname,sp,.experiment.modelRda(experiment),sep='')))
 		
 }
-
-	
 

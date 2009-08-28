@@ -121,8 +121,8 @@ varcov <- function(arfmodel)
 BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 	## BIC calculates the Bayesian Information Fit criterion
 	## input is an object of arfmodel
-	## output is an object of arfmodel
-	
+	## outcput is an object of arfmodel
+
 	if(.model.valid(arfmodel)) {
 		
 		#read in weights, used in constant

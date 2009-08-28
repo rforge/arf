@@ -16,8 +16,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=3,
-		update=10,
-		svnrev=54
+		update=11,
+		svnrev=55
 	)
 )
 
@@ -182,8 +182,8 @@ setClass(
 		min.iterlim=5000,		#iteration limit
 		min.routine='optim',	#which routine
 		start.method='rect',	
-		start.maxfac=2,
-		start.vector=c(0,0,0,0,0,0,.1,.2,-.1,100),
+		start.maxfac=4,
+		start.vector=c(0,0,0,0,0,0,.1,.2,-.1,1000),
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,0,0,-.9,-.9,-.9,-1e+64,0,0,0,0,0,0,.9,.9,.9,1e+64),
 		sw.type='diag',

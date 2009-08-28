@@ -11,12 +11,7 @@ ssq <- function(theta,datavec,weightvec,np,dimx,dimy,dimz,analyticalgrad=T) {
 	## input are theta (parameters), datavec, weightvec, number of regions, and dim x and dim y
 	## output is a vector of parameter estimates (double)
 
-	cat('theta=',round(theta,2),'\n')
-	
 	ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[8]]
-	cat('ssq=',ssqdat,'\n\n')
-	
-
 	
 	if(analyticalgrad) {
 		grad = gradient(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T)
@@ -33,15 +28,12 @@ gradient <- function(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T)
 	
 	model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
 	grad <- try(.C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=F)
-		
-	cat('grad=',grad,'\n')
+
 	if(!is.null(attr(grad,'class'))) grad=rep(Inf,np) 
 	
 	return(grad)
 	
 }
-
-
 
 
 #modelPred returns an array with modelpredictions for the model or the startingvalues, or ask for a specific region
@@ -99,9 +91,9 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 		arfmodel <- determineStartRect(arfmodel)
 	}
 	
-	if(.options.start.method(options)=='load') {
-		.model.startval(arfmodel) <- loadStart(arfmodel)
-	}
+		
+	#load StartingValues
+	.model.startval(arfmodel) <- loadStart(arfmodel)
 	
 	
 	#check if averages exist else stop
@@ -209,23 +201,15 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 ## fitModelOptim calls the minimization routine (OPTIM)
 fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
 	
+	#set separator
 	sp <- .Platform$file.sep
 	
+	#set routine to optim
 	.options.min.routine(options) <- 'optim'
 	
 	#start_time
 	st_time <- Sys.time()
-	
-	#get starting values
-	if(.options.start.method(options)=='rect') {
-		arfmodel <- determineStartRect(arfmodel)
-	}
-	
-	if(.options.start.method(options)=='load') {
-		.model.startval(arfmodel) <- loadStart(arfmodel)
-	}
-	
-	
+		
 	#check if averages exist else stop
 	if(!file.exists(.model.avgdatfile(arfmodel))) stop('Averages do not exist, please run createAverages')
 	if(!file.exists(.model.avgWfile(arfmodel))) stop('Averages do not exist, please run createAverages')
@@ -235,7 +219,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
 	
-	
+	#set analyticalgrad options
 	if(.options.min.analyticalgrad(options)) {
 		gradfunc=gradient
 		angrad=FALSE
@@ -244,10 +228,16 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 		angrad=FALSE
 	}
 	
-	.model.startval(arfmodel)=c(32,32,12,10,10,10,.1,.1,.1,10000)
-
 	#get ssq scale
 	ss_data = .C('ssqdata',as.double(.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])]),as.double(.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])]),as.integer(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4]),as.double(numeric(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])))[[4]]
+	
+	#get starting values
+	if(.options.start.method(options)=='rect') {
+		arfmodel <- determineStartRect(arfmodel)
+	}
+	
+	#load startingvalues
+	.model.startval(arfmodel) <- loadStart(arfmodel)
 	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
@@ -292,7 +282,6 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	
 		if(.model.valid(arfmodel)) {
 			#save the weights in a binary file
-			weights <- readData(.model.avgWfile(arfmodel))
 			con <- file(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep=''),'wb')
 			writeBin(.fmri.data.datavec(weights),con,double())
 			close(con)
@@ -333,13 +322,6 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	
 	#save the modelInfo
 	saveModel(arfmodel)
-	
-	
-	#for(i in seq(1,10,.1)) {
-	#	ssq(.model.startval(arfmodel)+c(i,0,0,0,0,0,0,0,0,0),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.regions(arfmodel)*10,.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],TRUE)
-	#	
-	#}
-	
 	
 	#return arf model object	
 	return(invisible(arfmodel))
@@ -499,10 +481,23 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 		
 		data[xvec,yvec,zvec]=(min(data)/2)
 	
+		#check determinant of sigma
+		detsig = try(detSigmaDeriv(theta),silen=T)
+		if(is.null(attr(detsig,'class'))) {
+			if(detsig$value<((dimx*dimy*dimz)/1e+4)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('starting values of region',reg,'seem very small (determinant of sigma is small)'))
+		} else {
+			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('starting values of region',reg,'return invalid deterimant of sigma'))
+		}
 	}
+		
 	
+	#save startingvalues
 	.model.startval(arfmodel) <- theta
+	saveStart(.model.startval(arfmodel),arfmodel)
 	
+	#save model
+	saveModel(arfmodel)
+		
 	return(invisible(arfmodel))
 	
 }
