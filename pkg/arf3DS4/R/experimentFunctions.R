@@ -303,7 +303,7 @@ loadExp <- function(path=getwd(),fast=T,overwrite=F)
 		#set and check all objects based on subjects/condition info and settings
 		allIsWell <- setAllObjects(experiment,over=overwrite)
 	
-	} else 
+	}  
 	
 	#save experiments
 	save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))

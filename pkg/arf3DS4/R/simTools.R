@@ -304,3 +304,6 @@ simBlobsST <- function(betadir,weightdir,templatedata,model='gauss',regions=3,th
 	return(signal)
 }
 
+
+
+

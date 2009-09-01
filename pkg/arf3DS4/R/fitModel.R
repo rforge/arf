@@ -5,31 +5,33 @@
 #############################################
 
 
-ssq <- function(theta,datavec,weightvec,np,dimx,dimy,dimz,analyticalgrad=T) {
+ssq <- function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,analyticalgrad=T) {
 	## ssq is the objective function (sums-of-squares)
 	## it calls the external C-funtion 'ssq'
 	## input are theta (parameters), datavec, weightvec, number of regions, and dim x and dim y
 	## output is a vector of parameter estimates (double)
 
-	ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[8]]
+	ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
 	
 	if(analyticalgrad) {
 		grad = gradient(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T)
 		attr(ssqdat,'gradient') <- grad
 	}
-	
+		
+	if(is.nan(ssqdat) | ssqdat==Inf) ssqdat=1e+128
+	#cat(ssqdat,'\n')
 	return(invisible(ssqdat))	
 	
 }
 
 
 #gradient returns the analytical gradient of the ssq to the thetaparameters
-gradient <- function(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T) {
+gradient <- function(np,dimx,dimy,dimz,theta,datavec,weightvec,brain,analyticalgrad=T) {
 	
 	model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
-	grad <- try(.C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=F)
+	grad <- try(.C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=T)
 
-	if(!is.null(attr(grad,'class'))) grad=rep(Inf,np) 
+	if(!is.null(attr(grad,'class'))) grad=rep(1e+128,np) 
 	
 	return(grad)
 	
@@ -201,6 +203,8 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 ## fitModelOptim calls the minimization routine (OPTIM)
 fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
 	
+	#try.silen=F
+	
 	#set separator
 	sp <- .Platform$file.sep
 	
@@ -228,9 +232,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 		angrad=FALSE
 	}
 	
-	#get ssq scale
-	ss_data = .C('ssqdata',as.double(.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])]),as.double(.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])]),as.integer(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4]),as.double(numeric(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])))[[4]]
-	
+
 	#get starting values
 	if(.options.start.method(options)=='rect') {
 		arfmodel <- determineStartRect(arfmodel)
@@ -239,13 +241,41 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	#load startingvalues
 	.model.startval(arfmodel) <- loadStart(arfmodel)
 	
+	
+	if(length(.options.opt.lower(options))==1) {
+		lowbound=-Inf
+	} else {
+		lowbound=rep(.options.opt.lower(options),.model.regions(arfmodel))
+	}
+	
+	if(length(.options.opt.upper(options))==1) {
+		upbound=Inf
+	} else {
+		upbound=rep(.options.opt.upper(options),.model.regions(arfmodel))
+	}
+	
+	#set brain voxels
+	if(.options.adjust.n(options)) {
+		brain <- rep(1,length(.fmri.data.datavec(dat)))
+		nb = which(.fmri.data.datavec(dat)==0)
+		if(length(nb)>0) brain[nb]=0
+	} 
+	
+	cat('  non-brain voxels:',length(nb),'\n')
+	
+	#get ssq scale
+	ss_data = .C('ssqdata',as.double(.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])]),as.double(.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])]),as.integer(brain),as.integer(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4]),as.double(numeric(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])))[[4]]
+		
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 						.model.startval(arfmodel),
 						ssq,
 						gradfunc,
+						lower=lowbound,
+						upper=upbound,
 						datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 						weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
+						brain=brain,
 						np=.model.regions(arfmodel)*10,
 						dimx=.fmri.data.dims(dat)[2],
 						dimy=.fmri.data.dims(dat)[3],
@@ -430,8 +460,7 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 	dimy <- .fmri.data.dims(fmridata)[3]
 	dimz <- .fmri.data.dims(fmridata)[4]
 	data <- .fmri.data.datavec(fmridata)[1:(dimx*dimy*dimz)]
-	rm(fmridata)
-
+	
 	mindim=c(1,1,1)
 	maxdim=c(dimx,dimy,dimz)
 	
@@ -479,7 +508,7 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 		if(length(rmy)>0 & length(rmy)<length(yvec)) yvec <- yvec[-rmy]
 		if(length(rmz)>0 & length(rmz)<length(zvec)) zvec <- zvec[-rmz]	
 		
-		data[xvec,yvec,zvec]=(min(data)/2)
+		data[xvec,yvec,zvec]=0
 	
 		#check determinant of sigma
 		detsig = try(detSigmaDeriv(theta),silen=T)
@@ -495,12 +524,21 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 	.model.startval(arfmodel) <- theta
 	saveStart(.model.startval(arfmodel),arfmodel)
 	
+	#save startmap
+	.fmri.data.fullpath(fmridata) <- .model.modeldatapath(arfmodel)
+	.fmri.data.filename(fmridata) <- 'startmap'
+	.fmri.data.intent_name(fmridata) <- 'start_search_map'
+	writeData(fmridata,as.vector(data))
+	
 	#save model
 	saveModel(arfmodel)
 		
 	return(invisible(arfmodel))
 	
 }
+
+
+
 
 #calculates mean falloff of a vector
 fallOff <- function(vec,fwhm=2) 

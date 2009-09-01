@@ -64,7 +64,7 @@ void gauss(double *theta, int *np, int *dimx, int *dimy, int *dimz, double *gx)
 	}
 }
 
-void ssqgauss(double *theta, double *dat, double *W, int *np, int *dimx, int *dimy, int *dimz, double *ss)
+void ssqgauss(double *theta, double *dat, double *W, int *brain, int *np, int *dimx, int *dimy, int *dimz, double *ss)
 {
 
 	int reg,x,y,z,p;
@@ -83,7 +83,7 @@ void ssqgauss(double *theta, double *dat, double *W, int *np, int *dimx, int *di
 
 				f=0; //f becomes the sum of all regions  (zeroed every region)
 
-				if(dat[p]!=0e0) {
+				if(brain[p]!=0) {
 
 					for(reg=0;reg<(*np);reg=reg+10) {
 
@@ -128,7 +128,7 @@ void ssqgauss(double *theta, double *dat, double *W, int *np, int *dimx, int *di
 	ss[0]=g;
 }
 
-void ssqdata(double *dat, double *W, int *n, double *ss)
+void ssqdata(double *dat, double *W, int *brain, int *n, double *ss)
 {
 
 	int i;
@@ -136,7 +136,7 @@ void ssqdata(double *dat, double *W, int *n, double *ss)
 
 	g=0e0;
 	for(i=0;i<(*n);i++) {
-		if(dat[i]!=0e0) {
+		if(brain[i]!=0) {
 			g=g+pow((dat[i]),2)*(1/W[i]);
 		}
 	}
