@@ -19,9 +19,19 @@ newModel <- function(modelname='defaultmodel',regions=1,subject='',condition='',
 	if(!class(arfdata)=='data') stop('Input must be of class \'data\'')
 	if(modelname=='') stop('Modelname cannot be empty')
 	
+	
+	#check if Averages exist (else create)
+	if(!file.exists(.data.avgdatfile(arfdata)) | !file.exists(.data.avgWfile(arfdata))) {
+		if(overwrite) {
+			arfdata <- createAverages(arfdata,experiment)
+		} else {
+			warning('Averages do not exist, and overwrite is FALSE! Things might go wrong.')
+		}
+	} 
+	
 	#make new modelobject
 	model <- new('model',arfdata)
-
+		
 	#set modelname
 	.model.modelname(model) <- modelname 
 			

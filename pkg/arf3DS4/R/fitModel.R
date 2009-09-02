@@ -5,7 +5,7 @@
 #############################################
 
 
-ssq <- function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,analyticalgrad=T) {
+ssq <- function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad=T) {
 	## ssq is the objective function (sums-of-squares)
 	## it calls the external C-funtion 'ssq'
 	## input are theta (parameters), datavec, weightvec, number of regions, and dim x and dim y
@@ -14,24 +14,24 @@ ssq <- function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,analyticalgrad=T
 	ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
 	
 	if(analyticalgrad) {
-		grad = gradient(np,dimx,dimy,dimz,theta,datavec,weightvec,analyticalgrad=T)
+		grad = gradient(np,dimx,dimy,dimz,theta,datavec,weightvec,brain,ss_data,analyticalgrad=T)
 		attr(ssqdat,'gradient') <- grad
 	}
 		
-	if(is.nan(ssqdat) | ssqdat==Inf) ssqdat=1e+128
-	#cat(ssqdat,'\n')
+	if(is.nan(ssqdat) | ssqdat==Inf) ssqdat=ss_data
+	
 	return(invisible(ssqdat))	
 	
 }
 
 
 #gradient returns the analytical gradient of the ssq to the thetaparameters
-gradient <- function(np,dimx,dimy,dimz,theta,datavec,weightvec,brain,analyticalgrad=T) {
+gradient <- function(np,dimx,dimy,dimz,theta,datavec,weightvec,brain,ss_data,analyticalgrad=T) {
 	
 	model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
 	grad <- try(.C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=T)
 
-	if(!is.null(attr(grad,'class'))) grad=rep(1e+128,np) 
+	if(!is.null(attr(grad,'class'))) grad=rep(1e+256,np) 
 	
 	return(grad)
 	
@@ -88,17 +88,7 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 	#start_time
 	st_time <- Sys.time()
 
-	#get starting values
-	if(.options.start.method(options)=='rect') {
-		arfmodel <- determineStartRect(arfmodel)
-	}
-	
-		
-	#load StartingValues
-	.model.startval(arfmodel) <- loadStart(arfmodel)
-	
-	
-	#check if averages exist else stop
+	#check if averages exist
 	if(!file.exists(.model.avgdatfile(arfmodel))) stop('Averages do not exist, please run createAverages')
 	if(!file.exists(.model.avgWfile(arfmodel))) stop('Averages do not exist, please run createAverages')
 	
@@ -107,17 +97,27 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
 	
-		
+	#get starting values
+	if(.options.start.method(options)=='rect') {
+		arfmodel <- determineStartRect(arfmodel)
+	}
+	
+	#load startingvalues
+	.model.startval(arfmodel) <- loadStart(arfmodel)
+	
+	
 	#call NLM (within a try-loop)
 	nlm.output <- try(suppressWarnings(nlm(
-					try(ssq,silen=try.silen),
+					ssq,
 					.model.startval(arfmodel),
 					datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 					weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
 					np=.model.regions(arfmodel)*10,
+					brain=.model.mask(arfmodel),
 					dimx=.fmri.data.dims(dat)[2],
 					dimy=.fmri.data.dims(dat)[3],
 					dimz=.fmri.data.dims(dat)[4],
+					ss_data=.model.ss(arfmodel),
 					analyticalgrad=.options.min.analyticalgrad(options),
 					print.level=printlevel,
 					hessian=T,
@@ -146,7 +146,9 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 		.model.iterates(arfmodel) <- nlm.output$iterations
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
-					
+		if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient(.model.regions(arfmodel)*10,.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
+		
+		
 		#save the ModelBinary
 		arfmodel <- saveModelBin(arfmodel)
 		
@@ -203,8 +205,6 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 ## fitModelOptim calls the minimization routine (OPTIM)
 fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
 	
-	#try.silen=F
-	
 	#set separator
 	sp <- .Platform$file.sep
 	
@@ -214,7 +214,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	#start_time
 	st_time <- Sys.time()
 		
-	#check if averages exist else stop
+	#check if averages exist
 	if(!file.exists(.model.avgdatfile(arfmodel))) stop('Averages do not exist, please run createAverages')
 	if(!file.exists(.model.avgWfile(arfmodel))) stop('Averages do not exist, please run createAverages')
 	
@@ -241,30 +241,9 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	#load startingvalues
 	.model.startval(arfmodel) <- loadStart(arfmodel)
 	
-	
-	if(length(.options.opt.lower(options))==1) {
-		lowbound=-Inf
-	} else {
-		lowbound=rep(.options.opt.lower(options),.model.regions(arfmodel))
-	}
-	
-	if(length(.options.opt.upper(options))==1) {
-		upbound=Inf
-	} else {
-		upbound=rep(.options.opt.upper(options),.model.regions(arfmodel))
-	}
-	
-	#set brain voxels
-	if(.options.adjust.n(options)) {
-		brain <- rep(1,length(.fmri.data.datavec(dat)))
-		nb = which(.fmri.data.datavec(dat)==0)
-		if(length(nb)>0) brain[nb]=0
-	} 
-	
-	cat('  non-brain voxels:',length(nb),'\n')
-	
-	#get ssq scale
-	ss_data = .C('ssqdata',as.double(.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])]),as.double(.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])]),as.integer(brain),as.integer(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4]),as.double(numeric(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])))[[4]]
+	#set boundaries in L-BFGS-B mode
+	if(length(.options.opt.lower(options))==1) lowbound=-Inf else lowbound=rep(.options.opt.lower(options),.model.regions(arfmodel))
+	if(length(.options.opt.upper(options))==1) upbound=Inf else upbound=rep(.options.opt.upper(options),.model.regions(arfmodel))
 		
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
@@ -275,14 +254,15 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 						upper=upbound,
 						datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 						weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
-						brain=brain,
+						brain=.model.mask(arfmodel),
 						np=.model.regions(arfmodel)*10,
 						dimx=.fmri.data.dims(dat)[2],
 						dimy=.fmri.data.dims(dat)[3],
 						dimz=.fmri.data.dims(dat)[4],
+						ss_data=.model.ss(arfmodel),
 						analyticalgrad=angrad,
 						method=.options.opt.method(options),
-						control=list(trace=printlevel,maxit=.options.min.iterlim(options),fnscale=ss_data),
+						control=list(trace=printlevel,maxit=.options.min.iterlim(options),fnscale=.model.ss(arfmodel)),
 						hessian=T
 					)),silen=try.silen)
 
@@ -306,6 +286,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 		.model.iterates(arfmodel) <- optim.output$counts[1]
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
+		if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient(.model.regions(arfmodel)*10,.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
 		
 		#save the ModelBinary
 		arfmodel <- saveModelBin(arfmodel)
@@ -359,7 +340,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 
 
 
-# createAverages averages the data and weightfiles 
+# createAverages averages of the data and weightfiles, set n mask and ss_data 
 createAverages <- function(arfdat,experiment=.experiment) {
 
 	sp=.Platform$file.sep
@@ -405,7 +386,22 @@ createAverages <- function(arfdat,experiment=.experiment) {
 	if(.nifti.header.gzipped(headinf)==T) filename <- paste(filename,'.gz',sep='') 
 	headinf <- newFile(filename,headinf)
 	.nifti.header.descrip(headinf) <- 'ARF average t-stat'
-	writeData(headinf,avgdat/sqrt(avgweight))
+	.data.avgtstatFile(arfdat) <- filename
+	avgtstat <- avgdat/sqrt(avgweight)
+	writeData(headinf,avgtstat)
+	
+		
+	#define mask
+	brain <- rep(1,length(avgtstat))
+	nb <- which(avgtstat==0)
+	if(length(nb)>0) brain[nb]=0
+	.data.mask(arfdat) <- brain
+	
+	#define n
+	.data.n(arfdat) <- sum(brain) 
+			
+	#get ssq_data
+	.data.ss(arfdat) <- .C('ssqdata',as.double(avgdat),as.double(avgweight),as.integer(brain),as.integer(length(avgtstat)),as.double(numeric(1)))[[5]]
 		
 	#save arfdatafile with updated weights
 	save(arfdat,file=paste(.data.fullpath(arfdat),sp,.experiment.dataDir(experiment),sp,.experiment.dataRda(experiment),sep=''))
@@ -587,4 +583,68 @@ fwhm.filter <- function(vec,fwhm) {
 		
 	return(vec)
 	
+}
+
+#set mask attributes if necessary
+setMask <- function(arfmodel) {
+
+	avgtstat <- .fmri.data.datavec(readData(.model.avgtstatFile(arfmodel)))
+	
+	#define mask
+	brain <- rep(1,length(avgtstat))
+	nb <- which(avgtstat==0)
+	if(length(nb)>0) brain[nb]=0
+	.model.mask(arfmodel) <- brain
+	
+	#define n
+	.model.n(arfmodel) <- sum(brain)
+		
+	#get ssq_data
+	.model.ss(arfmodel) <- .C('ssqdata',as.double(.fmri.data.datavec(readData(.model.avgdatFile(arfmodel)))),as.double(.fmri.data.datavec(readData(.model.avgWFile(arfmodel)))),as.integer(brain),as.integer(length(avgstat)),as.double(numeric(1)))[[5]]
+	
+	return(invisible(arfmodel))
+}
+
+
+determineModelDim <- function(subject,condition,range=c(1,200),mf=1,experiment=.experiment) {
+	
+	arfdata = loadData(subject,condition,exp=.experiment)
+	
+	dat = readData(.data.avgdatfile(arfdata))
+	datavec = .fmri.data.datavec(dat)
+	weightvec = .fmri.data.datavec(readData(.data.avgWfile(arfdata)))
+	
+	brain = .data.mask(arfdata)
+	ss_data = .data.ss(arfdata)
+	n = .data.n(arfdata)
+	
+	dimvec = range[1]:range[2]
+	
+	mat = matrix(NA,length(dimvec),4,dimnames=list(dimvec,c('reg','par','rss','BIC')))
+	
+	for(regs in dimvec) {
+		cat('region',regs,'\n')
+		opt=new('options')
+		.options.start.maxfac(opt)=mf
+		
+		mod = newModel('detdim',regs,subject,condition,exp=.experiment,options=opt)
+		
+		mod = determineStartRect(mod)
+		theta = .model.startval(mod)
+		
+		np = regs*10
+		dimx=.fmri.data.dims(dat)[2]
+		dimy=.fmri.data.dims(dat)[3]
+		dimz=.fmri.data.dims(dat)[4]
+			
+		ss_mod = ssq(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad=F)
+		
+		bic_est = (n*log(ss_mod/n)) + (((.model.regions(mod)*10))*log(n))
+		
+		mat[regs,]=c(regs,np,ss_mod,bic_est)
+		
+		
+	}
+	
+	return(mat)
 }

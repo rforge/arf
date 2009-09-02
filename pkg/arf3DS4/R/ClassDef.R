@@ -15,9 +15,9 @@ setClass(
 	),
 	prototype=prototype(
 		version=1,
-		build=3,
-		update=12,
-		svnrev=56
+		build=4,
+		update=1,
+		svnrev=57
 	)
 )
 
@@ -166,7 +166,6 @@ setClass(
 		chk.method='character',		#which method is used to check the range of parameter values
 		chk.range='numeric',		#vector containing ranges for each parameter (vector is recycled for regions)		
 		sw.type='character',		#method to use with Residuals ('diag','full')
-		adjust.n='logical',			#adjust the number of voxels used in BIC and Wald to the number of 'brain' voxels, iso full dimensions.
 		output.mode='character',	#output mode
 		version='ANY'
 
@@ -180,14 +179,13 @@ setClass(
 		opt.upper=c(rep(Inf,6),rep(.95,3),Inf),			#L-BFGS-U upper bound
 		min.analyticalgrad=T, 	#use analytical gradient
 		min.iterlim=5000,		#iteration limit
-		min.routine='optim',	#which routine
+		min.routine='nlm',		#which routine
 		start.method='rect',	
 		start.maxfac=2,
 		start.vector=c(0,0,0,0,0,0,.1,.2,-.1,100),
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,0,0,-.9,-.9,-.9,-1e+64,0,0,0,0,0,0,.9,.9,.9,1e+64),
 		sw.type='diag',
-		adjust.n=TRUE,
 		output.mode=c('log','screen'),
 		version=new('version')
 	)
@@ -346,15 +344,21 @@ setClass(
 		avgdatfile='character',		#filename of average data
 		avgWfile='character',		#filename of average weights
 		avgtstatFile='character',	#filename of avgtstatFile
+		n='numeric',				#number of voxels of the images
+		mask='numeric',				#vector of length n defining a mask
+		ss='numeric',				#sums of squares of the data
 		regDir='character',			#directory of registration dirs
 		regRda='character',			#filename of registration file 
-		funcDir='character',
-		funcRda='character',
+		funcDir='character',		#directory of functional volume
+		funcRda='character',		#filename of functional file
 		trials='numeric',			#number of trials
 		version='ANY'
 	),
 	prototype=prototype(
-		version=new('version')
+		version=new('version'),
+		avgdatfile='',
+		avgWfile='',
+		avgtstatFile=''
 	)
 )
 
@@ -379,6 +383,7 @@ setClass(
 		iterates='numeric',			#number of iterations
 		minimum='numeric',			#minimum of objective function
 		estimates='numeric',		#vector of parameter estimates (t1r1..t6r1,t1r2..t6r2,t1rR..t6rR)
+		gradient='numeric',			#gradient of solution
 		hessian='matrix',			#hessian matrix
 		sandwichmethod='character',	#sandwichmethod
 		varcov='matrix',			#variance covariance matrix (full form)

@@ -275,7 +275,7 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 }
 
 #loadExp loads an experiment and if FAST=F sets all objects to the directory-root of where experiment.Rda was found
-loadExp <- function(path=getwd(),fast=T,overwrite=F)
+loadExp <- function(path=getwd(),fast=T,overwrite=T)
 {
 	#set separator
 	sp <- .Platform$file.sep

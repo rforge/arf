@@ -128,16 +128,21 @@ BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 		#read in weights, used in constant
 		Wdata <- readData(.model.avgWfile(arfmodel))
 		
-		if(.options.adjust.n(options)) {
-			Adata <- readData(.model.avgdatfile(arfmodel))
-			n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
+		if(checkVersion(.model.version(arfmodel),1,4,0)) {
+			n <- .model.n(arfmodel) 
 			W <- .fmri.data.datavec(Wdata)[1:(.fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4])]
-			
 		} else {
-			n <- .fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4]
-			W <- .fmri.data.datavec(Wdata)[1:n]
+			if(.options.adjust.n(options)) {
+				Adata <- readData(.model.avgdatfile(arfmodel))
+				n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
+				W <- .fmri.data.datavec(Wdata)[1:(.fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4])]
+				
+			} else {
+				n <- .fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4]
+				W <- .fmri.data.datavec(Wdata)[1:n]
+			}
 		}
-		
+				
 		#calculate the determinant of the weights
 		dtm <- prod(W)
 		
@@ -190,12 +195,17 @@ RMSEA <- function(arfmodel,options=loadOptions(arfmodel)) {
 		
 		#set number of voxels
 		Adata <- readData(.model.avgdatfile(arfmodel))
-		if(.options.adjust.n(options)) {
-			n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
-		} else {
-			n <- .fmri.data.dims(Adata)[2]*.fmri.data.dims(Adata)[3]*.fmri.data.dims(Adata)[4]
-		}
 		
+		if(checkVersion(.model.version(arfmodel),1,4,0)) {
+			n <- .model.n(arfmodel) 
+		} else {
+			if(.options.adjust.n(options)) {
+				n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
+			} else {
+				n <- .fmri.data.dims(Adata)[2]*.fmri.data.dims(Adata)[3]*.fmri.data.dims(Adata)[4]
+			}
+		}
+	
 		#Hotellings T
 		HTs = .model.trials(arfmodel)*.model.minimum(arfmodel)
 		
@@ -263,10 +273,14 @@ wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 		# get dimensions (set number of voxels)
 		Adata <- readData(.model.avgdatfile(arfmodel))
 		
-		if(.options.adjust.n(options)) {
-			n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
+		if(checkVersion(.model.version(arfmodel),1,4,0)) {
+			n <- .model.n(arfmodel) 
 		} else {
-			n <- .fmri.data.dims(Adata)[2]*.fmri.data.dims(Adata)[3]*.fmri.data.dims(Adata)[4]
+			if(.options.adjust.n(options)) {
+				n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
+			} else {
+				n <- .fmri.data.dims(Adata)[2]*.fmri.data.dims(Adata)[3]*.fmri.data.dims(Adata)[4]
+			}
 		}
 		
 		#set relevant matrix sizes and dfs
@@ -328,15 +342,15 @@ wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 }
 
 
-mcpCorrect <- function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,df=100,sig.steps=10) 
+mcpCorrect <- function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,df=100,sig.steps=10,adj.n=T) 
 {
 	
 	
 	veclen <- length(.fmri.data.datavec(fmridata))
-	n <- length(.fmri.data.datavec(fmridata)[.fmri.data.datavec(fmridata)!=0])
+	if(adj.n) n <- length(.fmri.data.datavec(fmridata)[.fmri.data.datavec(fmridata)!=0]) else n <- length(.fmri.data.datavec(fmridata))
 	pseq = seq(sig.steps,1,-1)
 	
-	which <- match.arg(type[1],c('bonferroni','FDR','uncorrected'))
+	which <- match.arg(type)
 		
 	if(which=='bonferroni') {
 		

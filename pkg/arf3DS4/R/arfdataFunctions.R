@@ -102,11 +102,6 @@ setAllObjects <- function(experiment,overwrite=F)
 			#weightfiles
 			weightfiles <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.weightsDir(experiment),sep=''),full=T)
 			.data.weightfiles(data) <- weightfiles
-			 
-			#averagefiles
-			.data.avgdatfile(data) <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.avgDir(experiment),sep=''),.experiment.avgdatFile(experiment),full=T)
-			.data.avgWfile(data) <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.avgDir(experiment),sep=''),.experiment.avgWFile(experiment),full=T)
-			.data.avgtstatFile(data) <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.avgDir(experiment),sep=''),.experiment.avgtstatFile(experiment),full=T)			
 			
 			#set number of trials (warn if beta/weight mismatch)
 			if(length(betafiles)!=length(weightfiles)) {warning('Betafiles - Weightfiles mismatch!');allIsWell=F}
@@ -114,8 +109,9 @@ setAllObjects <- function(experiment,overwrite=F)
 						
 			#checkFileIntegrity
 			if(!checkFiles(data)) {warning('checkFiles returns false. Check warnings!');allIsWell=F}
-			
+						
 			if(allIsWell) {
+			
 				#save the data
 				save(data,file=paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.dataRda(experiment),sep=''))
 				
@@ -143,6 +139,10 @@ setAllObjects <- function(experiment,overwrite=F)
 						.model.regRda(model) <- .data.regRda(data)
 						.model.funcDir(model) <- .data.funcDir(data)
 						.model.funcRda(model) <- .data.funcRda(data)
+						.model.n(model) <- .data.n(data)
+						.model.mask(model) <- .data.mask(data)
+						.model.ss(model) <- .data.ss(data)
+												
 						save(model,file=paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
 						
 						#overwrite options file if applicable
