@@ -312,7 +312,7 @@ loadExp <- function(path=getwd(),fast=T,overwrite=T)
 	save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
 		
 	#return loaded info 
-	if(allIsWell) cat('Loaded experiment',.experiment.name(experiment),'\n') else cat('Loaded experiment',.experiment.name(experiment),'with warnings!\n')
+	if(allIsWell) cat('Loaded experiment ',.experiment.name(experiment),' (version',.version.version(.experiment.version(experiment)),'.',.version.build(.experiment.version(experiment)),'-',.version.update(.experiment.version(experiment)),')\n',sep='') else cat('Loaded experiment ',.experiment.name(experiment),' (version',.version.version(.experiment.version(experiment)),'.',.version.update(.experiment.version(experiment)),'-',.version.build(.experiment.version(experiment)),') with warnings!\n',sep='')
 	
 	return(invisible(experiment))
 		

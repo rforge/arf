@@ -103,6 +103,11 @@ setAllObjects <- function(experiment,overwrite=F)
 			weightfiles <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.weightsDir(experiment),sep=''),full=T)
 			.data.weightfiles(data) <- weightfiles
 			
+			#averagefiles
+			.data.avgdatfile(data) <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.avgDir(experiment),sep=''),.experiment.avgdatFile(experiment),full=T)
+			.data.avgWfile(data) <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.avgDir(experiment),sep=''),.experiment.avgWFile(experiment),full=T)
+			.data.avgtstatFile(data) <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.avgDir(experiment),sep=''),.experiment.avgtstatFile(experiment),full=T)			
+						
 			#set number of trials (warn if beta/weight mismatch)
 			if(length(betafiles)!=length(weightfiles)) {warning('Betafiles - Weightfiles mismatch!');allIsWell=F}
 			.data.trials(data) <- length(betafiles)  		
