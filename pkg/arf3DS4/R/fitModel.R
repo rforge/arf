@@ -31,7 +31,7 @@ gradient <- function(np,dimx,dimy,dimz,theta,datavec,weightvec,brain,ss_data,ana
 	model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
 	grad <- try(.C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=T)
 
-	if(!is.null(attr(grad,'class'))) grad=rep(1e+256,np) 
+	if(!is.null(attr(grad,'class'))) grad=rep(1e+12,np) 
 	
 	return(grad)
 	
@@ -68,6 +68,19 @@ modelPred <- function(arfmodel,which=c('model','start','ask')) {
 	
 }
 
+#simple 3 gauss function
+gauss3D <- function(theta,np,dimx,dimy,dimz) {
+
+	gauss = .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]] 
+	grad = try(.C('dfgauss',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(vector('numeric',dimx*dimy*dimz*np)))[[6]])
+	
+	if(!is.null(attr(grad,'class'))) grad=rep(1e+256,np*dimx*dimy*dimz) 
+	grad=matrix(grad,dimx*dimy*dimz,)
+	attr(gauss,'gradient') <- grad
+	
+	return(gauss)
+	
+}
 
 
 ## fitModel is a wrapper for NLM and optim based on the options
@@ -134,7 +147,7 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 	if(is.null(attr(nlm.output,'class'))) {
 		if(nlm.output$code==1) .model.convergence(arfmodel) <- paste('Gradient close to zero. Converged in ',nlm.output$iterations,' iterations.',sep='')
 		if(nlm.output$code==2) .model.convergence(arfmodel) <- paste('Iterates within tolerance. Converged in ',nlm.output$iterations,' iterations.',sep='')
-		if(nlm.output$code==3) .model.convergence(arfmodel) <- 'No lower point found. Convergence may be local minimum.'
+		if(nlm.output$code==3) .model.convergence(arfmodel) <- 'No lower point found.' 
 		if(nlm.output$code==4) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.'
 		if(nlm.output$code==5) .model.convergence(arfmodel) <- 'Stepmax exceeded five times. No convergence.'
 		if(nlm.output$code <= 3) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
@@ -244,6 +257,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	#set boundaries in L-BFGS-B mode
 	if(length(.options.opt.lower(options))==1) lowbound=-Inf else lowbound=rep(.options.opt.lower(options),.model.regions(arfmodel))
 	if(length(.options.opt.upper(options))==1) upbound=Inf else upbound=rep(.options.opt.upper(options),.model.regions(arfmodel))
+	
 		
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
@@ -262,7 +276,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 						ss_data=.model.ss(arfmodel),
 						analyticalgrad=angrad,
 						method=.options.opt.method(options),
-						control=list(trace=printlevel,maxit=.options.min.iterlim(options),fnscale=.model.ss(arfmodel)),
+						control=list(trace=printlevel,maxit=.options.min.iterlim(options)),
 						hessian=T
 					)),silen=try.silen)
 

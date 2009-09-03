@@ -144,6 +144,127 @@ void ssqdata(double *dat, double *W, int *brain, int *n, double *ss)
 	ss[0]=g;
 }
 
+void simplegauss(double *theta, int *np, int *dimx, int *dimy, int *dimz, double *gx)
+{
+
+	int reg,x,y,z,p;
+	double f,theta_x,theta_y,theta_z,sig_x,sig_y,sig_z,sig_xy,sig_xz,sig_yz,det_sig,dif_x,dif_y,dif_z;
+
+	//theta 1,2,3 = x,y,z coordinates
+	//theta 4,5,6 = sd's of x,y,z
+	//theta 7,8,9 = corr xy, xz, yz
+	//theta 10    = amplitude
+
+	p=0;
+	for(z=1;z<(*dimz+1);z++) {
+		for(y=1;y<(*dimy+1);y++) {
+			for(x=1;x<(*dimx+1);x++) {
+
+				f=0; //f becomes the sum of all regions  (zeroed every region)
+
+				for(reg=0;reg<(*np);reg=reg+5) {
+					//parameter coordinates
+					theta_x=theta[reg+0];
+					theta_y=theta[reg+1];
+					theta_z=theta[reg+2];
+
+					//sigma matrix
+					sig_x=pow(theta[reg+3],2);
+					sig_xy=0;
+					sig_xz=0;
+					sig_y=pow(theta[reg+3],2);
+					sig_yz=0;
+					sig_z=pow(theta[reg+3],2);
+
+
+					//determinant of sigma
+					det_sig=sig_x*sig_y*sig_z;
+					if(det_sig < 0) det_sig=0;
+
+					//(x-pc)
+					dif_x=(x-theta_x);
+					dif_y=(y-theta_y);
+					dif_z=(z-theta_z);
+
+					//add to f gaussian value for each region
+					f=f+theta[reg+4]*(1/(pow(sqrt(2*M_PI),3)*sqrt(det_sig)))*exp(-.5*(dif_x*(dif_x*(sig_y*sig_z-sig_yz*sig_yz)+dif_y*(sig_yz*sig_xz-sig_xy*sig_z)+dif_z*(sig_xy*sig_yz-sig_y*sig_xz))/det_sig+dif_y*(dif_x*(sig_xz*sig_yz-sig_z*sig_xy)+dif_y*(sig_x*sig_z-sig_xz*sig_xz)+dif_z*(sig_xy*sig_xz-sig_x*sig_yz))/det_sig+dif_z*(dif_x*(sig_xy*sig_yz-sig_xz*sig_y)+dif_y*(sig_xz*sig_xy-sig_yz*sig_x)+dif_z*(sig_x*sig_y-sig_xy*sig_xy))/det_sig));
+
+				}
+
+				gx[p]=f; //set output vector to sum of gaussian
+				p++;
+
+			}
+		}
+	}
+}
+
+
+void simplessqgauss(double *theta, double *dat, double *W, int *brain, int *np, int *dimx, int *dimy, int *dimz, double *ss)
+{
+
+	int reg,x,y,z,p;
+	double f,g,theta_x,theta_y,theta_z,sig_x,sig_y,sig_z,sig_xy,sig_xz,sig_yz,det_sig,dif_x,dif_y,dif_z;
+
+	//theta 1,2,3 = x,y,z coordinates
+	//theta 4,5,6 = sd's of x,y,z
+	//theta 7,8,9 = corr xy, xz, yz
+	//theta 10    = amplitude
+
+	p=0;
+	g=0e0;
+	for(z=1;z<(*dimz+1);z++) {
+		for(y=1;y<(*dimy+1);y++) {
+			for(x=1;x<(*dimx+1);x++) {
+
+				f=0; //f becomes the sum of all regions  (zeroed every region)
+
+				if(brain[p]!=0) {
+
+					for(reg=0;reg<(*np);reg=reg+5) {
+
+						//parameter coordinates
+						theta_x=theta[reg+0];
+						theta_y=theta[reg+1];
+						theta_z=theta[reg+2];
+
+						//sigma matrix
+						sig_x=pow(theta[reg+3],2);
+						sig_xy=0;
+						sig_xz=0;
+						sig_y=pow(theta[reg+3],2);
+						sig_yz=0;
+						sig_z=pow(theta[reg+3],2);
+
+
+						//determinant of sigma
+						det_sig=sig_x*sig_y*sig_z;
+						if(det_sig < 0) det_sig=0;
+
+						//(x-pc)
+						dif_x=(x-theta_x);
+						dif_y=(y-theta_y);
+						dif_z=(z-theta_z);
+
+						//add to f gaussian value for each region
+						f=f+theta[reg+4]*(1/(pow(sqrt(2*M_PI),3)*sqrt(det_sig)))*exp(-.5*(dif_x*(dif_x*(sig_y*sig_z-sig_yz*sig_yz)+dif_y*(sig_yz*sig_xz-sig_xy*sig_z)+dif_z*(sig_xy*sig_yz-sig_y*sig_xz))/det_sig+dif_y*(dif_x*(sig_xz*sig_yz-sig_z*sig_xy)+dif_y*(sig_x*sig_z-sig_xz*sig_xz)+dif_z*(sig_xy*sig_xz-sig_x*sig_yz))/det_sig+dif_z*(dif_x*(sig_xy*sig_yz-sig_xz*sig_y)+dif_y*(sig_xz*sig_xy-sig_yz*sig_x)+dif_z*(sig_x*sig_y-sig_xy*sig_xy))/det_sig));
+
+					}
+				}
+
+				//sum (data-model)^2 over voxels and weight
+				g=g+pow((dat[p]-f),2)*(1/W[p]);
+				p++;
+
+			}
+		}
+	}
+
+	//set ss to g
+	ss[0]=g;
+}
+
+
 
 void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, double *B)
 {
@@ -503,6 +624,67 @@ void dfgaussFile(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, cha
 	fclose(f);
 }
 
+void dfgauss(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, double *derivs)
+{
+
+	void dftheta0();
+	void dftheta1();
+	void dftheta2();
+	void dftheta3();
+	void dftheta4();
+	void dftheta5();
+	void dftheta6();
+	void dftheta7();
+	void dftheta8();
+	void dftheta9();
+
+	int i,j,n=(*dimx)*(*dimy)*(*dimz), reg;
+	double *grad, *theta;
+	grad = (double *) R_alloc((n),sizeof(double));
+	theta = (double *) R_alloc((10),sizeof(double));
+
+
+	for(reg=0;reg<(*np);reg=reg+10) {
+
+		for(i=0;i<10;i++) {
+			*(theta+i)=*(thetavec+reg+i);
+		}
+
+		dftheta0(theta,dimx,dimy,dimz,grad);
+		for(j=0;j<n;j++) derivs[j+(0*n)+(n*reg)]=grad[j];
+
+		dftheta1(theta,dimx,dimy,dimz,grad);
+		for(j=0;j<n;j++) derivs[j+(1*n)+(n*reg)]=grad[j];
+
+		dftheta2(theta,dimx,dimy,dimz,grad);
+		for(j=0;j<n;j++) derivs[j+(2*n)+(n*reg)]=grad[j];
+
+		dftheta3(theta,dimx,dimy,dimz,grad);
+		for(j=0;j<n;j++) derivs[j+(3*n)+(n*reg)]=grad[j];
+
+		dftheta4(theta,dimx,dimy,dimz,grad);
+		for(j=0;j<n;j++) derivs[j+(4*n)+(n*reg)]=grad[j];
+
+		dftheta5(theta,dimx,dimy,dimz,grad);
+		for(j=0;j<n;j++) derivs[j+(5*n)+(n*reg)]=grad[j];
+
+		dftheta6(theta,dimx,dimy,dimz,grad);
+		for(j=0;j<n;j++) derivs[j+(6*n)+(n*reg)]=grad[j];
+
+		dftheta7(theta,dimx,dimy,dimz,grad);
+		for(j=0;j<n;j++) derivs[j+(7*n)+(n*reg)]=grad[j];
+
+		dftheta8(theta,dimx,dimy,dimz,grad);
+		for(j=0;j<n;j++) derivs[j+(8*n)+(n*reg)]=grad[j];
+
+		dftheta9(theta,dimx,dimy,dimz,grad);
+		for(j=0;j<n;j++) derivs[j+(9*n)+(n*reg)]=grad[j];
+
+	}
+
+}
+
+
 void dfssq(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, double *data, double *model, double *weights, double *ssqgrad)
 {
 
@@ -584,6 +766,59 @@ void dfssq(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, double *d
 
 
 }
+
+void simpledfssq(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, double *data, double *model, double *weights, double *ssqgrad)
+{
+
+	void dftheta0();
+	void dftheta1();
+	void dftheta2();
+	void dftheta3();
+	void dftheta9();
+
+
+
+	int i,j,n=(*dimx)*(*dimy)*(*dimz), reg;
+	double *grad, *theta;
+	grad = (double *) R_alloc((n),sizeof(double));
+	theta = (double *) R_alloc((5),sizeof(double));
+
+
+	for(reg=0;reg<(*np);reg=reg+5) {
+
+		for(i=0;i<10;i++) {
+			*(theta+i)=*(thetavec+reg+i);
+		}
+
+		dftheta0(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+0)=0e0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+0)=*(ssqgrad+reg+0)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+0)=*(ssqgrad+reg+0)*-2;
+
+		dftheta1(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+1)=0e0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+1)=*(ssqgrad+reg+1)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+1)=*(ssqgrad+reg+1)*-2;
+
+		dftheta2(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+2)=0e0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+2)=*(ssqgrad+reg+2)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+2)=*(ssqgrad+reg+2)*-2;
+
+		dftheta3(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+3)=0e0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+3)=*(ssqgrad+reg+3)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+3)=*(ssqgrad+reg+3)*-2;
+
+		dftheta9(theta,dimx,dimy,dimz,grad);
+		*(ssqgrad+reg+4)=0e0;
+		for(j=0;j<n;j=j+1) *(ssqgrad+reg+9)=*(ssqgrad+reg+9)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		*(ssqgrad+reg+9)=*(ssqgrad+reg+9)*-2;
+	}
+
+
+}
+
 
 void dftheta0(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {
 
