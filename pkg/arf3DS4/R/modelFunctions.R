@@ -117,6 +117,27 @@ saveModelBin <- function(arfmodel) {
 	
 }
 
+#save the modelBinary
+saveModelBinSimple <- function(arfmodel) {
+	
+	#set separator
+	sp <- .Platform$file.sep
+
+	#get Header info from avgdatfile
+	headinf <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))
+
+	#set fullpaths
+	.nifti.header.fullpath(headinf) <- .model.modeldatapath(arfmodel)
+	.nifti.header.filename(headinf) <- .model.modelDataFile(arfmodel)
+	.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
+	
+	#write the Data to the modelNiftiFile
+	writeData(headinf,.C('simplegauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*5),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
+	
+	return(arfmodel)
+	
+}
+
 #loadOptions loads the options object
 loadOptions <- function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.optionsFile(arfmodel),sep='')))
 

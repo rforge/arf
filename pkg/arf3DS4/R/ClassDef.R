@@ -16,8 +16,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=4,
-		update=4,
-		svnrev=59
+		update=5,
+		svnrev=60
 	)
 )
 
@@ -175,13 +175,13 @@ setClass(
 		nlm.gradtol=1e-6,		#NLM gradient tolerance
 		nlm.steptol=1e-3,		#NLM stepsize tolerance
 		opt.method='L-BFGS-B',	#optim method
-		opt.lower=c(rep(-Inf,6),rep(-.95,3),-Inf),		#L-BFGS-U lower bound
+		opt.lower=c(rep(-Inf,3),rep(1,3),rep(-.95,3),-Inf),		#L-BFGS-U lower bound
 		opt.upper=c(rep(Inf,6),rep(.95,3),Inf),			#L-BFGS-U upper bound
 		min.analyticalgrad=T, 	#use analytical gradient
 		min.iterlim=5000,		#iteration limit
 		min.routine='nlm',		#which routine
 		start.method='rect',	
-		start.maxfac=2,
+		start.maxfac=1,
 		start.vector=c(0,0,0,0,0,0,.1,.2,-.1,100),
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,0,0,-.9,-.9,-.9,-1e+64,0,0,0,0,0,0,.9,.9,.9,1e+64),

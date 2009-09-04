@@ -105,7 +105,8 @@ checkSNR <- function(snr,trials=10,tslen=101,smooth=F) {
 	fn = paste('~/Desktop/snrcheck/subjects/testsubject/conditions/testcondition/data/')
 	
 	if(snr!=0) {
-		simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='square',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max')) 
+		#simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='square',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max')) 
+		simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='gauss',sq_par=c(12,12,8,4,4,3,.1,.1,.2,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max')) 
 		
 	} else {
 		simBlobs3D(paste(fn,'beta',sep=''),paste(fn,'weights',sep=''),new('fmri.data'),model='snr0',sq_par=c(12,12,8,4,4,3,100),dims=c(64,64,32),snr=snr,noisesmooth=smooth,trials=trials,tslen=tslen,maxb=c('max'))

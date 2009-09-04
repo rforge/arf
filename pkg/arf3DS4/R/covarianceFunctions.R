@@ -150,9 +150,11 @@ BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 		if(!is.na(dtm) & !is.nan(dtm)) {
 			if(is.numeric(try(log(n))) & is.numeric(try(log(dtm))) & is.numeric(log(.model.minimum(arfmodel)))) {
 				cons <- try((2*(((n/2)*log(2*pi))+((1/2)*log(dtm))+((1/2)*(.model.minimum(arfmodel))))),silen=T)
+				
 				if(cons!=0) { 
-					if(log(dtm)==-Inf) {dtm=1e-323;.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'Determinant (in BIC) was -Inf, set to minimum value 1e-323.',sep='')}
-					if(log(dtm)==Inf) {dtm=1e308;.model.warnings(arfmodel) <- paste(.model.warnings(arfmodel),'Determinant (in BIC) was Inf, set to maximum value 1e308.',sep='')}
+					if(log(dtm)==-Inf) {dtm=1e-323;.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Determinant (in BIC) was -Inf, set to minimum value 1e-323.')}
+					if(log(dtm)==Inf) {dtm=1e308;.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Determinant (in BIC) was Inf, set to maximum value 1e308.')}
+					cons <- (2*(((n/2)*log(2*pi))+((1/2)*log(dtm))+((1/2)*(.model.minimum(arfmodel)))))
 				}
 				
 			} else { #logs not valid
