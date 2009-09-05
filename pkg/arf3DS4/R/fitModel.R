@@ -383,7 +383,7 @@ fitSimpleModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readD
 		
 		
 		#save the ModelBinary
-		arfmodel <- saveModelBinSimple(arfmodel)
+		arfmodel <- saveModelBin(arfmodel)
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
@@ -482,7 +482,7 @@ fitSimpleModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readDat
 		
 		
 		#save the ModelBinary
-		arfmodel <- saveModelBinSimple(arfmodel)
+		arfmodel <- saveModelBin(arfmodel)
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
