@@ -21,7 +21,7 @@ newModel <- function(modelname='defaultmodel',regions=1,subject='',condition='',
 	
 	
 	#check if Averages exist (else create)
-	if(!file.exists(.data.avgdatfile(arfdata)) | !file.exists(.data.avgWfile(arfdata))) {
+	if(!file.exists(.data.avgdatfile(arfdata)) | !file.exists(.data.avgWfile(arfdata)) | !file.exists(.data.avgtstatFile(arfdata))) {
 		if(overwrite) {
 			arfdata <- createAverages(arfdata,experiment)
 		} else {
@@ -55,6 +55,8 @@ newModel <- function(modelname='defaultmodel',regions=1,subject='',condition='',
 	.model.optionsFile(model) <- .experiment.optionsRda(experiment)
 	.model.modelDataFile(model) <- .experiment.modelDataFile(experiment)
 	.model.startFile(model) <- .experiment.startRda(experiment)
+	.model.logFile(model) <- .experiment.logFile(experiment)
+	
 	
 	#set number of regions
 	.model.regions(model) <- regions
@@ -111,7 +113,7 @@ saveModelBin <- function(arfmodel) {
 	.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 	
 	#write the Data to the modelNiftiFile
-	writeData(headinf,.C('gauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*10),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
+	writeData(headinf,.C('gauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
 	
 	return(arfmodel)
 	
@@ -132,7 +134,7 @@ saveModelBinSimple <- function(arfmodel) {
 	.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 	
 	#write the Data to the modelNiftiFile
-	writeData(headinf,.C('simplegauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*5),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
+	writeData(headinf,.C('simplegauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
 	
 	return(arfmodel)
 	
@@ -160,5 +162,14 @@ loadModel <- function(modelname,subject,condition,experiment=.experiment) {
 	mod = loadRda(modname)
 	
 	return(mod)
+}
+
+#update a modelclass with elements
+updateClass <- function(object,...) {
+
+	new_object <- new(class(object),object,...)
+	
+	return(new_object)
+	
 }
 

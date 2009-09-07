@@ -17,7 +17,7 @@ makeDerivs <- function(arfmodel)
 		fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
 		
 		#calculate and write the derivatives
-		invisible(.C('dfgaussFile',as.integer(.model.regions(arfmodel)*10),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(.model.estimates(arfmodel)),as.character(fn)))
+		invisible(.C('dfgaussFile',as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(.model.estimates(arfmodel)),as.character(fn)))
 	
 		return(invisible(TRUE))
 	
@@ -73,13 +73,13 @@ varcov <- function(arfmodel)
 			n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
 			
 			#perform the inner_sandwich procedure
-			if(.model.sandwichmethod(arfmodel)=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*10),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*10)^2)))[[7]],silen=T)
-			if(.model.sandwichmethod(arfmodel)=='full') B <- try(.C('innerSW',as.integer(n),as.integer(.model.regions(arfmodel)*10),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*10)^2)))[[7]],silen=T)
+			if(.model.sandwichmethod(arfmodel)=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
+			if(.model.sandwichmethod(arfmodel)=='full') B <- try(.C('innerSW',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
 			
 			#check if innersandwich works
 			if(is.null(attr(B,'class'))) {
 				#set B to be a matrix
-				dim(B) <- c(.model.regions(arfmodel)*10,.model.regions(arfmodel)*10)
+				dim(B) <- c(.model.regions(arfmodel)*.model.params(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel))
 				
 				#add the outer sandwich parts
 				SW <- try(solve(.5*.model.hessian(arfmodel))%*%B%*%solve(.5*.model.hessian(arfmodel)),silen=T)
@@ -127,21 +127,9 @@ BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 		
 		#read in weights, used in constant
 		Wdata <- readData(.model.avgWfile(arfmodel))
-		
-		if(checkVersion(.model.version(arfmodel),1,4,0)) {
-			n <- .model.n(arfmodel) 
-			W <- .fmri.data.datavec(Wdata)[1:(.fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4])]
-		} else {
-			if(.options.adjust.n(options)) {
-				Adata <- readData(.model.avgdatfile(arfmodel))
-				n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
-				W <- .fmri.data.datavec(Wdata)[1:(.fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4])]
-				
-			} else {
-				n <- .fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4]
-				W <- .fmri.data.datavec(Wdata)[1:n]
-			}
-		}
+		n <- .model.n(arfmodel) 
+		W <- .fmri.data.datavec(Wdata)[1:(.fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4])]
+	
 				
 		#calculate the determinant of the weights
 		dtm <- prod(W)
@@ -168,7 +156,7 @@ BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 		
 		#check if constant is a number and calculate BIC
 		if(is.numeric(cons)) {
-			.model.fit(arfmodel)[1,1]  <- cons + (log(.model.minimum(arfmodel))) + (((.model.regions(arfmodel)*10))*log(n))
+			.model.fit(arfmodel)[1,1]  <- cons + (((.model.regions(arfmodel)*.model.params(arfmodel)))*log(n))
 			#.model.fit(arfmodel)[1,1]  <- (n*log(.model.minimum(arfmodel)/n)) + (((.model.regions(arfmodel)*10))*log(n))
 		} else { #constant is not a number
 			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Constant invalid. BIC not calculated')
@@ -195,28 +183,20 @@ RMSEA <- function(arfmodel,options=loadOptions(arfmodel)) {
 		
 		#set number of voxels
 		Adata <- readData(.model.avgdatfile(arfmodel))
+		n <- .model.n(arfmodel) 
 		
-		if(checkVersion(.model.version(arfmodel),1,4,0)) {
-			n <- .model.n(arfmodel) 
-		} else {
-			if(.options.adjust.n(options)) {
-				n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
-			} else {
-				n <- .fmri.data.dims(Adata)[2]*.fmri.data.dims(Adata)[3]*.fmri.data.dims(Adata)[4]
-			}
-		}
 	
 		#Hotellings T
 		HTs = .model.trials(arfmodel)*.model.minimum(arfmodel)
 		
 		#noncentrality parameter	
-		ncp = max(c((HTs-((n-(.model.regions(arfmodel)*10))/.model.trials(arfmodel))),0))
+		ncp = max(c((HTs-((n-(.model.regions(arfmodel)*.model.params(arfmodel)))/.model.trials(arfmodel))),0))
 		
 		#check if ncp < 0
 		if(ncp<0) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Noncentrality parameter smaller than zero, ncp is set to zero')
 		
 		#calculate RMSEA
-		eps = sqrt(ncp/(n-(.model.regions(arfmodel)*10)))
+		eps = sqrt(ncp/(n-(.model.regions(arfmodel)*.model.params(arfmodel))))
 
 		if(checkVersion(.model.version(arfmodel),1,2,7)) .model.fit(arfmodel)[1,2] = eps else .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'RMSEA not calculated for models prior to v1.2-7')
 		
@@ -262,6 +242,8 @@ wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 	
 	if(length(.model.varcov(arfmodel))==0) stop('(co)variance matrix not yet calculated, cannot compute Wald statistics!')
 	
+	if(.model.modeltype!='gauss') stop('wald statistics can only be calculated for the full model')
+	
 	#define function to calculate Wald statistic 
 	W <- function(a,A,C) t(a)%*%solve(A%*%C%*%t(A))%*%a
 		
@@ -272,29 +254,20 @@ wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 		
 		# get dimensions (set number of voxels)
 		Adata <- readData(.model.avgdatfile(arfmodel))
-		
-		if(checkVersion(.model.version(arfmodel),1,4,0)) {
-			n <- .model.n(arfmodel) 
-		} else {
-			if(.options.adjust.n(options)) {
-				n <- length(.fmri.data.datavec(Adata)[.fmri.data.datavec(Adata)!=0])
-			} else {
-				n <- .fmri.data.dims(Adata)[2]*.fmri.data.dims(Adata)[3]*.fmri.data.dims(Adata)[4]
-			}
-		}
+		n <- .model.n(arfmodel) 
 		
 		#set relevant matrix sizes and dfs
 		.wald.stats(waldobject) <- matrix(0,.model.regions(arfmodel),5)
 		.wald.pvalues(waldobject) <- matrix(0,.model.regions(arfmodel),5)
 		.wald.df1(waldobject) <- rep(n,5)
-		.wald.df2(waldobject) <- .wald.df1(waldobject)-rep(.model.regions(arfmodel)*10,5)
+		.wald.df2(waldobject) <- .wald.df1(waldobject)-rep(.model.regions(arfmodel)*.model.params(arfmodel),5)
 		
 		#perform hypothesis tests for each region and for locations, extent and amplitude
 		for(region in 1:.model.regions(arfmodel)) {
 			
 			#select the 10*10 vcov matrix and estimates for each region, with determinant and deriv
-			theta <- .model.estimates(arfmodel)[((1+(region-1)*10):(region*10))]
-			C <- .model.varcov(arfmodel)[((1+(region-1)*10):(region*10)),((1+(region-1)*10):(region*10))]
+			theta <- .model.estimates(arfmodel)[((1+(region-1)*.model.params(arfmodel)):(region*.model.params(arfmodel)))]
+			C <- .model.varcov(arfmodel)[((1+(region-1)*.model.params(arfmodel)):(region*.model.params(arfmodel))),((1+(region-1)*.model.params(arfmodel)):(region*.model.params(arfmodel)))]
 			sigma <- detSigmaDeriv(theta[4:9])
 			
 			#define the a matrix (containing hypotheses), uses info from the designmatrix
@@ -404,7 +377,7 @@ readDerivs <- function(arfmodel) {
 	dat = readData(fn)
 	n = .fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4]
 	rm(dat)
-	p = .model.regions(arfmodel)*10
+	p = .model.regions(arfmodel)*.model.params(arfmodel)
 	fn = paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')
 
 	if(file.exists(fn)) {

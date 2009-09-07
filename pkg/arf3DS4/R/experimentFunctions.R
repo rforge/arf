@@ -165,7 +165,7 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 	
 	#if experiment file exists open it, else create a new one
 	exp <-  list.files(path,pattern='Rda',full=T)
-	if(length(exp)==1) settings <- loadRda(exp) else settings <- new('settings') 
+	if(length(exp)==1 & overwrite==FALSE) settings <- loadRda(exp) else settings <- new('settings') 
 		
 	#create new experimentclass
 	experiment <- new('experiment',settings)
@@ -275,8 +275,22 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 }
 
 #loadExp loads an experiment and if FAST=F sets all objects to the directory-root of where experiment.Rda was found
-loadExp <- function(path=getwd(),fast=T,overwrite=T)
+loadExp <- function(path=getwd(),method=c('fast','set','rda'))
 {
+	
+	method = match.arg(method)
+	
+	if(method=='fast') fast=TRUE
+	if(method=='set') {
+		fast=FALSE
+		overwrite=TRUE
+		set=TRUE
+	}
+	if(method=='rda') {
+		fast=FALSE
+		overwrite=TRUE
+		set=FALSE
+	}
 	#set separator
 	sp <- .Platform$file.sep
 	
@@ -297,12 +311,13 @@ loadExp <- function(path=getwd(),fast=T,overwrite=T)
 		path <- path.expand(path)
 		path <- file.path(dirname(path),basename(path),'')
 		
-		#change root for the experiment-file to the current root
-		.experiment <- experiment <- chngRootExp(path,quiet=T)
+		if(!set)  {
+			#change root for the experiment-file to the current root
+			.experiment <- experiment <- chngRootExp(path,quiet=T)
+			#set and check all objects based on subjects/condition info and settings
+			allIsWell <- setAllObjects(experiment,over=overwrite) 
+		} else .experiment <- experiment <- setExp(path,1,1,TRUE,TRUE,TRUE)
 		
-		#set and check all objects based on subjects/condition info and settings
-		allIsWell <- setAllObjects(experiment,over=overwrite)
-	
 	}  
 	
 	#save experiments
@@ -312,7 +327,7 @@ loadExp <- function(path=getwd(),fast=T,overwrite=T)
 	save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
 		
 	#return loaded info 
-	if(allIsWell) cat('Loaded experiment ',.experiment.name(experiment),' (version',.version.version(.experiment.version(experiment)),'.',.version.build(.experiment.version(experiment)),'-',.version.update(.experiment.version(experiment)),')\n',sep='') else cat('Loaded experiment ',.experiment.name(experiment),' (version',.version.version(.experiment.version(experiment)),'.',.version.update(.experiment.version(experiment)),'-',.version.build(.experiment.version(experiment)),') with warnings!\n',sep='')
+	if(allIsWell) cat('Loaded experiment ',.experiment.name(experiment),' (version ',.version.version(.experiment.version(experiment)),'.',.version.build(.experiment.version(experiment)),'-',.version.update(.experiment.version(experiment)),')\n',sep='') else cat('Loaded experiment ',.experiment.name(experiment),' (version',.version.version(.experiment.version(experiment)),'.',.version.update(.experiment.version(experiment)),'-',.version.build(.experiment.version(experiment)),') with warnings!\n',sep='')
 	
 	return(invisible(experiment))
 		

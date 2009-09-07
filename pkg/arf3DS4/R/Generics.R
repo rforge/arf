@@ -439,6 +439,17 @@ standMethod <- function(x, value) {x@weightFile<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'experiment'
+funcname <-'.experiment.logFile'
+standGen <- function(object) standardGeneric('.experiment.logFile')
+standMethod <- function(object) object@logFile
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.experiment.logFile<-'
+standGen <- function(x, value) standardGeneric('.experiment.logFile<-')
+standMethod <- function(x, value) {x@logFile<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'experiment'
 funcname <-'.experiment.version'
 standGen <- function(object) standardGeneric('.experiment.version')
 standMethod <- function(object) object@version
@@ -777,6 +788,17 @@ setMethod(funcname,classname,standMethod)
 slotreplace <-'.settings.weightFile<-'
 standGen <- function(x, value) standardGeneric('.settings.weightFile<-')
 standMethod <- function(x, value) {x@weightFile<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'settings'
+funcname <-'.settings.logFile'
+standGen <- function(object) standardGeneric('.settings.logFile')
+standMethod <- function(object) object@logFile
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.settings.logFile<-'
+standGen <- function(x, value) standardGeneric('.settings.logFile<-')
+standMethod <- function(x, value) {x@logFile<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'settings'
@@ -2606,6 +2628,17 @@ standMethod <- function(x, value) {x@startFile<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'model'
+funcname <-'.model.logFile'
+standGen <- function(object) standardGeneric('.model.logFile')
+standMethod <- function(object) object@logFile
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.model.logFile<-'
+standGen <- function(x, value) standardGeneric('.model.logFile<-')
+standMethod <- function(x, value) {x@logFile<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'model'
 funcname <-'.model.convergence'
 standGen <- function(object) standardGeneric('.model.convergence')
 standMethod <- function(object) object@convergence
@@ -2669,6 +2702,28 @@ setMethod(funcname,classname,standMethod)
 slotreplace <-'.model.hessian<-'
 standGen <- function(x, value) standardGeneric('.model.hessian<-')
 standMethod <- function(x, value) {x@hessian<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'model'
+funcname <-'.model.params'
+standGen <- function(object) standardGeneric('.model.params')
+standMethod <- function(object) object@params
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.model.params<-'
+standGen <- function(x, value) standardGeneric('.model.params<-')
+standMethod <- function(x, value) {x@params<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'model'
+funcname <-'.model.modeltype'
+standGen <- function(object) standardGeneric('.model.modeltype')
+standMethod <- function(object) object@modeltype
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.model.modeltype<-'
+standGen <- function(x, value) standardGeneric('.model.modeltype<-')
+standMethod <- function(x, value) {x@modeltype<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'model'

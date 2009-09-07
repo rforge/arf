@@ -1,5 +1,5 @@
 #############################################
-# arf3DS4 MAIN FUNCTIONS (initialize, arf)	#
+# arf3DS4 MAIN FUNCTIONS                 	#
 # Copyright(c) 2009 Wouter D. Weeda			#
 # University of Amsterdam					#
 #############################################
@@ -10,7 +10,7 @@ processModel <- function(arfmodel,type=c('gauss','simple'),fast=T,options=loadOp
 	if(!is.na(match('screen',.options.output.mode(options)))) pr=TRUE
 	
 	type = match.arg(type)
-	
+			
 	if(pr) {
 		cat('[',.model.modelname(arfmodel),']\n')
 		cat(' arf process for data',.model.name(arfmodel),'started',as.character(Sys.time()),'\n')
@@ -22,9 +22,6 @@ processModel <- function(arfmodel,type=c('gauss','simple'),fast=T,options=loadOp
 	
 	if(.model.valid(arfmodel)) {
 		
-			arfmodel = BIC(arfmodel,options=options)
-			arfmodel = RMSEA(arfmodel,options=options)
-			
 			if(pr) cat(' modelfit:\n')
 			if(pr) cat('  BIC  :',round(.model.fit(arfmodel)[1]),'\n')
 			if(pr) cat('  RMSEA:',round(.model.fit(arfmodel)[2],1),'\n')

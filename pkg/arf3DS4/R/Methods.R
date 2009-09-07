@@ -38,8 +38,8 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		layout(matrix(1:m^2,m,m,byrow=T))
 		par(mar=c(2,2,1,1),las=1)
 		
-		#for(i in 1:dimz) image(1:dimx,1:dimy,data[,,i],bty='n',main=paste('z=',i,sep=''),axes=mrs,col=gray(seq(0,1,.01)))
-			for(i in 1:dimz) image(1:dimx,1:dimy,data[,,i],bty='n',main=paste('z=',i,sep=''),axes=mrs,col=heat.colors(64))
+
+		for(i in 1:dimz) image(1:dimx,1:dimy,data[,,i],bty='n',main=paste('z=',i,sep=''),axes=mrs,col=heat.colors(64))
 			
 		for(i in 1:(m*m-dimz)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F)			
 				

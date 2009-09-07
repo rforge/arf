@@ -16,8 +16,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=4,
-		update=6,
-		svnrev=61
+		update=7,
+		svnrev=62
 	)
 )
 
@@ -55,6 +55,7 @@ setClass(
 		residualFile='character',		#name of residual binary
 		derivativeFile='character',		#name of derivative binary
 		weightFile='character',
+		logFile='character',
 		version='ANY'
 	),
 	prototype=prototype(
@@ -88,6 +89,7 @@ setClass(
 		residualFile='residuals.bin',	#name of residual binary
 		derivativeFile='derivs.bin',	#name of derivative binary
 		weightFile='weights.bin',
+		logFile='arfprocess.log',
 		version=new('version')
 		)
 )
@@ -175,8 +177,8 @@ setClass(
 		nlm.gradtol=1e-6,		#NLM gradient tolerance
 		nlm.steptol=1e-3,		#NLM stepsize tolerance
 		opt.method='L-BFGS-B',	#optim method
-		opt.lower=c(rep(-Inf,3),rep(1,3),rep(-.95,3),-Inf),		#L-BFGS-U lower bound
-		opt.upper=c(rep(Inf,6),rep(.95,3),Inf),			#L-BFGS-U upper bound
+		opt.lower=c(rep(0,3),rep(1,3),rep(-.95,3),0),		#L-BFGS-U lower bound
+		opt.upper=c(rep(256,6),rep(.95,3),Inf),			#L-BFGS-U upper bound
 		min.analyticalgrad=T, 	#use analytical gradient
 		min.iterlim=5000,		#iteration limit
 		min.routine='nlm',		#which routine
@@ -305,7 +307,7 @@ setClass(
 		srow_x = c(1,0,0,0),
 		srow_y = c(0,1,0,0),
 		srow_z = c(0,0,1,0),
-		intent_name = 'ArfBlobsimdata',	#meaning of data
+		intent_name = 'ARF',	#meaning of data
 		magic = 'n+1',					#magicstring
 		data.type = 'double',			#type of data
 		data.signed = TRUE				#signed data
@@ -379,12 +381,15 @@ setClass(
 		modelFile='character',		#modelFilename
 		optionsFile='character',	#optionsFilename
 		startFile='character',		#startvalueFilename
+		logFile='character',		#logFileName
 		convergence='character', 	#convergence information
 		iterates='numeric',			#number of iterations
 		minimum='numeric',			#minimum of objective function
 		estimates='numeric',		#vector of parameter estimates (t1r1..t6r1,t1r2..t6r2,t1rR..t6rR)
 		gradient='numeric',			#gradient of solution
 		hessian='matrix',			#hessian matrix
+		params='numeric',			#number of parameters in the model
+		modeltype='character',		#type of model (currently simple or gauss)
 		sandwichmethod='character',	#sandwichmethod
 		varcov='matrix',			#variance covariance matrix (full form)
 		warnings='character',		#warnings (pos def var/covar etc.)
