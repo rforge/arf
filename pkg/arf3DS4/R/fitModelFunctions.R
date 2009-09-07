@@ -64,6 +64,7 @@ model.simple <-
 #returns model estimate for simple gaussmodel
 function(theta,np,dimx,dimy,dimz)
 {
+	
 	return(.C('simplegauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]])
 	
 }

@@ -39,7 +39,7 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 	if(!file.exists(.model.avgWfile(arfmodel))) stop('Averages do not exist, please run createAverages')
 	
 	#clear the warnings and deriv + residualfilres
-	.model.warnings(arfmodel) <- ''
+	.model.warnings(arfmodel) <- character(0)
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
 	
@@ -82,7 +82,7 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 		if(nlm.output$code==3) .model.convergence(arfmodel) <- 'No lower point found.' 
 		if(nlm.output$code==4) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.'
 		if(nlm.output$code==5) .model.convergence(arfmodel) <- 'Stepmax exceeded five times. No convergence.'
-		if(nlm.output$code <= 3) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
+		if(nlm.output$code <= 2) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 		
 		#set model objects
 		.model.minimum(arfmodel) <- nlm.output$minimum
@@ -92,12 +92,11 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.regions(arfmodel)*10,.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
-		
-		
-		#save the ModelBinary
-		arfmodel <- saveModelBin(arfmodel)
-		
+				
 		if(.model.valid(arfmodel)) {
+			#save the ModelBinary
+			arfmodel <- saveModelBin(arfmodel)
+						
 			#save the weights in a binary file
 			weights <- readData(.model.avgWfile(arfmodel))
 			con <- file(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep=''),'wb')
@@ -170,7 +169,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	if(!file.exists(.model.avgWfile(arfmodel))) stop('Averages do not exist, please run createAverages')
 	
 	#clear the warnings and deriv + residualfilres
-	.model.warnings(arfmodel) <- ''
+	.model.warnings(arfmodel) <- character(0)
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
 	
@@ -195,8 +194,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	#set boundaries in L-BFGS-B mode
 	if(length(.options.opt.lower(options))==1) lowbound=-Inf else lowbound=rep(.options.opt.lower(options),.model.regions(arfmodel))
 	if(length(.options.opt.upper(options))==1) upbound=Inf else upbound=rep(.options.opt.upper(options),.model.regions(arfmodel))
-	
-		
+			
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 						.model.startval(arfmodel),
@@ -240,10 +238,11 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
 		
-		#save the ModelBinary
-		arfmodel <- saveModelBin(arfmodel)
 	
 		if(.model.valid(arfmodel)) {
+			#save the ModelBinary
+			arfmodel <- saveModelBin(arfmodel)
+			
 			#save the weights in a binary file
 			con <- file(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep=''),'wb')
 			writeBin(.fmri.data.datavec(weights),con,double())
@@ -313,7 +312,7 @@ fitSimpleModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readD
 	if(!file.exists(.model.avgWfile(arfmodel))) stop('Averages do not exist, please run createAverages')
 	
 	#clear the warnings and deriv + residualfilres
-	.model.warnings(arfmodel) <- ''
+	.model.warnings(arfmodel) <- character(0)
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
 	
@@ -338,9 +337,9 @@ fitSimpleModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readD
 	.model.startval(arfmodel) <- loadStart(arfmodel)
 		
 	#set boundaries in L-BFGS-B mode
-	lowbound=-Inf
-	upbound=Inf 
-		
+	if(length(.options.opt.lower(options))==1) lowbound=-Inf else lowbound=rep(.options.opt.lower(options)[-c(5:9)],.model.regions(arfmodel))
+	if(length(.options.opt.upper(options))==1) upbound=Inf else upbound=rep(.options.opt.upper(options)[-c(5:9)],.model.regions(arfmodel))
+			
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 							.model.startval(arfmodel),
@@ -375,35 +374,42 @@ fitSimpleModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readD
 		
 		if(optim.output$convergence <= 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 		
-		#save the ModelBinary
-		arfmodel <- saveModelBinSimple(arfmodel)
-		
-		#set model objects
-		.model.minimum(arfmodel) <- optim.output$value
-		.model.estimates(arfmodel) <- rep(0,.model.regions(arfmodel)*10)
-		
-		for(i in 1:.model.regions(arfmodel)) {
-			.model.estimates(arfmodel)[1+(10*(i-1))] <- optim.output$par[1+(5*(i-1))]
-			.model.estimates(arfmodel)[2+(10*(i-1))] <- optim.output$par[2+(5*(i-1))]
-			.model.estimates(arfmodel)[3+(10*(i-1))] <- optim.output$par[3+(5*(i-1))]
-			.model.estimates(arfmodel)[4+(10*(i-1))] <- optim.output$par[4+(5*(i-1))]
-			.model.estimates(arfmodel)[5+(10*(i-1))] <- optim.output$par[4+(5*(i-1))]
-			.model.estimates(arfmodel)[6+(10*(i-1))] <- optim.output$par[4+(5*(i-1))]
-			.model.estimates(arfmodel)[7+(10*(i-1))] <- 0
-			.model.estimates(arfmodel)[8+(10*(i-1))] <- 0
-			.model.estimates(arfmodel)[9+(10*(i-1))] <- 0
-			.model.estimates(arfmodel)[10+(10*(i-1))] <- optim.output$par[5+(5*(i-1))]
-		}
+		#set model essentials
+		.model.estimates(arfmodel) <- optim.output$par
 		.model.iterates(arfmodel) <- optim.output$counts[1]
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
-		if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
-	
+		
 		if(.model.valid(arfmodel)) {
-			#caluclate fits
-			arfmodel = BIC(arfmodel,options=options)
-			arfmodel = RMSEA(arfmodel,options=options)
+		
+			
+			#save the ModelBinary
+			arfmodel <- saveModelBinSimple(arfmodel)
+			
+			#set model objects
+			.model.minimum(arfmodel) <- optim.output$value
+			.model.estimates(arfmodel) <- rep(0,.model.regions(arfmodel)*10)
+			
+			for(i in 1:.model.regions(arfmodel)) {
+				.model.estimates(arfmodel)[1+(10*(i-1))] <- optim.output$par[1+(5*(i-1))]
+				.model.estimates(arfmodel)[2+(10*(i-1))] <- optim.output$par[2+(5*(i-1))]
+				.model.estimates(arfmodel)[3+(10*(i-1))] <- optim.output$par[3+(5*(i-1))]
+				.model.estimates(arfmodel)[4+(10*(i-1))] <- optim.output$par[4+(5*(i-1))]
+				.model.estimates(arfmodel)[5+(10*(i-1))] <- optim.output$par[4+(5*(i-1))]
+				.model.estimates(arfmodel)[6+(10*(i-1))] <- optim.output$par[4+(5*(i-1))]
+				.model.estimates(arfmodel)[7+(10*(i-1))] <- 0
+				.model.estimates(arfmodel)[8+(10*(i-1))] <- 0
+				.model.estimates(arfmodel)[9+(10*(i-1))] <- 0
+				.model.estimates(arfmodel)[10+(10*(i-1))] <- optim.output$par[5+(5*(i-1))]
+			}
+					
+			if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
+		
+			if(.model.valid(arfmodel)) {
+				#caluclate fits
+				arfmodel = BIC(arfmodel,options=options)
+				arfmodel = RMSEA(arfmodel,options=options)
+			}
 		}
-	
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
@@ -437,7 +443,7 @@ fitSimpleModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readDat
 	if(!file.exists(.model.avgWfile(arfmodel))) stop('Averages do not exist, please run createAverages')
 	
 	#clear the warnings and deriv + residualfilres
-	.model.warnings(arfmodel) <- ''
+	.model.warnings(arfmodel) <- character(0)
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
 	.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Simple Gaussmodel was fitted.')
@@ -481,35 +487,41 @@ fitSimpleModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readDat
 		if(nlm.output$code==3) .model.convergence(arfmodel) <- 'No lower point found.' 
 		if(nlm.output$code==4) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.'
 		if(nlm.output$code==5) .model.convergence(arfmodel) <- 'Stepmax exceeded five times. No convergence.'
-		if(nlm.output$code <= 3) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
+		if(nlm.output$code <= 2) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 	
-		#save the ModelBinary
-		arfmodel <- saveModelBinSimple(arfmodel)
-		
-		#set model objects
-		.model.minimum(arfmodel) <- nlm.output$minimum
-		.model.estimates(arfmodel) <- rep(0,.model.regions(arfmodel)*10)
-		for(i in 1:.model.regions(arfmodel)) {
-			.model.estimates(arfmodel)[1+(10*(i-1))] <- nlm.output$estimate[1+(5*(i-1))]
-			.model.estimates(arfmodel)[2+(10*(i-1))] <- nlm.output$estimate[2+(5*(i-1))]
-			.model.estimates(arfmodel)[3+(10*(i-1))] <- nlm.output$estimate[3+(5*(i-1))]
-			.model.estimates(arfmodel)[4+(10*(i-1))] <- nlm.output$estimate[4+(5*(i-1))]
-			.model.estimates(arfmodel)[5+(10*(i-1))] <- nlm.output$estimate[4+(5*(i-1))]
-			.model.estimates(arfmodel)[6+(10*(i-1))] <- nlm.output$estimate[4+(5*(i-1))]
-			.model.estimates(arfmodel)[7+(10*(i-1))] <- 0
-			.model.estimates(arfmodel)[8+(10*(i-1))] <- 0
-			.model.estimates(arfmodel)[9+(10*(i-1))] <- 0
-			.model.estimates(arfmodel)[10+(10*(i-1))] <- nlm.output$estimate[5+(5*(i-1))]
-		}
+		#set model essentials
+		.model.estimates(arfmodel) <- nlm.output$estimates
 		.model.iterates(arfmodel) <- nlm.output$iterations
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
-		if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
 		
-				
 		if(.model.valid(arfmodel)) {
-			#caluclate fits
-			arfmodel = BIC(arfmodel,options=options)
-			arfmodel = RMSEA(arfmodel,options=options)
+			#save the ModelBinary
+			arfmodel <- saveModelBinSimple(arfmodel)
+			
+			#set model objects
+			.model.minimum(arfmodel) <- nlm.output$minimum
+			.model.estimates(arfmodel) <- rep(0,.model.regions(arfmodel)*10)
+			for(i in 1:.model.regions(arfmodel)) {
+				.model.estimates(arfmodel)[1+(10*(i-1))] <- nlm.output$estimate[1+(5*(i-1))]
+				.model.estimates(arfmodel)[2+(10*(i-1))] <- nlm.output$estimate[2+(5*(i-1))]
+				.model.estimates(arfmodel)[3+(10*(i-1))] <- nlm.output$estimate[3+(5*(i-1))]
+				.model.estimates(arfmodel)[4+(10*(i-1))] <- nlm.output$estimate[4+(5*(i-1))]
+				.model.estimates(arfmodel)[5+(10*(i-1))] <- nlm.output$estimate[4+(5*(i-1))]
+				.model.estimates(arfmodel)[6+(10*(i-1))] <- nlm.output$estimate[4+(5*(i-1))]
+				.model.estimates(arfmodel)[7+(10*(i-1))] <- 0
+				.model.estimates(arfmodel)[8+(10*(i-1))] <- 0
+				.model.estimates(arfmodel)[9+(10*(i-1))] <- 0
+				.model.estimates(arfmodel)[10+(10*(i-1))] <- nlm.output$estimate[5+(5*(i-1))]
+			}
+			
+			if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
+			
+					
+			if(.model.valid(arfmodel)) {
+				#caluclate fits
+				arfmodel = BIC(arfmodel,options=options)
+				arfmodel = RMSEA(arfmodel,options=options)
+			}
 		}
 		
 	} else {
