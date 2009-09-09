@@ -148,7 +148,7 @@ chngRootExp <- function(path=getwd(),quiet=F)
 }
 
 #setExp creates an experiment-class object based on existing directories
-setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrite=F) 
+setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrite=F,load=T) 
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -259,7 +259,7 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 	if(checkExp(experiment)) {
 		save(experiment,file=paste(.experiment.path(experiment),.settings.expRda(settings),sep=''))
 		cat('Experiment correctly set. Experiment saved to',paste(.experiment.path(experiment),.settings.expRda(settings),sep=''),'\n')
-		loadExp(paste(.experiment.path(experiment),sep=''))
+		if(load) loadExp(paste(.experiment.path(experiment),sep=''))
 		
 		.experiment <- experiment
 		save('.experiment',file=paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''))
@@ -316,7 +316,7 @@ loadExp <- function(path=getwd(),method=c('fast','set','rda'))
 			.experiment <- experiment <- chngRootExp(path,quiet=T)
 			#set and check all objects based on subjects/condition info and settings
 			allIsWell <- setAllObjects(experiment,over=overwrite) 
-		} else .experiment <- experiment <- setExp(path,1,1,TRUE,TRUE,TRUE)
+		} else .experiment <- experiment <- setExp(path,1,1,TRUE,TRUE,TRUE,FALSE)
 		
 	}  
 	

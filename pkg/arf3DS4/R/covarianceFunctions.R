@@ -130,7 +130,6 @@ BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 		n <- .model.n(arfmodel) 
 		W <- .fmri.data.datavec(Wdata)[1:(.fmri.data.dims(Wdata)[2]*.fmri.data.dims(Wdata)[3]*.fmri.data.dims(Wdata)[4])]
 	
-				
 		#calculate the determinant of the weights
 		dtm <- prod(W)
 		
@@ -140,8 +139,14 @@ BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 				cons <- try((2*(((n/2)*log(2*pi))+((1/2)*log(dtm))+((1/2)*(.model.minimum(arfmodel))))),silen=T)
 				
 				if(cons!=0) { 
-					if(log(dtm)==-Inf) {dtm=1e-323;.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Determinant (in BIC) was -Inf, set to minimum value 1e-323.')}
-					if(log(dtm)==Inf) {dtm=1e308;.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Determinant (in BIC) was Inf, set to maximum value 1e308.')}
+					if(log(dtm)==-Inf) {
+						dtm=1e-323
+						#.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Determinant (in BIC) was -Inf, set to minimum value 1e-323.')
+					}
+					if(log(dtm)==Inf) {
+						dtm=1e308
+						#.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Determinant (in BIC) was Inf, set to maximum value 1e308.')
+					}
 					cons <- (2*(((n/2)*log(2*pi))+((1/2)*log(dtm))+((1/2)*(.model.minimum(arfmodel)))))
 				}
 				
@@ -157,7 +162,7 @@ BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 		#check if constant is a number and calculate BIC
 		if(is.numeric(cons)) {
 			.model.fit(arfmodel)[1,1]  <- cons + (((.model.regions(arfmodel)*.model.params(arfmodel)))*log(n))
-			#.model.fit(arfmodel)[1,1]  <- (n*log(.model.minimum(arfmodel)/n)) + (((.model.regions(arfmodel)*10))*log(n))
+			
 		} else { #constant is not a number
 			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Constant invalid. BIC not calculated')
 			.model.valid(arfmodel) <- FALSE

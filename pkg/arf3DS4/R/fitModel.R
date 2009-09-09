@@ -10,6 +10,8 @@ fitModel <- function(arfmodel,type=c('gauss','simple'),options=loadOptions(arfmo
 	
 	type = match.arg(type)
 	
+	if(.options.start.method(options)=='rect') arfmodel <- determineStartRect(arfmodel)
+		
 	if(.options.min.routine(options)=='nlm') {
 		if(type=='simple')	arfmodel = fitSimpleModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 		if(type=='gauss')	arfmodel = fitModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
@@ -25,8 +27,11 @@ fitModel <- function(arfmodel,type=c('gauss','simple'),options=loadOptions(arfmo
 ## fitModelNlm calls the minimization routine (NLM)
 fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
 	
+	#set filesep
 	sp <- .Platform$file.sep
 	
+	#set modelobjects
+	.model.valid(arfmodel) <- TRUE
 	.options.min.routine(options) <- 'nlm'
 	.model.modeltype(arfmodel) <- 'gauss'
 	.model.params(arfmodel) <- 10
@@ -43,13 +48,15 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
 	
-	#get starting values
-	if(.options.start.method(options)=='rect') {
-		arfmodel <- determineStartRect(arfmodel)
-	}
-	
 	#load startingvalues
 	.model.startval(arfmodel) <- loadStart(arfmodel)
+	arfmodel <- validStart(arfmodel)
+	
+	#final check before fit
+	if(!.model.valid(arfmodel)) {
+		saveModel(arfmodel)	
+		return(arfmodel)
+	}
 		
 	#call NLM (within a try-loop)
 	nlm.output <- try(suppressWarnings(nlm(
@@ -91,8 +98,8 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 		.model.iterates(arfmodel) <- nlm.output$iterations
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
-		if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.regions(arfmodel)*10,.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
-				
+		if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T)
+		
 		if(.model.valid(arfmodel)) {
 			#save the ModelBinary
 			arfmodel <- saveModelBin(arfmodel)
@@ -136,6 +143,7 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error (probably Infinite gradient), no convergence.'
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),nlm.output)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}
@@ -156,7 +164,8 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	#set separator
 	sp <- .Platform$file.sep
 	
-	#set routine to optim
+	#set modelobjects
+	.model.valid(arfmodel) <- TRUE
 	.options.min.routine(options) <- 'optim'
 	.model.modeltype(arfmodel) <- 'gauss'
 	.model.params(arfmodel) <- 10
@@ -183,18 +192,20 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	}
 	
 
-	#get starting values
-	if(.options.start.method(options)=='rect') {
-		arfmodel <- determineStartRect(arfmodel)
-	}
-	
 	#load startingvalues
 	.model.startval(arfmodel) <- loadStart(arfmodel)
 	
 	#set boundaries in L-BFGS-B mode
+	.options.opt.upper(options)[4:6] = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])	
 	if(length(.options.opt.lower(options))==1) lowbound=-Inf else lowbound=rep(.options.opt.lower(options),.model.regions(arfmodel))
 	if(length(.options.opt.upper(options))==1) upbound=Inf else upbound=rep(.options.opt.upper(options),.model.regions(arfmodel))
-			
+	
+	#final check before fit
+	if(!.model.valid(arfmodel)) {
+		saveModel(arfmodel)	
+		return(arfmodel)
+	}
+	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 						.model.startval(arfmodel),
@@ -236,7 +247,8 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 		.model.iterates(arfmodel) <- optim.output$counts[1]
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
-		if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
+		if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T)
+		
 		
 	
 		if(.model.valid(arfmodel)) {
@@ -280,6 +292,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),optim.output)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}
@@ -327,16 +340,11 @@ fitSimpleModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readD
 		angrad=FALSE
 	}
 	
-	
-	#get starting values
-	if(.options.start.method(options)=='rect') {
-		arfmodel <- determineStartRectSimple(arfmodel)
-	}
-	
 	#load startingvalues
 	.model.startval(arfmodel) <- loadStart(arfmodel)
 		
 	#set boundaries in L-BFGS-B mode
+	.options.opt.upper(options)[4:6] = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
 	if(length(.options.opt.lower(options))==1) lowbound=-Inf else lowbound=rep(.options.opt.lower(options)[-c(5:9)],.model.regions(arfmodel))
 	if(length(.options.opt.upper(options))==1) upbound=Inf else upbound=rep(.options.opt.upper(options)[-c(5:9)],.model.regions(arfmodel))
 			
@@ -402,7 +410,7 @@ fitSimpleModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readD
 				.model.estimates(arfmodel)[10+(10*(i-1))] <- optim.output$par[5+(5*(i-1))]
 			}
 					
-			if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
+			if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T)
 		
 			if(.model.valid(arfmodel)) {
 				#caluclate fits
@@ -413,6 +421,7 @@ fitSimpleModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readD
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),optim.output)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}
@@ -447,11 +456,6 @@ fitSimpleModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readDat
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
 	.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Simple Gaussmodel was fitted.')
-	
-	#get starting values
-	if(.options.start.method(options)=='rect') {
-		arfmodel <- determineStartRectSimple(arfmodel)
-	}
 	
 	#load startingvalues
 	.model.startval(arfmodel) <- loadStart(arfmodel)
@@ -514,11 +518,10 @@ fitSimpleModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readDat
 				.model.estimates(arfmodel)[10+(10*(i-1))] <- nlm.output$estimate[5+(5*(i-1))]
 			}
 			
-			if(checkVersion(.model.version(arfmodel),1,4,0) & .options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.ss(arfmodel),analyticalgrad=T)
+			if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T)
 			
 					
 			if(.model.valid(arfmodel)) {
-				#caluclate fits
 				arfmodel = BIC(arfmodel,options=options)
 				arfmodel = RMSEA(arfmodel,options=options)
 			}
@@ -526,6 +529,7 @@ fitSimpleModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readDat
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),optim.output)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}

@@ -69,26 +69,19 @@ newModel <- function(modelname='defaultmodel',regions=1,subject='',condition='',
 	
 	
 	#updateModelNames in on dir up
-	updateModelNames(paste(sub(.model.modelname(model),'',.model.modelpath(model)),sp,.experiment.modelnamesRda(experiment),sep=''))
+	updateModelNames(dirname(.model.modelpath(model)))
 		
 	return(model)
 }
 
 
 #update ModelNames in a ModelNamesFile
-updateModelNames <- function(filename) {
-	
-	#set separator
-	sp <- .Platform$file.
-	
-	#remove filename from to create path
-	mn <- strsplit(filename,sp)[[1]]
-	mn <- mn[length(mn)]
-	path <- sub(mn,'',filename)
-
+updateModelNames <- function(path) {
+		
 	#list all dirs in path (minus the modelnames file)
 	existingfiles <- list.files(path,full=F)
-	existingfiles <- existingfiles[-grep(mn,existingfiles)]
+	filename <- list.files(path,'.Rda',full=T)
+	existingfiles <- existingfiles[-grep('.Rda',existingfiles)]
 
 	#save modelnames
 	save(existingfiles,file=filename)	

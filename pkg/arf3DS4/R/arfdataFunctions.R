@@ -128,7 +128,7 @@ setAllObjects <- function(experiment,overwrite=F)
 				modelname <- paste(modelpath,sp,.experiment.modelnamesRda(experiment),sep='')
 			
 				#updateModelNames 
-				updateModelNames(modelname)
+				updateModelNames(dirname(modelname))
 				mnames <- loadRda(modelname)
 				
 				if(length(mnames)>0) {

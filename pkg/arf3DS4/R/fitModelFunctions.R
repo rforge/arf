@@ -8,15 +8,17 @@ ssq.gauss <-
 ##ssq.gauss returns the ssq of the full gauss model with an anlytical gradient attached
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
 {
-	ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
+	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
+		ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
+	} else ssqdat=ss_data
 	
 	if(analyticalgrad) {
 		grad = gradient.gauss(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data)
 		attr(ssqdat,'gradient') <- grad
 	}
-
-	if(is.nan(ssqdat) | ssqdat==Inf | is.na(ssqdat) | ssqdat==-Inf) ssqdat=ss_data
 	
+	if(is.nan(ssqdat) | ssqdat==Inf | is.na(ssqdat) | ssqdat==-Inf) ssqdat=ss_data
+	#cat('ssqdat',ssqdat,'\n')
 	return(invisible(ssqdat))	
 	
 }
@@ -25,7 +27,11 @@ model.gauss <-
 #returns model estimate for full gaussmodel
 function(theta,np,dimx,dimy,dimz)
 {
-	return(.C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]])
+	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
+		model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
+	} else model=NA
+	
+	return(model)
 	
 }
 
@@ -33,11 +39,16 @@ gradient.gauss <-
 #gradient returns the analytical gradient of the ssq to the thetaparameters
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
 {
-	model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
-	grad <- try(.C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=T)
+	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0) {
+		model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
+	} else model=NA
 	
-	if(!is.null(attr(grad,'class'))) grad=rep(1e+12,np) 
+	if(length(model[is.na(model) | is.nan(model) | model==Inf | model==-Inf])==0) {
+		grad <- .C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]]
+	} else grad=rep(1e+12,np) 
 	
+	#cat('grad',grad,'\n')
+
 	return(grad)
 	
 }
@@ -64,8 +75,11 @@ model.simple <-
 #returns model estimate for simple gaussmodel
 function(theta,np,dimx,dimy,dimz)
 {
+	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
+		model <- .C('simplegauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
+	} else model=NA
 	
-	return(.C('simplegauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]])
+	return(model)
 	
 }
 
@@ -157,8 +171,7 @@ createAllAverages <- function(experiment=.experiment) {
 	
 	#set filesep
 	sp <- .Platform$file.sep
-	
-	
+		
 	#set subjects and conditions
 	subs <- .experiment.subject.names(experiment)
 	conds <- .experiment.condition.names(experiment)
@@ -188,7 +201,7 @@ createAllAverages <- function(experiment=.experiment) {
 determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loadOptions(arfmodel)) {
 	
 	#load in fmriData
-	fmridata <- readData(.model.avgdatfile(arfmodel))
+	fmridata <- readData(.model.avgtstatFile(arfmodel))
 	
 	#set theta to the default values (for all regions)
 	theta <- startvec
@@ -208,9 +221,13 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 	#set location matrix
 	location <- data.frame(x=rep(seq(1:dimx),times=dimz*dimy),y=rep(rep(seq(1:dimy),each=dimx),times=dimz),z=rep(seq(1:dimz),each=dimx*dimy))
 	
+	#set mask
+	mask <- .model.mask(arfmodel)
+	dim(mask) <-  c(dimx,dimy,dimz)
+	
 	for(reg in 1:.model.regions(arfmodel)) {
 		
-		#retriev location in x,y,z
+		#retrieve location in x,y,z
 		m <- location[which.max(data),]
 		
 		#set maximum locations
@@ -246,7 +263,16 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 		if(length(rmy)>0 & length(rmy)<length(yvec)) yvec <- yvec[-rmy]
 		if(length(rmz)>0 & length(rmz)<length(zvec)) zvec <- zvec[-rmz]	
 		
-		data[xvec,yvec,zvec]=0
+		data[xvec,yvec,zvec]=min(data)
+		
+		#check if box touches the edge of the brain
+		if(isEdge(mask,xvec,yvec,zvec)) { 
+			#set aximum locations to center
+			theta[1+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[2]/2)
+			theta[2+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[3]/2)
+			theta[3+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[4]/2)
+		}
+
 		
 		#check determinant of sigma
 		detsig = try(detSigmaDeriv(theta),silen=T)
@@ -279,7 +305,7 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 determineStartRectSimple <- function(arfmodel,options=loadOptions(arfmodel)) {
 	
 	#load in fmriData
-	fmridata <- readData(.model.avgdatfile(arfmodel))
+	fmridata <- readData(.model.avgtstatFile(arfmodel))
 	
 	#set theta to the default values (for all regions)
 	theta <- rep(.options.start.vector(options),.model.regions(arfmodel))
@@ -299,6 +325,9 @@ determineStartRectSimple <- function(arfmodel,options=loadOptions(arfmodel)) {
 	
 	#set location matrix
 	location <- data.frame(x=rep(seq(1:dimx),times=dimz*dimy),y=rep(rep(seq(1:dimy),each=dimx),times=dimz),z=rep(seq(1:dimz),each=dimx*dimy))
+	
+	mask = .model.mask(arfmodel)
+	dim(mask)=c(dimx,dimy,dimz)
 	
 	for(reg in 1:.model.regions(arfmodel)) {
 		
@@ -337,8 +366,16 @@ determineStartRectSimple <- function(arfmodel,options=loadOptions(arfmodel)) {
 		if(length(rmx)>0 & length(rmx)<length(xvec)) xvec <- xvec[-rmx]
 		if(length(rmy)>0 & length(rmy)<length(yvec)) yvec <- yvec[-rmy]
 		if(length(rmz)>0 & length(rmz)<length(zvec)) zvec <- zvec[-rmz]	
+				
+		data[xvec,yvec,zvec]==min(data)
 		
-		data[xvec,yvec,zvec]=0
+		#check if box touches the edge of the brain
+		if(isEdge(mask,xvec,yvec,zvec)) { 
+			#set aximum locations to center
+			theta[1+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[2]/2)
+			theta[2+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[3]/2)
+			theta[3+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[4]/2)
+		}
 		
 		#check determinant of sigma
 		detsig = try(detSigmaDeriv(theta),silen=T)
@@ -375,7 +412,11 @@ determineStartRectSimple <- function(arfmodel,options=loadOptions(arfmodel)) {
 	
 }
 
-
+isEdge <- function(mask,xvec,yvec,zvec) {
+	
+	if(sum(as.vector(mask[xvec,yvec,zvec]))==length(as.vector(mask[xvec,yvec,zvec]))) return(FALSE) else return(TRUE)
+		
+}
 
 #calculates mean falloff of a vector
 fallOff <- function(vec,fwhm=2) 
@@ -446,4 +487,39 @@ setMask <- function(arfmodel) {
 	return(invisible(arfmodel))
 }
 
-
+validStart <- function(arfmodel) {
+	
+	theta <- .model.startval(arfmodel)
+	mess = character(0)
+	
+	dat=readData(.model.avgtstatFile(arfmodel))
+	
+	mask = .model.mask(arfmodel)
+	dim(mask)=c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
+	
+	for(reg in 1:.model.regions(arfmodel)) {
+		st_loc = theta[(1:3)+(10*(reg-1))]
+		st_sd = theta[(4:6)+(10*(reg-1))]
+		st_rho = theta[(7:9)+(10*(reg-1))]
+		st_amp = theta[(10)+(10*(reg-1))]
+		
+		sigma = matrix(c(st_sd[1]^2,st_sd[1]*st_sd[2]*st_rho[1],st_sd[1]*st_sd[3]*st_rho[2],st_sd[1]*st_sd[2]*st_rho[1],st_sd[2]^2,st_sd[2]*st_sd[3]*st_rho[3],st_sd[1]*st_sd[3]*st_rho[2],st_sd[2]*st_sd[3]*st_rho[3],st_sd[3]^2),3,3)
+		det_sig=det(sigma)
+		
+		if(!is.na(det_sig) & !is.nan(det_sig) & det_sig!=Inf & det_sig!=-Inf) {
+			if(det_sig<1) mess = c(mess,paste('reg',reg,'small determinant',sep=''))
+		} else mess = c(mess,paste('reg',reg,'NA/NaN/Inf/-Inf determinant',sep=''))
+		
+		if(isEdge(.model.mask(arfmodel),st_loc[1],st_loc[2],st_loc[3])) mess=c(mess,paste('reg',reg,'non-brain start_location')) 
+		
+		if(st_amp<0) ess=c(mess,paste('reg',reg,'amplitude negative or zero')) 
+	}
+	
+	if(length(mess)>0) {
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),mess)
+		.model.valid(arfmodel) <- FALSE
+	}
+	
+	return(arfmodel)
+	
+}
