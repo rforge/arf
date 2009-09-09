@@ -16,8 +16,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=4,
-		update=9,
-		svnrev=64
+		update=10,
+		svnrev=65
 	)
 )
 
@@ -186,7 +186,7 @@ setClass(
 		start.maxfac=1,
 		start.vector=c(0,0,0,0,0,0,.1,.2,-.1,100),
 		chk.method='imagedim',
-		chk.range=c(0,0,0,0,0,0,-.9,-.9,-.9,-1e+64,0,0,0,0,0,0,.9,.9,.9,1e+64),
+		chk.range=c(0,0,0,0,0,0,-.95,-.95,-.95,-1e+64,0,0,0,0,0,0,.95,.95,.95,1e+64),
 		sw.type='diag',
 		output.mode=c('log','screen'),
 		version=new('version')

@@ -10,7 +10,10 @@ fitModel <- function(arfmodel,type=c('gauss','simple'),options=loadOptions(arfmo
 	
 	type = match.arg(type)
 	
-	if(.options.start.method(options)=='rect') arfmodel <- determineStartRect(arfmodel)
+	if(.options.start.method(options)=='rect') {
+		if(type=='gauss') arfmodel <- determineStartRect(arfmodel)
+		if(type=='simple') arfmodel <- determineStartRectSimple(arfmodel) 	
+	}
 		
 	if(.options.min.routine(options)=='nlm') {
 		if(type=='simple')	arfmodel = fitSimpleModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
@@ -270,7 +273,7 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 				df_fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
 				w_fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.weightFile(arfmodel),sep='')
 				n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
-				p = .model.regions(arfmodel)*10
+				p = .model.regions(arfmodel)*.model.params(arfmodel)
 				hessian <- try(.C('approxHessian',as.integer(p),as.integer(n),as.character(df_fn),as.character(w_fn),as.double(numeric(p*p))),silen=try.silen)
 				
 				if(is.null(attr(hessian,'class'))) {

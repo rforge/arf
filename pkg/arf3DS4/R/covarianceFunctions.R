@@ -89,15 +89,15 @@ varcov <- function(arfmodel)
 					.model.varcov(arfmodel) <- SW
 					.model.valid(arfmodel) <- TRUE
 				} else { #outersandiwch not good
-					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'outerSandwich did not compute.') 
+					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'outerSandwich did not compute.',SW) 
 					.model.valid(arfmodel) <- FALSE
 				}
 			} else { #innersandiwch not good
-				.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'innerSandwich did not compute.') 
+				.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'innerSandwich did not compute.',B) 
 				.model.valid(arfmodel) <- FALSE
 			}
 		} else { #hessian not good
-			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Hessian is singular.') 
+			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Hessian is singular.',hessian) 
 			.model.valid(arfmodel) <- FALSE
 		}
 	
@@ -247,7 +247,7 @@ wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 	
 	if(length(.model.varcov(arfmodel))==0) stop('(co)variance matrix not yet calculated, cannot compute Wald statistics!')
 	
-	if(.model.modeltype!='gauss') stop('wald statistics can only be calculated for the full model')
+	if(.model.modeltype(arfmodel)!='gauss') stop('wald statistics can only be calculated for the full model')
 	
 	#define function to calculate Wald statistic 
 	W <- function(a,A,C) t(a)%*%solve(A%*%C%*%t(A))%*%a

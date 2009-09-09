@@ -66,29 +66,67 @@ setMethod('show','data',
 setMethod('show','model',
 		function(object) {
 			cat(paste('[ ARF ',tolower(object@modelname),' ]\n',sep=''))
-			cat(' file:    ',object@modelDataFile,'\n')
 			cat(' regions: ',object@regions,'\n')
-			cat(' mintime: ',object@proctime[1],'\n')
-			cat(' swctime: ',object@proctime[2],'\n')
 			cat(' valid:   ',object@valid,'\n')
-			
 			cat(' warnings:\n')
 			for(warns in object@warnings) cat('  ',warns,'\n')
 			cat('\n')
-			
 			if(object@valid==T) {
 				cat(' modelinfo:\n')
 				cat(' ',object@convergence,'\n')
-				cat('  fit (BIC,RMSEA):',object@fit,'\n')
+				cat('  fit (BIC,RMSEA):',round(object@fit[1]),round(object@fit[2],1),'\n')
 				cat('  minimum:   ',object@minimum,'\n')
 				cat('  estimates:\n')
+				if(length(object@wald@pvalues)==0) {object@wald@pvalues=matrix(1,object@regions,5);w=FALSE} else w=TRUE
+				
 				for(reg in 1:object@regions) {
 					cat('  ',sprintf('[%3d]  (%3.0f,%3.0f,%3.0f)',reg,object@estimates[1+(10*(reg-1))],object@estimates[2+(10*(reg-1))],object@estimates[3+(10*(reg-1))]))
-					cat(' ',sprintf('[%5.1f %5.1f %5.1f ~ %5.1f %5.1f %5.1f]',object@estimates[4+(10*(reg-1))],object@estimates[5+(10*(reg-1))],object@estimates[6+(10*(reg-1))],object@estimates[7+(10*(reg-1))],object@estimates[8+(10*(reg-1))],object@estimates[9+(10*(reg-1))]))
-					cat(' ',sprintf('[%7.0f]',object@estimates[10+(10*(reg-1))]),'\n')	
+					if(object@wald@pvalues[reg,4]<.05) {	
+						cat(' ',sprintf('[%5.1f %5.1f %5.1f ~ %5.1f %5.1f %5.1f]* ',object@estimates[4+(10*(reg-1))],object@estimates[5+(10*(reg-1))],object@estimates[6+(10*(reg-1))],object@estimates[7+(10*(reg-1))],object@estimates[8+(10*(reg-1))],object@estimates[9+(10*(reg-1))]))
+					} else cat(' ',sprintf('[%5.1f %5.1f %5.1f ~ %5.1f %5.1f %5.1f]  ',object@estimates[4+(10*(reg-1))],object@estimates[5+(10*(reg-1))],object@estimates[6+(10*(reg-1))],object@estimates[7+(10*(reg-1))],object@estimates[8+(10*(reg-1))],object@estimates[9+(10*(reg-1))]))
+					if(object@wald@pvalues[reg,4]<.05) {	
+						cat(' ',sprintf('[%7.0f]*',object@estimates[10+(10*(reg-1))]),'\n')
+					} else cat(' ',sprintf('[%7.0f] ',object@estimates[10+(10*(reg-1))]),'\n')
 				}
+				if(w) cat('  * Wald tests significant at .05 (uncorrected for number of regions)\n')
+				if(!w) cat('  Wald statistics not calculated\n')
 				
 			}
+			
+		}
+)
+
+
+setMethod('show','fmri.data',
+		function(object) {
+			
+			cat('[ ',object@filename,' ]\n')
+			cat('type:        ',object@filetype,'\n',sep='')
+			cat('dims:		  ')
+			for(i in 2:(object@dims[1]+1)) cat(object@dims[i],' ')
+			cat('\n')
+			cat('description: ',object@descrip,'\n',sep='')
+			cat('\n')
+			
+		}
+)
+
+setMethod('summary','fmri.data',
+		function(object) {
+			
+			cat('[ ',object@filename,' ]\n')
+			cat('type:        ',object@filetype,'\n',sep='')
+			cat('dims:		 ')
+			for(i in 2:(object@dims[1]+1)) cat(object@dims[i],' ')
+			cat('\n')
+			cat('description: ',object@descrip,'\n',sep='')
+			cat('\n')
+			
+			cat('minimum: ',min(object@datavec),'\n')
+			cat('maximum: ',max(object@datavec),'\n')
+			cat('mean:    ',mean(object@datavec,na.rm=T),'\n')
+			cat('median:  ',median(object@datavec,na.rm=T),'\n')
+						
 			
 		}
 )

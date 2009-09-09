@@ -18,6 +18,7 @@ processModel <- function(arfmodel,type=c('gauss','simple'),fast=T,options=loadOp
 	}
 	
 	arfmodel <- fitModel(arfmodel,type,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen)
+	
 	if(pr) cat(' ',.model.convergence(arfmodel),'\n',sep='')
 	
 	if(.model.valid(arfmodel)) {

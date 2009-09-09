@@ -137,7 +137,7 @@ setAllObjects <- function(experiment,overwrite=F)
 						model <- loadRda(paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
 			
 						#version specific data to add to model (if not set by classDef, data prior to 1.3.0)
-						model <- updateClass(model,logFile=.experiment.logFile(experiment),gradient=0,params=10,modeltype='gauss',avgtstatFile='',n=0,mask=0,ss=0)
+						model <- updateClass(model,logFile=.experiment.logFile(experiment),gradient=0,params=0,modeltype='undef',avgtstatFile='',n=0,mask=0,ss=0)
 				
 						.model.modelpath(model) <- paste(modelpath,sp,mnames[mods],sep='')
 						.model.modeldatapath(model) <- paste(modelpath,sp,mnames[mods],sp,.experiment.modeldatDir(experiment),sep='')
@@ -154,7 +154,7 @@ setAllObjects <- function(experiment,overwrite=F)
 						.model.n(model) <- .data.n(data)
 						.model.mask(model) <- .data.mask(data)
 						.model.ss(model) <- .data.ss(data)
-		
+						
 						save(model,file=paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
 						
 						#overwrite options file if applicable
