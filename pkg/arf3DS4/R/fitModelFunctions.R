@@ -4,9 +4,27 @@
 # University of Amsterdam					#
 #############################################
 
+#[CONTAINS]
+#ssq.gauss
+#model.gauss
+#gradient.gauss
+#ssq.simple
+#model.simple
+#gradient.simple
+#createAverages
+#createAllAverages
+#determineStartRect
+#determineStartRectSimple
+#isEdge
+#fallOff
+#fwhm.filter
+#setMask
+#validStart
+
+
 ssq.gauss <- 
-##ssq.gauss returns the ssq of the full gauss model with an anlytical gradient attached
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+##ssq.gauss returns the ssq of the full gauss model with an anlytical gradient attached
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
 		ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
@@ -24,8 +42,8 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 }
 
 model.gauss <-
-#returns model estimate for full gaussmodel
 function(theta,np,dimx,dimy,dimz)
+#returns model estimate for full gaussmodel
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
 		model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
@@ -36,8 +54,8 @@ function(theta,np,dimx,dimy,dimz)
 }
 
 gradient.gauss <- 
-#gradient returns the analytical gradient of the ssq to the thetaparameters
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+#gradient returns the analytical gradient of the ssq to the thetaparameters
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0) {
 		model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
@@ -47,16 +65,14 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 		grad <- .C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]]
 	} else grad=rep(1e+12,np) 
 	
-	#cat('grad',grad,'\n')
-
 	return(grad)
-	
+
 }
 
 
 ssq.simple <- 
-##ssq.simple returns the ssq of the simple gauss model with an anlytical gradient attached
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+##ssq.simple returns the ssq of the simple gauss model with an anlytical gradient attached
 {
 	ssqdat <- .C('simplessqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
 	
@@ -72,8 +88,8 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 }
 
 model.simple <-
-#returns model estimate for simple gaussmodel
 function(theta,np,dimx,dimy,dimz)
+#returns model estimate for simple gaussmodel
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
 		model <- .C('simplegauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
@@ -84,8 +100,8 @@ function(theta,np,dimx,dimy,dimz)
 }
 
 gradient.simple <- 
-#gradient returns the analytical gradient of the ssq to the thetaparameters
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+#gradient returns the analytical gradient of the ssq to the thetaparameters
 {
 	model <- .C('simplegauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
 	grad <- try(.C('dfsimplessq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=T)
@@ -96,8 +112,11 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 	
 }
 
+
+createAverages <- 
+function(arfdat,experiment=.experiment) 
 # createAverages averages of the data and weightfiles, set n mask and ss_data 
-createAverages <- function(arfdat,experiment=.experiment) {
+{
 	
 	sp=.Platform$file.sep
 	
@@ -167,7 +186,10 @@ createAverages <- function(arfdat,experiment=.experiment) {
 	
 }
 
-createAllAverages <- function(experiment=.experiment) {
+createAllAverages <- 
+function(experiment=.experiment) 
+#create All averages is a wrapper to create all averages in an experiment
+{
 	
 	#set filesep
 	sp <- .Platform$file.sep
@@ -197,8 +219,11 @@ createAllAverages <- function(experiment=.experiment) {
 }
 
 
+
+determineStartRect <- 
+function(arfmodel,startvec=loadStart(arfmodel),options=loadOptions(arfmodel)) 
 # determineStartRect calculates starting values for regions (rectangular mode)
-determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loadOptions(arfmodel)) {
+{
 	
 	#load in fmriData
 	fmridata <- readData(.model.avgtstatFile(arfmodel))
@@ -301,8 +326,10 @@ determineStartRect <- function(arfmodel,startvec=loadStart(arfmodel),options=loa
 	
 }
 
+determineStartRectSimple <- 
+function(arfmodel,options=loadOptions(arfmodel)) 
 # determineStartRect calculates starting values for regions (rectangular mode)
-determineStartRectSimple <- function(arfmodel,options=loadOptions(arfmodel)) {
+{
 	
 	#load in fmriData
 	fmridata <- readData(.model.avgtstatFile(arfmodel))
@@ -412,14 +439,18 @@ determineStartRectSimple <- function(arfmodel,options=loadOptions(arfmodel)) {
 	
 }
 
-isEdge <- function(mask,xvec,yvec,zvec) {
+isEdge <-  
+function(mask,xvec,yvec,zvec)
+#check if a cube-region touches non-brain voxels
+{
 	
 	if(sum(as.vector(mask[xvec,yvec,zvec]))==length(as.vector(mask[xvec,yvec,zvec]))) return(FALSE) else return(TRUE)
 		
 }
 
+fallOff <- 
+function(vec,fwhm=2)
 #calculates mean falloff of a vector
-fallOff <- function(vec,fwhm=2) 
 {
 	#smooth vec with fwhm filter
 	vec <- fwhm.filter(vec,fwhm)
@@ -453,8 +484,10 @@ fallOff <- function(vec,fwhm=2)
 	return(c(j,i))
 }
 
-#smooth a datavector using FWHM filter (used in startval detect)
-fwhm.filter <- function(vec,fwhm) {
+fwhm.filter <- 
+function(vec,fwhm) 
+#smooth a datavector (1D) using FWHM filter (used in startval detect)
+{
 	
 	len=length(vec)
 	fl=50
@@ -467,8 +500,10 @@ fwhm.filter <- function(vec,fwhm) {
 	
 }
 
+setMask <- 
+function(arfmodel) 
 #set mask attributes if necessary
-setMask <- function(arfmodel) {
+{
 	
 	avgtstat <- .fmri.data.datavec(readData(.model.avgtstatFile(arfmodel)))
 	
@@ -487,8 +522,10 @@ setMask <- function(arfmodel) {
 	return(invisible(arfmodel))
 }
 
-validStart <- function(arfmodel) {
-	
+validStart <- 
+function(arfmodel) 
+#check if startvalues are valid
+{
 	theta <- .model.startval(arfmodel)
 	mess = character(0)
 	
@@ -520,6 +557,6 @@ validStart <- function(arfmodel) {
 		.model.valid(arfmodel) <- FALSE
 	}
 	
-	return(arfmodel)
+	return(invisible(arfmodel))
 	
 }

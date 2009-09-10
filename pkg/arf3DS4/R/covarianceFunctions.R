@@ -4,9 +4,21 @@
 # University of Amsterdam					#
 #############################################
 
+#[CONTAINS]
+#makeDerivs
+#makeResiduals
+#varcov
+#BIC
+#RMSEA
+#detSigmaDeriv
+#wald
+#mcpCorrect
+#readDerivs
+#approxHessianR
 
+makeDerivs <- 
+function(arfmodel)
 #make derivs calculates analytical first order derivatives based on the estimated model parameters
-makeDerivs <- function(arfmodel)
 {
 	
 	if(.model.valid(arfmodel)) {
@@ -25,8 +37,10 @@ makeDerivs <- function(arfmodel)
 		
 }
 
+
+makeResiduals <- 
+function(arfmodel)
 #make residuals makes residuals for each trial
-makeResiduals <- function(arfmodel)
 {
 	if(.model.valid(arfmodel)) {
 		#set separator
@@ -50,8 +64,10 @@ makeResiduals <- function(arfmodel)
 
 }
 
+
+varcov <- 
+function(arfmodel)
 #calculate sandwich estimate
-varcov <- function(arfmodel)
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -111,18 +127,17 @@ varcov <- function(arfmodel)
 	
 	
 	#save the model file
-	saveModel(arfmodel)
+	#saveModel(arfmodel)
 	
 	#return the varcov
 	return(invisible(arfmodel))
 }
 
-#calculate the BIC
-BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
-	## BIC calculates the Bayesian Information Fit criterion
-	## input is an object of arfmodel
-	## outcput is an object of arfmodel
 
+BIC <- 
+function(arfmodel,options=loadOptions(arfmodel)) 
+#calculate the BIC
+{
 	if(.model.valid(arfmodel)) {
 		
 		#read in weights, used in constant
@@ -174,14 +189,16 @@ BIC <- function(arfmodel,options=loadOptions(arfmodel)) {
 	}
 	
 	#save the model file
-	saveModel(arfmodel)
+	#saveModel(arfmodel)
 	
 	return(invisible(arfmodel))
 	
 }
 
+RMSEA <- 
+function(arfmodel,options=loadOptions(arfmodel)) 
 #RMSEA calculates root mean square errors of models
-RMSEA <- function(arfmodel,options=loadOptions(arfmodel)) {
+{
 	
 	#check model validity
 	if(.model.valid(arfmodel)) {
@@ -212,14 +229,16 @@ RMSEA <- function(arfmodel,options=loadOptions(arfmodel)) {
 	}
 	
 	#save the model file
-	saveModel(arfmodel)
+	#saveModel(arfmodel)
 	
 	return(invisible(arfmodel))
 	
 }
 
-#get determinant of sigma with derivatives 
-detSigmaDeriv <- function(theta) 
+ 
+detSigmaDeriv <- 
+function(theta) 
+#get determinant of sigma with derivatives
 {
 	
 	#set relevant parameters
@@ -238,13 +257,10 @@ detSigmaDeriv <- function(theta)
 	
 }
 
+wald <- 
+function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 #calculate Wald statistics 
-wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) {
-	## wald calculates Wald statistics for a fitted model
-	## input is and model object and waldobject (may be empty)
-	## output is an arfmodel object
-	
-	
+{
 	if(length(.model.varcov(arfmodel))==0) stop('(co)variance matrix not yet calculated, cannot compute Wald statistics!')
 	
 	if(.model.modeltype(arfmodel)!='gauss') stop('wald statistics can only be calculated for the full model')
@@ -311,7 +327,7 @@ wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 		.model.wald(arfmodel) <- waldobject	
 		
 		#save the model file
-		saveModel(arfmodel)
+		#saveModel(arfmodel)
 		
 	} else	warning('No valid model. wald statistics not calculated.')
 	
@@ -320,10 +336,10 @@ wald <- function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel)) 
 }
 
 
-mcpCorrect <- function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,df=100,sig.steps=10,adj.n=T) 
+mcpCorrect <- 
+function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,df=100,sig.steps=10,adj.n=T) 
+#calulate the multiple comparison correction on fmri data (uncorrected,bonferroni or FDR)
 {
-	
-	
 	veclen <- length(.fmri.data.datavec(fmridata))
 	if(adj.n) n <- length(.fmri.data.datavec(fmridata)[.fmri.data.datavec(fmridata)!=0]) else n <- length(.fmri.data.datavec(fmridata))
 	pseq = seq(sig.steps,1,-1)
@@ -331,17 +347,13 @@ mcpCorrect <- function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.
 	which <- match.arg(type)
 		
 	if(which=='bonferroni') {
-		
 		adj.p = alpha/n
 		pvec = adj.p / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-		
 		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(.fmri.data.datavec(fmridata),df))]=1/pseq[i]
-			
 	}
 	
 	if(which=='FDR') {
-		
 		fdr.value = sort(1-pt(.fmri.data.datavec(fmridata),df))
 		i = 1
 		while(fdr.value[i]<=((i*q)/(n*cv))) i = i + 1
@@ -349,33 +361,26 @@ mcpCorrect <- function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.
 		fdr=fdr.value[i]
 		pvec = fdr / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-		
-		
 		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(.fmri.data.datavec(fmridata),df))]=1/pseq[i]
-	
 	}
 	
-	
 	if(which=='uncorrected') {
-		
 		adj.p = alpha
 		pvec = adj.p / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-			
 		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(.fmri.data.datavec(fmridata),df))]=1/pseq[i]
-		
-
 	}
 	
-	
 	.fmri.data.datavec(fmridata) <- sigvec
-	
+
 	return(fmridata)
 	
 }
 
+readDerivs <- 
+function(arfmodel) 
 #readDerivs reads in a binary derivative file
-readDerivs <- function(arfmodel) {
+{
 	sp = .Platform$file.sep
 	
 	fn = paste(.model.modeldatapath(arfmodel),sp,.model.fullmodelDataFile(arfmodel),sep='')
@@ -395,8 +400,11 @@ readDerivs <- function(arfmodel) {
 	return(NULL)
 }
 
+
+approxHessianR <- 
+function(arfmodel) 
 #approxHessian calculates the approximate hessian (used only to check C code)
-approxHessianR <- function(arfmodel) {
+{
 	
 	df = readDerivs(arfmodel)
 	W = .fmri.data.datavec(readData(.model.avgWfile(arfmodel)))

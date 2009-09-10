@@ -4,8 +4,20 @@
 # University of Amsterdam					#
 #############################################
 
+#[CONTAINS]
+#getFileInfo
+#newFile
+#readHeader
+#readData
+#writeHeader
+#writeData
+#writeHeaderPart
+#writeDataPart
+#headToName
+
+getFileInfo <- 
+function(filename)
 # getFileInfo sets file information (file path, location, extension, gzippedness and endianness)
-getFileInfo <- function(filename) 
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -99,8 +111,9 @@ getFileInfo <- function(filename)
 	
 }
 
+newFile <- 
+function(filename,templateHDR) 
 #set header info accordomg to a templateHeader
-newFile <- function(filename,templateHDR) 
 {
 	##newFile creates a new file of the given filename (and directories it should be in if they not exist)
 	## input is a filename (full) and template headerinfo
@@ -131,9 +144,9 @@ newFile <- function(filename,templateHDR)
 	return(templateHDR)
 }
 
-
+readHeader <- 
+function(fileinf) 
 # readHeader reads nifti header info from nii,img,hdr and gzipped exts.
-readHeader <- function(fileinf) 
 {
 	sp <- .Platform$file.sep
 	
@@ -234,8 +247,9 @@ readHeader <- function(fileinf)
 	
 }
 
+readData <-
+function(filename) 
 # readData reads in nifti/analyze datafiles
-readData <- function(filename) 
 {
 	sp <- .Platform$file.sep
 	
@@ -275,8 +289,9 @@ readData <- function(filename)
 
 }
 
+writeHeader <- 
+function(headinf) 
 #writeHeader writes header info to a .hdr file
-writeHeader <- function(headinf) 
 {
 	sp <- .Platform$file.sep
 	
@@ -303,7 +318,9 @@ writeHeader <- function(headinf)
 	
 }
 
-writeData <- function(headinf,datavec) 
+writeData <- 
+function(headinf,datavec) 
+#write data to a nifti file
 {
 	## writeData writes both Header and Data info to a file
 	## input is headerinfo and datavector
@@ -348,7 +365,9 @@ writeData <- function(headinf,datavec)
 	
 }
 
-writeHeaderPart <- function(con,headinf) 
+writeHeaderPart <- 
+function(con,headinf) 
+#writeHeaderPart of a nifti file
 {
 	## writeHeaderPart writes nifti/analyze headerfiles
 	## input is connection,headerinfo,and datavec
@@ -422,7 +441,9 @@ writeHeaderPart <- function(con,headinf)
 	
 }
 
-writeDataPart <- function(con,headinf,datavec) 
+writeDataPart <- 
+function(con,headinf,datavec) 
+#write a datavector to nifti file
 {
 	## writeDataPart writes nifti/analyze datafiles
 	## input is connection,headerinfo,and datavec
@@ -440,9 +461,9 @@ writeDataPart <- function(con,headinf,datavec)
 
 }
 
-
+headToName <- 
+function(headinf) 
 #turn header information to a filename
-headToName <- function(headinf) 
 {
 	#set separator
 	sp <- .Platform$file.sep

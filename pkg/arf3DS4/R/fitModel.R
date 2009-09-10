@@ -4,10 +4,17 @@
 # University of Amsterdam					#
 #############################################
 
+#[CONTAINS]
+#fitModel
+#fitModelNlm
+#fitModelOptim
+#fitSimpleModelNlm
+#fitSimpleModelOptim
 
-## fitModel is a wrapper for NLM and optim based on the options
-fitModel <- function(arfmodel,type=c('gauss','simple'),options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
-	
+fitModel <- 
+function(arfmodel,type=c('gauss','simple'),options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 
+# fitModel is a wrapper for NLM and optim based on the options
+{
 	type = match.arg(type)
 	
 	if(.options.start.method(options)=='rect') {
@@ -24,11 +31,15 @@ fitModel <- function(arfmodel,type=c('gauss','simple'),options=loadOptions(arfmo
 		if(type=='simple')	arfmodel = fitSimpleModelOptim(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 		if(type=='gauss')	arfmodel = fitModelOptim(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 	}
+
 	return(arfmodel)	
 }
 
-## fitModelNlm calls the minimization routine (NLM)
-fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
+
+fitModelNlm <- 
+function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 
+# fitModelNlm calls the minimization routine (NLM)
+{
 	
 	#set filesep
 	sp <- .Platform$file.sep
@@ -161,8 +172,10 @@ fitModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.mod
 }
 
 
-## fitModelOptim calls the minimization routine (OPTIM)
-fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
+fitModelOptim <- 
+function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 
+# fitModelOptim calls the minimization routine (OPTIM)
+{
 
 	#set separator
 	sp <- .Platform$file.sep
@@ -309,8 +322,10 @@ fitModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.m
 	return(invisible(arfmodel))
 }
 
-## fitModelOptim calls the minimization routine (OPTIM)
-fitSimpleModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
+fitSimpleModelOptim <- 
+function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 
+# fitModelOptim calls the minimization routine (OPTIM)
+{
 	
 	#set separator
 	sp <- .Platform$file.sep
@@ -438,8 +453,11 @@ fitSimpleModelOptim <- function(arfmodel,options=loadOptions(arfmodel),dat=readD
 	return(invisible(arfmodel))
 }
 
-## fitModelOptim calls the minimization routine (OPTIM)
-fitSimpleModelNlm <- function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
+
+fitSimpleModelNlm <- 
+function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 
+# fitModelOptim calls the minimization routine (OPTIM)
+{
 
 	sp <- .Platform$file.sep
 	

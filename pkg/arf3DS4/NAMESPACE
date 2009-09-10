@@ -14,11 +14,14 @@ export(
 	arfToMNI,
 	fitModelNlm,
 	fitModelOptim,
+	fitSimpelModelNlm,
+	fitSimpleModelOptim,
 	fitModel,
 	processModel,
 	createAverages,
 	createAllAverages,
 	determineStartRect,
+	determineStartRectSimple,
 	newModel,
 	saveModel,
 	loadOptions,
@@ -48,6 +51,7 @@ exportClasses(
 	fmri.data,
 	data,
 	model,
+	sequence,
 	wald
 )
 

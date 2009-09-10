@@ -3177,3 +3177,69 @@ standGen <- function(x, value) standardGeneric('.data.version<-')
 standMethod <- function(x, value) {x@version<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
+classname <-'sequence'
+funcname <-'.sequence.current'
+standGen <- function(object) standardGeneric('.sequence.current')
+standMethod <- function(object) object@current
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.sequence.current<-'
+standGen <- function(x, value) standardGeneric('.sequence.current<-')
+standMethod <- function(x, value) {x@current<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'sequence'
+funcname <-'.sequence.regions'
+standGen <- function(object) standardGeneric('.sequence.regions')
+standMethod <- function(object) object@regions
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.sequence.regions<-'
+standGen <- function(x, value) standardGeneric('.sequence.regions<-')
+standMethod <- function(x, value) {x@regions<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'sequence'
+funcname <-'.sequence.mnames'
+standGen <- function(object) standardGeneric('.sequence.mnames')
+standMethod <- function(object) object@mnames
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.sequence.mnames<-'
+standGen <- function(x, value) standardGeneric('.sequence.mnames<-')
+standMethod <- function(x, value) {x@mnames<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'sequence'
+funcname <-'.sequence.fit'
+standGen <- function(object) standardGeneric('.sequence.fit')
+standMethod <- function(object) object@fit
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.sequence.fit<-'
+standGen <- function(x, value) standardGeneric('.sequence.fit<-')
+standMethod <- function(x, value) {x@fit<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'sequence'
+funcname <-'.sequence.minimum'
+standGen <- function(object) standardGeneric('.sequence.minimum')
+standMethod <- function(object) object@minimum
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.sequence.minimum<-'
+standGen <- function(x, value) standardGeneric('.sequence.minimum<-')
+standMethod <- function(x, value) {x@minimum<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'sequence'
+funcname <-'.sequence.valid'
+standGen <- function(object) standardGeneric('.sequence.valid')
+standMethod <- function(object) object@valid
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.sequence.valid<-'
+standGen <- function(x, value) standardGeneric('.sequence.valid<-')
+standMethod <- function(x, value) {x@valid<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)

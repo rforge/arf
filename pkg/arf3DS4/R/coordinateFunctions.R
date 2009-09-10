@@ -4,11 +4,22 @@
 # University of Amsterdam					#
 #############################################
 
+#[CONTAINS]
+#cropVolume
+#createRegs
+#createFuncs
+#checkRegs
+#checkFuncs
+#setRegFiles
+#setRegParams
+#arfToMNI
+
+cropVolume <- 
+function(filename,resizeToDim) 
 #resize nifti images (crops last slices to destination dimensions)
-cropVolume <- function(filename,resizeToDim) {
+{
 	
 	dat <- readData(filename)
-	
 	data_array <- .fmri.data.datavec(dat)
 	
 	x=.fmri.data.dims(dat)[2]
@@ -22,7 +33,6 @@ cropVolume <- function(filename,resizeToDim) {
 	dim(data_array) <- c(x,y,z)
 	
 	if(nx>x | ny>y | nz>z) stop('can only crop images!')
-	
 	if(nx==x & ny==y & nz==z) stop('no crop necessary')
 	
 	cat('Dims',.fmri.data.dims(dat),'>> ')
@@ -45,20 +55,18 @@ cropVolume <- function(filename,resizeToDim) {
 		.fmri.data.dims(dat)[4]=nz
 	} 
 	
-	
-	
 	cat(.fmri.data.dims(dat),'\n')
 	cat('filename',.fmri.data.filename(dat),'\n')	
 	cat('datavec should be',nx*ny*nz,'long and is now',length(as.vector(data_array)),'\n')
 	
-	
 	if(file.exists(.fmri.data.filename(dat))) file.remove(.fmri.data.filename(dat))
 	writeData(dat,as.vector(data_array))
-	
 }
 
 
-read.FSL.mat <- function(filename) 
+read.FSL.mat <- 
+function(filename)
+#read FSL affine matrix file
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -73,8 +81,11 @@ read.FSL.mat <- function(filename)
 }
 
 
-#createRegs creates registration files for each 
-createRegs <- function(arfdata) {
+ 
+createRegs <- 
+function(arfdata) 
+#createRegs creates registration files for each
+{
 	
 	#set separator
 	sp <- .Platform$file.sep
@@ -109,8 +120,11 @@ createRegs <- function(arfdata) {
 	
 }
 
+
+checkRegs <- 
+function(arfdata,overwrite=F) 
 #checkRegs checks the integrity of the registrationRda's and sets fullpath based on the experiment - data
-checkRegs <- function(arfdata,overwrite=F) {
+{
 	
 	#set separator
 	sp <- .Platform$file.sep
@@ -149,8 +163,9 @@ checkRegs <- function(arfdata,overwrite=F) {
 	return(allIsWell)	
 }
 
+setRegFiles <- 
+function(registration,examp2high='example_func2highres.mat',high2stand='highres2standard.mat',example_func='example_func.nii.gz',highres='highres.nii.gz',standard='standard.nii.gz') 
 #setRegfiles fills the registration object with the correct matrices and nifti images (uses FSL standard as default)
-setRegFiles <- function(registration,examp2high='example_func2highres.mat',high2stand='highres2standard.mat',example_func='example_func.nii.gz',highres='highres.nii.gz',standard='standard.nii.gz') 
 {
 	
 	#set and check regFiles
@@ -172,8 +187,10 @@ setRegFiles <- function(registration,examp2high='example_func2highres.mat',high2
 	return(invisible(registration))
 }
 
+
+setRegParams <- 
+function(registration) 
 #setRegparams reads in registration parameters from the files in registration object and sets appropriate matrices
-setRegParams <- function(registration) 
 {
 	#load registration volumes
 	examp = readData(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.example(registration),sep=''))
@@ -204,8 +221,10 @@ setRegParams <- function(registration)
 }
 
 
-#arfToMNI converts arf-native voxel locations to MNI_152 standard coordinates
-arfToMNI <- function(xyz_coor,registration) 
+
+arfToMNI <- 
+#arfToMNI converts arf-native voxel locations to MNI_152 standard coordinates		
+function(xyz_coor,registration) 
 {
 		
 	xyz = c(xyz_coor,1)
@@ -240,8 +259,10 @@ arfToMNI <- function(xyz_coor,registration)
 }
 
 
+createFuncs <- 
+function(arfdata) 
 #createFuncs creates registration files for each 
-createFuncs <- function(arfdata) {
+{
 	
 	#set separator
 	sp <- .Platform$file.sep
@@ -276,8 +297,10 @@ createFuncs <- function(arfdata) {
 	
 }
 
-#checkRegs checks the integrity of the registrationRda's and sets fullpath based on the experiment - data
-checkFuncs <- function(arfdata,overwrite=F) {
+checkFuncs <- 
+function(arfdata,overwrite=F) 
+#checkFuncs checks the integrity of the functionalRda and sets fullpath based on the experiment - data
+{
 	
 	#set separator
 	sp <- .Platform$file.sep

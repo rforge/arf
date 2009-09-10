@@ -4,6 +4,21 @@
 # University of Amsterdam					#
 #############################################
 
+#[CONTAINS]
+#version
+#settings
+#registration
+#functional
+#experiment
+#options
+#nifti.fileinfo
+#nifti.header
+#fmri.data
+#wald
+#data
+#model
+#sequence
+
 ## arf version class (version is set here)
 setClass(
 	Class='version',
@@ -16,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=4,
-		update=10,
-		svnrev=65
+		update=11,
+		svnrev=66
 	)
 )
 
@@ -234,7 +249,7 @@ setClass(
 		datatype = 'numeric',			#storage data type
 		bitpix = 'numeric',				#bits per pixel
 		slice_start = 'numeric',		
-		pixdim = 'numeric',
+		pixdim = 'numeric',				#voxel dimensions
 		vox_offset = 'numeric',			#offset of data in .nii file
 		scl_slope = 'numeric',
 		scl_inter = 'numeric',
@@ -406,4 +421,21 @@ setClass(
 			fit=matrix(0,1,2,dimnames=list(c(''),c('BIC','RMSEA'))),
 			wald=new('wald')
 	)
+)
+
+## arf sequence class (containing info (fit, valid) on a sequence of models)
+setClass(
+		Class='sequence',
+		representation=representation(
+				current='numeric',			#current number of regions in model
+				regions='numeric',			#vector of regions to fit (can be sequential or any other combination)
+				mnames='character',			#vector of names of models
+				fit='numeric',				#vector of fit measures (to evaluate best fit)
+				minimum='numeric',			#which region has the minimum
+				valid='numeric'				#vector of validity of solutions (all estimates and variances ok)
+		),
+		prototype=prototype(
+				current=1,
+				minimum=0
+		)
 )

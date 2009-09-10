@@ -4,9 +4,18 @@
 # University of Amsterdam					#
 #############################################
 
+#[CONTAINS]
+#checkExp
+#makeExpDirs
+#chngRootExp
+#setExp
+#loadExp
+#getFSL
+#checkVersion
 
+checkExp <- 
+function(experiment) 
 # checkExp determines if the experiment structure is valid
-checkExp <- function(experiment) 
 {
 	
 	#set separator and 'all is well' flag
@@ -41,9 +50,11 @@ checkExp <- function(experiment)
 	return(invisible(allIsWell))
 }
 
+
+makeExpDirs <- 
+function(path=getwd(),name='default_experiment',subjectind=1,conditionind=1,settings=new('settings'))
 # makeExpDirs creates a directory structure given the path, number of subjects, conditions and a settings object
 # by default creates a structure in the working directory with 1 subject 1 condition and default settings
-makeExpDirs <- function(path=getwd(),name='default_experiment',subjectind=1,conditionind=1,settings=new('settings'))
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -119,8 +130,10 @@ makeExpDirs <- function(path=getwd(),name='default_experiment',subjectind=1,cond
 	
 }
 
+
+chngRootExp <- 
+function(path=getwd(),quiet=F) 
 # resets and checks the experiment path
-chngRootExp <- function(path=getwd(),quiet=F) 
 {
 	
 	#set separator
@@ -147,8 +160,10 @@ chngRootExp <- function(path=getwd(),quiet=F)
 	return(invisible(experiment))
 }
 
+
+setExp <- 
+function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrite=F,load=T) 
 #setExp creates an experiment-class object based on existing directories
-setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrite=F,load=T) 
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -172,8 +187,8 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 	.experiment.name(experiment) <- expname
 	.experiment.path(experiment) <- path
 	
-	cat('[',toupper(expname),']\n')
-	cat(' Experiment root:',path,'\n')
+	#cat('[',toupper(expname),']\n')
+	#cat(' Experiment root:',path,'\n')
 	
 	#determine directories subjects
 	whichdirs <- file.info(list.files(.experiment.path(experiment),full=T))$isdir
@@ -182,7 +197,7 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 		
 	#set subjectsdirname
 	.experiment.subjectDir(experiment) <- fileList
-	cat('  \\Subjects directory:',fileList,'\n')
+	#cat('  \\Subjects directory:',fileList,'\n')
 	
 	#get subjects data
 	subd <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sep='')
@@ -199,7 +214,7 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 	#get conditions dirname
 	if(length(fileList)!=1) stop('Multiple condition directories found') 
 	.experiment.conditionDir(experiment) <- fileList
-	cat('   \\Condition directory:',fileList,'\n')
+	#cat('   \\Condition directory:',fileList,'\n')
 			
 	#get condition data
 	subc <- paste(sn,sp,.experiment.conditionDir(experiment),sep='')
@@ -274,8 +289,10 @@ setExp <- function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRU
 	
 }
 
-#loadExp loads an experiment and if FAST=F sets all objects to the directory-root of where experiment.Rda was found
-loadExp <- function(path=getwd(),method=c('fast','set','rda'))
+
+loadExp <- 
+function(path=getwd(),method=c('fast','set','rda'))
+#loadExp loads an experiment 
 {
 	
 	method = match.arg(method)
@@ -334,8 +351,11 @@ loadExp <- function(path=getwd(),method=c('fast','set','rda'))
 }
 
 
+
+getFSL <- 
+function(experiment,subject,condition,featpath,subjectname,contrastnum) 
 #get FSL data from a FEAT directory
-getFSL <- function(experiment,subject,condition,featpath,subjectname,contrastnum) {
+{
 	
 	sp=.Platform$file.sep
 	
@@ -360,8 +380,10 @@ getFSL <- function(experiment,subject,condition,featpath,subjectname,contrastnum
 	
 }
 
+
+checkVersion <- 
+function(curversion,version=1,build=0,update=0) 
 #checks the version of the ARF code (check if curversion larger than given version)
-checkVersion <- function(curversion,version=1,build=0,update=0) 
 {
 	allIsWell=FALSE
 		
@@ -382,5 +404,4 @@ checkVersion <- function(curversion,version=1,build=0,update=0)
 	}
 	
 	return(allIsWell)
-	
 }

@@ -1,12 +1,21 @@
 #############################################
-# arf3DS4 S4 ARFDATA FUNCTIONS				#
+# arf3DS4 ARFDATA FUNCTIONS					#
 # Copyright(c) 2009 Wouter D. Weeda			#
 # University of Amsterdam					#
 #############################################
 
+#[CONTAINS]
+#listNoHdr
+#loadRda
+#loadData
+#setAllObjects
+#checkFiles
+#makeWeights
 
+
+listNoHdr <- 
+function(path,pattern='',full=T) 
 #listNoHdr lists files excluding .hdr files 
-listNoHdr <- function(path,pattern='',full=T) 
 {
 	nameslist <-  list.files(path,pattern=pattern,full.names=full)
 	whichhdr <- grep('.hdr',nameslist,value=F,ignore=T)
@@ -18,8 +27,10 @@ listNoHdr <- function(path,pattern='',full=T)
 	
 }
 
+
+loadRda <- 
+function(file)
 #load Rda data into a user-specified object (iso the named object that was saved) 
-loadRda <- function(file) 
 {
 	
 	#load file and save objectname in fn
@@ -35,8 +46,9 @@ loadRda <- function(file)
 	return(object)
 }
 
+loadData <- 
+function(subject,condition,exp=.experiment)
 #with global environment variable loaded, load Data based on subject and condition
-loadData <- function(subject,condition,exp=.experiment)
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -47,8 +59,10 @@ loadData <- function(subject,condition,exp=.experiment)
 	return(invisible(loadRda(filename)))
 }
 
+
+setAllObjects <- 
+function(experiment,overwrite=F)
 #setDataObjects fills the DataObject within each subject/condition directory location of beta's weight's and averages.
-setAllObjects <- function(experiment,overwrite=F)
 {
 	#set separator and allIsWell flag
 	allIsWell=TRUE
@@ -175,9 +189,10 @@ setAllObjects <- function(experiment,overwrite=F)
 
 
 
-## checkFiles checks if the number of files and dimensions match
-checkFiles <- function(arfdat) {
-	
+checkFiles <- 
+function(arfdat) 
+# checkFiles checks if the number of files and dimensions match
+{
 	if(class(arfdat)!='data') stop('Input must be of class \'data\'')
 	
 	#set allIsWell
@@ -219,12 +234,14 @@ checkFiles <- function(arfdat) {
 	
 	#return logical
 	return(invisible(allIsWell))
-	
 }
 
 
+
+makeWeights <- 
+function(experiment) 
 #makeWeights creates uniform weight files for use with t-stat images
-makeWeights <- function(experiment) {
+{
 	
 	#set separator
 	sp <- .Platform$file.sep

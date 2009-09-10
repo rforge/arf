@@ -4,8 +4,23 @@
 # University of Amsterdam					#
 #############################################
 
+#[CONTAINS]
+#newModel
+#updateModelNames
+#saveModel
+#saveModelBin
+#saveModelBinSimple
+#loadOptions
+#loadStart
+#saveStart
+#loadStart
+#loadReg
+#loadModel
+#updateClass
+
+newModel <- 
+function(modelname='defaultmodel',regions=1,subject='',condition='',experiment=.experiment,options=new('options'),overwrite=T) 
 #newModel makes a modeldirectory based on data and experiment information and a modelname
-newModel <- function(modelname='defaultmodel',regions=1,subject='',condition='',experiment=.experiment,options=new('options'),overwrite=T) 
 {
 	#set separator
 	sp <- .Platform$file.sep
@@ -56,8 +71,7 @@ newModel <- function(modelname='defaultmodel',regions=1,subject='',condition='',
 	.model.modelDataFile(model) <- .experiment.modelDataFile(experiment)
 	.model.startFile(model) <- .experiment.startRda(experiment)
 	.model.logFile(model) <- .experiment.logFile(experiment)
-	
-	
+		
 	#set number of regions
 	.model.regions(model) <- regions
 	
@@ -75,8 +89,10 @@ newModel <- function(modelname='defaultmodel',regions=1,subject='',condition='',
 }
 
 
+updateModelNames <- 
+function(path) 
 #update ModelNames in a ModelNamesFile
-updateModelNames <- function(path) {
+{
 		
 	#list all dirs in path (minus the modelnames file)
 	existingfiles <- list.files(path,full=F)
@@ -88,11 +104,14 @@ updateModelNames <- function(path) {
 	
 }
 
+saveModel <- 
+function(arfmodel) save(arfmodel,file=paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.modelFile(arfmodel),sep=''))
 #save the model to the model.Rda
-saveModel <- function(arfmodel) save(arfmodel,file=paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.modelFile(arfmodel),sep=''))
 
+saveModelBin <- 
+function(arfmodel) 
 #save the modelBinary
-saveModelBin <- function(arfmodel) {
+{
 	
 	#set separator
 	sp <- .Platform$file.sep
@@ -112,8 +131,10 @@ saveModelBin <- function(arfmodel) {
 	
 }
 
+saveModelBinSimple <- 
+function(arfmodel) 
 #save the modelBinary
-saveModelBinSimple <- function(arfmodel) {
+{
 	
 	#set separator
 	sp <- .Platform$file.sep
@@ -133,23 +154,27 @@ saveModelBinSimple <- function(arfmodel) {
 	
 }
 
+
+loadOptions <- 
+function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.optionsFile(arfmodel),sep='')))
 #loadOptions loads the options object
-loadOptions <- function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.optionsFile(arfmodel),sep='')))
 
+loadStart <- 
+function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.startFile(arfmodel),sep='')))
 #loadStart loads the Start object
-loadStart <- function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.startFile(arfmodel),sep='')))
 
-
+saveStart <- 
+function(startval,arfmodel) save(startval,file=paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.startFile(arfmodel),sep=''))  	
 #save startingvalues
-saveStart <- function(startval,arfmodel) save(startval,file=paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.startFile(arfmodel),sep=''))  	
 
-
+loadReg <- 
+function(arfmodel) return(loadRda(.model.regfile(arfmodel),sep=''))
 #loadReg
-loadReg <- function(arfmodel) return(loadRda(.model.regfile(arfmodel),sep=''))
 
+loadModel <- 
+function(modelname,subject,condition,experiment=.experiment) 
 #load a model based on subject and conditions
-loadModel <- function(modelname,subject,condition,experiment=.experiment) {
-	
+{
 	sp <- .Platform$file.sep
 	modname = paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.modelDir(experiment),sp,modelname,sp,.experiment.modelRda(experiment),sep='')
 	mod = loadRda(modname)
@@ -157,11 +182,12 @@ loadModel <- function(modelname,subject,condition,experiment=.experiment) {
 	return(mod)
 }
 
+updateClass <- 
+function(object,...) 
 #update a modelclass with elements
-updateClass <- function(object,...) {
+{
 
 	new_object <- new(class(object),object,...)
-	
 	return(new_object)
 	
 }

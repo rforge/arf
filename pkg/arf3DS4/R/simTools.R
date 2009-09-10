@@ -4,7 +4,16 @@
 # University of Amsterdam					#
 #############################################
 
-simBlobs3D <- function(betadir,weightdir,templatedata,model=c('gauss','square','snr0'),regions=1,theta=c(32,32,16,5,5,3,.1,.3,.2,1000),sq_par=c(12,12,8,4,4,3,1000),dims=c(64,64,32),snr=10,trials=10,tslen=101,noisesmooth=0,maxb=c('max','box'),box=2) {
+#[CONTAINS]
+#simBlobs3D
+#checkSNR
+#blobMe
+#simBlobsST
+
+simBlobs3D <- 
+function(betadir,weightdir,templatedata,model=c('gauss','square','snr0'),regions=1,theta=c(32,32,16,5,5,3,.1,.3,.2,1000),sq_par=c(12,12,8,4,4,3,1000),dims=c(64,64,32),snr=10,trials=10,tslen=101,noisesmooth=0,maxb=c('max','box'),box=2) 
+#simulate 3D blobs
+{
 		
 	#set SNR
 	tsnr = snr / sqrt(trials)
@@ -98,7 +107,10 @@ simBlobs3D <- function(betadir,weightdir,templatedata,model=c('gauss','square','
 	
 }
 
-checkSNR <- function(snr,trials=10,tslen=101,smooth=F) {
+checkSNR <- 
+function(snr,trials=10,tslen=101,smooth=F) 
+#check the SNR sims 
+{
 	
 	makeExpDirs('~/Desktop','snrcheck','testsubject','testcondition')
 	exp = suppressWarnings(loadExp('~/Desktop/snrcheck'))
@@ -164,7 +176,9 @@ checkSNR <- function(snr,trials=10,tslen=101,smooth=F) {
 }
 
 
-blobMe <- function(dir,name,sims=10,model='gauss',regions=1,theta=c(32,32,16,5,5,3,.1,.3,.2,1000),snr=10,trials=10,dims=c(64,64,32)) 
+blobMe <- 
+function(dir,name,sims=10,model='gauss',regions=1,theta=c(32,32,16,5,5,3,.1,.3,.2,1000),snr=10,trials=10,dims=c(64,64,32)) 
+#create an experiment for simulation purposes
 {
 
 	sp <- .Platform$file.sep
@@ -208,7 +222,10 @@ blobMe <- function(dir,name,sims=10,model='gauss',regions=1,theta=c(32,32,16,5,5
 }
 
 
-simBlobsST <- function(betadir,weightdir,templatedata,model='gauss',regions=3,theta=c(12,12,24,3,4,3,.1,.1,.3,100,32,32,6,2,2,5,.1,.2,.2,30,12,56,12,5,4,2,.4,.1,.2,100),snr=5,noisesmooth=0,trials=50,tslen=101) {
+simBlobsST <- 
+function(betadir,weightdir,templatedata,model='gauss',regions=3,theta=c(12,12,24,3,4,3,.1,.1,.3,100,32,32,6,2,2,5,.1,.2,.2,30,12,56,12,5,4,2,.4,.1,.2,100),snr=5,noisesmooth=0,trials=50,tslen=101) 
+#create a connectivity dataset for sim purposes
+{
 	
 	require(MASS)
 	

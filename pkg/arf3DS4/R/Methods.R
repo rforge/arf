@@ -38,9 +38,16 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		layout(matrix(1:m^2,m,m,byrow=T))
 		par(mar=c(2,2,1,1),las=1)
 		
-
-		for(i in 1:dimz) image(1:dimx,1:dimy,data[,,i],bty='n',main=paste('z=',i,sep=''),axes=mrs,col=heat.colors(64))
-			
+		cv=data
+		len=length(cv)
+		cols=gray(seq(0,1,1/(len-1)))
+		
+		for(i in 1:dimz) {
+			mn=min(data[,,i])
+			mx=max(data[,,i])
+			cal=cols[which(cv>=mn & cv<=mx)]
+			image(1:dimx,1:dimy,data[,,i],bty='n',main=paste('z=',i,sep=''),axes=mrs,col=cal)
+		}
 		for(i in 1:(m*m-dimz)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F)			
 				
 	}		
@@ -88,9 +95,10 @@ setMethod('show','model',
 						cat(' ',sprintf('[%7.0f]*',object@estimates[10+(10*(reg-1))]),'\n')
 					} else cat(' ',sprintf('[%7.0f] ',object@estimates[10+(10*(reg-1))]),'\n')
 				}
+				cat('\n')
 				if(w) cat('  * Wald tests significant at .05 (uncorrected for number of regions)\n')
 				if(!w) cat('  Wald statistics not calculated\n')
-				
+				cat('\n')
 			}
 			
 		}
@@ -100,14 +108,60 @@ setMethod('show','model',
 setMethod('show','fmri.data',
 		function(object) {
 			
-			cat('[ ',object@filename,' ]\n')
-			cat('type:        ',object@filetype,'\n',sep='')
-			cat('dims:		  ')
-			for(i in 2:(object@dims[1]+1)) cat(object@dims[i],' ')
+			cat('[ ',object@filename,' ]\n\n')
+			cat('<file>\n')
+			cat('size of header: ',object@sizeof_hdr,'\n')			#size of header (must be 348))
+			cat('type of data:   ',object@datatype,'\n')			#storage data type
+			cat('bits_per_pixel: ',object@bitpix,'\n') 			#bits per pixel
+			cat('magic string:   ',object@magic,'\n')
+			cat('voxel offset:   ',object@vox_offset,'\n') 		#offset of data in .nii file
+			cat('data.type:      ',object@data.type,'\n')		#type of data
+			cat('signed:         ',object@data.signed,'\n')		#signed data
 			cat('\n')
-			cat('description: ',object@descrip,'\n',sep='')
+			cat('<fmri data>\n')
+			cat('description:    ',object@descrip,'\n') 
+			#cat('aux file:       ',object@aux_file,'\n') 
+			cat('intent code:    ',object@intent_code,'\n') 
+			#cat('intent p1:      ',object@intent_p1,'\n') 
+			#cat('intent p2:      ',object@intent_p2,'\n') 
+			#cat('intent p3:      ',object@intent_p3,'\n') 
+			#cat('intentname:     ',object@intent_name,'\n')		#meaning of data
+			#cat('data type:      ',object@data_type,'\n')		
+			#cat('db name:        ',object@db_name,'\n')			
 			cat('\n')
-			
+			cat('<dimensions>\n')
+			#cat('dim_info:       ',object@dim_info,'\n')
+			cat('xyzt units:     ',object@xyzt_units,'\n') 
+			cat('pixel dims:     ',object@pixdim,'\n') 			#voxel dimensions
+			cat('dimensions:     ',object@dims,'\n')
+			cat('q form code:    ',object@qform_code,'\n') 
+			cat('s form code:    ',object@sform_code ,'\n')
+			#cat('quaternion b:   ',object@quatern_b,'\n') 
+			#cat('quaternion c:   ',object@quatern_c,'\n')
+			#cat('quaternion d:   ',object@quatern_d,'\n') 
+			#cat('q offset x:     ',object@qoffset_x,'\n') 
+			#cat('q offset y:     ',object@qoffset_y,'\n') 
+			#cat('q offset z:     ',object@qoffset_z,'\n')
+			#cat('s row x:        ',object@srow_x,'\n') 
+			#cat('s row y:        ',object@srow_y,'\n')
+			#cat('s row z:        ',object@srow_z,'\n')
+			#cat('max display:    ',object@cal_max,'\n') 
+			#cat('min display:    ',object@cal_min,'\n') 
+			#cat('\n')
+			#cat('** scanner info **\n')
+			#cat('slice start:    ',object@slice_start,'\n') 	
+			#cat('slice duration: ',object@slice_duration,'\n') 
+			#cat('slice end:      ',object@slice_end ,'\n')
+			#cat('slice timing:   ',object@slice_code,'\n') 
+			#cat('time offset:    ',object@toffset,'\n') 
+			#cat('scale slope:    ',object@scl_slope,'\n')
+			#cat('scale offset:   ',object@scl_inter,'\n') 
+			#cat('extents:        ',object@extents,'\n')			
+			#cat('sessior_error:  ',object@session_error,'\n')
+			#cat('regular:        ',object@regular,'\n')
+			#cat('gl max:         ',object@glmax,'\n') 
+			#cat('gl min:         ',object@glmin,'\n') 
+			cat('\n')
 		}
 )
 

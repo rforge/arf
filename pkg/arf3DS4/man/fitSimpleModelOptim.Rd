@@ -1,0 +1,197 @@
+\name{fitSimpleModelOptim}
+\Rdversion{1.1}
+\alias{fitSimpleModelOptim}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{
+%%  ~~function to do ... ~~
+}
+\description{
+%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+}
+\usage{
+fitSimpleModelOptim(arfmodel, options = loadOptions(arfmodel), dat = readData(.model.avgdatfile(arfmodel)), weights = readData(.model.avgWfile(arfmodel)), printlevel = 0, try.silen = T)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{arfmodel}{
+%%     ~~Describe \code{arfmodel} here~~
+}
+  \item{options}{
+%%     ~~Describe \code{options} here~~
+}
+  \item{dat}{
+%%     ~~Describe \code{dat} here~~
+}
+  \item{weights}{
+%%     ~~Describe \code{weights} here~~
+}
+  \item{printlevel}{
+%%     ~~Describe \code{printlevel} here~~
+}
+  \item{try.silen}{
+%%     ~~Describe \code{try.silen} here~~
+}
+}
+\details{
+%%  ~~ If necessary, more details than the description above ~~
+}
+\value{
+%%  ~Describe the value returned
+%%  If it is a LIST, use
+%%  \item{comp1 }{Description of 'comp1'}
+%%  \item{comp2 }{Description of 'comp2'}
+%% ...
+}
+\references{
+%% ~put references to the literature/web site here ~
+}
+\author{
+%%  ~~who you are~~
+}
+\note{
+%%  ~~further notes~~
+}
+
+%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\seealso{
+%% ~~objects to See Also as \code{\link{help}}, ~~~
+}
+\examples{
+##---- Should be DIRECTLY executable !! ----
+##-- ==>  Define data, use random,
+##--	or do  help(data=index)  for the standard data sets.
+
+## The function is currently defined as
+function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) {
+	
+	#set separator
+	sp <- .Platform$file.sep
+	
+	#set routine to optim
+	.options.min.routine(options) <- 'optim'
+	.model.modeltype(arfmodel) <- 'simple'
+	.model.params(arfmodel) <- 5
+	
+	#start_time
+	st_time <- Sys.time()
+	
+	#check if averages exist
+	if(!file.exists(.model.avgdatfile(arfmodel))) stop('Averages do not exist, please run createAverages')
+	if(!file.exists(.model.avgWfile(arfmodel))) stop('Averages do not exist, please run createAverages')
+	
+	#clear the warnings and deriv + residualfilres
+	.model.warnings(arfmodel) <- character(0)
+	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
+	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
+	
+	.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Simple Gaussmodel was fitted.')
+	
+	#set analyticalgrad options
+	if(.options.min.analyticalgrad(options)) {
+		gradfunc=gradient.simple
+		angrad=FALSE
+	} else {
+		gradfunc=NULL
+		angrad=FALSE
+	}
+	
+	#load startingvalues
+	.model.startval(arfmodel) <- loadStart(arfmodel)
+		
+	#set boundaries in L-BFGS-B mode
+	.options.opt.upper(options)[4:6] = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
+	if(length(.options.opt.lower(options))==1) lowbound=-Inf else lowbound=rep(.options.opt.lower(options)[-c(5:9)],.model.regions(arfmodel))
+	if(length(.options.opt.upper(options))==1) upbound=Inf else upbound=rep(.options.opt.upper(options)[-c(5:9)],.model.regions(arfmodel))
+			
+	#runoptim	
+	optim.output <- try(suppressWarnings(optim(
+							.model.startval(arfmodel),
+							ssq.simple,
+							gradfunc,
+							lower=lowbound,
+							upper=upbound,
+							datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
+							weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
+							brain=.model.mask(arfmodel),
+							np=.model.regions(arfmodel)*.model.params(arfmodel),
+							dimx=.fmri.data.dims(dat)[2],
+							dimy=.fmri.data.dims(dat)[3],
+							dimz=.fmri.data.dims(dat)[4],
+							ss_data=.model.ss(arfmodel),
+							analyticalgrad=angrad,
+							method=.options.opt.method(options),
+							control=list(trace=printlevel,maxit=.options.min.iterlim(options)),
+							hessian=F
+					)),silen=try.silen)
+	
+	#end_time
+	en_time <- Sys.time()
+	
+	# check for internal errors and set relevant arf model values
+	if(is.null(attr(optim.output,'class'))) {
+		if(optim.output$convergence==0) .model.convergence(arfmodel) <- paste('Optim converged in ',optim.output$counts[1],' iterations.',sep='')
+		if(optim.output$convergence==1) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.'
+		if(optim.output$convergence==10) .model.convergence(arfmodel) <- 'Degeneracy of the Nelder-Mead Simplex'
+		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',optim.output$message,sep='')
+		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',optim.output$message,sep='')
+		
+		if(optim.output$convergence <= 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
+		
+		#set model essentials
+		.model.estimates(arfmodel) <- optim.output$par
+		.model.iterates(arfmodel) <- optim.output$counts[1]
+		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
+		
+		if(.model.valid(arfmodel)) {
+		
+			
+			#save the ModelBinary
+			arfmodel <- saveModelBinSimple(arfmodel)
+			
+			#set model objects
+			.model.minimum(arfmodel) <- optim.output$value
+			.model.estimates(arfmodel) <- rep(0,.model.regions(arfmodel)*10)
+			
+			for(i in 1:.model.regions(arfmodel)) {
+				.model.estimates(arfmodel)[1+(10*(i-1))] <- optim.output$par[1+(5*(i-1))]
+				.model.estimates(arfmodel)[2+(10*(i-1))] <- optim.output$par[2+(5*(i-1))]
+				.model.estimates(arfmodel)[3+(10*(i-1))] <- optim.output$par[3+(5*(i-1))]
+				.model.estimates(arfmodel)[4+(10*(i-1))] <- optim.output$par[4+(5*(i-1))]
+				.model.estimates(arfmodel)[5+(10*(i-1))] <- optim.output$par[4+(5*(i-1))]
+				.model.estimates(arfmodel)[6+(10*(i-1))] <- optim.output$par[4+(5*(i-1))]
+				.model.estimates(arfmodel)[7+(10*(i-1))] <- 0
+				.model.estimates(arfmodel)[8+(10*(i-1))] <- 0
+				.model.estimates(arfmodel)[9+(10*(i-1))] <- 0
+				.model.estimates(arfmodel)[10+(10*(i-1))] <- optim.output$par[5+(5*(i-1))]
+			}
+					
+			if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T)
+		
+			if(.model.valid(arfmodel)) {
+				#caluclate fits
+				arfmodel = BIC(arfmodel,options=options)
+				arfmodel = RMSEA(arfmodel,options=options)
+			}
+		}
+		
+	} else {
+		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),optim.output)
+		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
+		.model.valid(arfmodel) <- FALSE
+	}
+	
+	if(!.model.valid(arfmodel)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),.model.convergence(arfmodel)) 
+	
+	#save the modelInfo
+	saveModel(arfmodel)
+	
+	#return arf model object	
+	return(invisible(arfmodel))
+  }
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{ ~kwd1 }
+\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
