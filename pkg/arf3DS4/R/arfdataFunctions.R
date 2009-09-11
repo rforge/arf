@@ -37,7 +37,7 @@ function(file)
 	if(file.exists(file)) fn <- load(file) 
 		else {
 			fn <- ''
-			warning('loadRda could not load file.')
+			warning(paste('loadRda could not load file',file,sep=''))
 		}
 	
 	#set object to be the eval of the loaded object

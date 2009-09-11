@@ -1,4 +1,4 @@
-#############################################
+	#############################################
 # arf3DS4 S4 FITMODEL FUNCTIONS				#
 # Copyright(c) 2009 Wouter D. Weeda			#
 # University of Amsterdam					#
@@ -21,7 +21,9 @@ function(arfmodel,type=c('gauss','simple'),options=loadOptions(arfmodel),dat=rea
 		if(type=='gauss') arfmodel <- determineStartRect(arfmodel)
 		if(type=='simple') arfmodel <- determineStartRectSimple(arfmodel) 	
 	}
-		
+	
+	if(.options.start.method(options)=='load') .model.startval(arfmodel) <- loadStart(arfmodel)
+	
 	if(.options.min.routine(options)=='nlm') {
 		if(type=='simple')	arfmodel = fitSimpleModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 		if(type=='gauss')	arfmodel = fitModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
@@ -45,7 +47,6 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	sp <- .Platform$file.sep
 	
 	#set modelobjects
-	.model.valid(arfmodel) <- TRUE
 	.options.min.routine(options) <- 'nlm'
 	.model.modeltype(arfmodel) <- 'gauss'
 	.model.params(arfmodel) <- 10
@@ -62,8 +63,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
 	
-	#load startingvalues
-	.model.startval(arfmodel) <- loadStart(arfmodel)
+	#check startingvalues
 	arfmodel <- validStart(arfmodel)
 	
 	#final check before fit
@@ -142,7 +142,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 					dim(hessian) = c(p,p)
 					.model.hessian(arfmodel) <- hessian 	
 				} else {
-					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Could not approximate Hessian with analytical gradient.')
+					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'[min] Could not approximate Hessian with analytical gradient.')
 					.model.valid(arfmodel) <- FALSE
 					
 				}
@@ -152,12 +152,12 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			arfmodel = BIC(arfmodel,options=options)
 			arfmodel = RMSEA(arfmodel,options=options)
 			
-		}
+		} else .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] nlm did not converge.',sep=''))
 		
 		
 	} else {
-		.model.convergence(arfmodel) <- 'Internal error (probably Infinite gradient), no convergence.'
-		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),nlm.output)
+		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] nlm internal error: ',nlm.output,sep=''))
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}
@@ -181,7 +181,6 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	sp <- .Platform$file.sep
 	
 	#set modelobjects
-	.model.valid(arfmodel) <- TRUE
 	.options.min.routine(options) <- 'optim'
 	.model.modeltype(arfmodel) <- 'gauss'
 	.model.params(arfmodel) <- 10
@@ -207,15 +206,14 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		angrad=FALSE
 	}
 	
-
-	#load startingvalues
-	.model.startval(arfmodel) <- loadStart(arfmodel)
-	
 	#set boundaries in L-BFGS-B mode
 	.options.opt.upper(options)[4:6] = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])	
 	if(length(.options.opt.lower(options))==1) lowbound=-Inf else lowbound=rep(.options.opt.lower(options),.model.regions(arfmodel))
 	if(length(.options.opt.upper(options))==1) upbound=Inf else upbound=rep(.options.opt.upper(options),.model.regions(arfmodel))
 	
+	#check startingvalues
+	arfmodel <- validStart(arfmodel)
+		
 	#final check before fit
 	if(!.model.valid(arfmodel)) {
 		saveModel(arfmodel)	
@@ -294,7 +292,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 					dim(hessian) = c(p,p)
 					.model.hessian(arfmodel) <- hessian 	
 				} else {
-					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Could not approximate Hessian with analytical gradient.')
+					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),' [min] could not approximate Hessian with analytical gradient.')
 					.model.valid(arfmodel) <- FALSE
 					
 				}
@@ -304,11 +302,12 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			arfmodel = BIC(arfmodel,options=options)
 			arfmodel = RMSEA(arfmodel,options=options)
 			
-		}
+		} else .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim did not converge.',sep=''))
+			
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
-		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),optim.output)
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim internal error: ',optim.output,sep=''))
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}
@@ -358,14 +357,20 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		angrad=FALSE
 	}
 	
-	#load startingvalues
-	.model.startval(arfmodel) <- loadStart(arfmodel)
-		
 	#set boundaries in L-BFGS-B mode
 	.options.opt.upper(options)[4:6] = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
 	if(length(.options.opt.lower(options))==1) lowbound=-Inf else lowbound=rep(.options.opt.lower(options)[-c(5:9)],.model.regions(arfmodel))
 	if(length(.options.opt.upper(options))==1) upbound=Inf else upbound=rep(.options.opt.upper(options)[-c(5:9)],.model.regions(arfmodel))
-			
+	
+	#check startingvalues
+	arfmodel <- validStart(arfmodel)
+	
+	#final check before fit
+	if(!.model.valid(arfmodel)) {
+		saveModel(arfmodel)	
+		return(arfmodel)
+	}
+	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 							.model.startval(arfmodel),
@@ -435,11 +440,11 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 				arfmodel = BIC(arfmodel,options=options)
 				arfmodel = RMSEA(arfmodel,options=options)
 			}
-		}
+		} else .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim did not converge.',sep=''))
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
-		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),optim.output)
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim internal error: ',optim.output,sep=''))
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}
@@ -459,8 +464,10 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 # fitModelOptim calls the minimization routine (OPTIM)
 {
 
+	#set separator
 	sp <- .Platform$file.sep
 	
+	#set routine to nlm
 	.options.min.routine(options) <- 'nlm'
 	.model.modeltype(arfmodel) <- 'simple'
 	.model.params(arfmodel) <- 5
@@ -478,8 +485,14 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	if(file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) file.remove(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))
 	.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Simple Gaussmodel was fitted.')
 	
-	#load startingvalues
-	.model.startval(arfmodel) <- loadStart(arfmodel)
+	#check startingvalues
+	arfmodel <- validStart(arfmodel)
+	
+	#final check before fit
+	if(!.model.valid(arfmodel)) {
+		saveModel(arfmodel)	
+		return(arfmodel)
+	}
 	
 	#call NLM (within a try-loop)
 	nlm.output <- try(suppressWarnings(nlm(
@@ -546,10 +559,11 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 				arfmodel = BIC(arfmodel,options=options)
 				arfmodel = RMSEA(arfmodel,options=options)
 			}
-		}
+		}  else .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] nlm did not converge.',sep=''))
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] nlm internal error: ',nlm.output,sep=''))
 		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),optim.output)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE

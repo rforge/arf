@@ -318,7 +318,7 @@ function(path=getwd(),method=c('fast','set','rda'))
 	
 	#set filename and load experiment
 	filename <- list.files(path,'.Rda',full=T)
-	if(length(filename)!=1) stop('No experiment rda file found or multiple rda files found.')
+	if(length(filename)!=1) stop(paste('No experiment rda file found or multiple rda files found in ',path,sep=''))
 	.experiment <- experiment <- loadRda(filename)
 	
 	if(!fast) {

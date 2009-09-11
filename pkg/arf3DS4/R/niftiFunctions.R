@@ -26,7 +26,7 @@ function(filename)
 	if(length(grep(sp,filename))==0) filename <- paste(getwd(),sp,filename,sep='')
 	
 	#check if file exists
-	if(!file.exists(filename)) stop(paste('File',filename,'does noet exist!'))
+	if(!file.exists(filename)) stop(paste('[getFileInfo] File',filename,'does noet exist!'))
 	
 	#create new instance of class fileinfo
 	fileinf=new('nifti.fileinfo')

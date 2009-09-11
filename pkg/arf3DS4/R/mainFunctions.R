@@ -15,6 +15,9 @@ function(arfmodel,type=c('gauss','simple'),fast=T,options=loadOptions(arfmodel),
 	#check if screen output is preferred
 	if(!is.na(match('screen',.options.output.mode(options)))) pr=TRUE
 	
+	.model.warnings(arfmodel) <- character(0)
+	.model.convergence(arfmodel) <- character(0)
+	
 	type = match.arg(type)
 			
 	if(pr) {

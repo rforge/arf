@@ -139,7 +139,7 @@ function(arfdat,experiment=.experiment)
 	
 	if(.nifti.header.gzipped(headinf)==T) filename <- paste(filename,'.gz',sep='') 
 	headinf <- newFile(filename,headinf)
-	.nifti.header.descrip(headinf) <- 'ARF average data'
+	.nifti.header.descrip(headinf) <- 'Average data image (ARF)'
 	.data.avgdatfile(arfdat) <- filename
 	writeData(headinf,avgdat)
 	
@@ -151,7 +151,7 @@ function(arfdat,experiment=.experiment)
 	
 	if(.nifti.header.gzipped(headinf)==T) filename <- paste(filename,'.gz',sep='') 
 	headinf <- newFile(filename,headinf)
-	.nifti.header.descrip(headinf) <- 'ARF average weights'
+	.nifti.header.descrip(headinf) <- 'Average weights image (ARF)'
 	.data.avgWfile(arfdat) <- filename	
 	writeData(headinf,avgweight)
 	
@@ -160,7 +160,7 @@ function(arfdat,experiment=.experiment)
 	
 	if(.nifti.header.gzipped(headinf)==T) filename <- paste(filename,'.gz',sep='') 
 	headinf <- newFile(filename,headinf)
-	.nifti.header.descrip(headinf) <- 'ARF average t-stat'
+	.nifti.header.descrip(headinf) <- 'Average t-statistics image (ARF)'
 	.data.avgtstatFile(arfdat) <- filename
 	avgtstat <- avgdat/sqrt(avgweight)
 	writeData(headinf,avgtstat)
@@ -221,15 +221,18 @@ function(experiment=.experiment)
 
 
 determineStartRect <- 
-function(arfmodel,startvec=loadStart(arfmodel),options=loadOptions(arfmodel)) 
+function(arfmodel,options=loadOptions(arfmodel)) 
 # determineStartRect calculates starting values for regions (rectangular mode)
 {
+	
+	.model.modeltype(arfmodel) <- 'gauss'
+	.model.params(arfmodel) <- 10
 	
 	#load in fmriData
 	fmridata <- readData(.model.avgtstatFile(arfmodel))
 	
 	#set theta to the default values (for all regions)
-	theta <- startvec
+	theta <- rep(.options.start.vector(options),.model.regions(arfmodel))
 	
 	#set dimensions and read in data
 	dimx <- .fmri.data.dims(fmridata)[2]
@@ -239,6 +242,8 @@ function(arfmodel,startvec=loadStart(arfmodel),options=loadOptions(arfmodel))
 	
 	mindim=c(1,1,1)
 	maxdim=c(dimx,dimy,dimz)
+	min_amp = .options.start.vector(options)[10]*-1
+	max_amp = .options.start.vector(options)[10]
 	
 	#set dims of the data
 	dim(data) <- c(dimx,dimy,dimz)
@@ -253,13 +258,14 @@ function(arfmodel,startvec=loadStart(arfmodel),options=loadOptions(arfmodel))
 	for(reg in 1:.model.regions(arfmodel)) {
 		
 		#retrieve location in x,y,z
-		m <- location[which.max(data),]
+		m <- location[which.max(abs(data)),]
+		if(data[m$x,m$y,m$z]<0) theta[10+(10*(reg-1))]=min_amp else theta[10+(10*(reg-1))]=max_amp
 		
 		#set maximum locations
 		theta[1+(10*(reg-1))] <- m$x
 		theta[2+(10*(reg-1))] <- m$y
 		theta[3+(10*(reg-1))] <- m$z
-		
+				
 		#caluclatefalloff
 		xf <- fallOff(data[,m$y,m$z],.options.start.maxfac(options))
 		yf <- fallOff(data[m$x,,m$z],.options.start.maxfac(options))
@@ -288,24 +294,8 @@ function(arfmodel,startvec=loadStart(arfmodel),options=loadOptions(arfmodel))
 		if(length(rmy)>0 & length(rmy)<length(yvec)) yvec <- yvec[-rmy]
 		if(length(rmz)>0 & length(rmz)<length(zvec)) zvec <- zvec[-rmz]	
 		
-		data[xvec,yvec,zvec]=min(data)
-		
-		#check if box touches the edge of the brain
-		if(isEdge(mask,xvec,yvec,zvec)) { 
-			#set aximum locations to center
-			theta[1+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[2]/2)
-			theta[2+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[3]/2)
-			theta[3+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[4]/2)
-		}
+		data[xvec,yvec,zvec]=0
 
-		
-		#check determinant of sigma
-		detsig = try(detSigmaDeriv(theta),silen=T)
-		if(is.null(attr(detsig,'class'))) {
-			if(detsig$value<((dimx*dimy*dimz)/1e+4)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('starting values of region',reg,'seem very small (determinant of sigma is small)'))
-		} else {
-			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('starting values of region',reg,'return invalid deterimant of sigma'))
-		}
 	}
 	
 	
@@ -331,6 +321,9 @@ function(arfmodel,options=loadOptions(arfmodel))
 # determineStartRect calculates starting values for regions (rectangular mode)
 {
 	
+	.model.modeltype(arfmodel) <- 'simple'
+	.model.params(arfmodel) <- 5
+	
 	#load in fmriData
 	fmridata <- readData(.model.avgtstatFile(arfmodel))
 	
@@ -346,6 +339,8 @@ function(arfmodel,options=loadOptions(arfmodel))
 	
 	mindim=c(1,1,1)
 	maxdim=c(dimx,dimy,dimz)
+	min_amp = .options.start.vector(options)[10]*-1
+	max_amp = .options.start.vector(options)[10]
 	
 	#set dims of the data
 	dim(data) <- c(dimx,dimy,dimz)
@@ -358,9 +353,10 @@ function(arfmodel,options=loadOptions(arfmodel))
 	
 	for(reg in 1:.model.regions(arfmodel)) {
 		
-		#retriev location in x,y,z
-		m <- location[which.max(data),]
-		
+		#retrieve location in x,y,z
+		m <- location[which.max(abs(data)),]
+		if(data[m$x,m$y,m$z]<0) theta[10+(10*(reg-1))]=min_amp else theta[10+(10*(reg-1))]=max_amp
+				
 		#set maximum locations
 		theta[1+(10*(reg-1))] <- m$x
 		theta[2+(10*(reg-1))] <- m$y
@@ -394,31 +390,14 @@ function(arfmodel,options=loadOptions(arfmodel))
 		if(length(rmy)>0 & length(rmy)<length(yvec)) yvec <- yvec[-rmy]
 		if(length(rmz)>0 & length(rmz)<length(zvec)) zvec <- zvec[-rmz]	
 				
-		data[xvec,yvec,zvec]==min(data)
-		
-		#check if box touches the edge of the brain
-		if(isEdge(mask,xvec,yvec,zvec)) { 
-			#set aximum locations to center
-			theta[1+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[2]/2)
-			theta[2+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[3]/2)
-			theta[3+(10*(reg-1))] <- round(.fmri.data.dims(fmridata)[4]/2)
-		}
-		
-		#check determinant of sigma
-		detsig = try(detSigmaDeriv(theta),silen=T)
-		if(is.null(attr(detsig,'class'))) {
-			if(detsig$value<((dimx*dimy*dimz)/1e+4)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('starting values of region',reg,'seem very small (determinant of sigma is small)'))
-		} else {
-			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('starting values of region',reg,'return invalid deterimant of sigma'))
-		}
-		
+		data[xvec,yvec,zvec]=0
+				
 		newstart[1+(5*(reg-1))]=theta[1+(10*(reg-1))]
 		newstart[2+(5*(reg-1))]=theta[2+(10*(reg-1))]
 		newstart[3+(5*(reg-1))]=theta[3+(10*(reg-1))]
 		newstart[4+(5*(reg-1))]=mean(theta[4+(10*(reg-1))],theta[5+(10*(reg-1))],theta[6+(10*(reg-1))])
 		newstart[5+(5*(reg-1))]=theta[10+(10*(reg-1))]
-		
-		
+			
 	}
 	
 	
@@ -443,7 +422,6 @@ isEdge <-
 function(mask,xvec,yvec,zvec)
 #check if a cube-region touches non-brain voxels
 {
-	
 	if(sum(as.vector(mask[xvec,yvec,zvec]))==length(as.vector(mask[xvec,yvec,zvec]))) return(FALSE) else return(TRUE)
 		
 }
@@ -526,36 +504,58 @@ validStart <-
 function(arfmodel) 
 #check if startvalues are valid
 {
+	
 	theta <- .model.startval(arfmodel)
 	mess = character(0)
-	
+	onlywarn=TRUE
+		
 	dat=readData(.model.avgtstatFile(arfmodel))
-	
 	mask = .model.mask(arfmodel)
 	dim(mask)=c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
 	
-	for(reg in 1:.model.regions(arfmodel)) {
-		st_loc = theta[(1:3)+(10*(reg-1))]
-		st_sd = theta[(4:6)+(10*(reg-1))]
-		st_rho = theta[(7:9)+(10*(reg-1))]
-		st_amp = theta[(10)+(10*(reg-1))]
+	if(length(.model.startval(arfmodel))!=(.model.regions(arfmodel)*.model.params(arfmodel))) {
+		mess=c(mess,'[startval] Vector of startingvalues are not a multiple of regions*parameters')
+		onlywarn=FALSE
+	} else {
+		for(reg in 1:.model.regions(arfmodel)) {
+			st_loc = theta[(1:3)+(.model.params(arfmodel)*(reg-1))]
+			if(.model.modeltype(arfmodel)=='gauss') st_sd = theta[(4:6)+(.model.params(arfmodel)*(reg-1))]  else st_sd=rep(theta[(4)+(.model.params(arfmodel)*(reg-1))],3)
+			if(.model.modeltype(arfmodel)=='gauss') st_rho = theta[(7:9)+(.model.params(arfmodel)*(reg-1))] else st_rho=rep(0,3)
+			if(.model.modeltype(arfmodel)=='gauss') st_amp = theta[(10)+(.model.params(arfmodel)*(reg-1))] else st_amp=theta[(5)+(.model.params(arfmodel)*(reg-1))]
+			
+			sigma = matrix(c(st_sd[1]^2,st_sd[1]*st_sd[2]*st_rho[1],st_sd[1]*st_sd[3]*st_rho[2],st_sd[1]*st_sd[2]*st_rho[1],st_sd[2]^2,st_sd[2]*st_sd[3]*st_rho[3],st_sd[1]*st_sd[3]*st_rho[2],st_sd[2]*st_sd[3]*st_rho[3],st_sd[3]^2),3,3)
+			det_sig=det(sigma)
+			
+			if(!is.na(det_sig) & !is.nan(det_sig) & det_sig!=Inf & det_sig!=-Inf) {
+				if(det_sig<1 & det_sig>0) mess = c(mess,paste('[startval] Region ',reg,' has a small volume (',round(det_sig,2),').',sep=''))
+				if(det_sig<=0) mess = c(mess,paste('[startval] Region ',reg,' has a zero volume (',round(det_sig,2),').',sep=''))
+				
+			} else {
+				mess = c(mess,paste('[startval] Region ',reg,' returns NA/NaN/Inf/-Inf as determinant.',sep=''))
+				onlywarn=FALSE
+			}
+			
+			if(st_loc[1]<1 | st_loc[2]<1 | st_loc[3]<1) {
+				mess=c(mess,paste('[startval] Region ',reg,' has a location smaller than 1',sep=''))
+				onlywarn=FALSE
+			} else if(isEdge(mask,st_loc[1],st_loc[2],st_loc[3])) mess=c(mess,paste('[startval] Region ',reg,' has a location outside the brain',sep='')) 
+			
+			if(st_amp==0) {
+				mess=c(mess,paste('[startval] Region ',reg,' has an amplitude of zero.'))
+				onlywarn=FALSE
+			}
+		}
 		
-		sigma = matrix(c(st_sd[1]^2,st_sd[1]*st_sd[2]*st_rho[1],st_sd[1]*st_sd[3]*st_rho[2],st_sd[1]*st_sd[2]*st_rho[1],st_sd[2]^2,st_sd[2]*st_sd[3]*st_rho[3],st_sd[1]*st_sd[3]*st_rho[2],st_sd[2]*st_sd[3]*st_rho[3],st_sd[3]^2),3,3)
-		det_sig=det(sigma)
-		
-		if(!is.na(det_sig) & !is.nan(det_sig) & det_sig!=Inf & det_sig!=-Inf) {
-			if(det_sig<1) mess = c(mess,paste('reg',reg,'small determinant',sep=''))
-		} else mess = c(mess,paste('reg',reg,'NA/NaN/Inf/-Inf determinant',sep=''))
-		
-		if(isEdge(.model.mask(arfmodel),st_loc[1],st_loc[2],st_loc[3])) mess=c(mess,paste('reg',reg,'non-brain start_location')) 
-		
-		if(st_amp<0) ess=c(mess,paste('reg',reg,'amplitude negative or zero')) 
 	}
 	
 	if(length(mess)>0) {
 		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),mess)
-		.model.valid(arfmodel) <- FALSE
+		if(!onlywarn) .model.valid(arfmodel) <- FALSE else .model.valid(arfmodel) <- TRUE
+	} else {
+		.model.valid(arfmodel) <- TRUE
 	}
+	
+	if(!.model.valid(arfmodel)) .model.convergence(arfmodel) <- 'Starting values are not valid. Minimization routine not started.'
 	
 	return(invisible(arfmodel))
 	

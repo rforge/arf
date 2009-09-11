@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=4,
-		update=11,
-		svnrev=66
+		update=12,
+		svnrev=67
 	)
 )
 
@@ -192,14 +192,14 @@ setClass(
 		nlm.gradtol=1e-6,		#NLM gradient tolerance
 		nlm.steptol=1e-3,		#NLM stepsize tolerance
 		opt.method='L-BFGS-B',	#optim method
-		opt.lower=c(rep(0,3),rep(1,3),rep(-.95,3),0),	#L-BFGS-U lower bound
+		opt.lower=c(rep(0,3),rep(1,3),rep(-.95,3),-Inf),	#L-BFGS-U lower bound
 		opt.upper=c(rep(256,6),rep(.95,3),Inf),			#L-BFGS-U upper bound
 		min.analyticalgrad=T, 	#use analytical gradient
 		min.iterlim=5000,		#iteration limit
 		min.routine='optim',		#which routine
-		start.method='rect',	
+		start.method='load',	
 		start.maxfac=1,
-		start.vector=c(0,0,0,0,0,0,.1,.2,-.1,100),
+		start.vector=c(0,0,0,0,0,0,.05,.05,.05,10),
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,0,0,-.95,-.95,-.95,-1e+64,0,0,0,0,0,0,.95,.95,.95,1e+64),
 		sw.type='diag',
@@ -419,6 +419,8 @@ setClass(
 			valid=FALSE,
 			proctime=matrix(0,1,2,dimnames=list(c(''),c('mintime','swtime'))),
 			fit=matrix(0,1,2,dimnames=list(c(''),c('BIC','RMSEA'))),
+			modeltype='gauss',
+			params=10,
 			wald=new('wald')
 	)
 )
