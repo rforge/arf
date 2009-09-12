@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=4,
-		update=12,
-		svnrev=67
+		update=13,
+		svnrev=68
 	)
 )
 

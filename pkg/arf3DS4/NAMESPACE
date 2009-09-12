@@ -14,7 +14,7 @@ export(
 	arfToMNI,
 	fitModelNlm,
 	fitModelOptim,
-	fitSimpelModelNlm,
+	fitSimpleModelNlm,
 	fitSimpleModelOptim,
 	fitModel,
 	processModel,
