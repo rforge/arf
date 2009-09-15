@@ -36,7 +36,7 @@ function(file)
 	#load file and save objectname in fn
 	if(file.exists(file)) fn <- load(file) 
 		else {
-			fn <- ''
+			fn <- character(0)
 			warning(paste('loadRda could not load file',file,sep=''))
 		}
 	
@@ -74,6 +74,7 @@ function(experiment,overwrite=F)
 	
 	#search within subjects and conditions directories
 	for(subs in 1:.experiment.subject.num(experiment)) {
+	
 		for(conds in 1:.experiment.condition.num(experiment)) {
 			
 			#locate main path of datafiles structure
@@ -100,15 +101,11 @@ function(experiment,overwrite=F)
 			#set registration path and check if registration dirs are available
 			.data.regDir(data) <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sep='') 
 			.data.regRda(data) <- .experiment.regRda(experiment)
-			regIsWell <- checkRegs(data,overwrite=overwrite)
-			if(!regIsWell) warning('Registration files not yet linked. Run createRegs.')
 			
 			#set functional path and check if available
 			.data.funcDir(data) <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.funcDir(experiment),sep='')
 			.data.funcRda(data) <- .experiment.funcRda(experiment)
-			 funcIsWell <- checkFuncs(data,overwrite=overwrite)
-			if(!funcIsWell) warning('Functional files not yet linked. Run createFuncs.')
-						
+			
 			#betafiles
 			betafiles <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.betaDir(experiment),sep=''),full=T)
 			.data.betafiles(data) <- betafiles
@@ -182,6 +179,7 @@ function(experiment,overwrite=F)
 				}
 			}
 		}
+		
 	}
 	
 	return(invisible(allIsWell))

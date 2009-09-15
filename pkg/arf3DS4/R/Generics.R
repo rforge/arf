@@ -1044,6 +1044,17 @@ standMethod <- function(x, value) {x@high2stand<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'registration'
+funcname <-'.registration.examp2stand'
+standGen <- function(object) standardGeneric('.registration.examp2stand')
+standMethod <- function(object) object@examp2stand
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.registration.examp2stand<-'
+standGen <- function(x, value) standardGeneric('.registration.examp2stand<-')
+standMethod <- function(x, value) {x@examp2stand<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'registration'
 funcname <-'.registration.example'
 standGen <- function(object) standardGeneric('.registration.example')
 standMethod <- function(object) object@example
@@ -2463,6 +2474,17 @@ standMethod <- function(x, value) {x@fullpath<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'functional'
+funcname <-'.functional.functionaldata'
+standGen <- function(object) standardGeneric('.functional.functionaldata')
+standMethod <- function(object) object@functionaldata
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.functional.functionaldata<-'
+standGen <- function(x, value) standardGeneric('.functional.functionaldata<-')
+standMethod <- function(x, value) {x@functionaldata<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'functional'
 funcname <-'.functional.filename'
 standGen <- function(object) standardGeneric('.functional.filename')
 standMethod <- function(object) object@filename
@@ -2474,25 +2496,25 @@ standMethod <- function(x, value) {x@filename<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'functional'
-funcname <-'.functional.linkedfile'
-standGen <- function(object) standardGeneric('.functional.linkedfile')
-standMethod <- function(object) object@linkedfile
+funcname <-'.functional.linkedfiles'
+standGen <- function(object) standardGeneric('.functional.linkedfiles')
+standMethod <- function(object) object@linkedfiles
 setGeneric(funcname,standGen,package='arf3DS4')
 setMethod(funcname,classname,standMethod)
-slotreplace <-'.functional.linkedfile<-'
-standGen <- function(x, value) standardGeneric('.functional.linkedfile<-')
-standMethod <- function(x, value) {x@linkedfile<- value;x}
+slotreplace <-'.functional.linkedfiles<-'
+standGen <- function(x, value) standardGeneric('.functional.linkedfiles<-')
+standMethod <- function(x, value) {x@linkedfiles<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'functional'
-funcname <-'.functional.functionaldata'
-standGen <- function(object) standardGeneric('.functional.functionaldata')
-standMethod <- function(object) object@functionaldata
+funcname <-'.functional.timings'
+standGen <- function(object) standardGeneric('.functional.timings')
+standMethod <- function(object) object@timings
 setGeneric(funcname,standGen,package='arf3DS4')
 setMethod(funcname,classname,standMethod)
-slotreplace <-'.functional.functionaldata<-'
-standGen <- function(x, value) standardGeneric('.functional.functionaldata<-')
-standMethod <- function(x, value) {x@functionaldata<- value;x}
+slotreplace <-'.functional.timings<-'
+standGen <- function(x, value) standardGeneric('.functional.timings<-')
+standMethod <- function(x, value) {x@timings<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'functional'

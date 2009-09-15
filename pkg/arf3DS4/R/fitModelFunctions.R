@@ -163,6 +163,7 @@ function(arfdat,experiment=.experiment)
 	.nifti.header.descrip(headinf) <- 'Average t-statistics image (ARF)'
 	.data.avgtstatFile(arfdat) <- filename
 	avgtstat <- avgdat/sqrt(avgweight)
+	avgtstat[is.nan(avgtstat)]=0
 	writeData(headinf,avgtstat)
 	
 	
@@ -537,8 +538,7 @@ function(arfmodel)
 			
 			if(st_loc[1]<1 | st_loc[2]<1 | st_loc[3]<1) {
 				mess=c(mess,paste('[startval] Region ',reg,' has a location smaller than 1',sep=''))
-				onlywarn=FALSE
-			} else if(isEdge(mask,st_loc[1],st_loc[2],st_loc[3])) mess=c(mess,paste('[startval] Region ',reg,' has a location outside the brain',sep='')) 
+			} 
 			
 			if(st_amp==0) {
 				mess=c(mess,paste('[startval] Region ',reg,' has an amplitude of zero.'))

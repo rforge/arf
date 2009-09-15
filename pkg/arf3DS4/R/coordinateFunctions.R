@@ -6,16 +6,16 @@
 
 #[CONTAINS]
 #cropVolume
+#cropVolumeAuto
 #createRegs
 #createFuncs
-#checkRegs
-#checkFuncs
 #setRegFiles
 #setRegParams
 #arfToMNI
+#setFuncFile
 
 cropVolume <- 
-function(filename,resizeToDim) 
+function(filename,resizeToDim,quiet=F) 
 #resize nifti images (crops last slices to destination dimensions)
 {
 	
@@ -32,37 +32,66 @@ function(filename,resizeToDim)
 	
 	dim(data_array) <- c(x,y,z)
 	
-	if(nx>x | ny>y | nz>z) stop('can only crop images!')
-	if(nx==x & ny==y & nz==z) stop('no crop necessary')
+	doCrop=TRUE
 	
-	cat('Dims',.fmri.data.dims(dat),'>> ')
+	if(nx>x | ny>y | nz>z) {warning('can only crop images!');doCrop=FALSE}
+	if(nx==x & ny==y & nz==z) {doCrop=FALSE}
+	
+	if(doCrop) {
+		if(!quiet) cat('Dims',.fmri.data.dims(dat),'>> ')
+			
+		if(nx<x) {
+			remx <- seq(nx+1,x,1)
+			data_array <- data_array[-remx,,]
+			.fmri.data.dims(dat)[2]=nx
+		} 
 		
-	if(nx<x) {
-		remx <- seq(nx+1,x,1)
-		data_array <- data_array[-remx,,]
-		.fmri.data.dims(dat)[2]=nx
-	} 
-	
-	if(ny<y) {
-		remy <- seq(ny+1,y,1)
-		data_array <- data_array[,-remy,]
-		.fmri.data.dims(dat)[3]=ny
-	} 
-	
-	if(nz<z) {
-		remz <- seq(nz+1,z,1)
-		data_array <- data_array[,,-remz]
-		.fmri.data.dims(dat)[4]=nz
-	} 
-	
-	cat(.fmri.data.dims(dat),'\n')
-	cat('filename',.fmri.data.filename(dat),'\n')	
-	cat('datavec should be',nx*ny*nz,'long and is now',length(as.vector(data_array)),'\n')
-	
-	if(file.exists(.fmri.data.filename(dat))) file.remove(.fmri.data.filename(dat))
-	writeData(dat,as.vector(data_array))
+		if(ny<y) {
+			remy <- seq(ny+1,y,1)
+			data_array <- data_array[,-remy,]
+			.fmri.data.dims(dat)[3]=ny
+		} 
+		
+		if(nz<z) {
+			remz <- seq(nz+1,z,1)
+			data_array <- data_array[,,-remz]
+			.fmri.data.dims(dat)[4]=nz
+		} 
+		
+		if(!quiet) cat(.fmri.data.dims(dat),'\n')
+		if(!quiet) cat('filename',.fmri.data.filename(dat),'\n')	
+		if(!quiet) cat('datavec should be',nx*ny*nz,'long and is now',length(as.vector(data_array)),'\n')
+		cat(paste('[crop] cropped file ',.fmri.data.filename(dat),' (',x,'x',y,'x',z,') to: ',nx,'x',ny,'x',nz,sep=''),'\n')
+		if(file.exists(.fmri.data.filename(dat))) file.remove(.fmri.data.filename(dat))
+		writeData(dat,as.vector(data_array))
+	}
 }
 
+
+cropVolumeAuto <- 
+function(betadir,quiet=T) 
+#resize nifti images (crops last slices to destination dimensions)
+{
+	
+	
+	#determinesmallest
+	filelist <- list.files(betadir,full=T)
+	dims=matrix(NA,length(filelist),8)
+	for(i in 1:length(filelist)) {
+		
+		dat = readData(filelist[i])
+		dims[i,]=.fmri.data.dims(dat)
+		
+	}
+	
+	minx=min(dims[,2])
+	miny=min(dims[,3])
+	minz=min(dims[,4])
+	
+	for(i in 1:length(filelist)) cropVolume(filelist[i],c(1,minx,miny,minz),quiet)
+	
+	
+}
 
 read.FSL.mat <- 
 function(filename)
@@ -117,58 +146,18 @@ function(arfdata)
 						
 		} else warning('No betafile found to match reg to')
 	}
-	
+	#return(invisble(registration))
 }
 
-
-checkRegs <- 
-function(arfdata,overwrite=F) 
-#checkRegs checks the integrity of the registrationRda's and sets fullpath based on the experiment - data
-{
-	
-	#set separator
-	sp <- .Platform$file.sep
-	
-	#allisWell
-	allIsWell = TRUE
-	
-	#get betafiles plus path of registration
-	filelist <- .data.betafiles(arfdata)
-	path <- .data.regDir(arfdata)
-	
-	#check betafile integrity and make paths in regDir
-	for(filename in filelist) {
-		if(file.exists(filename)) {
-			
-			#get info from betafile and set linkedfile
-			info <- getFileInfo(filename)
-			fn <- paste(path,sp,.nifti.fileinfo.filename(info),sp,.data.regRda(arfdata),sep='')
-			
-			if(file.exists(fn)) {
-			
-				#set correct paths
-				registration = loadRda(fn)
-				.registration.linkedfile(registration) <- filename
-				.registration.fullpath(registration) <- paste(path,sp,.nifti.fileinfo.filename(info),sep='')
-				.registration.filename(registration) <- .data.regRda(arfdata)
-			
-				#save objects
-				save(registration,file=paste(.registration.fullpath(registration),sp,.registration.filename(registration),sep=''))
-			} 
-		} else {
-			#warning('No betafile found to match reg to')
-			allIsWell = FALSE
-		}
-	}
-	return(allIsWell)	
-}
 
 setRegFiles <- 
-function(registration,examp2high='example_func2highres.mat',high2stand='highres2standard.mat',example_func='example_func.nii.gz',highres='highres.nii.gz',standard='standard.nii.gz') 
+function(registration,examp2stand='example_func2standard.mat',examp2high='example_func2highres.mat',high2stand='highres2standard.mat',example_func='example_func.nii.gz',highres='highres.nii.gz',standard='standard.nii.gz') 
 #setRegfiles fills the registration object with the correct matrices and nifti images (uses FSL standard as default)
 {
 	
 	#set and check regFiles
+	.registration.examp2stand(registration) <- examp2stand
+	if(!file.exists(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.examp2stand(registration),sep=''))) stop('ex2stand does not exist')
 	.registration.examp2high(registration) <- examp2high
 	if(!file.exists(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.examp2high(registration),sep=''))) stop('ex2high does not exist')
 	.registration.high2stand(registration) <- high2stand
@@ -285,59 +274,56 @@ function(arfdata)
 			#create dir and create regfilename
 			if(!file.exists(paste(path,sp,dirname,sep=''))) dir.create(paste(path,sp,dirname,sep=''))
 			
-			.functional.linkedfile(functional) <- filename
-			.functional.fullpath(functional) <- paste(path,sp,.nifti.fileinfo.filename(info),sep='')
-			.functional.filename(functional) <- .data.funcRda(arfdata)
+			.functional.linkedfiles(functional) <- filename
+			.functional.filename(functional) <- paste(path,sp,dirname,sp,.data.funcRda(arfdata),sep='')
 			
 			#save objects
-			save(functional,file=paste(.functional.fullpath(functional),sp,.functional.filename(functional),sep=''))
+			save(functional,file=paste(.functional.filename(functional),sep=''))
 			
 		} else warning('No betafile found to match functional data to')
 	}
-	
+	#return(invisble(functional))
 }
 
-checkFuncs <- 
-function(arfdata,overwrite=F) 
-#checkFuncs checks the integrity of the functionalRda and sets fullpath based on the experiment - data
+
+
+setFuncFiles <- 
+function(experiment=.experiment,func_data='filtered_func_data.nii.gz') 
+###
 {
-	
 	#set separator
 	sp <- .Platform$file.sep
 	
-	#allisWell
-	allIsWell = TRUE
-	
-	#get betafiles plus path of registration
-	filelist <- .data.betafiles(arfdata)
-	path <- .data.funcDir(arfdata)
-	
-	#check betafile integrity and make paths in regDir
-	for(filename in filelist) {
-		if(file.exists(filename)) {
+	for(sdirs in 1:.experiment.subject.num(experiment)) {
+		spath <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,.experiment.subject.names(experiment)[sdirs],sep='')
+		
+		for(cdirs in 1:.experiment.condition.num(experiment)) {
+			cpath <- paste(spath,sp,.experiment.conditionDir(experiment),sp,.experiment.condition.names(experiment)[cdirs],sp,.experiment.dataDir(experiment),sp,.experiment.funcDir(experiment),sep='')
 			
-			#get info from betafile and set linkedfile
-			info <- getFileInfo(filename)
-			fn <- paste(path,sp,.nifti.fileinfo.filename(info),sp,.data.funcRda(arfdata),sep='')
-			
-			if(file.exists(fn)) {
+			funcdirs <- list.files(cpath)
+		
+			for(trs in 1:length(funcdirs)) {
 				
-				#set correct paths
-				functional = loadRda(fn)
-				.functional.linkedfile(functional) <- filename
-				.functional.fullpath(functional) <- paste(path,sp,.nifti.fileinfo.filename(info),sep='')
-				.functional.filename(functional) <- .data.funcRda(arfdata)
+				functional <- loadRda(paste(cpath,sp,funcdirs[trs],sp,.experiment.funcRda(experiment),sep=''))
 				
-				#save objects
-				save(functional,file=paste(.functional.fullpath(functional),sp,.functional.filename(functional),sep=''))
+				if(length(functional)>0) {
+					.functional.fullpath(functional) <- paste(spath,sp,.experiment.funcDir(experiment),sp,funcdirs[trs],sep='')
+					.functional.functionaldata(functional) <- func_data				
+				} else cat('[func] functional.Rda not found\n') 
+	
+				#save regfile object
+				save(functional,file=paste(.functional.filename(functional),sep=''))
+				
+			}
 			
-			} 
-		} else {
-			#warning('No betafile found to match functional data to')
-			allIsWell = FALSE
 		}
+		
 	}
-	return(allIsWell)	
+		
+	
+	#return registration object
+	return(invisible(functional))
 }
+
 
 

@@ -94,6 +94,9 @@ function(path=getwd(),name='default_experiment',subjectind=1,conditionind=1,sett
 		subc <- paste(sn,sp,.settings.conditionDir(settings),sep='')
 		dir.create(subc,show=F)		
 
+		#create funcDir
+		dir.create(paste(sn,sp,.settings.funcDir(settings),sep=''),show=F)
+		
 		for(cdirs in 1:.experiment.condition.num(experiment)) {
 			
 			#create individual condition dirs
@@ -114,7 +117,6 @@ function(path=getwd(),name='default_experiment',subjectind=1,conditionind=1,sett
 			dir.create(paste(dn,sp,.settings.avgDir(settings),sep=''),show=F)
 			dir.create(paste(dn,sp,.settings.regDir(settings),sep=''),show=F)
 			dir.create(paste(dn,sp,.settings.funcDir(settings),sep=''),show=F)
-			
 			
 		
 		}
@@ -212,58 +214,22 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 	fileList <- list.files(sn,full=F)[whichdirs]
 	
 	#get conditions dirname
-	if(length(fileList)!=1) stop('Multiple condition directories found') 
+	if(length(fileList)!=1) fileList <- .experiment.conditionDir(experiment) 
 	.experiment.conditionDir(experiment) <- fileList
 	#cat('   \\Condition directory:',fileList,'\n')
 			
 	#get condition data
 	subc <- paste(sn,sp,.experiment.conditionDir(experiment),sep='')
-	whichdirs <- file.info(list.files(subc,full=T))$isdir
+	whichdirs <- which(file.info(list.files(subc,full=T))$isdir)
 	fileList <- list.files(subc,full=F)[whichdirs]
 	.experiment.condition.num(experiment) <- length(fileList)
 	.experiment.condition.names(experiment) <- fileList
 	
 	#go to first condition 	
 	cn <- paste(subc,sp,.experiment.conditionPrefix(experiment),.experiment.condition.names(experiment)[tempcond],sep='')
-	whichdirs <- file.info(list.files(cn,full=T))$isdir
+	whichdirs <- which(file.info(list.files(cn,full=T))$isdir)
 	fileList <- list.files(cn,full=F)[whichdirs]
 		
-	if(!auto) { 	
-		#set the data and model directories
-		cat('    the following directories have been found.\n')
-		wdir <- numeric(length(fileList))
-		if(length(fileList)<2) stop('Not enough directories found!')
-		names(wdir) <- c('data','models')
-		
-		for(i in 1:length(fileList)) cat('     [',i,'] ',fileList[i],'\n',sep='')
-		for(i in 1:2) wdir[i] <- as.numeric(readline(paste('    Please indicate the number corresponding to the',names(wdir)[i],'directory: ')))
-				
-		.experiment.dataDir(experiment) <- fileList[wdir[1]]
-		.experiment.modelDir(experiment) <- fileList[wdir[2]]
-		
-		#goto dataDir
-		cn <- paste(subc,sp,.experiment.conditionPrefix(experiment),.experiment.condition.names(experiment)[tempcond],sp,.experiment.dataDir(experiment),sep='')
-		whichdirs <- file.info(list.files(cn,full=T))$isdir
-		fileList <- list.files(cn,full=F)[whichdirs]
-		
-		cat('    the following directories have been found within data.\n')
-		wdir <- numeric(length(fileList))
-		if(length(fileList)<5) stop('Not enough directories found!')
-		names(wdir) <- c('average','beta','func','reg','weights')
-		
-		
-		for(i in 1:length(fileList)) cat('     [',i,'] ',fileList[i],'\n',sep='')
-		for(i in 1:5) wdir[i] <- as.numeric(readline(paste('    Please indicate the number corresponding to the',names(wdir)[i],'directory: ')))
-		
-		.experiment.avgDir(experiment) <- fileList[wdir[1]]
-		.experiment.betaDir(experiment) <- fileList[wdir[2]]
-		.experiment.funcDir(experiment) <- fileList[wdir[3]]
-		.experiment.regDir(experiment) <- fileList[wdir[3]]
-		.experiment.weightsDir(experiment) <- fileList[wdir[4]]
-		
-	
-	} 
-	
 	#make uniform weights when no weights exist
 	if(createWeights) makeWeights(experiment)
 	
@@ -350,37 +316,6 @@ function(path=getwd(),method=c('fast','set','rda'))
 		
 }
 
-
-
-getFSL <- 
-function(experiment,subject,condition,featpath,subjectname,contrastnum) 
-#get FSL data from a FEAT directory
-{
-	
-	sp=.Platform$file.sep
-	
-	cat('Subject:',subjectname,'\n')
-		
-	fns <- list.files(path=featpath,pattern=subjectname)
-	
-	rn=1
-	for(run in fns) {
-		
-		filename <- paste(featpath,sp,run,sp,'stats',sp,'tstat',contrastnum,'.nii.gz',sep='')
-		
-		
-		path <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sep='')
-		newfilename <- paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.betaDir(experiment),sp,rn,'tstat',contrastnum,'.nii.gz',sep='')
-		
-		cat(' ',filename,'->',newfilename,'\n')
-		file.copy(filename,newfilename,overwrite=T)
-				
-		rn=rn+1
-	}
-	
-}
-
-
 checkVersion <- 
 function(curversion,version=1,build=0,update=0) 
 #checks the version of the ARF code (check if curversion larger than given version)
@@ -404,4 +339,207 @@ function(curversion,version=1,build=0,update=0)
 	}
 	
 	return(allIsWell)
+}
+
+
+getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF',expdir=getwd(),settings=new('settings'),quiet=F,doReg=T,doFunc=T) 
+{
+	#set separator
+	sp = .Platform$file.sep
+	
+	cont = TRUE
+	
+	cat('getFSLdata featdir',fsldir,'\n')
+	cat('getFSL for subjects:\n')
+	for(i in 1:length(subjectlist)) cat(' >',subjectlist[i],'\n')
+	
+	#standard FSL files DO NOT CHANGE!!!!
+	functional = c('filtered_func_data.nii.gz')
+	registration = c('example_func2standard.mat','example_func2highres.mat','highres2standard.mat','example_func.nii.gz','highres.nii.gz','standard.nii.gz')
+	cope = 'cope'
+	varcope = 'varcope'
+	
+	subjects <- length(subjectlist)
+	subinf <- vector(subjects,mode='list')
+	
+	for(i in 1:subjects) if(!file.exists(paste(fsldir,sp,subjectlist[i],'.feat',sep=''))) {warning(paste('subject',subjectlist[i],'does not exist'));cont=FALSE}
+	
+	if(!cont) stop('Cannot run getFSLdata, reason: one or more subjects does not exist!')
+	
+	cat('fetching fsl filenames...')
+	#get all subject files and info for copying
+	for(subj in 1:subjects) {
+			
+		dirs = list.files(fsldir,subjectlist[subj],full=T)
+		trials = length(dirs)
+				
+		func_file=reg_file=cope_file=vector(trials,mode='list')
+				
+		for(tri in 1:trials) {
+		
+			#get functional data
+			func_file[[tri]] = list.files(dirs[tri],functional,full=T)
+			
+			#get registration data
+			rdir = paste(dirs[tri],sp,'reg',sep='')
+			reg_file[[tri]] = list(ex2stand=list.files(rdir,registration[1],full=T),ex2hi=list.files(rdir,registration[2],full=T),hi2st=list.files(rdir,registration[3],full=T),ex=list.files(rdir,registration[4],full=T),hi=list.files(rdir,registration[5],full=T),st=list.files(rdir,registration[6],full=T))
+			
+			reg_file[[tri]]$hi = reg_file[[tri]]$hi[-1]
+			reg_file[[tri]]$st = reg_file[[tri]]$st[-c(1,2)]
+			
+			
+			#get copes and varcopes
+			sdir = paste(dirs[tri],sp,'stats',sep='')
+			all_copes = list.files(sdir,cope,full=T)
+			
+			use_cope=use_varcope=numeric(0)
+			
+			for(i in contrastnums){
+				use_cope = c(use_cope,grep(paste(cope,i,sep=''),all_copes))
+				use_varcope = c(use_varcope,grep(paste(varcope,i,sep=''),all_copes))
+			}
+			
+			use = unique(c(use_cope,use_varcope))
+			if(length(use)>0) all_copes = all_copes[use]
+			vcs = grep(varcope,all_copes)
+			
+			#get varcopes out of it and put all in list 
+			cope_file[[tri]] = list(copes=all_copes[-vcs],varcopes=all_copes[vcs])
+		}
+		
+		subinf[[subj]] = list(func_file=func_file,reg_file=reg_file,cope_file=cope_file,trials=trials,contrasts=length(cope_file[[1]]$copes),name=subjectlist[subj])
+	
+	}
+	cat('ok\n')
+	
+	if(length(contrastnums)==0) contrastnums = 1:subinf[[1]]$contrasts
+	
+	
+	cat('making experiment dirs...')
+	#make new experiment
+	experiment <- makeExpDirs(path=expdir,name=expname,subjectind=subjectlist,conditionind=paste('contrast',contrastnums,sep=''),settings=settings)
+	subd <- paste(.experiment.path(experiment),sp,.settings.subjectDir(settings),sep='')
+	cat('ok\n')
+	
+	cat('copying images [status]:\n')
+	
+	#fill the experiment with files
+	for(sdirs in 1:length(subinf)) {
+		
+		#get to subjectsdir
+		sn <- paste(subd,sp,.settings.subjectPrefix(settings),subinf[[sdirs]]$name,sep='')
+		subc <- paste(sn,sp,.settings.conditionDir(settings),sep='')
+			
+		for(cdirs in 1:.experiment.condition.num(experiment)) {
+			
+			#get to conditiondir and datadir
+			cn <- paste(subc,sp,.settings.conditionPrefix(settings),.experiment.condition.names(experiment)[cdirs],sep='')
+			dn <- paste(cn,sp,.settings.dataDir(settings),sep='')
+			
+			#get the trials for the conditions 
+			for(i in 1:subinf[[sdirs]]$trials) {
+				copefile = avgfile = readData(subinf[[sdirs]]$cope_file[[i]]$copes[cdirs])
+				varcopefile = readData(subinf[[sdirs]]$cope_file[[i]]$varcopes[cdirs])
+				tstat = .fmri.data.datavec(copefile)/sqrt(.fmri.data.datavec(varcopefile))
+				tstat[is.nan(tstat)]=0
+				.fmri.data.fullpath(avgfile) = paste(dn,sp,.settings.betaDir(settings),sep='')
+				.fmri.data.filename(avgfile) = paste('arf_tstat',i,sep='')
+				.fmri.data.descrip(avgfile) = 'arf t_stat image'
+				writeData(avgfile,tstat)
+				if(!quiet) cat('',subinf[[sdirs]]$cope_file[[i]]$copes[cdirs],'>',paste(dn,sp,.settings.betaDir(settings),sp,'arf_tstat',i,'\n',sep=''))
+			}
+			
+			cropVolumeAuto(paste(dn,sp,.settings.betaDir(settings),sep=''),quiet=T)
+		}
+	}
+	cat('> ready\n')
+	
+	
+	#set experiment and create weights
+	experiment <- setExp(.experiment.path(experiment),1,1,T,T,T,F)
+	
+	if(doReg) {
+		cat('setting registration files [status]:\n')
+		#create and fill regs and funcs
+		for(sdirs in 1:length(subinf)) {
+			
+			#get to subjectsdir
+			sn <- paste(subd,sp,.settings.subjectPrefix(settings),subinf[[sdirs]]$name,sep='')
+			subc <- paste(sn,sp,.settings.conditionDir(settings),sep='')
+			
+			for(cdirs in 1:.experiment.condition.num(experiment)) {
+				
+				#get to conditiondir and datadir
+				cn <- paste(subc,sp,.settings.conditionPrefix(settings),.experiment.condition.names(experiment)[cdirs],sep='')
+				dn <- paste(cn,sp,.settings.dataDir(settings),sep='')
+				
+				arfdata <- loadRda(paste(dn,sp,.settings.dataRda(settings),sep=''))
+				createRegs(arfdata)
+			
+				
+				filelist_reg = list.files(paste(dn,sp,.settings.regDir(settings),sep=''))
+					
+				for(i in 1:subinf[[sdirs]]$trials) {
+					
+					registration <- loadRda(paste(dn,sp,.settings.regDir(settings),sp,filelist_reg[i],sp,.settings.regRda(settings),sep=''))
+								
+					for(f in 1:length(subinf[[sdirs]]$reg_file[[i]])) {
+						fn = as.character(subinf[[sdirs]]$reg_file[[i]][f])
+						fns = strsplit(fn,sp)[[1]]
+						file.copy(fn,paste(.registration.fullpath(registration),sp,fns[length(fns)],sep=''))
+						if(!quiet) cat('',fn,'>',paste(.registration.fullpath(registration),sp,fns[length(fns)],sep=''),'\n')
+						
+					}
+					
+					registration <- setRegFiles(registration)
+					registration <- setRegParams(registration)
+							
+				}
+			}
+		}
+		cat('> ready\n')
+	}
+	
+	if(doFunc) {
+		
+		cat('setting functional files [status]:\n')
+		#create and fill regs and funcs
+		for(sdirs in 1:length(subinf)) {
+			
+			#get to subjectsdir
+			sn <- paste(subd,sp,.settings.subjectPrefix(settings),subinf[[sdirs]]$name,sep='')
+			subc <- paste(sn,sp,.settings.conditionDir(settings),sep='')
+			
+			for(cdirs in 1:.experiment.condition.num(experiment)) {
+				cn <- paste(subc,sp,.settings.conditionPrefix(settings),.experiment.condition.names(experiment)[cdirs],sep='')
+				dn <- paste(cn,sp,.settings.dataDir(settings),sep='')
+				arfdata <- loadRda(paste(dn,sp,.settings.dataRda(settings),sep=''))
+				createFuncs(arfdata)
+			}
+			
+			filelist_func = list.files(paste(dn,sp,.settings.funcDir(settings),sep=''))
+			
+			for(i in 1:subinf[[sdirs]]$trials) {
+				functional <- loadRda(paste(dn,sp,.settings.funcDir(settings),sp,filelist_func[i],sp,.settings.funcRda(settings),sep=''))
+				fn = as.character(subinf[[sdirs]]$func_file[[i]][1])
+				fns = strsplit(fn,sp)[[1]]
+				funcdatapath <- paste(sn,sp,.settings.funcDir(settings),sp,filelist_func[i],sep='')
+				if(!file.exists(funcdatapath)) dir.create(funcdatapath)
+				file.copy(fn,paste(funcdatapath,sp,fns[length(fns)],sep=''))
+				if(!quiet) cat('',fn,'>',paste(funcdatapath,sp,fns[length(fns)],sep=''),'\n')
+
+				
+			}
+		}
+				
+		setFuncFiles(experiment)
+		cat('> ready\n')
+		
+		
+	} else cat('functional files not requested.')
+	
+	#set experiment and create weights
+	experiment <- setExp(.experiment.path(experiment),1,1,T,T,T,T)
+	
+	return(invisible(experiment))
 }

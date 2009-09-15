@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=4,
-		update=13,
-		svnrev=68
+		update=14,
+		svnrev=69
 	)
 )
 
@@ -91,7 +91,7 @@ setClass(
 		weightsDir='weights',			#weights directory name
 		avgDir='avg',					#avg directory name
 		regDir='reg',
-		funcDir='func',
+		funcDir='funcs',
 		betaDir='beta',					#beta directory
 		modelDir='models',				#model directory
 		statsDir='stats',				#stats directory
@@ -118,6 +118,7 @@ setClass(
 		linkedfile='character',		#link to betafile
 		examp2high='character',		#examp2high ASCII mat (affine transform)
 		high2stand='character',		#high2standard ASCII mat (affine transform)
+		examp2stand='character',
 		example='character',		#example.nii.gz (corr to betafile)
 		highres='character',		#highres.nii.gz (subject anatomical scan)
 		standard='character',		#standard.nii.gz (FSL MNI152)
@@ -140,9 +141,10 @@ setClass(
 	Class='functional',
 	representation=representation(
 		fullpath='character',			#fullpath of functionalvolume
-		filename='character',			#filename of functionalvolume
-		linkedfile='character',			#link to betafile
-		functionaldata='character',		#file with stimulus_timings
+		functionaldata='character',		#functionalvolumefilename
+		filename='character',			#full filename of functional.Rda
+		linkedfiles='character',		#link to betafilename
+		timings='numeric',				#stimulus timings for condition/contrast
 		version='ANY'
 	),
 	prototype=prototype(

@@ -15,17 +15,19 @@ setMethod('show','experiment',
 		cat('[ ARF experiment ]\n')
 		cat('name:      ',toupper(object@name),'\n',sep='')
 		cat('path:      ',object@path,'\n',sep='')
+		cat('\n')
 		cat('subjects[',object@subject.num,']\n',sep='')
-		for(subs in object@subject.names) cat('  - ',subs,'\n',sep='')
+		for(subs in object@subject.names) cat('  > ',subs,'\n',sep='')
+		cat('\n')
 		cat('conditions[',object@condition.num,']\n',sep='')
-		for(conds in object@condition.names) cat('  - ',conds,'\n',sep='')
+		for(conds in object@condition.names) cat('  > ',conds,'\n',sep='')
 		cat('\n')
 
 	}
 )
 
 setMethod('plot',signature(x='fmri.data',y='missing'),
-	function(x,y,mrs=F) {
+	function(x,y,...) {
 		
 		dimx <- x@dims[2]
 		dimy <- x@dims[3]
@@ -34,21 +36,25 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		data <- x@datavec[1:(dimx*dimy*dimz)]
 		dim(data) <- c(dimx,dimy,dimz)
 				
-		m <- round(sqrt(dimz)+.5)
+		m <- round(sqrt(dimz+1)+.5)
 		layout(matrix(1:m^2,m,m,byrow=T))
 		par(mar=c(2,2,1,1),las=1)
-		
-		cv=data
-		len=length(cv)
-		cols=gray(seq(0,1,1/(len-1)))
+				
+		newdata = makeDiscreteImage(as.vector(data))
+		colors = makeColors(newdata)
+		dim(newdata) <- c(dimx,dimy,dimz)	
 		
 		for(i in 1:dimz) {
-			mn=min(data[,,i])
-			mx=max(data[,,i])
-			cal=cols[which(cv>=mn & cv<=mx)]
-			image(1:dimx,1:dimy,data[,,i],bty='n',main=paste('z=',i,sep=''),axes=mrs,col=cal)
+			colvec = sliceColor(as.vector(newdata[,,i]),colors)
+			image(1:dimx,1:dimy,newdata[,,i],bty='n',main=paste('z=',i,sep=''),axes=F,col=colvec)
+			
 		}
-		for(i in 1:(m*m-dimz)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F)			
+		
+		par(las=1,mar=c(2, 6, 1, 1) + 0.1)
+		image(matrix(colors$data,1,),axes=F,col=colors$colvec)
+		axis(2,at=c(0,.5,1),labels=c(round(min(data),2),0,round(max(data),2)),cex=1.5)
+		
+		if(((m*m-dimz)-1)>0) for(i in 1:((m*m-dimz)-1)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F)			
 				
 	}		
 )
