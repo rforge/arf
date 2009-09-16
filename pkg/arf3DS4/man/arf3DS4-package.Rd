@@ -13,24 +13,24 @@ Activated Region Fitting (ARF) is an analysis method for fMRI data. The method u
 \tabular{ll}{
 Package: \tab arf3DS4\cr
 Type: \tab Package\cr
-Version: \tab 1.4-14\cr
-Date: \tab 2009-09-15\cr
+Version: \tab 1.5-0\cr
+Date: \tab 2009-09-16\cr
 Depends: \tab R (>= 2.9.1), methods\cr
 URL: \tab http://arf.r-forge.r-project.org/\cr
 License: \tab GNU (GPL)\cr
 LazyLoad: \tab yes\cr
 Repository: \tab R-Forge\cr
 Repository/R-Forge/Project: \tab arf\cr
-Repository/R-Forge/Revision: \tab 69\cr
-Publication: \tab 2009-09-15 16:45:00\cr
-Packaged: \tab 2009-09-15 16:45:00; rforge\cr
-Built: \tab R 2.9.1; universal-apple-darwin8.11.1; 2009-09-15 16:45:00; unix\cr
+Repository/R-Forge/Revision: \tab 70\cr
+Publication: \tab 2009-09-16 16:27:46\cr
+Packaged: \tab 2009-09-16 16:27:46; rforge\cr
+Built: \tab R 2.9.1; universal-apple-darwin8.11.1; 2009-09-16 16:27:46; unix\cr
 }
 To get a feeling of the arf3DS4 package, it is recommended to read the manual first. More details can also be found in the ARF paper (see reference section).
 arf3DS4 stores all its data in a predefined directory structure, this is mainly because of the size of fMRI data files. To save memory the data is often not stored directly in an R object, but the location where the files can be found is stored instead. 
-Information of the directory structure is stored in the S4 class experiment and can be customized (by adjusting the S4 settings class). The fmri data files are stored in the S4 class fmri.data (wich includes the classes nifti.header and nifti.fileinfo). A set of fmri data files belonging to one condition in the experiment are stored in the S4 class data. To this data an ARF model can be fitted, the model information is stored in the S4 class model. Setting the options of the model fitting procedure etc. is done via the S4 class options. A valid ARF model contains hypothesis tests of its parameters, these are in the S4 class wald. Finally an ARF model can be registered to standard MNI space via the S4 registration class and to the functional data via the S4 functional class. Slots of the classes can be accessed and replaced using standard accessor and replacement functions.  
-Index:
+Information of the directory structure is stored in the S4 class experiment and can be customized (by adjusting the S4 settings class). The fmri data files are stored in the S4 class fmri.data (wich includes the classes nifti.header and nifti.fileinfo). A set of fmri data files belonging to one condition in the experiment are stored in the S4 class data. To this data an ARF model can be fitted, the model information is stored in the S4 class model. Setting the options of the model fitting procedure etc. is done via the S4 class options. A valid ARF model contains hypothesis tests of its parameters, these are in the S4 class wald. Finally an ARF model can be registered to standard MNI space via the S4 registration class and to the functional data via the S4 functional class. Slots of the classes can be accessed and replaced using standard accessor and replacement functions. The following functions are user-level: 
 \preformatted{
+*** ARF3DS4 USER LEVEL FUNCTIONS: ***
 Experiment functions:
 setExp              set an experiment based on files in the data directories
 makeExpDirs         make an ARF directory structure
@@ -86,6 +86,3 @@ Maintainer: Wouter D. Weeda <w.d.weeda@gmail.com>
 Wouter D. Weeda, Lourens J. Waldorp, Ingrid Christoffels and Hilde M. Huizenga. (2009) Activated Region Fitting: A robust high-power method of fMRI analysis using parameterized regions of activation. Human Brain Mapping, 30(8), 2595-2605.
 }
 \keyword{ package }
-\seealso{
-\code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}

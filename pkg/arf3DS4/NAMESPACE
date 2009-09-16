@@ -30,6 +30,7 @@ export(
 	loadRda,
 	loadData,
 	loadModel,
+	makeDiscreteImage,
 	makeDerivs,
 	makeResiduals,
 	varcov,

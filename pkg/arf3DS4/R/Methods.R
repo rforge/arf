@@ -8,7 +8,6 @@
 setGeneric('plot')
 setGeneric('summary')
 
-
 setMethod('show','experiment',
 	function(object) {
 		
@@ -27,7 +26,7 @@ setMethod('show','experiment',
 )
 
 setMethod('plot',signature(x='fmri.data',y='missing'),
-	function(x,y,...) {
+	function(x,y,zerotol=1e-3,what=c('all','pos','neg'),col=c('rgb','gray'),...) {
 		
 		dimx <- x@dims[2]
 		dimy <- x@dims[3]
@@ -35,15 +34,22 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		
 		data <- x@datavec[1:(dimx*dimy*dimz)]
 		dim(data) <- c(dimx,dimy,dimz)
-				
+		
 		m <- round(sqrt(dimz+1)+.5)
 		layout(matrix(1:m^2,m,m,byrow=T))
 		par(mar=c(2,2,1,1),las=1)
-				
-		newdata = makeDiscreteImage(as.vector(data))
-		colors = makeColors(newdata)
-		dim(newdata) <- c(dimx,dimy,dimz)	
 		
+		what = match.arg(what)
+		col = match.arg(col)
+		
+		if(what=='pos') data[data<0]=0
+		if(what=='neg') data[data>0]=0
+		if(col=='gray') gray = TRUE else gray=FALSE
+		
+		newdata = makeDiscreteImage(as.vector(data),zerotol=zerotol)
+		colors = makeColors(newdata,gray)
+		dim(newdata) <- c(dimx,dimy,dimz)	
+	
 		for(i in 1:dimz) {
 			colvec = sliceColor(as.vector(newdata[,,i]),colors)
 			image(1:dimx,1:dimy,newdata[,,i],bty='n',main=paste('z=',i,sep=''),axes=F,col=colvec)
@@ -51,11 +57,11 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		}
 		
 		par(las=1,mar=c(2, 6, 1, 1) + 0.1)
-		image(matrix(colors$data,1,),axes=F,col=colors$colvec)
-		axis(2,at=c(0,.5,1),labels=c(round(min(data),2),0,round(max(data),2)),cex=1.5)
+		image(x=c(1),y=colors$data,z=matrix(colors$data,1),axes=F,col=colors$colvec,xlab='',ylab='')
+		axis(2,at=c(min(colors$data),0,max(colors$data)),labels=c(round(min(data),2),0,round(max(data),2)),cex=1.5)
 		
-		if(((m*m-dimz)-1)>0) for(i in 1:((m*m-dimz)-1)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F)			
-				
+		if(((m*m-dimz)-1)>0) for(i in 1:((m*m-dimz)-1)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F,xlab='',ylab='')			
+		
 	}		
 )
 
@@ -182,11 +188,20 @@ setMethod('summary','fmri.data',
 			cat('description: ',object@descrip,'\n',sep='')
 			cat('\n')
 			
-			cat('minimum: ',min(object@datavec),'\n')
-			cat('maximum: ',max(object@datavec),'\n')
-			cat('mean:    ',mean(object@datavec,na.rm=T),'\n')
-			cat('median:  ',median(object@datavec,na.rm=T),'\n')
-						
+			zeroes = object@datavec[object@datavec==0]
+			if(length(zeroes)>0) object@datavec = object@datavec[-which(object@datavec==0)]
+			
+			qs = quantile(object@datavec,c(.25,.5,.75))
+			iqr = IQR(object@datavec)
+			
+			cat('minimum:   ',sprintf('%9.4f',min(object@datavec)),'\n')
+			cat('maximum:   ',sprintf('%9.4f',max(object@datavec)),'\n')
+			cat('mean:      ',sprintf('%9.4f',mean(object@datavec,na.rm=T)),'\n')
+			cat('1st quart: ',sprintf('%9.4f',qs[1]),'\n')
+			cat('median:    ',sprintf('%9.4f',qs[2]),'\n')
+			cat('3rd quart: ',sprintf('%9.4f',qs[3]),'\n')
+			cat('iqr:       ',sprintf('%9.4f',iqr),'\n')
+			cat('\n')
 			
 		}
 )

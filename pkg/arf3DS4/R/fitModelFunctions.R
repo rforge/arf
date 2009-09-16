@@ -162,8 +162,10 @@ function(arfdat,experiment=.experiment)
 	headinf <- newFile(filename,headinf)
 	.nifti.header.descrip(headinf) <- 'Average t-statistics image (ARF)'
 	.data.avgtstatFile(arfdat) <- filename
+	
 	avgtstat <- avgdat/sqrt(avgweight)
 	avgtstat[is.nan(avgtstat)]=0
+	
 	writeData(headinf,avgtstat)
 	
 	

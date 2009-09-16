@@ -10,49 +10,86 @@
 #makeDiscreteImage
 
 makeDiscreteImage <-
-function(datavec,steps=64,zerotol=1e-03)
+function(datavec,zerotol=1e-03)
+#make a discritezed image of a datavector (divide into steps relative to zero-point)
 {
-	max_dat = max(datavec)
-	min_dat = min(datavec)
+	#define maxsteps
+	maxsteps = 64
 	
 	datavec[abs(datavec)<zerotol]=0
+	
+	
+	max_dat = max(datavec)
+	min_dat = min(datavec)
+	total = abs(min_dat)+abs(max_dat)
+	
+	possteps = round(maxsteps*(abs(max_dat)/total))
+	negsteps = round(maxsteps*(abs(min_dat)/total))
 	
 	pos_data = datavec[datavec>0]
 	neg_data = datavec[datavec<0]
 	zero_data = datavec[datavec==0]
-	
-	pq = quantile(pos_data,probs=seq(0,1,1/steps)[-1])
-	nq = quantile(neg_data,probs=seq(1,0,-1/steps)[-1])
-	
-	newdata=rep(NA,length(datavec))
 		
-	newdata[datavec>0 & datavec<pq[1]]=1
-	newdata[datavec<0 & datavec>nq[1]]=-1
-	
-	for(i in 1:steps) {
-		newdata[datavec>=pq[i]]=i+1
-		newdata[datavec<=nq[i]]=-i-1
+	if(max_dat>0 & min_dat<0) {
+		pq = quantile(pos_data,probs=seq(0,1,1/possteps)[-1])
+		nq = quantile(neg_data,probs=seq(1,0,-1/negsteps)[-1])
 	}
-
+	
+	if(max_dat>0 & min_dat>=0) {
+		possteps = maxsteps
+		pq = quantile(pos_data,probs=seq(0,1,1/possteps)[-1])
+		nq = numeric(0)
+	}
+	
+	if(max_dat<=0 & min_dat<0) {
+		negsteps = maxsteps
+		nq = quantile(neg_data,probs=seq(1,0,-1/maxsteps)[-1])
+		pq = numeric(0)
+	}
+	
+	if(max_dat==0 & min_dat==0) {
+		nq = numeric(0)
+		pq = numeric(0)
+	}
+		
+	newdata=rep(NA,length(datavec))
+	
+	if(length(pq)>0) newdata[datavec>0 & datavec<pq[1]]=1
+	if(length(nq)>0) newdata[datavec<0 & datavec>nq[1]]=-1
+	
+	if(length(pq)>0) for(i in 1:possteps) newdata[datavec>=pq[i]]=i+1
+	if(length(nq)>0) for(i in 1:negsteps) newdata[datavec<=nq[i]]=-i-1
+	
 	newdata[datavec==0]=0
 	
 	return(newdata)
+	
 }
 
 
 makeColors <-
-function(datavec)
-## make colors for overlay images
+function(datavec,gray=FALSE)
+## make colors for overlay images, input is a discretized image
 {
-	
 	datasort = sort(unique(datavec))
 	
 	neg_dat = datasort[datasort<0]
 	pos_dat = datasort[datasort>0]
 	
-	pos_col <- rgb(1,seq(0,1,1/length(pos_dat))[-1],0)
-	neg_col <- rgb(seq(.5,0,-.5/length(neg_dat))[-1],seq(.5,0,-.5/length(neg_dat))[-1],1)
-	zero_col <- rgb(0,0,0)
+	if(gray) {
+		
+		pos_col = gray(seq(0,1,1/length(pos_dat))[-1])
+		neg_col = gray(seq(1,0,-1/length(neg_dat))[-length(seq(1,0,-1/length(neg_dat)))])
+		zero_col = gray(0)
+		
+	
+	} else {
+				
+		pos_col <- rgb(1,seq(0,1,1/length(pos_dat))[-1],0)
+		neg_col <- rgb(seq(.5,0,-.5/length(neg_dat))[-1],seq(.5,0,-.5/length(neg_dat))[-1],1)
+		zero_col <- rgb(0,0,0)
+		
+	}
 	
 	colvec <-c(neg_col,zero_col,pos_col) 
 	
@@ -70,7 +107,7 @@ function(datavec)
 
 sliceColor <-
 function(slicedata,colors)
-## calculate the colorvector for the slice
+## calculate the colorvector for the discretized slice based on an makeColor object. 
 {
 	
 	slice_max = max(slicedata)

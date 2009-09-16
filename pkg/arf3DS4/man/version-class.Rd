@@ -11,42 +11,29 @@
 \alias{.version.version,version-method}
 \alias{.version.version<-,version-method}
 
-\title{Class "version" ~~~ }
-\description{	 ~~ A concise (1-5 lines) description of what the class is.  ~~}
-\section{Objects from the Class}{
+\title{arf3DS4 "version" class}
+\description{The "version" class contains information on the version of the arf3DS4 objects. Each arf3DS4 object contains this class. }
+\section{Objects}{
 Objects can be created by calls of the form \code{new("version", ...)}.
-	 ~~ describe objects here ~~ 
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{version}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{build}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{update}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{svnrev}:}{Object of class \code{"numeric"} ~~ }
+    \item{\code{version}:}{Version number of the arf3DS4 package.}
+    \item{\code{build}:}{Build number of the arf3DS4 package.}
+    \item{\code{update}:}{Update number of the arf3DS4 package.}
+    \item{\code{svnrev}:}{SVN revision on r-forge.}
   }
 }
 \section{Methods}{
+Standard arf3DS4 accessor and replacement functions can be used to access and replace slots.  
   \describe{
-    \item{.version.build}{\code{signature(object = "version")}: ... }
-    \item{.version.build<-}{\code{signature(x = "version")}: ... }
-    \item{.version.svnrev}{\code{signature(object = "version")}: ... }
-    \item{.version.svnrev<-}{\code{signature(x = "version")}: ... }
-    \item{.version.update}{\code{signature(object = "version")}: ... }
-    \item{.version.update<-}{\code{signature(x = "version")}: ... }
-    \item{.version.version}{\code{signature(object = "version")}: ... }
-    \item{.version.version<-}{\code{signature(x = "version")}: ... }
+    \item{access}{\code{.classname.slotname(object)}}
+    \item{replace}{\code{.classname.slotname(object)<-}}
 	 }
+In this case classname is "version" and slotname is for example "snvrev". So to access the "svnrev" slot of an r-object "currentversion"  (of class "version") type \code{.version.svnrev(currentversion)}.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ }
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-	~~objects to See Also as \code{\link{~~fun~~}}, ~~~
-	or \code{\linkS4class{CLASSNAME}} for links to other classes
-}
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\note{ The "version" class is mainly used for back-compatibility issues.}
 \examples{
 showClass("version")
 }
