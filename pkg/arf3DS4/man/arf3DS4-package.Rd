@@ -21,10 +21,10 @@ License: \tab GNU (GPL)\cr
 LazyLoad: \tab yes\cr
 Repository: \tab R-Forge\cr
 Repository/R-Forge/Project: \tab arf\cr
-Repository/R-Forge/Revision: \tab 70\cr
-Publication: \tab 2009-09-17 17:02:44\cr
-Packaged: \tab 2009-09-17 17:02:44; rforge\cr
-Built: \tab R 2.9.1; universal-apple-darwin8.11.1; 2009-09-17 17:02:44; unix\cr
+Repository/R-Forge/Revision: \tab 72\cr
+Publication: \tab 2009-09-17 17:07:00\cr
+Packaged: \tab 2009-09-17 17:07:00; rforge\cr
+Built: \tab R 2.9.1; universal-apple-darwin8.11.1; 2009-09-17 17:07:00; unix\cr
 }
 To get a feeling of the arf3DS4 package, it is recommended to read the manual first. More details can also be found in the ARF paper (see reference section).
 arf3DS4 stores all its data in a predefined directory structure, this is mainly because of the size of fMRI data files. To save memory the data is often not stored directly in an R object, but the location where the files can be found is stored instead. 
