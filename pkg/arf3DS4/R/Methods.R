@@ -35,6 +35,10 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		data <- x@datavec[1:(dimx*dimy*dimz)]
 		dim(data) <- c(dimx,dimy,dimz)
 		
+		if(reqFlip(x)[1]) data <- flipAxis(data,'x')
+		if(reqFlip(x)[2]) data <- flipAxis(data,'y')
+		if(reqFlip(x)[3]) data <- flipAxis(data,'z')
+		
 		m <- round(sqrt(dimz+1)+.5)
 		layout(matrix(1:m^2,m,m,byrow=T))
 		par(mar=c(2,2,1,1),las=1)
@@ -52,17 +56,32 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 	
 		for(i in 1:dimz) {
 			colvec = sliceColor(as.vector(newdata[,,i]),colors)
-			image(1:dimx,1:dimy,newdata[,,i],bty='n',main=paste('z=',i,sep=''),axes=F,col=colvec)
+			par(mgp=c(1.1,0,0))
+			image(1:dimx,1:dimy,newdata[,,i],bty='n',main='',axes=F,col=colvec,xlab='',ylab='')
+			axis(1,at=round(dimx/2),labels='P',tick=F)
+			axis(2,at=round(dimy/2),labels='R',tick=F)
+			axis(3,at=c(1,round(dimx/2)),labels=c(i,'A'),tick=F)
+			axis(4,at=round(dimy/2),labels='L',tick=F)
 			
 		}
 		
-		par(las=1,mar=c(2, 6, 1, 1) + 0.1)
+		par(las=1,mar=c(2, 6, 1, 1) + 0.1,mgp=c(3,1,0))
 		image(x=c(1),y=colors$data,z=matrix(colors$data,1),axes=F,col=colors$colvec,xlab='',ylab='')
 		axis(2,at=c(min(colors$data),0,max(colors$data)),labels=c(round(min(data),2),0,round(max(data),2)),cex=1.5)
 		
 		if(((m*m-dimz)-1)>0) for(i in 1:((m*m-dimz)-1)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F,xlab='',ylab='')			
 		
 	}		
+)
+
+setMethod('plot',signature(x='model',y='missing'),
+		function(x,y,...) {
+			
+			mod = readData(paste(x@modeldatapath,.Platform$file.sep,x@fullmodelDataFile,sep=''))
+			plot(mod,...)
+			
+		}
+
 )
 
 
@@ -80,6 +99,7 @@ setMethod('show','data',
 			
 		}
 )
+
 
 
 setMethod('show','model',

@@ -105,15 +105,15 @@ function(arfmodel)
 					.model.varcov(arfmodel) <- SW
 					.model.valid(arfmodel) <- TRUE
 				} else { #outersandiwch not good
-					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'outerSandwich did not compute.',paste('[varcov] error: ',SW,'\n',sep='')) 
+					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'[varcov] outerSandwich did not compute.',paste('[varcov] error: ',SW,'\n',sep='')) 
 					.model.valid(arfmodel) <- FALSE
 				}
 			} else { #innersandiwch not good
-				.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'innerSandwich did not compute.',paste('[varcov] error: ',B,'\n',sep='')) 
+				.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'[varcov] innerSandwich did not compute.',paste('[varcov] error: ',B,'\n',sep='')) 
 				.model.valid(arfmodel) <- FALSE
 			}
 		} else { #hessian not good
-			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Hessian is singular.',paste('[varcov] error: ',hessian,'\n',sep='')) 
+			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'[varcov] Hessian is singular.',paste('[varcov] error: ',hessian,'\n',sep='')) 
 			.model.valid(arfmodel) <- FALSE
 		}
 	
@@ -121,7 +121,7 @@ function(arfmodel)
 		.model.proctime(arfmodel)[1,2] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		
 	} else { #model not valid
-		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'No valid model. var/cov not calculated')
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'[varcov] No valid model. var/cov not calculated')
 		.model.valid(arfmodel) <- FALSE
 	}
 	

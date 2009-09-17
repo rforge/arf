@@ -13,6 +13,7 @@
 #setRegParams
 #arfToMNI
 #setFuncFile
+#flipAxis
 
 cropVolume <- 
 function(filename,resizeToDim,quiet=F) 
@@ -245,6 +246,46 @@ function(xyz_coor,registration)
 	#return MNI
 	return(stand_mni_flipped[-length(stand_mni_flipped)])
 		
+}
+
+flipAxis <-
+function(data_array,axis=c('x','y','z'))
+#flips the axis of a data_array
+{
+	axis = match.arg(axis)
+	
+	new_dat = data_array
+	
+	affine = diag(c(1,1,1,1))
+	
+	if(axis=='x') {
+		affine[1,1] = -1
+		affine[1,4] = dim(data_array)[1]+1
+		for(x in 1:dim(data_array)[1]) {
+			nc = affine%*%c(x,1,1,1)
+			new_dat[nc[1],,] = data_array[x,,]
+		}
+	} 
+	
+	if(axis=='y') {
+		affine[2,2] = -1
+		affine[2,4] = dim(data_array)[2]+1
+		for(y in 1:dim(data_array)[2]) {
+			nc = affine%*%c(1,y,1,1)
+			new_dat[,nc[2],] = data_array[,y,]
+		}
+	} 
+	
+	if(axis=='z') {
+		affine[3,3] = -1
+		affine[3,4] = dim(data_array)[3]+1
+		for(z in 1:dim(data_array)[3]) {
+			nc = affine%*%c(1,1,z,1)
+			new_dat[,,nc[3]] = data_array[,,z]
+		}
+	} 
+	
+	return(new_dat)	
 }
 
 
