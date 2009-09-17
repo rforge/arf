@@ -58,8 +58,7 @@ exportClasses(
 
 import(
 	methods,
-	graphics,
-	MASS
+	graphics
 )
 
 useDynLib(arf3DS4,gauss,ssqgauss,ssqdata,dfssq,dfgauss,simplegauss,simplessqgauss,dfsimplegauss,dfsimplessq,innerSW,innerSWdiag,approxHessian,dfgaussFile,dftheta0,dftheta1,dftheta2,dftheta3,dftheta4,dftheta5,dftheta6,dftheta7,dftheta8,dftheta9,simTS)

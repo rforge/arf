@@ -32,7 +32,7 @@ setClass(
 		version=1,
 		build=5,
 		update=0,
-		svnrev=72
+		svnrev=73
 	)
 )
 
