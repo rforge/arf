@@ -46,7 +46,7 @@ function(theta,np,dimx,dimy,dimz)
 #returns model estimate for full gaussmodel
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
-		model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
+		model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[6]]
 	} else model=NA
 	
 	return(model)
@@ -58,7 +58,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 #gradient returns the analytical gradient of the ssq to the thetaparameters
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0) {
-		model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
+		model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[6]]
 	} else model=NA
 	
 	if(length(model[is.na(model) | is.nan(model) | model==Inf | model==-Inf])==0) {
@@ -74,7 +74,7 @@ ssq.simple <-
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
 ##ssq.simple returns the ssq of the simple gauss model with an anlytical gradient attached
 {
-	ssqdat <- .C('simplessqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
+	ssqdat <- .C('simplessqgaussnew',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
 	
 	if(analyticalgrad) {
 		grad = gradient.simple(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data)
@@ -92,7 +92,7 @@ function(theta,np,dimx,dimy,dimz)
 #returns model estimate for simple gaussmodel
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
-		model <- .C('simplegauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
+		model <- .C('simplegaussnew',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[6]]
 	} else model=NA
 	
 	return(model)
@@ -103,7 +103,7 @@ gradient.simple <-
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
 #gradient returns the analytical gradient of the ssq to the thetaparameters
 {
-	model <- .C('simplegauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',dimx*dimy*dimz)))[[6]]
+	model <- .C('simplegaussnew',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[6]]
 	grad <- try(.C('dfsimplessq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=T)
 	
 	if(!is.null(attr(grad,'class'))) grad=rep(1e+12,np) 

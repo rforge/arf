@@ -8,7 +8,6 @@
 #include<math.h>
 #include<stdio.h>
 
-
 void gauss(double *theta, int *np, int *dimx, int *dimy, int *dimz, double *gx)
 {
 
@@ -250,6 +249,132 @@ void simplessqgauss(double *theta, double *dat, double *W, int *brain, int *np, 
 	ss[0]=g;
 }
 
+void simplegaussnew(double *theta, int *np, int *dimx, int *dimy, int *dimz, double *gx)
+{
+
+	int reg,x,y,z,p;
+	int x_min,y_min,z_min,x_max,y_max,z_max;
+	double theta_x,theta_y,theta_z,sig_x,det_sig,dif_x,dif_y,dif_z;
+
+	for(reg=0;reg<(*np);reg=reg+5) {
+
+		//parameter coordinates
+		theta_x=theta[reg+0];
+		theta_y=theta[reg+1];
+		theta_z=theta[reg+2];
+
+		//sigma matrix
+		sig_x=pow(theta[reg+3],2);
+
+		//determinant of sigma
+		det_sig=pow(sig_x,3);
+		if(det_sig < 0) det_sig=0;
+
+		x_min = (int) theta_x - (int) sig_x;
+		x_max = (int) theta_x + (int) sig_x;
+		y_min = (int) theta_y - (int) sig_x;
+		y_max = (int) theta_y + (int) sig_x;
+		z_min = (int) theta_z - (int) sig_x;
+		z_max = (int) theta_z + (int) sig_x;
+
+		if(x_min<1) x_min = 1;
+		if(x_max>*dimx) x_max = *dimx;
+
+		if(y_min<1) y_min = 1;
+		if(y_max>*dimy) y_max = *dimy;
+
+		if(z_min<1) z_min = 1;
+		if(z_max>*dimz) z_max = *dimz;
+
+		for(z=z_min;z<(z_max+1);z++) {
+			for(y=y_min;y<(y_max+1);y++) {
+				for(x=x_min;x<(x_max+1);x++) {
+					//(x-pc)
+					dif_x=pow((x-theta_x),2);
+					dif_y=pow((y-theta_y),2);
+					dif_z=pow((z-theta_z),2);
+
+					//add to f gaussian value for each region
+					p=((x-1)+((y-1)*(*dimx))+((z-1)*(*dimx)*(*dimy)));
+					//Rprintf("x=%d y=%d z=%d p=%d\n",x,y,z,p);
+					gx[p]=gx[p]+theta[reg+4]*(1/(pow(sqrt(2*M_PI),3)*sqrt(det_sig)))*exp(-.5*(dif_x/sig_x+dif_y/sig_x+dif_z/sig_x));
+
+				}
+			}
+		}
+	}
+}
+
+
+void simplessqgaussnew(double *theta, double *dat, double *W, int *brain, int *np, int *dimx, int *dimy, int *dimz, double *ss)
+{
+
+	int reg,x,y,z,p,i;
+	int x_min,y_min,z_min,x_max,y_max,z_max;
+	double theta_x,theta_y,theta_z,sig_x,det_sig,dif_x,dif_y,dif_z,g,*gx;
+
+	gx = (double *) R_alloc(((*dimx)*(*dimy)*(*dimz)),sizeof(double));
+
+	for(reg=0;reg<(*np);reg=reg+5) {
+
+		//parameter coordinates
+		theta_x=theta[reg+0];
+		theta_y=theta[reg+1];
+		theta_z=theta[reg+2];
+
+		//sigma matrix
+		sig_x=pow(theta[reg+3],2);
+
+		//determinant of sigma
+		det_sig=pow(sig_x,3);
+		if(det_sig < 0) det_sig=0;
+
+		x_min = (int) theta_x - (int) sig_x;
+		x_max = (int) theta_x + (int) sig_x;
+		y_min = (int) theta_y - (int) sig_x;
+		y_max = (int) theta_y + (int) sig_x;
+		z_min = (int) theta_z - (int) sig_x;
+		z_max = (int) theta_z + (int) sig_x;
+
+		if(x_min<1) x_min = 1;
+		if(x_max>*dimx) x_max = *dimx;
+
+		if(y_min<1) y_min = 1;
+		if(y_max>*dimy) y_max = *dimy;
+
+		if(z_min<1) z_min = 1;
+		if(z_max>*dimz) z_max = *dimz;
+
+		for(z=z_min;z<(z_max+1);z++) {
+			for(y=y_min;y<(y_max+1);y++) {
+				for(x=x_min;x<(x_max+1);x++) {
+
+					p=((x-1)+((y-1)*(*dimx))+((z-1)*(*dimx)*(*dimy)));
+					//Rprintf("x=%d y=%d z=%d p=%d\n",x,y,z,p);
+
+					if(brain[p]!=0) {
+
+						//(x-pc)
+						dif_x=pow((x-theta_x),2);
+						dif_y=pow((y-theta_y),2);
+						dif_z=pow((z-theta_z),2);
+
+						//add to f gaussian value for each region
+						gx[p]=gx[p]+theta[reg+4]*(1/(pow(sqrt(2*M_PI),3)*sqrt(det_sig)))*exp(-.5*(dif_x/sig_x+dif_y/sig_x+dif_z/sig_x));
+					} //brain loop
+				} //x loop
+			} //y loop
+		} //z loop
+	} //reg loop
+
+	g=0e0;
+	for(i=0;i<((*dimx)*(*dimy)*(*dimz));i++) {
+		if(brain[i]!=0) {
+			g=g+pow((dat[i]-gx[i]),2)*(1/W[i]);
+		}
+	}
+	ss[0]=g;
+}
 
 
 void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, double *B)

@@ -23,7 +23,7 @@ function(arfmodel,type=c('gauss','simple'),options=loadOptions(arfmodel),dat=rea
 	}
 	
 	if(.options.start.method(options)=='load') .model.startval(arfmodel) <- loadStart(arfmodel)
-	
+		
 	if(.options.min.routine(options)=='nlm') {
 		if(type=='simple')	arfmodel = fitSimpleModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 		if(type=='gauss')	arfmodel = fitModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 

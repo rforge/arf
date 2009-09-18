@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=5,
-		update=0,
-		svnrev=73
+		update=1,
+		svnrev=74
 	)
 )
 
@@ -198,8 +198,8 @@ setClass(
 		opt.upper=c(rep(256,6),rep(.95,3),Inf),			#L-BFGS-U upper bound
 		min.analyticalgrad=T, 	#use analytical gradient
 		min.iterlim=5000,		#iteration limit
-		min.routine='optim',		#which routine
-		start.method='load',	
+		min.routine='optim',	#which routine
+		start.method='start',	
 		start.maxfac=1,
 		start.vector=c(0,0,0,0,0,0,.05,.05,.05,10),
 		chk.method='imagedim',
