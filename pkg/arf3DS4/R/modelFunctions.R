@@ -1,4 +1,4 @@
-#############################################
+show#############################################
 # arf3DS4 S4 MODEL FUNCTIONS  	     		#
 # Copyright(c) 2009 Wouter D. Weeda			#
 # University of Amsterdam					#
@@ -109,23 +109,61 @@ function(arfmodel) save(arfmodel,file=paste(.model.modelpath(arfmodel),.Platform
 #save the model to the model.Rda
 
 saveModelBin <- 
-function(arfmodel) 
+function(arfmodel,type=c('pos+neg','pos','neg','all')) 
 #save the modelBinary
 {
 	
 	#set separator
 	sp <- .Platform$file.sep
 	
+	#match type
+	type <- match.arg(type)
+	pos=neg=full=FALSE
+	if(type=='pos+neg') full=T
+	if(type=='neg') neg=T
+	if(type=='pos') pos=T
+	if(type=='all') full=neg=pos=T
+	
+	
 	#get Header info from avgdatfile
 	headinf <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))
 	
 	#set fullpaths
 	.nifti.header.fullpath(headinf) <- .model.modeldatapath(arfmodel)
-	.nifti.header.filename(headinf) <- .model.modelDataFile(arfmodel)
-	.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 	
 	#write the Data to the modelNiftiFile
-	writeData(headinf,.C('gauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
+	if(full) {
+		.nifti.header.filename(headinf) <- .model.modelDataFile(arfmodel)
+		.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
+		writeData(headinf,.C('gauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
+	}
+	
+	if(pos)	{
+		theta = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
+		which_neg = which(theta[10,]<0)
+		
+		if(length(which_neg)>0) theta = theta[,-which_neg]
+		regs = ncol(theta)
+		thetavec = as.vector(theta)
+		
+		.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_pos',sep='')
+		.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
+		
+		writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
+	}
+	
+	if(neg)	{
+		theta = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
+		which_pos = which(theta[10,]>0)
+		if(length(which_pos)>0) theta = theta[,-which_pos]
+		regs = ncol(theta)
+		thetavec = as.vector(theta)
+		
+		.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_neg',sep='')
+		.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
+		
+		writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
+	}
 	
 	return(arfmodel)
 	
@@ -192,3 +230,13 @@ function(object,...)
 	
 }
 
+showModels <-
+function(subject,condition,experiment=.experiment)
+#show all models in for a subject and condition
+{
+	sp <- .Platform$file.sep
+	modname = paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.modelDir(experiment),sp,.experiment.modelnamesRda(experiment),sep='')
+	mod = loadRda(modname)
+	return(mod)
+	
+}

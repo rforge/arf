@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=5,
-		update=1,
-		svnrev=74
+		update=2,
+		svnrev=75
 	)
 )
 
@@ -70,6 +70,8 @@ setClass(
 		residualFile='character',		#name of residual binary
 		derivativeFile='character',		#name of derivative binary
 		weightFile='character',
+		lowresFile='character',
+		lowresAvg='character',
 		logFile='character',
 		version='ANY'
 	),
@@ -104,6 +106,8 @@ setClass(
 		residualFile='residuals.bin',	#name of residual binary
 		derivativeFile='derivs.bin',	#name of derivative binary
 		weightFile='weights.bin',
+		lowresFile='lowres_struct',
+		lowresAvg='avglowres_struct',
 		logFile='arfprocess.log',
 		version=new('version')
 		)
@@ -118,7 +122,7 @@ setClass(
 		linkedfile='character',		#link to betafile
 		examp2high='character',		#examp2high ASCII mat (affine transform)
 		high2stand='character',		#high2standard ASCII mat (affine transform)
-		examp2stand='character',
+		examp2stand='character',	#examp2high ASCII mat (affine transform)
 		example='character',		#example.nii.gz (corr to betafile)
 		highres='character',		#highres.nii.gz (subject anatomical scan)
 		standard='character',		#standard.nii.gz (FSL MNI152)

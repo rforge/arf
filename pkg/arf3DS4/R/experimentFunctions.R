@@ -10,7 +10,7 @@
 #chngRootExp
 #setExp
 #loadExp
-#getFSL
+#getFSLdata
 #checkVersion
 
 checkExp <- 
@@ -342,7 +342,7 @@ function(curversion,version=1,build=0,update=0)
 }
 
 
-getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF',expdir=getwd(),settings=new('settings'),quiet=F,doReg=T,doFunc=T) 
+getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF',expdir=getwd(),settings=new('settings'),quiet=F,doReg=T,doFunc=F) 
 {
 	#set separator
 	sp = .Platform$file.sep
@@ -498,7 +498,7 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 			}
 		}
 		cat('> ready\n')
-	}
+	} else cat('registration files not requested.\n')
 	
 	if(doFunc) {
 		
@@ -536,7 +536,7 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 		cat('> ready\n')
 		
 		
-	} else cat('functional files not requested.')
+	} else cat('functional files not requested.\n')
 	
 	#set experiment and create weights
 	experiment <- setExp(.experiment.path(experiment),1,1,T,T,T,T)

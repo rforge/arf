@@ -11,9 +11,14 @@
 #createFuncs
 #setRegFiles
 #setRegParams
-#arfToMNI
+#arf2MNI
+#MNI2arf
 #setFuncFile
 #flipAxis
+#euclidDist
+#makeLowResStruct
+#makeLowResStructAvg
+
 
 cropVolume <- 
 function(filename,resizeToDim,quiet=F) 
@@ -94,7 +99,7 @@ function(betadir,quiet=T)
 	
 }
 
-read.FSL.mat <- 
+readFSLmat <- 
 function(filename)
 #read FSL affine matrix file
 {
@@ -170,6 +175,7 @@ function(registration,examp2stand='example_func2standard.mat',examp2high='exampl
 	.registration.standard(registration) <- standard
 	if(!file.exists(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.standard(registration),sep=''))) stop('standard does not exist')
 	
+	
 	#save regfile object
 	save(registration,file=paste(.registration.fullpath(registration),.Platform$file.sep,.registration.filename(registration),sep=''))
 	
@@ -197,8 +203,8 @@ function(registration)
 	.registration.SXhi(registration)[1,4] = .fmri.data.dims(highres)[2]-1
 	
 	#set affine transformation matrices
-	.registration.Aex2hi(registration) = read.FSL.mat(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.examp2high(registration),sep=''))
-	.registration.Ahi2st(registration) = read.FSL.mat(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.high2stand(registration),sep=''))
+	.registration.Aex2hi(registration) = readFSLmat(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.examp2high(registration),sep=''))
+	.registration.Ahi2st(registration) = readFSLmat(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.high2stand(registration),sep=''))
 	
 	#set origin offset matrix
 	.registration.OXst(registration) = rbind(.fmri.data.srow_x(standard),.fmri.data.srow_y(standard),.fmri.data.srow_z(standard),c(0,0,0,1))	
@@ -212,7 +218,7 @@ function(registration)
 
 
 
-arfToMNI <- 
+arf2MNI <- 
 #arfToMNI converts arf-native voxel locations to MNI_152 standard coordinates		
 function(xyz_coor,registration) 
 {
@@ -246,6 +252,55 @@ function(xyz_coor,registration)
 	#return MNI
 	return(stand_mni_flipped[-length(stand_mni_flipped)])
 		
+}
+
+MNI2arf <- 
+#arfToMNI converts MNI_152 standard coordinates	to arf-native voxel locations	
+function(xyz_coor,registration) 
+{
+	
+	xyz = c(xyz_coor,1)
+	
+	#inverse standard_vox to MNI (origin offset)
+	stand_mni_flipped = solve(.registration.OXst(registration))%*%xyz
+	
+	#inverse standard_mm to standard_vox 
+	stand_vox_flipped = (.registration.Dst(registration))%*%stand_mni_flipped
+	
+	#inverse high_mm to standard_mm
+	stand_mm_flipped = solve(.registration.Ahi2st(registration))%*%stand_vox_flipped
+	
+	#inverse high_vox to high_mm
+	high_mm_flipped = solve(.registration.Dhi(registration))%*%stand_mm_flipped
+	
+	#inverse x-axis flipped
+	high_vox_flipped = solve(.registration.SXhi(registration))%*%high_mm_flipped
+	
+	#inverse high_mm to high_vox
+	high_vox = (.registration.Dhi(registration))%*%high_vox_flipped
+	
+	#inverse examp_mm to high_mm
+	high_mm = solve(.registration.Aex2hi(registration))%*%high_vox
+	
+	#inverse examp_vox to mm
+	examp_mm = solve(.registration.Dex(registration))%*%high_mm
+			
+	#return arf
+	return(examp_mm[-length(examp_mm)])
+	
+}
+
+MNI2atlas <- 
+#MNI converts MNI_152 standard coordinates to tal index 		
+function(xyz_coor,registration) 
+{
+	xyz = c(xyz_coor,1)
+		
+	#inverse standard_vox to MNI (origin offset)
+	stand_mni_flipped = solve(.registration.OXst(registration))%*%xyz
+			
+	#return arf
+	return(stand_mni_flipped [-length(stand_mni_flipped)])
 }
 
 flipAxis <-
@@ -364,6 +419,300 @@ function(experiment=.experiment,func_data='filtered_func_data.nii.gz')
 	
 	#return registration object
 	return(invisible(functional))
+}
+
+euclidDist <-
+function(arfmodel,thres=5,quiet=F) 
+#calculate euclidian distances between estimates
+{
+	
+	theta = matrix(.model.estimates(arfmodel),10)
+	#distmat = matrix(0,ncol(theta),ncol(theta))
+	#showmat = matrix(0,ncol(theta),ncol(theta))
+	
+	p=0
+	for(i in 1:(ncol(theta)-1)) {
+		for(j in (i+1):ncol(theta)) {
+			
+			dist=0
+			for(k in 1:3) dist = dist + (theta[k,i]-theta[k,j])^2
+			#distmat[i,j]=c(sqrt(dist))
+			
+			opp=FALSE
+			if(theta[10,j]<0 & theta[10,i]>0) opp=TRUE
+			if(theta[10,j]>0 & theta[10,i]<0) opp=TRUE
+			
+			if(i!=j & distmat[i,j]<thres & opp) {
+				if(!quiet) cat('region',i,'[',round(theta[c(1,2,3,4,5,6,10),i]),'] -',j,'[',round(theta[c(1,2,3,4,5,6,10),j]),'] distance:',sqrt(dist),'\n')
+				#showmat[i,j]=1/sqrt(dist)
+			}
+			p=p+1	
+		}
+	}
+	#return(list(dist=distmat,opp=showmat))
+}
+
+
+makeLowResStruct <-
+function(arfdata,experiment=.experiment)
+#make low resolution structural image from high_res T1 image
+{
+	trials = list.files(.data.regDir(arfdata),full=F)
+	
+	for(trialdir in trials) {
+		
+		registration = loadRda(paste(.data.regDir(arfdata),.Platform$file.sep,trialdir,.Platform$file.sep,.data.regRda(arfdata),sep=''))
+		
+		examp = readData(.registration.linkedfile(registration))
+		highres = readData(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.highres(registration),sep=''))
+		
+		ex2high = readFSLmat(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.examp2high(registration),sep=''))
+		
+		dimx = .fmri.data.dims(examp)[2]
+		dimy = .fmri.data.dims(examp)[3]
+		dimz = .fmri.data.dims(examp)[4]
+		
+		highdat = .fmri.data.datavec(highres)
+		dim(highdat) = c(.fmri.data.dims(highres)[2],.fmri.data.dims(highres)[3],.fmri.data.dims(highres)[4])
+		
+		newdat = examp
+		.fmri.data.filename(newdat) = .experiment.lowresFile(experiment)
+		.fmri.data.fullpath(newdat) = paste(.data.regDir(arfdata),.Platform$file.sep,trialdir,sep='')
+		
+		newdatavec = rep(0,dimx*dimy*dimz)
+		dim(newdatavec) = c(dimx,dimy,dimz)		
+		
+		for(z in 1:dimz) {
+			for(y in 1:dimy) {
+				for(x in 1:dimx) {
+							
+					xyz = c(x,y,z,1)
+					
+					examp_mm = .registration.Dex(registration)%*%xyz
+					high_mm = .registration.Aex2hi(registration)%*%examp_mm
+					high_vox = solve(.registration.Dhi(registration))%*%high_mm
+				
+					newdatavec[x,y,z] = highdat[high_vox[1],high_vox[2],high_vox[3]] 
+
+				}
+			}
+		}
+		
+		.fmri.data.cal_min(newdat) = min(newdatavec)
+		.fmri.data.cal_max(newdat) = max(newdatavec)
+		
+		invisible(writeData(newdat,as.vector(newdatavec)))
+		
+	}
+	
+}
+
+makeLowResStructAvg <-
+function(arfmodel,experiment=.experiment)
+#make average of low_resolution structural images
+{
+	
+	sp = .Platform$file.sep
+	trials = list.files(.model.regDir(arfmodel),full=F)
+	
+	avgdat = 0
+	
+	for(trialdir in trials) {
+		
+		registration = loadRda(paste(.model.regDir(arfmodel),sp,trialdir,sp,.model.regRda(arfmodel),sep=''))
+		fn = list.files(path=.registration.fullpath(registration),pattern=.experiment.lowresFile(experiment),full=T)
+		lrdat = readData(fn[1])
+		avgdat = avgdat + .fmri.data.datavec(lrdat)
+	}
+
+	avgdat = avgdat / length(trials)
+	
+	avgstruct = lrdat
+	.fmri.data.filename(avgstruct) = .experiment.lowresAvg(experiment)
+	.fmri.data.fullpath(avgstruct) = .model.modeldatapath(arfmodel)
+	.fmri.data.cal_min(avgstruct) = min(avgdat)
+	.fmri.data.cal_max(avgstruct) = max(avgdat)
+
+	invisible(writeData(avgstruct,avgdat))
+}
+
+
+getTal <-
+function(atlas='talairach',FSLDIR='/usr/local/fsl',which='2mm')
+#get talairach indices from FSL talairach file
+{
+	sp <- .Platform$file.sep
+	
+	atlas = match.arg(atlas)
+	if(!atlas=='talairach') stop('only talairach atlas is supported')
+	
+	atlaspath = paste(FSLDIR,sp,'data/atlases',sep='')
+	taldat = read.table(paste(atlaspath,sp,atlas,'.xml',sep=''),fill=T,skip=15,sep='\n',strings=F)
+	
+	talmat = matrix(NA,1106,6)
+	
+	for(i in 1:1106) {
+	
+		#split up data
+		splits = strsplit(strsplit(taldat[i,1],'>')[[1]],'<')
+		
+		index = as.numeric(strsplit(strsplit(splits[[1]],' ')[[2]],'=')[[2]][2])
+		namevec = strsplit(splits[[2]][1],"\\.")[[1]]
+		
+		talmat[i,1]=index
+		talmat[i,2:6]=namevec
+		
+	}
+	
+	talname = paste(FSLDIR,sp,'data/atlases',sp,atlas,sp,atlas,'-labels-2mm.nii.gz',sep='')
+	talfile = readData(talname)
+
+	talmap = .fmri.data.datavec(talfile)
+	dim(talmap) = c(.fmri.data.dims(talfile)[2],.fmri.data.dims(talfile)[3],.fmri.data.dims(talfile)[4])
+	
+	return(list(data=talmat,map=talmap))
+		
+}
+
+getOxfordCort <-
+function(atlas='HarvardOxford',FSLDIR='/usr/local/fsl',which='2mm')
+#get talairach indices from FSL talairach file
+{
+	sp <- .Platform$file.sep
+	
+	atlas = match.arg(atlas)
+	if(!atlas=='HarvardOxford') stop('only Oxford atlas is supported')
+	
+	atlaspath = paste(FSLDIR,sp,'data/atlases',sep='')
+	taldat = read.table(paste(atlaspath,sp,atlas,'-Cortical.xml',sep=''),fill=T,skip=16,sep='\n',strings=F,quote="")
+	taldat=apply(taldat,2,function(x) gsub("\"",'',x))
+	
+	talmat = matrix(NA,48,2)
+	
+	for(i in 1:48) {
+		
+		#split up data
+		splits = strsplit(strsplit(taldat[i,1],'>')[[1]],'<')
+		index = as.numeric(strsplit(strsplit(splits[[1]],' ')[[2]],'=')[[2]][2])
+		namevec = strsplit(splits[[2]][1],"\\.")[[1]]
+
+		talmat[i,1]=index
+		talmat[i,2]=namevec
+		
+	}
+	
+	talname = paste(FSLDIR,sp,'data/atlases',sp,atlas,sp,atlas,'-cort-maxprob-thr0-2mm.nii.gz',sep='')
+	talfile = readData(talname)
+
+	talmap = .fmri.data.datavec(talfile)
+	dim(talmap) = c(.fmri.data.dims(talfile)[2],.fmri.data.dims(talfile)[3],.fmri.data.dims(talfile)[4])
+
+	return(list(data=talmat,map=talmap))
+	
+}
+
+getOxfordSubCort <-
+function(atlas='HarvardOxford',FSLDIR='/usr/local/fsl',which='2mm')
+#get talairach indices from FSL talairach file
+{
+	sp <- .Platform$file.sep
+	
+	atlas = match.arg(atlas)
+	if(!atlas=='HarvardOxford') stop('only Oxford atlas is supported')
+	
+	atlaspath = paste(FSLDIR,sp,'data/atlases',sep='')
+	taldat = read.table(paste(atlaspath,sp,atlas,'-Subcortical.xml',sep=''),fill=T,skip=16,sep='\n',strings=F,quote="")
+	taldat=apply(taldat,2,function(x) gsub("\"",'',x))
+	
+	talmat = matrix(NA,21,2)
+	
+	for(i in 1:21) {
+		
+		#split up data
+		splits = strsplit(strsplit(taldat[i,1],'>')[[1]],'<')
+		index = as.numeric(strsplit(strsplit(splits[[1]],' ')[[2]],'=')[[2]][2])
+		namevec = strsplit(splits[[2]][1],"\\.")[[1]]
+		
+		talmat[i,1]=index
+		talmat[i,2]=namevec
+		
+	}
+	
+	talname = paste(FSLDIR,sp,'data/atlases',sp,atlas,sp,atlas,'-sub-maxprob-thr0-2mm.nii.gz',sep='')
+	talfile = readData(talname)
+	
+	talmap = .fmri.data.datavec(talfile)
+	dim(talmap) = c(.fmri.data.dims(talfile)[2],.fmri.data.dims(talfile)[3],.fmri.data.dims(talfile)[4])
+	
+	return(list(data=talmat,map=talmap))
+	
+}
+
+
+
+arfToAtlas <-
+function(xyz,registration,atlasdata,which)
+#gets atlas labels from ARF coordinates
+{
+	
+	mni = arfToMNI(xyz,registration)
+	atlas = round(MNI2atlas(mni,registration))
+
+	if(any(atlas<1) | atlas[1]>91 | atlas[2]>109 | atlas[3]>91) index=0 else index = atlasdata$map[atlas[1],atlas[2],atlas[3]]
+	
+	if(which=='Talairach') return(atlasdata$data[index+1,])
+	if(which=='HarvardOxford') 	if(index==0) return(c('-1','No label found!')) else return(try(atlasdata$data[index,]))
+	
+	
+}
+
+
+arfLocations <-
+function(arfmodel,atlas=c('Talairach','HarvardOxford'))
+#get and print talairach labels of region centers
+{
+
+	sp <- .Platform$file.sep
+
+	atlas = match.arg(atlas)
+	
+	centers = round(matrix(.model.estimates(arfmodel),10)[c(1,2,3),])
+	
+	trial = list.files(.model.regDir(arfmodel),full=F)[1]
+	registration = loadRda(paste(.model.regDir(arfmodel),sp,trial,sp,.model.regRda(arfmodel),sep=''))
+	
+	cat('Using',atlas,'atlas\n')
+	
+		if(atlas=='Talairach') {
+		atlasdata = getTal()
+		for(regs in 1:ncol(centers)) {
+			
+			regdat = arfToAtlas(as.vector(centers[,regs]),registration,atlasdata,atlas)
+			cat('Region',regs,'[',centers[,regs],'] labels:\n')
+			for(i in 1:(length(regdat)-1)) cat('  [',i,']  ',regdat[i+1],'\n',sep='')
+			cat('\n')
+			
+		}
+	}
+	
+	
+	if(atlas=='HarvardOxford') {
+		atlasdata_cort = getOxfordCort()
+		atlasdata_sub = getOxfordSubCort()
+	
+		for(regs in 1:ncol(centers)) {
+			
+			regdatC = arfToAtlas(as.vector(centers[,regs]),registration,atlasdata_cort,atlas)
+			regdatS = arfToAtlas(as.vector(centers[,regs]),registration,atlasdata_sub,atlas)
+			
+			cat('Region',regs,'[',centers[,regs],'] labels:\n')
+			cat('  [cort]  ',regdatC[2],'\n',sep='')
+			cat('  [sub ]  ',regdatS[2],'\n',sep='')
+			cat('\n')
+			
+		}
+	}
+		
 }
 
 

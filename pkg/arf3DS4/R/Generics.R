@@ -439,6 +439,28 @@ standMethod <- function(x, value) {x@weightFile<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'experiment'
+funcname <-'.experiment.lowresFile'
+standGen <- function(object) standardGeneric('.experiment.lowresFile')
+standMethod <- function(object) object@lowresFile
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.experiment.lowresFile<-'
+standGen <- function(x, value) standardGeneric('.experiment.lowresFile<-')
+standMethod <- function(x, value) {x@lowresFile<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'experiment'
+funcname <-'.experiment.lowresAvg'
+standGen <- function(object) standardGeneric('.experiment.lowresAvg')
+standMethod <- function(object) object@lowresAvg
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.experiment.lowresAvg<-'
+standGen <- function(x, value) standardGeneric('.experiment.lowresAvg<-')
+standMethod <- function(x, value) {x@lowresAvg<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'experiment'
 funcname <-'.experiment.logFile'
 standGen <- function(object) standardGeneric('.experiment.logFile')
 standMethod <- function(object) object@logFile
@@ -788,6 +810,28 @@ setMethod(funcname,classname,standMethod)
 slotreplace <-'.settings.weightFile<-'
 standGen <- function(x, value) standardGeneric('.settings.weightFile<-')
 standMethod <- function(x, value) {x@weightFile<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'settings'
+funcname <-'.settings.lowresFile'
+standGen <- function(object) standardGeneric('.settings.lowresFile')
+standMethod <- function(object) object@lowresFile
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.settings.lowresFile<-'
+standGen <- function(x, value) standardGeneric('.settings.lowresFile<-')
+standMethod <- function(x, value) {x@lowresFile<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'settings'
+funcname <-'.settings.lowresAvg'
+standGen <- function(object) standardGeneric('.settings.lowresAvg')
+standMethod <- function(object) object@lowresAvg
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.settings.lowresAvg<-'
+standGen <- function(x, value) standardGeneric('.settings.lowresAvg<-')
+standMethod <- function(x, value) {x@lowresAvg<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'settings'
