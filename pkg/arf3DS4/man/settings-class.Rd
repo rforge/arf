@@ -30,6 +30,10 @@
 \alias{.settings.funcRda<-,settings-method}
 \alias{.settings.logFile,settings-method}
 \alias{.settings.logFile<-,settings-method}
+\alias{.settings.lowresAvg,settings-method}
+\alias{.settings.lowresAvg<-,settings-method}
+\alias{.settings.lowresFile,settings-method}
+\alias{.settings.lowresFile<-,settings-method}
 \alias{.settings.modelDataFile,settings-method}
 \alias{.settings.modelDataFile<-,settings-method}
 \alias{.settings.modeldatDir,settings-method}
@@ -104,6 +108,8 @@ Objects can be created by calls of the form \code{new("settings", ...)}.
     \item{\code{residualFile}:}{Name of the residuals file (binary).}
     \item{\code{derivativeFile}:}{Name of the derivatives file (binary).}
     \item{\code{weightFile}:}{Name of the weight file (binary).}
+    \item{\code{lowresFile}:}{Name of the lowres structural image.}
+    \item{\code{lowresAvg}:}{Name of the average lowres structural image.}
     \item{\code{logFile}:}{Name of the logFile (not yet implemented).}
     \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}}) }
   }

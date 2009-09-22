@@ -4,6 +4,8 @@
 \alias{model-class}
 \alias{.model.avgdatfile,model-method}
 \alias{.model.avgdatfile<-,model-method}
+\alias{.model.avgtstatFile,model-method}
+\alias{.model.avgtstatFile<-,model-method}
 \alias{.model.avgWfile,model-method}
 \alias{.model.avgWfile<-,model-method}
 \alias{.model.betafiles,model-method}
@@ -24,10 +26,16 @@
 \alias{.model.funcDir<-,model-method}
 \alias{.model.funcRda,model-method}
 \alias{.model.funcRda<-,model-method}
+\alias{.model.gradient,model-method}
+\alias{.model.gradient<-,model-method}
 \alias{.model.hessian,model-method}
 \alias{.model.hessian<-,model-method}
 \alias{.model.iterates,model-method}
 \alias{.model.iterates<-,model-method}
+\alias{.model.logFile,model-method}
+\alias{.model.logFile<-,model-method}
+\alias{.model.mask,model-method}
+\alias{.model.mask<-,model-method}
 \alias{.model.minimum,model-method}
 \alias{.model.minimum<-,model-method}
 \alias{.model.modelDataFile,model-method}
@@ -40,10 +48,16 @@
 \alias{.model.modelname<-,model-method}
 \alias{.model.modelpath,model-method}
 \alias{.model.modelpath<-,model-method}
+\alias{.model.modeltype,model-method}
+\alias{.model.modeltype<-,model-method}
+\alias{.model.n,model-method}
+\alias{.model.n<-,model-method}
 \alias{.model.name,model-method}
 \alias{.model.name<-,model-method}
 \alias{.model.optionsFile,model-method}
 \alias{.model.optionsFile<-,model-method}
+\alias{.model.params,model-method}
+\alias{.model.params<-,model-method}
 \alias{.model.proctime,model-method}
 \alias{.model.proctime<-,model-method}
 \alias{.model.regDir,model-method}
@@ -56,6 +70,8 @@
 \alias{.model.residualFile<-,model-method}
 \alias{.model.sandwichmethod,model-method}
 \alias{.model.sandwichmethod<-,model-method}
+\alias{.model.ss,model-method}
+\alias{.model.ss<-,model-method}
 \alias{.model.startFile,model-method}
 \alias{.model.startFile<-,model-method}
 \alias{.model.startval,model-method}
@@ -76,148 +92,81 @@
 \alias{.model.weightFile<-,model-method}
 \alias{.model.weightfiles,model-method}
 \alias{.model.weightfiles<-,model-method}
+\alias{plot,model,missing-method}
 \alias{show,model-method}
 
-\title{Class "model" ~~~ }
-\description{	 ~~ A concise (1-5 lines) description of what the class is.  ~~}
-\section{Objects from the Class}{
+\title{arf3DS4 "model" class}
+\description{The arf3DS4 model class contains all information on a (fitted) model. It extends the "data" class directly, since it uses these files to fit the model. The "model" class contains information on file locations and filenames. More importantly it contains information on the fitted model: parameter estimates, parameter variance/covariance matrices, statistical test information, fit indices, convergence information, warnings, etc.}
+\section{Objects}{
 Objects can be created by calls of the form \code{new("model", ...)}.
-	 ~~ describe objects here ~~ 
+ 
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{modelname}:}{Object of class \code{"character"} ~~ }
-    \item{\code{modelpath}:}{Object of class \code{"character"} ~~ }
-    \item{\code{modeldatapath}:}{Object of class \code{"character"} ~~ }
-    \item{\code{residualFile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{derivativeFile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{weightFile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{modelDataFile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{fullmodelDataFile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{modelFile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{optionsFile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{startFile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{convergence}:}{Object of class \code{"character"} ~~ }
-    \item{\code{iterates}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{minimum}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{estimates}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{hessian}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{sandwichmethod}:}{Object of class \code{"character"} ~~ }
-    \item{\code{varcov}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{warnings}:}{Object of class \code{"character"} ~~ }
-    \item{\code{fit}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{wald}:}{Object of class \code{"ANY"} ~~ }
-    \item{\code{regions}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{startval}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{proctime}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{valid}:}{Object of class \code{"logical"} ~~ }
-    \item{\code{name}:}{Object of class \code{"character"} ~~ }
-    \item{\code{fullpath}:}{Object of class \code{"character"} ~~ }
-    \item{\code{betafiles}:}{Object of class \code{"character"} ~~ }
-    \item{\code{weightfiles}:}{Object of class \code{"character"} ~~ }
-    \item{\code{avgdatfile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{avgWfile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{regDir}:}{Object of class \code{"character"} ~~ }
-    \item{\code{regRda}:}{Object of class \code{"character"} ~~ }
-    \item{\code{funcDir}:}{Object of class \code{"character"} ~~ }
-    \item{\code{funcRda}:}{Object of class \code{"character"} ~~ }
-    \item{\code{trials}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{version}:}{Object of class \code{"ANY"} ~~ }
+    \item{\code{modelname}:}{Name of the (fitted) model.}
+    \item{\code{modelpath}:}{Full path to the model directory.}
+    \item{\code{modeldatapath}:}{Full path to the model/data directory. }
+    \item{\code{residualFile}:}{Name of the file containing model residuals. }
+    \item{\code{derivativeFile}:}{Name of the file containing first order derivatives. }
+    \item{\code{weightFile}:}{Name of the file containing binary weights.}
+    \item{\code{modelDataFile}:}{Name of the file containing model predicitions. }
+    \item{\code{fullmodelDataFile}:}{Full name of the file containing model predicitions.}
+    \item{\code{modelFile}:}{Name of the model.Rda file containing the model object.}
+    \item{\code{optionsFile}:}{Name of the options.Rda file (used to specify options, see \code{\linkS4class{options}}).}
+    \item{\code{startFile}:}{Name of the start.Rda file.}
+    \item{\code{logFile}:}{Name of the log.Rda file. }
+    \item{\code{convergence}:}{Convergence information.}
+    \item{\code{iterates}:}{Number of iterates. }
+    \item{\code{minimum}:}{Value of the objective function at the minimum. }
+    \item{\code{estimates}:}{Parameter Estimates. }
+    \item{\code{gradient}:}{Gradient of the objective function to the parameters at the minimum. }
+    \item{\code{hessian}:}{Hessian matrix of the solution.}
+    \item{\code{params}:}{Number of parameters. }
+    \item{\code{modeltype}:}{Type of model fitted.}
+    \item{\code{sandwichmethod}:}{Method used to calculate Sandwich estimates.}
+    \item{\code{varcov}:}{Variance/covariance matrix of the parameters. }
+    \item{\code{warnings}:}{Warnings encountered during processing. }
+    \item{\code{fit}:}{Fit of the model (BIC and RMSEA). }
+    \item{\code{wald}:}{Wald class object (containing model statistics, see \code{\linkS4class{wald}})}
+    \item{\code{regions}:}{Number of spatial models fitted.}
+    \item{\code{startval}:}{Starting values of the minimization procedure. }
+    \item{\code{proctime}:}{Processing time of minization and sandwich estimation.}
+    \item{\code{valid}:}{Is the model valid?}
+    \item{\code{name}:}{Name of the data objec, usually 'subjectname - conditionname'. }
+	\item{\code{fullpath}:}{Fullpath to the data directory.}
+    \item{\code{betafiles}:}{Vector of filenames (full path) of the beta files (containing beta estimates).}
+    \item{\code{weightfiles}:}{Vector of filenames (full path) of the weight files (containing variances of the beta estimates).}
+    \item{\code{avgdatfile}:}{Filename of the averaged beta file.}
+    \item{\code{avgWfile}:}{Filename of the averaged weight file.}
+    \item{\code{avgtstatFile}:}{Filename of the average t-statistics file (=avgbetafile/sqrt(avgweightfile)) }
+    \item{\code{n}:}{Number of 'brain' voxels (excluding voxels not masked).}
+    \item{\code{mask}:}{Vector containing an (optional) mask for the data.}
+    \item{\code{ss}:}{Sums-of-squares of the data.}
+    \item{\code{regDir}:}{Fullpath to the registration directory.}
+    \item{\code{regRda}:}{Name of the registration.Rda file.}
+    \item{\code{funcDir}:}{Fullpath to the functional directory.}
+    \item{\code{funcRda}:}{Name of the functional.Rda file.}
+    \item{\code{trials}:}{Number of trials (= number of beta files).}
+    \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }
 }
 \section{Extends}{
-Class \code{"\linkS4class{data}"}, directly.
+Class \code{\linkS4class{data}}, directly.
 }
 \section{Methods}{
   \describe{
-    \item{.model.avgdatfile}{\code{signature(object = "model")}: ... }
-    \item{.model.avgdatfile<-}{\code{signature(x = "model")}: ... }
-    \item{.model.avgWfile}{\code{signature(object = "model")}: ... }
-    \item{.model.avgWfile<-}{\code{signature(x = "model")}: ... }
-    \item{.model.betafiles}{\code{signature(object = "model")}: ... }
-    \item{.model.betafiles<-}{\code{signature(x = "model")}: ... }
-    \item{.model.convergence}{\code{signature(object = "model")}: ... }
-    \item{.model.convergence<-}{\code{signature(x = "model")}: ... }
-    \item{.model.derivativeFile}{\code{signature(object = "model")}: ... }
-    \item{.model.derivativeFile<-}{\code{signature(x = "model")}: ... }
-    \item{.model.estimates}{\code{signature(object = "model")}: ... }
-    \item{.model.estimates<-}{\code{signature(x = "model")}: ... }
-    \item{.model.fit}{\code{signature(object = "model")}: ... }
-    \item{.model.fit<-}{\code{signature(x = "model")}: ... }
-    \item{.model.fullmodelDataFile}{\code{signature(object = "model")}: ... }
-    \item{.model.fullmodelDataFile<-}{\code{signature(x = "model")}: ... }
-    \item{.model.fullpath}{\code{signature(object = "model")}: ... }
-    \item{.model.fullpath<-}{\code{signature(x = "model")}: ... }
-    \item{.model.funcDir}{\code{signature(object = "model")}: ... }
-    \item{.model.funcDir<-}{\code{signature(x = "model")}: ... }
-    \item{.model.funcRda}{\code{signature(object = "model")}: ... }
-    \item{.model.funcRda<-}{\code{signature(x = "model")}: ... }
-    \item{.model.hessian}{\code{signature(object = "model")}: ... }
-    \item{.model.hessian<-}{\code{signature(x = "model")}: ... }
-    \item{.model.iterates}{\code{signature(object = "model")}: ... }
-    \item{.model.iterates<-}{\code{signature(x = "model")}: ... }
-    \item{.model.minimum}{\code{signature(object = "model")}: ... }
-    \item{.model.minimum<-}{\code{signature(x = "model")}: ... }
-    \item{.model.modelDataFile}{\code{signature(object = "model")}: ... }
-    \item{.model.modelDataFile<-}{\code{signature(x = "model")}: ... }
-    \item{.model.modeldatapath}{\code{signature(object = "model")}: ... }
-    \item{.model.modeldatapath<-}{\code{signature(x = "model")}: ... }
-    \item{.model.modelFile}{\code{signature(object = "model")}: ... }
-    \item{.model.modelFile<-}{\code{signature(x = "model")}: ... }
-    \item{.model.modelname}{\code{signature(object = "model")}: ... }
-    \item{.model.modelname<-}{\code{signature(x = "model")}: ... }
-    \item{.model.modelpath}{\code{signature(object = "model")}: ... }
-    \item{.model.modelpath<-}{\code{signature(x = "model")}: ... }
-    \item{.model.name}{\code{signature(object = "model")}: ... }
-    \item{.model.name<-}{\code{signature(x = "model")}: ... }
-    \item{.model.optionsFile}{\code{signature(object = "model")}: ... }
-    \item{.model.optionsFile<-}{\code{signature(x = "model")}: ... }
-    \item{.model.proctime}{\code{signature(object = "model")}: ... }
-    \item{.model.proctime<-}{\code{signature(x = "model")}: ... }
-    \item{.model.regDir}{\code{signature(object = "model")}: ... }
-    \item{.model.regDir<-}{\code{signature(x = "model")}: ... }
-    \item{.model.regions}{\code{signature(object = "model")}: ... }
-    \item{.model.regions<-}{\code{signature(x = "model")}: ... }
-    \item{.model.regRda}{\code{signature(object = "model")}: ... }
-    \item{.model.regRda<-}{\code{signature(x = "model")}: ... }
-    \item{.model.residualFile}{\code{signature(object = "model")}: ... }
-    \item{.model.residualFile<-}{\code{signature(x = "model")}: ... }
-    \item{.model.sandwichmethod}{\code{signature(object = "model")}: ... }
-    \item{.model.sandwichmethod<-}{\code{signature(x = "model")}: ... }
-    \item{.model.startFile}{\code{signature(object = "model")}: ... }
-    \item{.model.startFile<-}{\code{signature(x = "model")}: ... }
-    \item{.model.startval}{\code{signature(object = "model")}: ... }
-    \item{.model.startval<-}{\code{signature(x = "model")}: ... }
-    \item{.model.trials}{\code{signature(object = "model")}: ... }
-    \item{.model.trials<-}{\code{signature(x = "model")}: ... }
-    \item{.model.valid}{\code{signature(object = "model")}: ... }
-    \item{.model.valid<-}{\code{signature(x = "model")}: ... }
-    \item{.model.varcov}{\code{signature(object = "model")}: ... }
-    \item{.model.varcov<-}{\code{signature(x = "model")}: ... }
-    \item{.model.version}{\code{signature(object = "model")}: ... }
-    \item{.model.version<-}{\code{signature(x = "model")}: ... }
-    \item{.model.wald}{\code{signature(object = "model")}: ... }
-    \item{.model.wald<-}{\code{signature(x = "model")}: ... }
-    \item{.model.warnings}{\code{signature(object = "model")}: ... }
-    \item{.model.warnings<-}{\code{signature(x = "model")}: ... }
-    \item{.model.weightFile}{\code{signature(object = "model")}: ... }
-    \item{.model.weightFile<-}{\code{signature(x = "model")}: ... }
-    \item{.model.weightfiles}{\code{signature(object = "model")}: ... }
-    \item{.model.weightfiles<-}{\code{signature(x = "model")}: ... }
+ 	\item{access}{\code{.classname.slotname(object)}}
+    \item{replace}{\code{.classname.slotname(object)<-}}
+    \item{plot}{\code{signature(x = "model", y = "missing")}: ... }
     \item{show}{\code{signature(object = "model")}: ... }
 	 }
+ In this case classname is "model" and slotname is for example "estimates". So to access the "estimates" slot of an r-object "mymodel"  (of class "model") type \code{.settings.estimates(mymodel)}.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ }
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	~~objects to See Also as \code{\link{~~fun~~}}, ~~~
-	or \code{\linkS4class{CLASSNAME}} for links to other classes
+	\code{\linkS4class{data}},\code{\linkS4class{options}}, \code{\linkS4class{wald}}
 }
 \examples{
-showClass("model")
+showClass("data")
 }
 \keyword{classes}

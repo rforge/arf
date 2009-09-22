@@ -4,6 +4,8 @@
 \alias{data-class}
 \alias{.data.avgdatfile,data-method}
 \alias{.data.avgdatfile<-,data-method}
+\alias{.data.avgtstatFile,data-method}
+\alias{.data.avgtstatFile<-,data-method}
 \alias{.data.avgWfile,data-method}
 \alias{.data.avgWfile<-,data-method}
 \alias{.data.betafiles,data-method}
@@ -14,12 +16,18 @@
 \alias{.data.funcDir<-,data-method}
 \alias{.data.funcRda,data-method}
 \alias{.data.funcRda<-,data-method}
+\alias{.data.mask,data-method}
+\alias{.data.mask<-,data-method}
+\alias{.data.n,data-method}
+\alias{.data.n<-,data-method}
 \alias{.data.name,data-method}
 \alias{.data.name<-,data-method}
 \alias{.data.regDir,data-method}
 \alias{.data.regDir<-,data-method}
 \alias{.data.regRda,data-method}
 \alias{.data.regRda<-,data-method}
+\alias{.data.ss,data-method}
+\alias{.data.ss<-,data-method}
 \alias{.data.trials,data-method}
 \alias{.data.trials<-,data-method}
 \alias{.data.version,data-method}
@@ -28,66 +36,42 @@
 \alias{.data.weightfiles<-,data-method}
 \alias{show,data-method}
 
-\title{Class "data" ~~~ }
-\description{	 ~~ A concise (1-5 lines) description of what the class is.  ~~}
-\section{Objects from the Class}{
+\title{arf3DS4 "data" class}
+\description{The "data" class contains all information on the fMRI data of one condition of a subject. Mostly the "data" class contains filenames of the datafiles (with full paths) with some basic information on the number of trials etc., the functional volumes, and registration files. Each instance of \code{\linkS4class{model}} class object inherits a "data" object. The "data" class uses some slots of the \code{\linkS4class{experiment}} class.}
+\section{Objects}{
 Objects can be created by calls of the form \code{new("data", ...)}.
-	 ~~ describe objects here ~~ 
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{name}:}{Object of class \code{"character"} ~~ }
-    \item{\code{fullpath}:}{Object of class \code{"character"} ~~ }
-    \item{\code{betafiles}:}{Object of class \code{"character"} ~~ }
-    \item{\code{weightfiles}:}{Object of class \code{"character"} ~~ }
-    \item{\code{avgdatfile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{avgWfile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{regDir}:}{Object of class \code{"character"} ~~ }
-    \item{\code{regRda}:}{Object of class \code{"character"} ~~ }
-    \item{\code{funcDir}:}{Object of class \code{"character"} ~~ }
-    \item{\code{funcRda}:}{Object of class \code{"character"} ~~ }
-    \item{\code{trials}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{version}:}{Object of class \code{"ANY"} ~~ }
+    \item{\code{name}:}{Name of the data objec, usually 'subjectname - conditionname'. }
+    \item{\code{fullpath}:}{Fullpath to the data directory.}
+    \item{\code{betafiles}:}{Vector of filenames (full path) of the beta files (containing beta estimates).}
+    \item{\code{weightfiles}:}{Vector of filenames (full path) of the weight files (containing variances of the beta estimates).}
+    \item{\code{avgdatfile}:}{Filename of the averaged beta file.}
+    \item{\code{avgWfile}:}{Filename of the averaged weight file.}
+    \item{\code{avgtstatFile}:}{Filename of the average t-statistics file (=avgbetafile/sqrt(avgweightfile)) }
+    \item{\code{n}:}{Number of 'brain' voxels (excluding voxels not masked).}
+    \item{\code{mask}:}{Vector containing an (optional) mask for the data.}
+    \item{\code{ss}:}{Sums-of-squares of the data.}
+    \item{\code{regDir}:}{Fullpath to the registration directory.}
+    \item{\code{regRda}:}{Name of the registration.Rda file.}
+    \item{\code{funcDir}:}{Fullpath to the functional directory.}
+    \item{\code{funcRda}:}{Name of the functional.Rda file.}
+    \item{\code{trials}:}{Number of trials (= number of beta files).}
+    \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }
 }
 \section{Methods}{
+Standard arf3DS4 accessor and replacement functions can be used to access and replace slots.  
   \describe{
-    \item{.data.avgdatfile}{\code{signature(object = "data")}: ... }
-    \item{.data.avgdatfile<-}{\code{signature(x = "data")}: ... }
-    \item{.data.avgWfile}{\code{signature(object = "data")}: ... }
-    \item{.data.avgWfile<-}{\code{signature(x = "data")}: ... }
-    \item{.data.betafiles}{\code{signature(object = "data")}: ... }
-    \item{.data.betafiles<-}{\code{signature(x = "data")}: ... }
-    \item{.data.fullpath}{\code{signature(object = "data")}: ... }
-    \item{.data.fullpath<-}{\code{signature(x = "data")}: ... }
-    \item{.data.funcDir}{\code{signature(object = "data")}: ... }
-    \item{.data.funcDir<-}{\code{signature(x = "data")}: ... }
-    \item{.data.funcRda}{\code{signature(object = "data")}: ... }
-    \item{.data.funcRda<-}{\code{signature(x = "data")}: ... }
-    \item{.data.name}{\code{signature(object = "data")}: ... }
-    \item{.data.name<-}{\code{signature(x = "data")}: ... }
-    \item{.data.regDir}{\code{signature(object = "data")}: ... }
-    \item{.data.regDir<-}{\code{signature(x = "data")}: ... }
-    \item{.data.regRda}{\code{signature(object = "data")}: ... }
-    \item{.data.regRda<-}{\code{signature(x = "data")}: ... }
-    \item{.data.trials}{\code{signature(object = "data")}: ... }
-    \item{.data.trials<-}{\code{signature(x = "data")}: ... }
-    \item{.data.version}{\code{signature(object = "data")}: ... }
-    \item{.data.version<-}{\code{signature(x = "data")}: ... }
-    \item{.data.weightfiles}{\code{signature(object = "data")}: ... }
-    \item{.data.weightfiles<-}{\code{signature(x = "data")}: ... }
-    \item{show}{\code{signature(object = "data")}: ... }
+    \item{access}{\code{.classname.slotname(object)}}
+    \item{replace}{\code{.classname.slotname(object)<-}}
 	 }
+In this case classname is "data" and slotname is for example "avgstatfile". So to access the "avgtstatfile" slot of an r-object "mydata"  (of class "data") type \code{.settings.avgtstatfile(mydata)}.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ }
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	~~objects to See Also as \code{\link{~~fun~~}}, ~~~
-	or \code{\linkS4class{CLASSNAME}} for links to other classes
+	\code{\linkS4class{model}},\code{\linkS4class{experiment}}
 }
 \examples{
 showClass("data")

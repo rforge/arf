@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=5,
-		update=2,
-		svnrev=75
+		update=3,
+		svnrev=76
 	)
 )
 
@@ -198,8 +198,8 @@ setClass(
 		nlm.gradtol=1e-6,		#NLM gradient tolerance
 		nlm.steptol=1e-3,		#NLM stepsize tolerance
 		opt.method='L-BFGS-B',	#optim method
-		opt.lower=c(rep(0,3),rep(1,3),rep(-.95,3),-Inf),	#L-BFGS-U lower bound
-		opt.upper=c(rep(256,6),rep(.95,3),Inf),			#L-BFGS-U upper bound
+		opt.lower=c(rep(1,3),rep(1,3),rep(-.95,3),-Inf),	#L-BFGS-U lower bound
+		opt.upper=c(rep(Inf,3),rep(3,3),rep(.95,3),Inf),	#L-BFGS-U upper bound
 		min.analyticalgrad=T, 	#use analytical gradient
 		min.iterlim=5000,		#iteration limit
 		min.routine='optim',	#which routine
@@ -298,7 +298,7 @@ setClass(
 		intent_p1 = 0,
 		intent_p2 = 0,
 		intent_p3 = 0,
-		intent_code = 0,
+		intent_code = 5,
 		datatype = 16,			#storage data type
 		bitpix = 32,			#bits per pixel
 		slice_start = 0,		
@@ -328,7 +328,7 @@ setClass(
 		srow_x = c(1,0,0,0),
 		srow_y = c(0,1,0,0),
 		srow_z = c(0,0,1,0),
-		intent_name = 'ARF',	#meaning of data
+		intent_name = 'estimates',	#meaning of data
 		magic = 'n+1',					#magicstring
 		data.type = 'double',			#type of data
 		data.signed = TRUE				#signed data

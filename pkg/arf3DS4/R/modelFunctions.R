@@ -109,7 +109,7 @@ function(arfmodel) save(arfmodel,file=paste(.model.modelpath(arfmodel),.Platform
 #save the model to the model.Rda
 
 saveModelBin <- 
-function(arfmodel,type=c('pos+neg','pos','neg','all')) 
+function(arfmodel,type=c('pos+neg','pos','neg','all','separate')) 
 #save the modelBinary
 {
 	
@@ -164,6 +164,20 @@ function(arfmodel,type=c('pos+neg','pos','neg','all'))
 		
 		writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
 	}
+	
+	if(type=='separate') {
+		theta = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
+		regs = 1
+		
+		for(i in 1:ncol(theta)) {
+			thetavec = as.vector(theta[,i])
+			.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_region',i,sep='')
+			.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
+			writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
+		}
+		
+	}
+	
 	
 	return(arfmodel)
 	

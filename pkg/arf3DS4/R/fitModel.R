@@ -207,10 +207,22 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	}
 	
 	#set boundaries in L-BFGS-B mode
-	.options.opt.upper(options)[4:6] = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])	
-	if(length(.options.opt.lower(options))==1) lowbound=-Inf else lowbound=rep(.options.opt.lower(options),.model.regions(arfmodel))
-	if(length(.options.opt.upper(options))==1) upbound=Inf else upbound=rep(.options.opt.upper(options),.model.regions(arfmodel))
+	if(length(.options.opt.lower(options))==1 | length(.options.opt.upper(options))==1) {
+		lowbound=-Inf
+		upbound=Inf
+	} else {
+		#set location to maximal dim
+		.options.opt.upper(options)[1:3] = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
+		
+		#set width parameters to maxdim divided by tphe value given in the options
+		.options.opt.upper(options)[4] = .fmri.data.dims(dat)[2]/.options.opt.upper(options)[4]
+		.options.opt.upper(options)[5] = .fmri.data.dims(dat)[3]/.options.opt.upper(options)[5]
+		.options.opt.upper(options)[6] = .fmri.data.dims(dat)[4]/.options.opt.upper(options)[6]
 	
+		upbound = rep(.options.opt.upper(options),.model.regions(arfmodel))
+		lowbound = rep(.options.opt.lower(options),.model.regions(arfmodel))
+	}
+
 	#check startingvalues
 	arfmodel <- validStart(arfmodel)
 		
@@ -358,9 +370,23 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	}
 	
 	#set boundaries in L-BFGS-B mode
-	.options.opt.upper(options)[4:6] = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
-	if(length(.options.opt.lower(options))==1) lowbound=-Inf else lowbound=rep(.options.opt.lower(options)[-c(5:9)],.model.regions(arfmodel))
-	if(length(.options.opt.upper(options))==1) upbound=Inf else upbound=rep(.options.opt.upper(options)[-c(5:9)],.model.regions(arfmodel))
+	#set boundaries in L-BFGS-B mode
+	if(length(.options.opt.lower(options))==1 | length(.options.opt.upper(options))==1) {
+		lowbound=-Inf
+		upbound=Inf
+	} else {
+		#set location to maximal dim
+		.options.opt.upper(options)[1:3] = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
+		
+		#set width parameters to maxdim divided by tphe value given in the options
+		.options.opt.upper(options)[4] = .fmri.data.dims(dat)[2]/.options.opt.upper(options)[4]
+		.options.opt.upper(options)[5] = .fmri.data.dims(dat)[3]/.options.opt.upper(options)[5]
+		.options.opt.upper(options)[6] = .fmri.data.dims(dat)[4]/.options.opt.upper(options)[6]
+		
+		upbound = rep(.options.opt.upper(options)[-c(5:9)],.model.regions(arfmodel))
+		lowbound = rep(.options.opt.lower(options)[-c(5:9)],.model.regions(arfmodel))
+		
+	}	
 	
 	#check startingvalues
 	arfmodel <- validStart(arfmodel)

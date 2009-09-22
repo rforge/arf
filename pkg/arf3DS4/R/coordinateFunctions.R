@@ -13,12 +13,14 @@
 #setRegParams
 #arf2MNI
 #MNI2arf
+#MNI2atlas
 #setFuncFile
 #flipAxis
 #euclidDist
 #makeLowResStruct
 #makeLowResStructAvg
-
+#getTalairach
+#getHarvardOxford
 
 cropVolume <- 
 function(filename,resizeToDim,quiet=F) 
@@ -222,8 +224,8 @@ arf2MNI <-
 #arfToMNI converts arf-native voxel locations to MNI_152 standard coordinates		
 function(xyz_coor,registration) 
 {
-		
-	xyz = c(xyz_coor,1)
+	#minus one to correct for vector in FSL starting at zero	
+	xyz = c(xyz_coor-1,1)
 	
 	#examp_vox to mm
 	examp_mm = .registration.Dex(registration)%*%xyz
@@ -245,7 +247,7 @@ function(xyz_coor,registration)
 	
 	#standard_mm to standard_vox 
 	stand_vox_flipped = solve(.registration.Dst(registration))%*%stand_mm_flipped
-	
+
 	#standard_vox to MNI (origin offset)
 	stand_mni_flipped = .registration.OXst(registration)%*%stand_vox_flipped
 	
@@ -258,9 +260,9 @@ MNI2arf <-
 #arfToMNI converts MNI_152 standard coordinates	to arf-native voxel locations	
 function(xyz_coor,registration) 
 {
-	
+	#add one (at end to corrrect for arf coordinates starting at 1 in R)
 	xyz = c(xyz_coor,1)
-	
+
 	#inverse standard_vox to MNI (origin offset)
 	stand_mni_flipped = solve(.registration.OXst(registration))%*%xyz
 	
@@ -286,33 +288,36 @@ function(xyz_coor,registration)
 	examp_mm = solve(.registration.Dex(registration))%*%high_mm
 			
 	#return arf
-	return(examp_mm[-length(examp_mm)])
+	return(examp_mm[-length(examp_mm)]+1)
 	
 }
 
 MNI2atlas <- 
-#MNI converts MNI_152 standard coordinates to tal index 		
+#MNI converts MNI_152 standard coordinates to atlas index coordinates 		
 function(xyz_coor,registration) 
 {
+	#add one (at end to corrrect for arf coordinates starting at 1 in R)
 	xyz = c(xyz_coor,1)
-		
+	
 	#inverse standard_vox to MNI (origin offset)
 	stand_mni_flipped = solve(.registration.OXst(registration))%*%xyz
 			
 	#return arf
-	return(stand_mni_flipped [-length(stand_mni_flipped)])
+	return(stand_mni_flipped [-length(stand_mni_flipped)]+1)
 }
 
 flipAxis <-
 function(data_array,axis=c('x','y','z'))
 #flips the axis of a data_array
 {
+	#which axis
 	axis = match.arg(axis)
 	
+	#create standard affine matrix
 	new_dat = data_array
-	
 	affine = diag(c(1,1,1,1))
 	
+	#flip x-axis
 	if(axis=='x') {
 		affine[1,1] = -1
 		affine[1,4] = dim(data_array)[1]+1
@@ -322,6 +327,7 @@ function(data_array,axis=c('x','y','z'))
 		}
 	} 
 	
+	#flip y-axis
 	if(axis=='y') {
 		affine[2,2] = -1
 		affine[2,4] = dim(data_array)[2]+1
@@ -331,6 +337,7 @@ function(data_array,axis=c('x','y','z'))
 		}
 	} 
 	
+	#flip z-axis
 	if(axis=='z') {
 		affine[3,3] = -1
 		affine[3,4] = dim(data_array)[3]+1
@@ -422,21 +429,20 @@ function(experiment=.experiment,func_data='filtered_func_data.nii.gz')
 }
 
 euclidDist <-
-function(arfmodel,thres=5,quiet=F) 
+function(arfmodel,thres=5,quiet=T) 
 #calculate euclidian distances between estimates
 {
 	
 	theta = matrix(.model.estimates(arfmodel),10)
-	#distmat = matrix(0,ncol(theta),ncol(theta))
-	#showmat = matrix(0,ncol(theta),ncol(theta))
 	
 	p=0
+	#for all off-diagonal elements calculate Euclidian distance
 	for(i in 1:(ncol(theta)-1)) {
 		for(j in (i+1):ncol(theta)) {
 			
 			dist=0
 			for(k in 1:3) dist = dist + (theta[k,i]-theta[k,j])^2
-			#distmat[i,j]=c(sqrt(dist))
+			distmat[i,j]=c(sqrt(dist))
 			
 			opp=FALSE
 			if(theta[10,j]<0 & theta[10,i]>0) opp=TRUE
@@ -444,12 +450,11 @@ function(arfmodel,thres=5,quiet=F)
 			
 			if(i!=j & distmat[i,j]<thres & opp) {
 				if(!quiet) cat('region',i,'[',round(theta[c(1,2,3,4,5,6,10),i]),'] -',j,'[',round(theta[c(1,2,3,4,5,6,10),j]),'] distance:',sqrt(dist),'\n')
-				#showmat[i,j]=1/sqrt(dist)
 			}
 			p=p+1	
 		}
 	}
-	#return(list(dist=distmat,opp=showmat))
+	return(distmat)
 }
 
 
@@ -457,41 +462,47 @@ makeLowResStruct <-
 function(arfdata,experiment=.experiment)
 #make low resolution structural image from high_res T1 image
 {
+	#get trials from dataDir
 	trials = list.files(.data.regDir(arfdata),full=F)
+	
+	if(length(trials)==0) stop('No trial directories found found in',.data.regDir(arfdata),',please run registration.')
 	
 	for(trialdir in trials) {
 		
+		#load registration parameters
 		registration = loadRda(paste(.data.regDir(arfdata),.Platform$file.sep,trialdir,.Platform$file.sep,.data.regRda(arfdata),sep=''))
 		
+		#read in lowres + highresfiles
 		examp = readData(.registration.linkedfile(registration))
 		highres = readData(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.highres(registration),sep=''))
-		
 		ex2high = readFSLmat(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.examp2high(registration),sep=''))
 		
+		
+		#set dimensions of highres image
+		highdat = .fmri.data.datavec(highres)
+		dim(highdat) = c(.fmri.data.dims(highres)[2],.fmri.data.dims(highres)[3],.fmri.data.dims(highres)[4])
+		
+		#set dimensions of lowres image
 		dimx = .fmri.data.dims(examp)[2]
 		dimy = .fmri.data.dims(examp)[3]
 		dimz = .fmri.data.dims(examp)[4]
 		
-		highdat = .fmri.data.datavec(highres)
-		dim(highdat) = c(.fmri.data.dims(highres)[2],.fmri.data.dims(highres)[3],.fmri.data.dims(highres)[4])
-		
+		#make newfile and fill with zeroes
 		newdat = examp
 		.fmri.data.filename(newdat) = .experiment.lowresFile(experiment)
 		.fmri.data.fullpath(newdat) = paste(.data.regDir(arfdata),.Platform$file.sep,trialdir,sep='')
-		
 		newdatavec = rep(0,dimx*dimy*dimz)
 		dim(newdatavec) = c(dimx,dimy,dimz)		
 		
+		#transform highresimage to lowres
 		for(z in 1:dimz) {
 			for(y in 1:dimy) {
 				for(x in 1:dimx) {
 							
 					xyz = c(x,y,z,1)
-					
 					examp_mm = .registration.Dex(registration)%*%xyz
 					high_mm = .registration.Aex2hi(registration)%*%examp_mm
 					high_vox = solve(.registration.Dhi(registration))%*%high_mm
-				
 					newdatavec[x,y,z] = highdat[high_vox[1],high_vox[2],high_vox[3]] 
 
 				}
@@ -501,6 +512,7 @@ function(arfdata,experiment=.experiment)
 		.fmri.data.cal_min(newdat) = min(newdatavec)
 		.fmri.data.cal_max(newdat) = max(newdatavec)
 		
+		#write data to new image
 		invisible(writeData(newdat,as.vector(newdatavec)))
 		
 	}
@@ -509,53 +521,53 @@ function(arfdata,experiment=.experiment)
 
 makeLowResStructAvg <-
 function(arfmodel,experiment=.experiment)
-#make average of low_resolution structural images
+#make average of low_resolution structural image from multiple lowres images (and save in modeldir)
 {
 	
 	sp = .Platform$file.sep
+	
+	#get trial list
 	trials = list.files(.model.regDir(arfmodel),full=F)
 	
+	#set avg to zero
 	avgdat = 0
-	
-	for(trialdir in trials) {
 		
+	#load and sum images
+	for(trialdir in trials) {
 		registration = loadRda(paste(.model.regDir(arfmodel),sp,trialdir,sp,.model.regRda(arfmodel),sep=''))
 		fn = list.files(path=.registration.fullpath(registration),pattern=.experiment.lowresFile(experiment),full=T)
 		lrdat = readData(fn[1])
 		avgdat = avgdat + .fmri.data.datavec(lrdat)
 	}
-
 	avgdat = avgdat / length(trials)
 	
+	#set parameters for newfile and save to modelpath
 	avgstruct = lrdat
 	.fmri.data.filename(avgstruct) = .experiment.lowresAvg(experiment)
 	.fmri.data.fullpath(avgstruct) = .model.modeldatapath(arfmodel)
 	.fmri.data.cal_min(avgstruct) = min(avgdat)
 	.fmri.data.cal_max(avgstruct) = max(avgdat)
-
 	invisible(writeData(avgstruct,avgdat))
+
 }
 
 
-getTal <-
-function(atlas='talairach',FSLDIR='/usr/local/fsl',which='2mm')
+getTalairach <-
+function(FSLDIR='/usr/local/fsl',which='2mm')
 #get talairach indices from FSL talairach file
 {
 	sp <- .Platform$file.sep
 	
-	atlas = match.arg(atlas)
-	if(!atlas=='talairach') stop('only talairach atlas is supported')
 	
+	#set atlaspath of FSL
 	atlaspath = paste(FSLDIR,sp,'data/atlases',sep='')
-	taldat = read.table(paste(atlaspath,sp,atlas,'.xml',sep=''),fill=T,skip=15,sep='\n',strings=F)
+	taldat = read.table(paste(atlaspath,sp,'talairach.xml',sep=''),fill=T,skip=15,sep='\n',strings=F)
 	
 	talmat = matrix(NA,1106,6)
-	
 	for(i in 1:1106) {
 	
-		#split up data
+		#get index and names
 		splits = strsplit(strsplit(taldat[i,1],'>')[[1]],'<')
-		
 		index = as.numeric(strsplit(strsplit(splits[[1]],' ')[[2]],'=')[[2]][2])
 		namevec = strsplit(splits[[2]][1],"\\.")[[1]]
 		
@@ -564,156 +576,218 @@ function(atlas='talairach',FSLDIR='/usr/local/fsl',which='2mm')
 		
 	}
 	
-	talname = paste(FSLDIR,sp,'data/atlases',sp,atlas,sp,atlas,'-labels-2mm.nii.gz',sep='')
+	#set 2mm or 1mm file
+	which = match.arg(which)
+	if(which=='2mm') niiname = 'talairach-labels-2mm.nii.gz'
+	if(which=='1mm') niiname = 'talairach-labels-1mm.nii.gz'
+	
+	#read in file and make array (MNI voxel space)
+	talname = paste(FSLDIR,sp,'data/atlases/talairach',sp,niiname,sep='')
 	talfile = readData(talname)
-
 	talmap = .fmri.data.datavec(talfile)
 	dim(talmap) = c(.fmri.data.dims(talfile)[2],.fmri.data.dims(talfile)[3],.fmri.data.dims(talfile)[4])
 	
-	return(list(data=talmat,map=talmap))
+	#make atlas class
+	talairach <- list(data=talmat,map=talmap)
+	attr(talairach,'class') <- 'TalairachAtlas'
+	
+	return(talairach)
 		
 }
 
-getOxfordCort <-
-function(atlas='HarvardOxford',FSLDIR='/usr/local/fsl',which='2mm')
-#get talairach indices from FSL talairach file
+
+getHarvardOxford <-
+function(FSLDIR='/usr/local/fsl',which='2mm')
+#get harvard-oxford probability map (cortical and subcortical)
 {
 	sp <- .Platform$file.sep
-	
-	atlas = match.arg(atlas)
-	if(!atlas=='HarvardOxford') stop('only Oxford atlas is supported')
-	
+		
+	#get cortical and subcortical data
 	atlaspath = paste(FSLDIR,sp,'data/atlases',sep='')
-	taldat = read.table(paste(atlaspath,sp,atlas,'-Cortical.xml',sep=''),fill=T,skip=16,sep='\n',strings=F,quote="")
-	taldat=apply(taldat,2,function(x) gsub("\"",'',x))
+	cortdat  = read.table(paste(atlaspath,sp,'HarvardOxford-Cortical.xml',sep=''),fill=T,skip=16,sep='\n',strings=F,quote="")
+	cortdat = apply(cortdat,2,function(x) gsub("\"",'',x))
 	
-	talmat = matrix(NA,48,2)
-	
+	cortical = matrix(NA,48,2)
 	for(i in 1:48) {
 		
-		#split up data
-		splits = strsplit(strsplit(taldat[i,1],'>')[[1]],'<')
+		#get index and names
+		splits = strsplit(strsplit(cortdat[i,1],'>')[[1]],'<')
 		index = as.numeric(strsplit(strsplit(splits[[1]],' ')[[2]],'=')[[2]][2])
 		namevec = strsplit(splits[[2]][1],"\\.")[[1]]
-
-		talmat[i,1]=index
-		talmat[i,2]=namevec
+		
+		cortical[i,1]=index
+		cortical[i,2]=namevec
 		
 	}
 	
-	talname = paste(FSLDIR,sp,'data/atlases',sp,atlas,sp,atlas,'-cort-maxprob-thr0-2mm.nii.gz',sep='')
-	talfile = readData(talname)
-
-	talmap = .fmri.data.datavec(talfile)
-	dim(talmap) = c(.fmri.data.dims(talfile)[2],.fmri.data.dims(talfile)[3],.fmri.data.dims(talfile)[4])
-
-	return(list(data=talmat,map=talmap))
+	subdat = read.table(paste(atlaspath,sp,'HarvardOxford-Subcortical.xml',sep=''),fill=T,skip=16,sep='\n',strings=F,quote="")
+	subdat = apply(subdat,2,function(x) gsub("\"",'',x))
 	
-}
-
-getOxfordSubCort <-
-function(atlas='HarvardOxford',FSLDIR='/usr/local/fsl',which='2mm')
-#get talairach indices from FSL talairach file
-{
-	sp <- .Platform$file.sep
-	
-	atlas = match.arg(atlas)
-	if(!atlas=='HarvardOxford') stop('only Oxford atlas is supported')
-	
-	atlaspath = paste(FSLDIR,sp,'data/atlases',sep='')
-	taldat = read.table(paste(atlaspath,sp,atlas,'-Subcortical.xml',sep=''),fill=T,skip=16,sep='\n',strings=F,quote="")
-	taldat=apply(taldat,2,function(x) gsub("\"",'',x))
-	
-	talmat = matrix(NA,21,2)
-	
+	subcort = matrix(NA,21,2)
 	for(i in 1:21) {
 		
-		#split up data
-		splits = strsplit(strsplit(taldat[i,1],'>')[[1]],'<')
+		#get index and names
+		splits = strsplit(strsplit(subdat[i,1],'>')[[1]],'<')
 		index = as.numeric(strsplit(strsplit(splits[[1]],' ')[[2]],'=')[[2]][2])
 		namevec = strsplit(splits[[2]][1],"\\.")[[1]]
 		
-		talmat[i,1]=index
-		talmat[i,2]=namevec
+		subcort[i,1]=index
+		subcort[i,2]=namevec
 		
 	}
 	
-	talname = paste(FSLDIR,sp,'data/atlases',sp,atlas,sp,atlas,'-sub-maxprob-thr0-2mm.nii.gz',sep='')
-	talfile = readData(talname)
+	which = match.arg(which)
+	if(which=='2mm') {
+		cortnii = 'HarvardOxford-cort-prob-2mm.nii.gz'
+		subnii = 'HarvardOxford-sub-prob-2mm.nii.gz'
+	}
 	
-	talmap = .fmri.data.datavec(talfile)
-	dim(talmap) = c(.fmri.data.dims(talfile)[2],.fmri.data.dims(talfile)[3],.fmri.data.dims(talfile)[4])
+	if(which=='1mm') {
+		cortnii = 'HarvardOxford-cort-prob-1mm.nii.gz'
+		subnii = 'HarvardOxford-sub-prob-1mm.nii.gz'
+	}
 	
-	return(list(data=talmat,map=talmap))
+	#load cortical probability volume
+	cortfile = paste(FSLDIR,sp,'data/atlases/HarvardOxford',sp,cortnii,sep='')
+	corticalvol = readData(cortfile)
+	corticalmap = .fmri.data.datavec(corticalvol)
+	dim(corticalmap) = c(.fmri.data.dims(corticalvol)[2],.fmri.data.dims(corticalvol)[3],.fmri.data.dims(corticalvol)[4],.fmri.data.dims(corticalvol)[5])
+	
+	#load subcortical probability volume
+	subfile = paste(FSLDIR,sp,'data/atlases/HarvardOxford',sp,subnii,sep='')
+	subcortvol = readData(subfile)
+	subcortmap = .fmri.data.datavec(subcortvol)
+	dim(subcortmap) = c(.fmri.data.dims(subcortvol)[2],.fmri.data.dims(subcortvol)[3],.fmri.data.dims(subcortvol)[4],.fmri.data.dims(subcortvol)[5])
+	
+	#make atlas class
+	harvardoxford = list(cortical=list(data=cortical,map=corticalmap),subcortical=list(data=subcort,map=subcortmap))
+	attr(harvardoxford,'class') <- 'HarvardOxfordAtlas'
+	
+	return(harvardoxford)
 	
 }
 
 
-
-arfToAtlas <-
-function(xyz,registration,atlasdata,which)
-#gets atlas labels from ARF coordinates
+getAtlasLabels <-
+function(coordinates,registration,coortype=c('arf','mni'),atlas=c('both','Talairach','HarvardOxford'),...)
+#get atlas labels for a set of coordinates using a registration class and atlas type
 {
+	if(!is.matrix(coordinates)) stop('input coordinates must be in a matrix')
+	if(ncol(coordinates)!=3) stop('input coordinate matrix must have three columns (x,y,z)')
 	
-	mni = arfToMNI(xyz,registration)
-	atlas = round(MNI2atlas(mni,registration))
-
-	if(any(atlas<1) | atlas[1]>91 | atlas[2]>109 | atlas[3]>91) index=0 else index = atlasdata$map[atlas[1],atlas[2],atlas[3]]
-	
-	if(which=='Talairach') return(atlasdata$data[index+1,])
-	if(which=='HarvardOxford') 	if(index==0) return(c('-1','No label found!')) else return(try(atlasdata$data[index,]))
-	
-	
-}
-
-
-arfLocations <-
-function(arfmodel,atlas=c('Talairach','HarvardOxford'))
-#get and print talairach labels of region centers
-{
-
-	sp <- .Platform$file.sep
-
+	#get atlases
 	atlas = match.arg(atlas)
-	
-	centers = round(matrix(.model.estimates(arfmodel),10)[c(1,2,3),])
-	
-	trial = list.files(.model.regDir(arfmodel),full=F)[1]
-	registration = loadRda(paste(.model.regDir(arfmodel),sp,trial,sp,.model.regRda(arfmodel),sep=''))
-	
-	cat('Using',atlas,'atlas\n')
-	
-		if(atlas=='Talairach') {
-		atlasdata = getTal()
-		for(regs in 1:ncol(centers)) {
-			
-			regdat = arfToAtlas(as.vector(centers[,regs]),registration,atlasdata,atlas)
-			cat('Region',regs,'[',centers[,regs],'] labels:\n')
-			for(i in 1:(length(regdat)-1)) cat('  [',i,']  ',regdat[i+1],'\n',sep='')
-			cat('\n')
-			
-		}
+	if(atlas=='both') {
+		talairach = getTalairach(...)
+		harvard = getHarvardOxford(...)
 	}
+	if(atlas=='Talairach') talairach = getTalairach(...)
+	if(atlas=='HarvardOxford') harvard = getHarvardOxford(...)
 	
+	#convert coordinates to MNI voxel space
+	coortype = match.arg(coortype)
+	if(coortype=='arf') coordinates = t(apply(coordinates,1,function(coordinates,registration) arf2MNI(coordinates,registration),registration=registration))
+	coordinates = t(round(apply(coordinates,1,function(coordinates,registration) MNI2atlas(coordinates,registration),registration=registration)))
 	
-	if(atlas=='HarvardOxford') {
-		atlasdata_cort = getOxfordCort()
-		atlasdata_sub = getOxfordSubCort()
-	
-		for(regs in 1:ncol(centers)) {
-			
-			regdatC = arfToAtlas(as.vector(centers[,regs]),registration,atlasdata_cort,atlas)
-			regdatS = arfToAtlas(as.vector(centers[,regs]),registration,atlasdata_sub,atlas)
-			
-			cat('Region',regs,'[',centers[,regs],'] labels:\n')
-			cat('  [cort]  ',regdatC[2],'\n',sep='')
-			cat('  [sub ]  ',regdatS[2],'\n',sep='')
-			cat('\n')
-			
-		}
-	}
+	#get labels for the coordinates
+	atlasvec = vector(nrow(coordinates),mode='list')
+	for(i in 1:nrow(coordinates)) {
+		if(atlas=='both') atlasvec[[i]] = list(harvard=calcHarvardOxfordProbs(coordinates[i,],harvard),talairach=calcTalairach(coordinates[i,],talairach))
+		if(atlas=='Talairach') atlasvec[[i]] = list(talairach=calcTalairach(coordinates[i,],talairach))
+		if(atlas=='HarvardOxford') atlasvec[[i]] = list(harvard=calcHarvardOxfordProbs(coordinates[i,],harvard))
 		
+	}
+	
+	return(atlasvec)
 }
 
+calcHarvardOxfordProbs <-
+function(xyz,harvard)
+#calculate harvardOxford probabilities, return vector with percentage labels
+{
+	
+	#check validity of coordinates
+	valid = TRUE
+	if(xyz[1]<1 | xyz[1]>dim(harvard$cortical$map)[1]) valid=FALSE
+	if(xyz[2]<1 | xyz[2]>dim(harvard$cortical$map)[2]) valid=FALSE
+	if(xyz[3]<1 | xyz[3]>dim(harvard$cortical$map)[3]) valid=FALSE
+	
+	labelvec = character(0)
+	
+	if(valid) {
+		#get cortical and subcortical data
+		cortical_probvec = harvard$cortical$map[xyz[1],xyz[2],xyz[3],] 
+		subcort_probvec = harvard$subcortical$map[xyz[1],xyz[2],xyz[3],] 
+		
+		cort_large_probs = which(cortical_probvec>=1)
+		sub_large_probs = which(subcort_probvec>=1)
+	
+		for(i in 1:length(cort_large_probs)) {
+			index = cort_large_probs[i]
+			labelvec = c(labelvec,paste(cortical_probvec[cort_large_probs[i]],'% ',harvard$cortical$data[index,2],sep=''))
+		}
+		
+		for(i in 1:length(sub_large_probs)) {
+			index = sub_large_probs[i]
+			labelvec = c(labelvec,paste(subcort_probvec[sub_large_probs[i]],'% ',harvard$subcortical$data[index,2],sep=''))
+		}
+		
+	}
+	
+	return(labelvec)
+	
+}
+
+calcTalairach <-
+function(xyz,talairach)
+#calculate talairach index labels, return vector with matching labels
+{
+	#check validity of coordinates
+	valid = TRUE
+	if(xyz[1]<1 | xyz[1]>dim(talairach$map)[1]) valid=FALSE
+	if(xyz[2]<1 | xyz[2]>dim(talairach$map)[2]) valid=FALSE
+	if(xyz[3]<1 | xyz[3]>dim(talairach$map)[3]) valid=FALSE
+	
+	labelvec = character(0)
+	
+	if(valid) {
+		#get talairach labels
+		index = talairach$map[xyz[1],xyz[2],xyz[3]]
+		labelvec = c(labelvec,talairach$data[index+1,2:6])
+	}
+	
+	return(labelvec)
+}
+
+getModelAtlas <-
+function(arfmodel,regtrial=1,saveastext=F) 
+#wrapper for Atlas coordinates of model estimates
+{
+	sp <- .Platform$file.sep
+	trials = list.files(.model.regDir(arfmodel),full=F)[regtrial]
+	registration = loadRda(paste(.model.regDir(arfmodel),sp,trials,sp,.model.regRda(arfmodel),sep=''))
+	
+	estimates = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
+	coors = t(round(estimates[c(1,2,3),]))
+	
+	atlas = getAtlasLabels(coors,registration,coortype='arf')
+	
+	if(saveastext) sink(paste(.model.modelname(arfmodel),'-atlas.txt',sep=''),split=T)
+	
+	for(i in 1:nrow(coors)) {
+		cat('Region ',i,' [',coors[i,1],' ',coors[i,2],' ',coors[i,3],'] @ ',round(estimates[10,i]),'\n',sep='')
+		cat('HarvardOxford:\n')
+		for(j in 1:length(atlas[[i]]$harvard)) cat('  ',atlas[[i]]$harvard[j],'\n')
+		cat('Talairach:\n')
+		for(j in 1:length(atlas[[i]]$talairach)) cat('  ',atlas[[i]]$talairach[j],'\n')
+		cat('\n')	
+	}
+	
+	if(saveastext) sink()
+	
+	
+	return(invisible(atlas))
+	
+}
 
 
