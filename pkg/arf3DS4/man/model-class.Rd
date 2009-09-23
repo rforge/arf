@@ -154,19 +154,20 @@ Objects can be created by calls of the form \code{new("model", ...)}.
 Class \code{\linkS4class{data}}, directly.
 }
 \section{Methods}{
+ Standard arf3DS4 accessor and replacement functions can be used to access and replace slots. 
   \describe{
  	\item{access}{\code{.classname.slotname(object)}}
     \item{replace}{\code{.classname.slotname(object)<-}}
     \item{plot}{\code{signature(x = "model", y = "missing")}: ... }
     \item{show}{\code{signature(object = "model")}: ... }
 	 }
- In this case classname is "model" and slotname is for example "estimates". So to access the "estimates" slot of an r-object "mymodel"  (of class "model") type \code{.settings.estimates(mymodel)}.
+ In this case classname is "model" and slotname is for example "estimates". So to access the "estimates" slot of an r-object "mymodel"  (of class "model") type \code{.model.estimates(mymodel)}.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
 	\code{\linkS4class{data}},\code{\linkS4class{options}}, \code{\linkS4class{wald}}
 }
 \examples{
-showClass("data")
+showClass("model")
 }
 \keyword{classes}

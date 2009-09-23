@@ -107,190 +107,85 @@
 \alias{.nifti.header.xyzt_units,nifti.header-method}
 \alias{.nifti.header.xyzt_units<-,nifti.header-method}
 
-\title{Class "nifti.header" ~~~ }
-\description{	 ~~ A concise (1-5 lines) description of what the class is.  ~~}
-\section{Objects from the Class}{
+\title{arf3DS4 "nifti.header" class }
+\description{The arf3DS4 "nifti.header" class contains the header information of an ANALYZE/NIFTI functional volume.}
+\section{Objects}{
 Objects can be created by calls of the form \code{new("nifti.header", ...)}.
-	 ~~ describe objects here ~~ 
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{sizeof_hdr}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{data_type}:}{Object of class \code{"character"} ~~ }
-    \item{\code{db_name}:}{Object of class \code{"character"} ~~ }
-    \item{\code{extents}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{session_error}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{regular}:}{Object of class \code{"character"} ~~ }
-    \item{\code{dim_info}:}{Object of class \code{"character"} ~~ }
-    \item{\code{dims}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{intent_p1}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{intent_p2}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{intent_p3}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{intent_code}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{datatype}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{bitpix}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{slice_start}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{pixdim}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{vox_offset}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{scl_slope}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{scl_inter}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{slice_end}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{slice_code}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{xyzt_units}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{cal_max}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{cal_min}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{slice_duration}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{toffset}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{glmax}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{glmin}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{descrip}:}{Object of class \code{"character"} ~~ }
-    \item{\code{aux_file}:}{Object of class \code{"character"} ~~ }
-    \item{\code{qform_code}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{sform_code}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{quatern_b}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{quatern_c}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{quatern_d}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{qoffset_x}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{qoffset_y}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{qoffset_z}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{srow_x}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{srow_y}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{srow_z}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{intent_name}:}{Object of class \code{"character"} ~~ }
-    \item{\code{magic}:}{Object of class \code{"character"} ~~ }
-    \item{\code{data.type}:}{Object of class \code{"character"} ~~ }
-    \item{\code{data.signed}:}{Object of class \code{"logical"} ~~ }
-    \item{\code{fullpath}:}{Object of class \code{"character"} ~~ }
-    \item{\code{filename}:}{Object of class \code{"character"} ~~ }
-    \item{\code{filetype}:}{Object of class \code{"character"} ~~ }
-    \item{\code{extension}:}{Object of class \code{"character"} ~~ }
-    \item{\code{gzipped}:}{Object of class \code{"logical"} ~~ }
-    \item{\code{endian}:}{Object of class \code{"character"} ~~ }
-    \item{\code{version}:}{Object of class \code{"ANY"} ~~ }
+    \item{\code{sizeof_hdr}:}{<nifti> Size of the header file.}
+    \item{\code{data_type}:}{<nifti> Type of data (representation). }
+    \item{\code{db_name}:}{<nifti> db_name.}
+    \item{\code{extents}:}{<nifti> extents}
+    \item{\code{session_error}:}{<nifti> session error. }
+    \item{\code{regular}:}{<nifti> regular }
+    \item{\code{dim_info}:}{<nifti> MRI slice ordering. }
+    \item{\code{dims}:}{<nifti> Data array dimensions. }
+    \item{\code{intent_p1}:}{<nifti> 1st intent parameter.}
+    \item{\code{intent_p2}:}{<nifti> 2nd intent parameter.}
+    \item{\code{intent_p3}:}{<nifti> 3rd intent parameter.}
+    \item{\code{intent_code}:}{<nifti> Intent code.}
+    \item{\code{datatype}:}{<nifti> Data type.}
+    \item{\code{bitpix}:}{<nifti> Number of bits per voxel.}
+    \item{\code{slice_start}:}{<nifti> First slice index. }
+    \item{\code{pixdim}:}{<nifti> Grid spacing (single voxel dimensions).}
+    \item{\code{vox_offset}:}{<nifti> Offset in the .nii file. }
+    \item{\code{scl_slope}:}{<nifti> Data scaling, slope. }
+    \item{\code{scl_inter}:}{<nifti> Data scaling, offset. }
+    \item{\code{slice_end}:}{<nifti> Last slice index. }
+    \item{\code{slice_code}:}{<nifti> Slice timing order. }
+    \item{\code{xyzt_units}:}{<nifti> Units of single voxel dimensions. }
+    \item{\code{cal_max}:}{<nifti> Maximum display intensity. }
+    \item{\code{cal_min}:}{<nifti> Minimum display intensity. }
+    \item{\code{slice_duration}:}{<nifti> Time for one slice (TR).}
+    \item{\code{toffset}:}{<nifti> Shift in time. }
+    \item{\code{glmax}:}{<nifti> glmax. }
+    \item{\code{glmin}:}{<nifti> glmin. }
+    \item{\code{descrip}:}{<nifti> Description of file.}
+    \item{\code{aux_file}:}{<nifti> An auxilliary filename. }
+    \item{\code{qform_code}:}{<nifti> q_form code. }
+    \item{\code{sform_code}:}{<nifti> s_form code.}
+    \item{\code{quatern_b}:}{<nifti> quaternion b parameter. }
+    \item{\code{quatern_c}:}{<nifti> quaternion c parameter. }
+    \item{\code{quatern_d}:}{<nifti> quaternion d parameter. }
+    \item{\code{qoffset_x}:}{<nifti> q offset x parameter. }
+    \item{\code{qoffset_y}:}{<nifti> q offset y parameter. }
+    \item{\code{qoffset_z}:}{<nifti> q offset z parameter.}
+    \item{\code{srow_x}:}{<nifti> 1st row affine transformation. }
+    \item{\code{srow_y}:}{<nifti> 2nd row affine transformation.  }
+    \item{\code{srow_z}:}{<nifti> 3rd row affine transformation. }
+    \item{\code{intent_name}:}{<nifti> Meaning of data. }
+    \item{\code{magic}:}{<nifti> nifti magicstring.  }
+    \item{\code{data.type}:}{<arf3DS4> Data type. }
+    \item{\code{data.signed}:}{<arf3DS4> Signed data. }
+    \item{\code{fullpath}:}{<arf3DS4> Full path of datafile. }
+    \item{\code{filename}:}{<arf3DS4> Filename. }
+    \item{\code{filetype}:}{<arf3DS4> Type of file. }
+    \item{\code{extension}:}{<arf3DS4> File extension. }
+    \item{\code{gzipped}:}{<arf3DS4> Is the file gzipped? }
+    \item{\code{endian}:}{<arf3DS4> Endianness of file. }
+    \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }
 }
 \section{Extends}{
 Class \code{"\linkS4class{nifti.fileinfo}"}, directly.
 }
 \section{Methods}{
+ Standard arf3DS4 accessor and replacement functions can be used to access and replace slots. 
   \describe{
-    \item{.nifti.header.aux_file}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.aux_file<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.bitpix}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.bitpix<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.cal_max}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.cal_max<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.cal_min}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.cal_min<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.data_type}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.data_type<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.data.signed}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.data.signed<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.data.type}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.data.type<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.datatype}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.datatype<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.db_name}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.db_name<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.descrip}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.descrip<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.dim_info}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.dim_info<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.dims}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.dims<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.endian}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.endian<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.extension}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.extension<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.extents}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.extents<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.filename}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.filename<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.filetype}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.filetype<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.fullpath}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.fullpath<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.glmax}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.glmax<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.glmin}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.glmin<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.gzipped}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.gzipped<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.intent_code}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.intent_code<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.intent_name}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.intent_name<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.intent_p1}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.intent_p1<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.intent_p2}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.intent_p2<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.intent_p3}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.intent_p3<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.magic}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.magic<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.pixdim}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.pixdim<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.qform_code}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.qform_code<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.qoffset_x}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.qoffset_x<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.qoffset_y}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.qoffset_y<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.qoffset_z}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.qoffset_z<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.quatern_b}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.quatern_b<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.quatern_c}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.quatern_c<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.quatern_d}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.quatern_d<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.regular}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.regular<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.scl_inter}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.scl_inter<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.scl_slope}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.scl_slope<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.session_error}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.session_error<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.sform_code}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.sform_code<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.sizeof_hdr}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.sizeof_hdr<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.slice_code}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.slice_code<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.slice_duration}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.slice_duration<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.slice_end}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.slice_end<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.slice_start}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.slice_start<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.srow_x}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.srow_x<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.srow_y}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.srow_y<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.srow_z}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.srow_z<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.toffset}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.toffset<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.version}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.version<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.vox_offset}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.vox_offset<-}{\code{signature(x = "nifti.header")}: ... }
-    \item{.nifti.header.xyzt_units}{\code{signature(object = "nifti.header")}: ... }
-    \item{.nifti.header.xyzt_units<-}{\code{signature(x = "nifti.header")}: ... }
-	 }
+ 	\item{access}{\code{.classname.slotname(object)}}
+    \item{replace}{\code{.classname.slotname(object)<-}}
+ 	 }
+ In this case classname is "nifti.header" and slotname is for example "dims". So to access the "dims" slot of an r-object "myniftiheader"  (of class "nifti.header") type \code{.nifti.header.dims(myfniftiheader)}.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ }
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-
+\references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	~~objects to See Also as \code{\link{~~fun~~}}, ~~~
-	or \code{\linkS4class{CLASSNAME}} for links to other classes
+	\code{\linkS4class{nifti.header}},\code{\linkS4class{nifti.fileinfo}}
 }
 \examples{
 showClass("nifti.header")
 }
 \keyword{classes}
+

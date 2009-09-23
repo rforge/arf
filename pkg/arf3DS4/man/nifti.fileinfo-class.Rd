@@ -17,50 +17,34 @@
 \alias{.nifti.fileinfo.version,nifti.fileinfo-method}
 \alias{.nifti.fileinfo.version<-,nifti.fileinfo-method}
 
-\title{Class "nifti.fileinfo" ~~~ }
-\description{	 ~~ A concise (1-5 lines) description of what the class is.  ~~}
-\section{Objects from the Class}{
+\title{arf3DS4 "nifti.fileinfo" class }
+\description{The arf3DS4 "nifti.fileinfo" class contains the basic file information needed to read/write an ANALYZE/NIFTI header.}
+\section{Objects}{
 Objects can be created by calls of the form \code{new("nifti.fileinfo", ...)}.
-	 ~~ describe objects here ~~ 
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{fullpath}:}{Object of class \code{"character"} ~~ }
-    \item{\code{filename}:}{Object of class \code{"character"} ~~ }
-    \item{\code{filetype}:}{Object of class \code{"character"} ~~ }
-    \item{\code{extension}:}{Object of class \code{"character"} ~~ }
-    \item{\code{gzipped}:}{Object of class \code{"logical"} ~~ }
-    \item{\code{endian}:}{Object of class \code{"character"} ~~ }
-    \item{\code{version}:}{Object of class \code{"ANY"} ~~ }
+    \item{\code{fullpath}:}{Full path of datafile. }
+    \item{\code{filename}:}{Filename. }
+    \item{\code{filetype}:}{Type of file. }
+    \item{\code{extension}:}{File extension. }
+    \item{\code{gzipped}:}{Is the file gzipped? }
+    \item{\code{endian}:}{Endianness of file. }
+    \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }
 }
 \section{Methods}{
+ Standard arf3DS4 accessor and replacement functions can be used to access and replace slots. 
   \describe{
-    \item{.nifti.fileinfo.endian}{\code{signature(object = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.endian<-}{\code{signature(x = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.extension}{\code{signature(object = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.extension<-}{\code{signature(x = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.filename}{\code{signature(object = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.filename<-}{\code{signature(x = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.filetype}{\code{signature(object = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.filetype<-}{\code{signature(x = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.fullpath}{\code{signature(object = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.fullpath<-}{\code{signature(x = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.gzipped}{\code{signature(object = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.gzipped<-}{\code{signature(x = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.version}{\code{signature(object = "nifti.fileinfo")}: ... }
-    \item{.nifti.fileinfo.version<-}{\code{signature(x = "nifti.fileinfo")}: ... }
-	 }
+ 	\item{access}{\code{.classname.slotname(object)}}
+    \item{replace}{\code{.classname.slotname(object)<-}}
+ 	 }
+ In this case classname is "nifti.fileinfo" and slotname is for example "extension". So to access the "extension" slot of an r-object "myniftifileinfo"  (of class "nifti.fileinfo") type \code{.nifti.fileinfo.extension(myfniftifileinfo)}.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ }
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-
+\references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	~~objects to See Also as \code{\link{~~fun~~}}, ~~~
-	or \code{\linkS4class{CLASSNAME}} for links to other classes
+	\code{\linkS4class{nifti.header}},\code{\linkS4class{fmri.data}}
 }
 \examples{
 showClass("nifti.fileinfo")

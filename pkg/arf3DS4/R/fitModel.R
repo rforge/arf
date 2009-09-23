@@ -1,4 +1,4 @@
-	#############################################
+#############################################
 # arf3DS4 S4 FITMODEL FUNCTIONS				#
 # Copyright(c) 2009 Wouter D. Weeda			#
 # University of Amsterdam					#
@@ -24,12 +24,12 @@ function(arfmodel,type=c('gauss','simple'),options=loadOptions(arfmodel),dat=rea
 	
 	if(.options.start.method(options)=='load') .model.startval(arfmodel) <- loadStart(arfmodel)
 		
-	if(.options.min.routine(options)=='nlm') {
+	if(.options.min.routine(options)[1]=='nlm') {
 		if(type=='simple')	arfmodel = fitSimpleModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 		if(type=='gauss')	arfmodel = fitModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 	}
 	
-	if(.options.min.routine(options)=='optim') {
+	if(.options.min.routine(options)[1]=='optim') {
 		if(type=='simple')	arfmodel = fitSimpleModelOptim(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 		if(type=='gauss')	arfmodel = fitModelOptim(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 	}
@@ -47,9 +47,11 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	sp <- .Platform$file.sep
 	
 	#set modelobjects
-	.options.min.routine(options) <- 'nlm'
+	.options.min.routine(options)[1] <- 'nlm'
+	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='rpr'
 	.model.modeltype(arfmodel) <- 'gauss'
 	.model.params(arfmodel) <- 10
+	.model.valid(arfmodel) <- TRUE
 	
 	#start_time
 	st_time <- Sys.time()
@@ -71,15 +73,24 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		saveModel(arfmodel)	
 		return(arfmodel)
 	}
-		
+	
+	#set which method of model calculation to use and set mask accordingly
+	if(.options.min.routine(options)[2]=='vpv') {
+		sumsofsquares = ssq.gauss
+		mask = .model.mask(arfmodel)
+	} else {
+		sumsofsquares = ssq.gauss.rpr
+		mask = rep(1,.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])		
+	}
+	
 	#call NLM (within a try-loop)
 	nlm.output <- try(suppressWarnings(nlm(
-					ssq.gauss,
+					sumsofsquares,
 					.model.startval(arfmodel),
 					datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 					weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
 					np=.model.regions(arfmodel)*.model.params(arfmodel),
-					brain=.model.mask(arfmodel),
+					brain=mask,
 					dimx=.fmri.data.dims(dat)[2],
 					dimy=.fmri.data.dims(dat)[3],
 					dimz=.fmri.data.dims(dat)[4],
@@ -181,9 +192,11 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	sp <- .Platform$file.sep
 	
 	#set modelobjects
-	.options.min.routine(options) <- 'optim'
+	.options.min.routine(options)[1] <- 'optim'
+	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='rpr'
 	.model.modeltype(arfmodel) <- 'gauss'
 	.model.params(arfmodel) <- 10
+	.model.valid(arfmodel) <- TRUE
 	
 	#start_time
 	st_time <- Sys.time()
@@ -199,11 +212,20 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	#set analyticalgrad options
 	if(.options.min.analyticalgrad(options)) {
-		gradfunc=gradient.gauss
+		if(.options.min.routine(options)[2]=='vpv') gradfunc=gradient.gauss else gradfunc=gradient.gauss.rpr
 		angrad=FALSE
 	} else {
 		gradfunc=NULL
 		angrad=FALSE
+	}
+	
+	#set which method of model calculation to use and set mask accordingly
+	if(.options.min.routine(options)[2]=='vpv') {
+		sumsofsquares = ssq.gauss
+		mask = .model.mask(arfmodel)
+	} else {
+		sumsofsquares = ssq.gauss.rpr
+		mask = rep(1,.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])		
 	}
 	
 	#set boundaries in L-BFGS-B mode
@@ -212,14 +234,12 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		upbound=Inf
 	} else {
 		#set location to maximal dim
-		.options.opt.upper(options)[1:3] = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
-		
-		#set width parameters to maxdim divided by tphe value given in the options
-		.options.opt.upper(options)[4] = .fmri.data.dims(dat)[2]/.options.opt.upper(options)[4]
-		.options.opt.upper(options)[5] = .fmri.data.dims(dat)[3]/.options.opt.upper(options)[5]
-		.options.opt.upper(options)[6] = .fmri.data.dims(dat)[4]/.options.opt.upper(options)[6]
+		max_loc = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
 	
-		upbound = rep(.options.opt.upper(options),.model.regions(arfmodel))
+		#set width parameters to maxdim divided by tphe value given in the options
+		max_width =  c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4]) / c(.options.opt.upper(options)[4],.options.opt.upper(options)[5],.options.opt.upper(options)[6])
+		
+		upbound = rep(c(max_loc,max_width,.options.opt.upper(options)[7:10]),.model.regions(arfmodel))
 		lowbound = rep(.options.opt.lower(options),.model.regions(arfmodel))
 	}
 
@@ -231,17 +251,17 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		saveModel(arfmodel)	
 		return(arfmodel)
 	}
-	
+		
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 						.model.startval(arfmodel),
-						ssq.gauss,
+						sumsofsquares,
 						gradfunc,
 						lower=lowbound,
 						upper=upbound,
 						datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 						weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
-						brain=.model.mask(arfmodel),
+						brain=mask,
 						np=.model.regions(arfmodel)*.model.params(arfmodel),
 						dimx=.fmri.data.dims(dat)[2],
 						dimy=.fmri.data.dims(dat)[3],
@@ -342,9 +362,11 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	sp <- .Platform$file.sep
 	
 	#set routine to optim
-	.options.min.routine(options) <- 'optim'
+	.options.min.routine(options)[1] <- 'optim'
+	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='rpr'
 	.model.modeltype(arfmodel) <- 'simple'
 	.model.params(arfmodel) <- 5
+	.model.valid(arfmodel) <- TRUE
 	
 	#start_time
 	st_time <- Sys.time()
@@ -362,30 +384,35 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	#set analyticalgrad options
 	if(.options.min.analyticalgrad(options)) {
-		gradfunc=gradient.simple
+		if(.options.min.routine(options)[2]=='vpv') gradfunc=gradient.simple else gradfunc=gradient.simple.rpr
 		angrad=FALSE
 	} else {
 		gradfunc=NULL
 		angrad=FALSE
 	}
 	
-	#set boundaries in L-BFGS-B mode
+	#set which method of model calculation to use and set mask accordingly
+	if(.options.min.routine(options)[2]=='vpv') {
+		sumsofsquares = ssq.simple
+		mask = .model.mask(arfmodel)
+	} else {
+		sumsofsquares = ssq.simple.rpr
+		mask = rep(1,.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])		
+	}
+	
 	#set boundaries in L-BFGS-B mode
 	if(length(.options.opt.lower(options))==1 | length(.options.opt.upper(options))==1) {
 		lowbound=-Inf
 		upbound=Inf
 	} else {
 		#set location to maximal dim
-		.options.opt.upper(options)[1:3] = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
+		max_loc = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
 		
 		#set width parameters to maxdim divided by tphe value given in the options
-		.options.opt.upper(options)[4] = .fmri.data.dims(dat)[2]/.options.opt.upper(options)[4]
-		.options.opt.upper(options)[5] = .fmri.data.dims(dat)[3]/.options.opt.upper(options)[5]
-		.options.opt.upper(options)[6] = .fmri.data.dims(dat)[4]/.options.opt.upper(options)[6]
+		max_width =  c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4]) / c(.options.opt.upper(options)[4],.options.opt.upper(options)[5],.options.opt.upper(options)[6])
 		
-		upbound = rep(.options.opt.upper(options)[-c(5:9)],.model.regions(arfmodel))
-		lowbound = rep(.options.opt.lower(options)[-c(5:9)],.model.regions(arfmodel))
-		
+		upbound = rep(c(max_loc,max(max_width),.options.opt.upper(options)[10]),.model.regions(arfmodel))
+		lowbound = rep(.options.opt.lower(options)[-(5:9)],.model.regions(arfmodel))
 	}	
 	
 	#check startingvalues
@@ -396,17 +423,17 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		saveModel(arfmodel)	
 		return(arfmodel)
 	}
-	
+		
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 							.model.startval(arfmodel),
-							ssq.simple,
+							sumsofsquares,
 							gradfunc,
 							lower=lowbound,
 							upper=upbound,
 							datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 							weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
-							brain=.model.mask(arfmodel),
+							brain=mask,
 							np=.model.regions(arfmodel)*.model.params(arfmodel),
 							dimx=.fmri.data.dims(dat)[2],
 							dimy=.fmri.data.dims(dat)[3],
@@ -476,7 +503,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	}
 	
 	if(!.model.valid(arfmodel)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),.model.convergence(arfmodel)) 
-	
+
 	#save the modelInfo
 	saveModel(arfmodel)
 	
@@ -494,9 +521,11 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	sp <- .Platform$file.sep
 	
 	#set routine to nlm
-	.options.min.routine(options) <- 'nlm'
+	.options.min.routine(options)[1] <- 'nlm'
+	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='rpr'
 	.model.modeltype(arfmodel) <- 'simple'
 	.model.params(arfmodel) <- 5
+	.model.valid(arfmodel) <- TRUE
 		
 	#start_time
 	st_time <- Sys.time()
@@ -520,14 +549,23 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		return(arfmodel)
 	}
 	
+	#set which method of model calculation to use and set mask accordingly
+	if(.options.min.routine(options)[2]=='vpv') {
+		sumsofsquares = ssq.simple
+		mask = .model.mask(arfmodel)
+	} else {
+		sumsofsquares = ssq.simple.rpr
+		mask = rep(1,.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])		
+	}
+	
 	#call NLM (within a try-loop)
 	nlm.output <- try(suppressWarnings(nlm(
-							ssq.simple,
+							sumsofsquares,
 							.model.startval(arfmodel),
 							datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 							weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
 							np=.model.regions(arfmodel)*.model.params(arfmodel),
-							brain=.model.mask(arfmodel),
+							brain=mask,
 							dimx=.fmri.data.dims(dat)[2],
 							dimy=.fmri.data.dims(dat)[3],
 							dimz=.fmri.data.dims(dat)[4],

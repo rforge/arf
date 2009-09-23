@@ -55,7 +55,7 @@ void gauss(double *theta, int *np, int *dimx, int *dimy, int *dimz, double *gx)
 
 				}
 
-				gx[p]=f; //set output vector to sum of gaussian
+				gx[p]=f; //set output vector to sum of gaussians
 				p++;
 
 			}
@@ -249,7 +249,7 @@ void simplessqgauss(double *theta, double *dat, double *W, int *brain, int *np, 
 	ss[0]=g;
 }
 
-void simplegaussnew(double *theta, int *np, int *dimx, int *dimy, int *dimz, double *gx)
+void simplegaussrpr(double *theta, int *np, int *dimx, int *dimy, int *dimz, double *gx)
 {
 
 	int reg,x,y,z,p;
@@ -306,7 +306,7 @@ void simplegaussnew(double *theta, int *np, int *dimx, int *dimy, int *dimz, dou
 }
 
 
-void simplessqgaussnew(double *theta, double *dat, double *W, int *brain, int *np, int *dimx, int *dimy, int *dimz, double *ss)
+void simplessqgaussrpr(double *theta, double *dat, double *W, int *brain, int *np, int *dimx, int *dimy, int *dimz, double *ss)
 {
 
 	int reg,x,y,z,p,i;
@@ -353,7 +353,6 @@ void simplessqgaussnew(double *theta, double *dat, double *W, int *brain, int *n
 					//Rprintf("x=%d y=%d z=%d p=%d\n",x,y,z,p);
 
 					if(brain[p]!=0) {
-
 						//(x-pc)
 						dif_x=pow((x-theta_x),2);
 						dif_y=pow((y-theta_y),2);
@@ -375,6 +374,147 @@ void simplessqgaussnew(double *theta, double *dat, double *W, int *brain, int *n
 	}
 	ss[0]=g;
 }
+
+
+void gaussrpr(double *theta, double *eigen, int *np, int *dimx, int *dimy, int *dimz, double *gx)
+{
+
+	int reg,x,y,z,p,q;
+	int x_min,y_min,z_min,x_max,y_max,z_max;
+	double theta_x,theta_y,theta_z,sig_x,sig_y,sig_z,sig_xy,sig_xz,sig_yz,det_sig,dif_x,dif_y,dif_z,f;
+
+
+	q=0;
+	for(reg=0;reg<(*np);reg=reg+10) {
+
+		//parameter coordinates
+		theta_x=theta[reg+0];
+		theta_y=theta[reg+1];
+		theta_z=theta[reg+2];
+
+		//sigma matrix
+		sig_x=pow(theta[reg+3],2);
+		sig_xy=theta[reg+6]*theta[reg+4]*theta[reg+3];
+		sig_xz=theta[reg+7]*theta[reg+5]*theta[reg+3];
+		sig_y=pow(theta[reg+4],2);
+		sig_yz=theta[reg+8]*theta[reg+4]*theta[reg+5];
+		sig_z=pow(theta[reg+5],2);
+
+
+		//determinant of sigma
+		det_sig=sig_x*sig_y*sig_z-sig_x*sig_yz*sig_yz-sig_xy*sig_xy*sig_z+sig_xy*sig_xz*sig_yz+sig_xz*sig_xy*sig_yz-sig_xz*sig_y*sig_xz;
+		if(det_sig < 0) det_sig=0;
+
+		//set box around region
+		x_min = (int) theta_x - (int) eigen[q];
+		x_max = (int) theta_x + (int) eigen[q];
+		y_min = (int) theta_y - (int) eigen[q];
+		y_max = (int) theta_y + (int) eigen[q];
+		z_min = (int) theta_z - (int) eigen[q];
+		z_max = (int) theta_z + (int) eigen[q];
+		q = q + 1;
+
+		if(x_min<1) x_min = 1;
+		if(x_max>*dimx) x_max = *dimx;
+
+		if(y_min<1) y_min = 1;
+		if(y_max>*dimy) y_max = *dimy;
+
+		if(z_min<1) z_min = 1;
+		if(z_max>*dimz) z_max = *dimz;
+
+		for(z=z_min;z<(z_max+1);z++) {
+			for(y=y_min;y<(y_max+1);y++) {
+				for(x=x_min;x<(x_max+1);x++) {
+					//(x-pc)
+					dif_x=(x-theta_x);
+					dif_y=(y-theta_y);
+					dif_z=(z-theta_z);
+
+					//add to f gaussian value for each region
+					p=((x-1)+((y-1)*(*dimx))+((z-1)*(*dimx)*(*dimy)));
+					gx[p]=gx[p]+theta[reg+9]*(1/(pow(sqrt(2*M_PI),3)*sqrt(det_sig)))*exp(-.5*(dif_x*(dif_x*(sig_y*sig_z-sig_yz*sig_yz)+dif_y*(sig_yz*sig_xz-sig_xy*sig_z)+dif_z*(sig_xy*sig_yz-sig_y*sig_xz))/det_sig+dif_y*(dif_x*(sig_xz*sig_yz-sig_z*sig_xy)+dif_y*(sig_x*sig_z-sig_xz*sig_xz)+dif_z*(sig_xy*sig_xz-sig_x*sig_yz))/det_sig+dif_z*(dif_x*(sig_xy*sig_yz-sig_xz*sig_y)+dif_y*(sig_xz*sig_xy-sig_yz*sig_x)+dif_z*(sig_x*sig_y-sig_xy*sig_xy))/det_sig));
+
+				}
+			}
+		}
+	}
+}
+
+void ssqgaussrpr(double *theta, double *eigen, double *dat, double *W, int *brain, int *np, int *dimx, int *dimy, int *dimz, double *ss)
+{
+
+	int reg,x,y,z,p,i,q;
+	int x_min,y_min,z_min,x_max,y_max,z_max;
+	double theta_x,theta_y,theta_z,sig_x,sig_y,sig_z,sig_xy,sig_xz,sig_yz,det_sig,dif_x,dif_y,dif_z,g,*gx;
+
+	gx = (double *) R_alloc(((*dimx)*(*dimy)*(*dimz)),sizeof(double));
+
+	q=0;
+	for(reg=0;reg<(*np);reg=reg+10) {
+
+		//parameter coordinates
+		theta_x=theta[reg+0];
+		theta_y=theta[reg+1];
+		theta_z=theta[reg+2];
+
+		//sigma matrix
+		sig_x=pow(theta[reg+3],2);
+		sig_xy=theta[reg+6]*theta[reg+4]*theta[reg+3];
+		sig_xz=theta[reg+7]*theta[reg+5]*theta[reg+3];
+		sig_y=pow(theta[reg+4],2);
+		sig_yz=theta[reg+8]*theta[reg+4]*theta[reg+5];
+		sig_z=pow(theta[reg+5],2);
+
+		//determinant of sigma
+		det_sig=sig_x*sig_y*sig_z-sig_x*sig_yz*sig_yz-sig_xy*sig_xy*sig_z+sig_xy*sig_xz*sig_yz+sig_xz*sig_xy*sig_yz-sig_xz*sig_y*sig_xz;
+		if(det_sig < 0) det_sig=0;
+
+		//set box around region
+		x_min = (int) theta_x - (int) eigen[q];
+		x_max = (int) theta_x + (int) eigen[q];
+		y_min = (int) theta_y - (int) eigen[q];
+		y_max = (int) theta_y + (int) eigen[q];
+		z_min = (int) theta_z - (int) eigen[q];
+		z_max = (int) theta_z + (int) eigen[q];
+		q = q + 1;
+
+		if(x_min<1) x_min = 1;
+		if(x_max>*dimx) x_max = *dimx;
+
+		if(y_min<1) y_min = 1;
+		if(y_max>*dimy) y_max = *dimy;
+
+		if(z_min<1) z_min = 1;
+		if(z_max>*dimz) z_max = *dimz;
+
+		for(z=z_min;z<(z_max+1);z++) {
+			for(y=y_min;y<(y_max+1);y++) {
+				for(x=x_min;x<(x_max+1);x++) {
+					if(brain[i]!=0) {
+						//(x-pc)
+						dif_x=(x-theta_x);
+						dif_y=(y-theta_y);
+						dif_z=(z-theta_z);
+
+						//add to f gaussian value for each region
+						p=((x-1)+((y-1)*(*dimx))+((z-1)*(*dimx)*(*dimy)));
+						gx[p]=gx[p]+theta[reg+9]*(1/(pow(sqrt(2*M_PI),3)*sqrt(det_sig)))*exp(-.5*(dif_x*(dif_x*(sig_y*sig_z-sig_yz*sig_yz)+dif_y*(sig_yz*sig_xz-sig_xy*sig_z)+dif_z*(sig_xy*sig_yz-sig_y*sig_xz))/det_sig+dif_y*(dif_x*(sig_xz*sig_yz-sig_z*sig_xy)+dif_y*(sig_x*sig_z-sig_xz*sig_xz)+dif_z*(sig_xy*sig_xz-sig_x*sig_yz))/det_sig+dif_z*(dif_x*(sig_xy*sig_yz-sig_xz*sig_y)+dif_y*(sig_xz*sig_xy-sig_yz*sig_x)+dif_z*(sig_x*sig_y-sig_xy*sig_xy))/det_sig));
+					}
+				}
+			}
+		}
+	}
+
+	g=0e0;
+	for(i=0;i<((*dimx)*(*dimy)*(*dimz));i++) {
+		if(brain[i]!=0) {
+			g=g+pow((dat[i]-gx[i]),2)*(1/W[i]);
+		}
+	}
+	ss[0]=g;
+}
+
 
 
 void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, double *B)

@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=5,
-		update=3,
-		svnrev=76
+		update=4,
+		svnrev=77
 	)
 )
 
@@ -199,10 +199,10 @@ setClass(
 		nlm.steptol=1e-3,		#NLM stepsize tolerance
 		opt.method='L-BFGS-B',	#optim method
 		opt.lower=c(rep(1,3),rep(1,3),rep(-.95,3),-Inf),	#L-BFGS-U lower bound
-		opt.upper=c(rep(Inf,3),rep(3,3),rep(.95,3),Inf),	#L-BFGS-U upper bound
+		opt.upper=c(rep(Inf,3),rep(1,3),rep(.95,3),Inf),	#L-BFGS-U upper bound
 		min.analyticalgrad=T, 	#use analytical gradient
 		min.iterlim=5000,		#iteration limit
-		min.routine='optim',	#which routine
+		min.routine=c('optim','rpr'),	#which routine
 		start.method='start',	
 		start.maxfac=1,
 		start.vector=c(0,0,0,0,0,0,.05,.05,.05,10),

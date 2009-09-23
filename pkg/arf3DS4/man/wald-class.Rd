@@ -13,46 +13,34 @@
 \alias{.wald.stats,wald-method}
 \alias{.wald.stats<-,wald-method}
 
-\title{Class "wald" ~~~ }
-\description{	 ~~ A concise (1-5 lines) description of what the class is.  ~~}
-\section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("wald", ...)}.
-	 ~~ describe objects here ~~ 
+\title{arf3DS4 "wald" class}
+\description{The arf3DS4 "wald" class contains information of the statistics on the spatial model parameters. It is used in the \code{\linkS4class{model}} class.}
+\section{Objects}{
+Objects can be created by calls of the form \code{new("wald", ...)}. 
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{design}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{stats}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{df1}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{df2}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{pvalues}:}{Object of class \code{"matrix"} ~~ }
+    \item{\code{design}:}{The #regions by #hypothesis design matrix.}
+    \item{\code{stats}:}{The #regions by #hypothesis matrix of wald statistics.}
+    \item{\code{df1}:}{Vector of the Degrees of Freedom of the model.}
+    \item{\code{df2}:}{Vector of the Degrees of Freedom of the error. }
+    \item{\code{pvalues}:}{The #regions by #hypothesis matrix of p-values.}
   }
 }
 \section{Methods}{
+ Standard arf3DS4 accessor and replacement functions can be used to access and replace slots. 
   \describe{
-    \item{.wald.design}{\code{signature(object = "wald")}: ... }
-    \item{.wald.design<-}{\code{signature(x = "wald")}: ... }
-    \item{.wald.df1}{\code{signature(object = "wald")}: ... }
-    \item{.wald.df1<-}{\code{signature(x = "wald")}: ... }
-    \item{.wald.df2}{\code{signature(object = "wald")}: ... }
-    \item{.wald.df2<-}{\code{signature(x = "wald")}: ... }
-    \item{.wald.pvalues}{\code{signature(object = "wald")}: ... }
-    \item{.wald.pvalues<-}{\code{signature(x = "wald")}: ... }
-    \item{.wald.stats}{\code{signature(object = "wald")}: ... }
-    \item{.wald.stats<-}{\code{signature(x = "wald")}: ... }
+ 	\item{access}{\code{.classname.slotname(object)}}
+    \item{replace}{\code{.classname.slotname(object)<-}}
 	 }
+ In this case classname is "wald" and slotname is for example "stats". So to access the "stats" slot of an r-object "mywald"  (of class "wald") type \code{.wald.stats(mywald)}.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ }
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	~~objects to See Also as \code{\link{~~fun~~}}, ~~~
-	or \code{\linkS4class{CLASSNAME}} for links to other classes
+	\code{\linkS4class{model}}
 }
 \examples{
 showClass("wald")
 }
 \keyword{classes}
+
