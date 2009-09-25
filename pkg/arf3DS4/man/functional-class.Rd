@@ -10,48 +10,37 @@
 \alias{.functional.functionaldata<-,functional-method}
 \alias{.functional.linkedfile,functional-method}
 \alias{.functional.linkedfile<-,functional-method}
+\alias{.functional.linkedfiles,functional-method}
+\alias{.functional.linkedfiles<-,functional-method}
+\alias{.functional.timings,functional-method}
+\alias{.functional.timings<-,functional-method}
 \alias{.functional.version,functional-method}
 \alias{.functional.version<-,functional-method}
 
-\title{Class "functional" ~~~ }
-\description{	 ~~ A concise (1-5 lines) description of what the class is.  ~~}
-\section{Objects from the Class}{
+\title{arf3DS4 "functional" class }
+\description{The arf3DS4 "functional" class contains information on the functional volume the fMRI beta-files are taken from. The functional volume can be used to create time-series for connectivity analyses.}
+\section{Objects}{
 Objects can be created by calls of the form \code{new("functional", ...)}.
-	 ~~ describe objects here ~~ 
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{fullpath}:}{Object of class \code{"character"} ~~ }
-    \item{\code{filename}:}{Object of class \code{"character"} ~~ }
-    \item{\code{linkedfile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{functionaldata}:}{Object of class \code{"character"} ~~ }
-    \item{\code{version}:}{Object of class \code{"ANY"} ~~ }
+    \item{\code{fullpath}:}{Full path of the functional volume directory. }
+    \item{\code{functionaldata}:}{Filename of the functional volume.}
+    \item{\code{filename}:}{Filename of the functional.Rda file. }
+    \item{\code{linkedfiles}:}{Path to linked beta-file. }
+    \item{\code{timings}:}{Vector of stimulus timings. }
+  	\item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}}) }
   }
 }
 \section{Methods}{
+Standard arf3DS4 accessor and replacement functions can be used to access and replace slots.  
   \describe{
-    \item{.functional.filename}{\code{signature(object = "functional")}: ... }
-    \item{.functional.filename<-}{\code{signature(x = "functional")}: ... }
-    \item{.functional.fullpath}{\code{signature(object = "functional")}: ... }
-    \item{.functional.fullpath<-}{\code{signature(x = "functional")}: ... }
-    \item{.functional.functionaldata}{\code{signature(object = "functional")}: ... }
-    \item{.functional.functionaldata<-}{\code{signature(x = "functional")}: ... }
-    \item{.functional.linkedfile}{\code{signature(object = "functional")}: ... }
-    \item{.functional.linkedfile<-}{\code{signature(x = "functional")}: ... }
-    \item{.functional.version}{\code{signature(object = "functional")}: ... }
-    \item{.functional.version<-}{\code{signature(x = "functional")}: ... }
+    \item{access}{\code{.classname.slotname(object)}}
+    \item{replace}{\code{.classname.slotname(object)<-}}
 	 }
+In this case classname is "functional" and slotname is for example "timings". So to access the "timings" slot of an r-object "myfunctional"  (of class "functional") type \code{.functional.timings(myfunctional)}.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ }
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-	~~objects to See Also as \code{\link{~~fun~~}}, ~~~
-	or \code{\linkS4class{CLASSNAME}} for links to other classes
-}
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \examples{
 showClass("functional")
 }

@@ -116,8 +116,9 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 ##ssq.gauss returns the ssq of the full gauss model with an anlytical gradient attached
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
-		eigen <- makeEigen(theta,np)
-		ssqdat <- .C('ssqgaussrpr',as.double(theta),as.double(eigen),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[10]]
+		eigen <- makeEigen(theta,np) 
+		if(!any(is.na(eigen))) ssqdat <- .C('ssqgaussrpr',as.double(theta),as.double(eigen),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[10]]
+		else ssqdat=ss_data
 	} else ssqdat=ss_data
 	
 	if(analyticalgrad) {
@@ -136,8 +137,9 @@ function(theta,np,dimx,dimy,dimz)
 #returns model estimate for full gaussmodel
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
-		eigen <- makeEigen(theta,np)
-		model <- .C('gaussrpr',as.double(theta),as.double(eigen),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[7]]
+		eigen <- makeEigen(theta,np) 
+		if(!any(is.na(eigen))) model <- .C('gaussrpr',as.double(theta),as.double(eigen),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[7]]
+			else model=NA
 	} else model=NA
 	
 	return(model)
@@ -149,8 +151,9 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 #gradient returns the analytical gradient of the ssq to the thetaparameters
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0) {
-		eigen <- makeEigen(theta,np)
-		model <- .C('gaussrpr',as.double(theta),as.double(eigen),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[7]]
+		eigen <- makeEigen(theta,np) 
+		if(!any(is.na(eigen))) model <- .C('gaussrpr',as.double(theta),as.double(eigen),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[7]]
+			else model=NA
 	} else model=NA
 	
 	if(length(model[is.na(model) | is.nan(model) | model==Inf | model==-Inf])==0) {
@@ -216,8 +219,13 @@ function(theta,np)
 		sigma[3,1]=sigma[1,3]=est[8,i]*sigma[1,1]*sigma[3,3]
 		sigma[2,3]=sigma[3,2]=est[9,i]*sigma[3,3]*sigma[2,2]
 		
-		eigen[i] = round(max(abs(eigen(sigma)$values)))
+		ev = try(eigen(sigma,T,T),silen=F)
 		
+		if(class(ev)=='list') {
+			eigen[i] = round(max(abs(ev$values)))
+		} else {
+			eigen[i]=NA
+		}
 	}
 	return(eigen)
 }

@@ -189,7 +189,7 @@ Class \code{"\linkS4class{nifti.fileinfo}"}, by class "nifti.header".
 	 }
  In this case classname is "fmri.data" and slotname is for example "dims". So to access the "dims" slot of an r-object "myfmridata"  (of class "fmri.data") type \code{.fmri.data.dims(myfmridata)}.
 }
-\references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.
+\references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.}
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
 	\code{\linkS4class{nifti.header}},\code{\linkS4class{nifti.fileinfo}}

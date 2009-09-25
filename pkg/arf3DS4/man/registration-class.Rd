@@ -14,6 +14,8 @@
 \alias{.registration.Dst<-,registration-method}
 \alias{.registration.examp2high,registration-method}
 \alias{.registration.examp2high<-,registration-method}
+\alias{.registration.examp2stand,registration-method}
+\alias{.registration.examp2stand<-,registration-method}
 \alias{.registration.example,registration-method}
 \alias{.registration.example<-,registration-method}
 \alias{.registration.filename,registration-method}
@@ -35,79 +37,43 @@
 \alias{.registration.version,registration-method}
 \alias{.registration.version<-,registration-method}
 
-\title{Class "registration" ~~~ }
-\description{	 ~~ A concise (1-5 lines) description of what the class is.  ~~}
-\section{Objects from the Class}{
+\title{arf3DS4 "registration" class  }
+\description{The arf3DS4 registration class contains information on the conversion matrices for brain registration purposes. Used to convert arf solutions to standard space (MNI152), and to structural (T1) images. It is also used to look up arf solutions in standard atlases (Harvard-Oxford and Talairach). The "registration" class is optional, for it to work properly a functioning installation of FSL is required.}
+\section{Objects}{
 Objects can be created by calls of the form \code{new("registration", ...)}.
-	 ~~ describe objects here ~~ 
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{fullpath}:}{Object of class \code{"character"} ~~ }
-    \item{\code{filename}:}{Object of class \code{"character"} ~~ }
-    \item{\code{linkedfile}:}{Object of class \code{"character"} ~~ }
-    \item{\code{examp2high}:}{Object of class \code{"character"} ~~ }
-    \item{\code{high2stand}:}{Object of class \code{"character"} ~~ }
-    \item{\code{example}:}{Object of class \code{"character"} ~~ }
-    \item{\code{highres}:}{Object of class \code{"character"} ~~ }
-    \item{\code{standard}:}{Object of class \code{"character"} ~~ }
-    \item{\code{Dex}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{Dhi}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{Dst}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{SXhi}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{Aex2hi}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{Ahi2st}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{OXst}:}{Object of class \code{"matrix"} ~~ }
-    \item{\code{version}:}{Object of class \code{"ANY"} ~~ }
+    \item{\code{fullpath}:}{Full path of registration directory.}
+    \item{\code{filename}:}{Registration filename. }
+    \item{\code{linkedfile}:}{Path to linked beta-file.}
+    \item{\code{examp2high}:}{Arf to high resolution affine transformation. }
+    \item{\code{high2stand}:}{High resolution to standard space affine transformation.}
+    \item{\code{examp2stand}:}{Arf to standard space affine transformation. }
+    \item{\code{example}:}{Nifti file in arf space. }
+    \item{\code{highres}:}{T1 weighted structural image.}
+    \item{\code{standard}:}{Standard space image (MNI152).}
+    \item{\code{Dex}:}{arf voxel to arf mm. }
+    \item{\code{Dhi}:}{highres mm to highres voxels. }
+    \item{\code{Dst}:}{standard mm to standard voxels. }
+    \item{\code{SXhi}:}{x-axis flip.}
+    \item{\code{Aex2hi}:}{arf mm to highres mm. }
+    \item{\code{Ahi2st}:}{highres mm to standard mm. }
+    \item{\code{OXst}:}{standard origin offset. }
+    \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }
 }
 \section{Methods}{
+ Standard arf3DS4 accessor and replacement functions can be used to access and replace slots. 
   \describe{
-    \item{.registration.Aex2hi}{\code{signature(object = "registration")}: ... }
-    \item{.registration.Aex2hi<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.Ahi2st}{\code{signature(object = "registration")}: ... }
-    \item{.registration.Ahi2st<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.Dex}{\code{signature(object = "registration")}: ... }
-    \item{.registration.Dex<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.Dhi}{\code{signature(object = "registration")}: ... }
-    \item{.registration.Dhi<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.Dst}{\code{signature(object = "registration")}: ... }
-    \item{.registration.Dst<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.examp2high}{\code{signature(object = "registration")}: ... }
-    \item{.registration.examp2high<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.example}{\code{signature(object = "registration")}: ... }
-    \item{.registration.example<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.filename}{\code{signature(object = "registration")}: ... }
-    \item{.registration.filename<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.fullpath}{\code{signature(object = "registration")}: ... }
-    \item{.registration.fullpath<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.high2stand}{\code{signature(object = "registration")}: ... }
-    \item{.registration.high2stand<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.highres}{\code{signature(object = "registration")}: ... }
-    \item{.registration.highres<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.linkedfile}{\code{signature(object = "registration")}: ... }
-    \item{.registration.linkedfile<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.OXst}{\code{signature(object = "registration")}: ... }
-    \item{.registration.OXst<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.standard}{\code{signature(object = "registration")}: ... }
-    \item{.registration.standard<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.SXhi}{\code{signature(object = "registration")}: ... }
-    \item{.registration.SXhi<-}{\code{signature(x = "registration")}: ... }
-    \item{.registration.version}{\code{signature(object = "registration")}: ... }
-    \item{.registration.version<-}{\code{signature(x = "registration")}: ... }
-	 }
+ 	\item{access}{\code{.classname.slotname(object)}}
+    \item{replace}{\code{.classname.slotname(object)<-}}
+ 	 }
+ In this case classname is "registration" and slotname is for example "highres". So to access the "highres" slot of an r-object "myregistration"  (of class "registration") type \code{.registration.highres(myregistration)}.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ }
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-	~~objects to See Also as \code{\link{~~fun~~}}, ~~~
-	or \code{\linkS4class{CLASSNAME}} for links to other classes
-}
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \examples{
 showClass("registration")
 }
 \keyword{classes}
+

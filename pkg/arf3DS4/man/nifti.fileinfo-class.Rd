@@ -41,7 +41,7 @@ Objects can be created by calls of the form \code{new("nifti.fileinfo", ...)}.
  	 }
  In this case classname is "nifti.fileinfo" and slotname is for example "extension". So to access the "extension" slot of an r-object "myniftifileinfo"  (of class "nifti.fileinfo") type \code{.nifti.fileinfo.extension(myfniftifileinfo)}.
 }
-\references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.
+\references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.}
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
 	\code{\linkS4class{nifti.header}},\code{\linkS4class{fmri.data}}

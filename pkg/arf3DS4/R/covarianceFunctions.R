@@ -72,12 +72,13 @@ function(arfmodel)
 	#set separator
 	sp <- .Platform$file.sep
 	
-	#check for deriv and resid
-	if(!file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) stop('Residuals not yet created. Cannot compute (co)variance matrix.')
-	if(!file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) stop('Derivatives not yet created. Cannot compute (co)variance matrix.')
-		
+	
 	if(.model.valid(arfmodel)) {
 	
+		#check for deriv and resid
+		if(!file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) makeResiduals(arfmodel) 
+		if(!file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) makeDerivs(arfmodel)
+		
 		st_time <- Sys.time()
 		
 		#try to invert hessian
@@ -126,9 +127,12 @@ function(arfmodel)
 	}
 	
 	
-	#save the model file
-	#saveModel(arfmodel)
-	
+	#remove derivatives and residuals
+	fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
+	if(file.exists(fn)) file.remove(fn)
+	fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.residualFile(arfmodel),sep='')
+	if(file.exists(fn)) file.remove(fn)
+
 	#return the varcov
 	return(invisible(arfmodel))
 }
@@ -188,9 +192,6 @@ function(arfmodel,options=loadOptions(arfmodel))
 		.model.valid(arfmodel) <- FALSE
 	}
 	
-	#save the model file
-	#saveModel(arfmodel)
-	
 	return(invisible(arfmodel))
 	
 }
@@ -227,9 +228,6 @@ function(arfmodel,options=loadOptions(arfmodel))
 		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'No valid model. RMSEA not calculated')
 		.model.valid(arfmodel) <- FALSE
 	}
-	
-	#save the model file
-	#saveModel(arfmodel)
 	
 	return(invisible(arfmodel))
 	

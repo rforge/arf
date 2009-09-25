@@ -163,6 +163,12 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			arfmodel = BIC(arfmodel,options=options)
 			arfmodel = RMSEA(arfmodel,options=options)
 			
+			#remove derivatives and residuals
+			fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
+			if(file.exists(fn)) file.remove(fn)
+			fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.residualFile(arfmodel),sep='')
+			if(file.exists(fn)) file.remove(fn)
+			
 		} else .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] nlm did not converge.',sep=''))
 		
 		
@@ -333,6 +339,13 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			#caluclate fits
 			arfmodel = BIC(arfmodel,options=options)
 			arfmodel = RMSEA(arfmodel,options=options)
+			
+			#remove derivatives and residuals
+			fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
+			if(file.exists(fn)) file.remove(fn)
+			fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.residualFile(arfmodel),sep='')
+			if(file.exists(fn)) file.remove(fn)
+			
 			
 		} else .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim did not converge.',sep=''))
 			

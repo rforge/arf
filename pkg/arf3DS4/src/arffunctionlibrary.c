@@ -383,7 +383,6 @@ void gaussrpr(double *theta, double *eigen, int *np, int *dimx, int *dimy, int *
 	int x_min,y_min,z_min,x_max,y_max,z_max;
 	double theta_x,theta_y,theta_z,sig_x,sig_y,sig_z,sig_xy,sig_xz,sig_yz,det_sig,dif_x,dif_y,dif_z,f;
 
-
 	q=0;
 	for(reg=0;reg<(*np);reg=reg+10) {
 
@@ -466,6 +465,7 @@ void ssqgaussrpr(double *theta, double *eigen, double *dat, double *W, int *brai
 		sig_yz=theta[reg+8]*theta[reg+4]*theta[reg+5];
 		sig_z=pow(theta[reg+5],2);
 
+
 		//determinant of sigma
 		det_sig=sig_x*sig_y*sig_z-sig_x*sig_yz*sig_yz-sig_xy*sig_xy*sig_z+sig_xy*sig_xz*sig_yz+sig_xz*sig_xy*sig_yz-sig_xz*sig_y*sig_xz;
 		if(det_sig < 0) det_sig=0;
@@ -491,16 +491,19 @@ void ssqgaussrpr(double *theta, double *eigen, double *dat, double *W, int *brai
 		for(z=z_min;z<(z_max+1);z++) {
 			for(y=y_min;y<(y_max+1);y++) {
 				for(x=x_min;x<(x_max+1);x++) {
-					if(brain[i]!=0) {
+
+					p=((x-1)+((y-1)*(*dimx))+((z-1)*(*dimx)*(*dimy)));
+
+					if(brain[p]!=0) {
 						//(x-pc)
 						dif_x=(x-theta_x);
 						dif_y=(y-theta_y);
 						dif_z=(z-theta_z);
 
 						//add to f gaussian value for each region
-						p=((x-1)+((y-1)*(*dimx))+((z-1)*(*dimx)*(*dimy)));
 						gx[p]=gx[p]+theta[reg+9]*(1/(pow(sqrt(2*M_PI),3)*sqrt(det_sig)))*exp(-.5*(dif_x*(dif_x*(sig_y*sig_z-sig_yz*sig_yz)+dif_y*(sig_yz*sig_xz-sig_xy*sig_z)+dif_z*(sig_xy*sig_yz-sig_y*sig_xz))/det_sig+dif_y*(dif_x*(sig_xz*sig_yz-sig_z*sig_xy)+dif_y*(sig_x*sig_z-sig_xz*sig_xz)+dif_z*(sig_xy*sig_xz-sig_x*sig_yz))/det_sig+dif_z*(dif_x*(sig_xy*sig_yz-sig_xz*sig_y)+dif_y*(sig_xz*sig_xy-sig_yz*sig_x)+dif_z*(sig_x*sig_y-sig_xy*sig_xy))/det_sig));
 					}
+
 				}
 			}
 		}

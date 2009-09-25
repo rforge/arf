@@ -37,82 +37,45 @@
 \alias{.options.version,options-method}
 \alias{.options.version<-,options-method}
 
-\title{Class "options" ~~~ }
-\description{	 ~~ A concise (1-5 lines) description of what the class is.  ~~}
-\section{Objects from the Class}{
+\title{arf3DS4 "options" class  }
+\description{The arf3DS4 "options" class contains the options of the minimization procedure (including starting value calculation, and (co)variance estimation). Mostly used by arf3DS4 "model" objects (see \code{\linkS4class{model}})}
+\section{Objects}{
 Objects can be created by calls of the form \code{new("options", ...)}.
-	 ~~ describe objects here ~~ 
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{nlm.gradtol}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{nlm.steptol}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{opt.method}:}{Object of class \code{"character"} ~~ }
-    \item{\code{opt.lower}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{opt.upper}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{min.analyticalgrad}:}{Object of class \code{"logical"} ~~ }
-    \item{\code{min.iterlim}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{min.routine}:}{Object of class \code{"character"} ~~ }
-    \item{\code{start.method}:}{Object of class \code{"character"} ~~ }
-    \item{\code{start.maxfac}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{start.vector}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{chk.method}:}{Object of class \code{"character"} ~~ }
-    \item{\code{chk.range}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{sw.type}:}{Object of class \code{"character"} ~~ }
-    \item{\code{adjust.n}:}{Object of class \code{"logical"} ~~ }
-    \item{\code{output.mode}:}{Object of class \code{"character"} ~~ }
-    \item{\code{version}:}{Object of class \code{"ANY"} ~~ }
+    \item{\code{nlm.gradtol}:}{<nlm> Gradient tolerance. }
+    \item{\code{nlm.steptol}:}{<nlm> Step tolerance. }
+    \item{\code{opt.method}:}{<optim> Optim method (BFGS,L-BFGS-B,NelderMead,SANN). }
+    \item{\code{opt.lower}:}{<optim> Lowerbound of parameters (for L-BFGS-B).}
+    \item{\code{opt.upper}:}{<optim> Upperbound of parameters (for L-BFGS-B).}
+    \item{\code{min.analyticalgrad}:}{Use analytical gradient in minimization? }
+    \item{\code{min.iterlim}:}{Iteration limit.}
+    \item{\code{min.routine}:}{Minimization routine (nlm or optim). }
+    \item{\code{start.method}:}{Method of startingvalue calulation.}
+    \item{\code{start.maxfac}:}{Width of smoothing kernel used in starting value calculation.}
+    \item{\code{start.vector}:}{Starting value template (used for default values).}
+    \item{\code{chk.method}:}{Check method for minimized solution.}
+    \item{\code{chk.range}:}{Range of values to check minimized solution.}
+    \item{\code{sw.type}:}{Use diagnonal of residual matrix or full residual matrix in sandwich (co)variance calculation. }
+    \item{\code{output.mode}:}{Vector with output types. }
+    \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }
 }
 \section{Methods}{
+ Standard arf3DS4 accessor and replacement functions can be used to access and replace slots. 
   \describe{
-    \item{.options.adjust.n}{\code{signature(object = "options")}: ... }
-    \item{.options.adjust.n<-}{\code{signature(x = "options")}: ... }
-    \item{.options.chk.method}{\code{signature(object = "options")}: ... }
-    \item{.options.chk.method<-}{\code{signature(x = "options")}: ... }
-    \item{.options.chk.range}{\code{signature(object = "options")}: ... }
-    \item{.options.chk.range<-}{\code{signature(x = "options")}: ... }
-    \item{.options.min.analyticalgrad}{\code{signature(object = "options")}: ... }
-    \item{.options.min.analyticalgrad<-}{\code{signature(x = "options")}: ... }
-    \item{.options.min.iterlim}{\code{signature(object = "options")}: ... }
-    \item{.options.min.iterlim<-}{\code{signature(x = "options")}: ... }
-    \item{.options.min.routine}{\code{signature(object = "options")}: ... }
-    \item{.options.min.routine<-}{\code{signature(x = "options")}: ... }
-    \item{.options.nlm.gradtol}{\code{signature(object = "options")}: ... }
-    \item{.options.nlm.gradtol<-}{\code{signature(x = "options")}: ... }
-    \item{.options.nlm.steptol}{\code{signature(object = "options")}: ... }
-    \item{.options.nlm.steptol<-}{\code{signature(x = "options")}: ... }
-    \item{.options.opt.lower}{\code{signature(object = "options")}: ... }
-    \item{.options.opt.lower<-}{\code{signature(x = "options")}: ... }
-    \item{.options.opt.method}{\code{signature(object = "options")}: ... }
-    \item{.options.opt.method<-}{\code{signature(x = "options")}: ... }
-    \item{.options.opt.upper}{\code{signature(object = "options")}: ... }
-    \item{.options.opt.upper<-}{\code{signature(x = "options")}: ... }
-    \item{.options.output.mode}{\code{signature(object = "options")}: ... }
-    \item{.options.output.mode<-}{\code{signature(x = "options")}: ... }
-    \item{.options.start.maxfac}{\code{signature(object = "options")}: ... }
-    \item{.options.start.maxfac<-}{\code{signature(x = "options")}: ... }
-    \item{.options.start.method}{\code{signature(object = "options")}: ... }
-    \item{.options.start.method<-}{\code{signature(x = "options")}: ... }
-    \item{.options.start.vector}{\code{signature(object = "options")}: ... }
-    \item{.options.start.vector<-}{\code{signature(x = "options")}: ... }
-    \item{.options.sw.type}{\code{signature(object = "options")}: ... }
-    \item{.options.sw.type<-}{\code{signature(x = "options")}: ... }
-    \item{.options.version}{\code{signature(object = "options")}: ... }
-    \item{.options.version<-}{\code{signature(x = "options")}: ... }
-	 }
+ 	\item{access}{\code{.classname.slotname(object)}}
+    \item{replace}{\code{.classname.slotname(object)<-}}
+ 	 }
+ In this case classname is "options" and slotname is for example "sw.type". So to access the "sw.type" slot of an r-object "myoptions"  (of class "options") type \code{.options.sw.type(myoptions)}.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ }
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	~~objects to See Also as \code{\link{~~fun~~}}, ~~~
-	or \code{\linkS4class{CLASSNAME}} for links to other classes
+	\code{\linkS4class{model}}
 }
 \examples{
-showClass("options")
+showClass("option")
 }
 \keyword{classes}
+

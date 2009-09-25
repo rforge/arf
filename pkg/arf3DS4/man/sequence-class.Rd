@@ -1,24 +1,45 @@
 \name{sequence-class}
+\Rdversion{1.1}
 \docType{class}
 \alias{sequence-class}
+\alias{.sequence.current,sequence-method}
+\alias{.sequence.current<-,sequence-method}
+\alias{.sequence.fit,sequence-method}
+\alias{.sequence.fit<-,sequence-method}
+\alias{.sequence.minimum,sequence-method}
+\alias{.sequence.minimum<-,sequence-method}
+\alias{.sequence.mnames,sequence-method}
+\alias{.sequence.mnames<-,sequence-method}
+\alias{.sequence.regions,sequence-method}
+\alias{.sequence.regions<-,sequence-method}
+\alias{.sequence.valid,sequence-method}
+\alias{.sequence.valid<-,sequence-method}
 
-\title{S4 sequence class}
-\description{sequence}
-\section{Objects from the Class}{
+\title{arf3DS4 "sequence" class}
+\description{The arf3DS4 "sequence" class contains information of a sequence of fitted models. It can be used to assess the relative fit between models and decide which model fits best.}
+\section{Objects}{
 Objects can be created by calls of the form \code{new("sequence", ...)}.
-
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{name}:}{Name of the sequence (\code{"character"})}
+    \item{\code{current}:}{The current model number in the sequence.}
+    \item{\code{regions}:}{Vector of number-of-regions to be fitted in sequence.}
+    \item{\code{mnames}:}{Vector of modelnames of the sequence.}
+    \item{\code{fit}:}{Vector of fit indices for each model.}
+    \item{\code{minimum}:}{Which model currently fits the best? }
+    \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}}) }
   }
 }
 \section{Methods}{
+ Standard arf3DS4 accessor and replacement functions can be used to access and replace slots. 
   \describe{
-    \item{slots:}{Slots can be accessed via the standard accessor and replacment methods.}
-	 }
+ 	\item{access}{\code{.classname.slotname(object)}}
+    \item{replace}{\code{.classname.slotname(object)<-}}
+ 	 }
+ In this case classname is "sequence" and slotname is for example "fit". So to access the "fit" slot of an r-object "mysequence"  (of class "sequence") type \code{.sequence.fit(mysequence)}.
 }
-
-\author{ Wouter D. Weeda }
-\note{NOT YET IMPLEMENTED}
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\examples{
+showClass("sequence")
+}
 \keyword{classes}
