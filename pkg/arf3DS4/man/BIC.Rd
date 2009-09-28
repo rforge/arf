@@ -1,29 +1,29 @@
 \name{BIC}
 \Rdversion{1.1}
 \alias{BIC}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+
+\title{Bayesian Information Criterion}
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+BIC calculates the Bayesian Information Criterion (model fit) for a valid arf-model. BIC requires a valid (converged) arf-model (\code{\linkS4class{model}} }
+\usage{
+BIC(arfmodel, options = loadOptions(arfmodel))
 }
-\usage{data(BIC)}
-\format{
-  The format is:
- chr "BIC"
+
+\arguments{
+  \item{arfmodel}{A fitted (and valid) arf-model object of class "model". }
+  \item{options}{An "options" object. The options object belonging to the arf-model is loaded by default.}
 }
+
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+BIC calculates the BIC value using the "effective" number of voxels. That is, only the brain-voxels (Set by the \code{model@mask} slot), are counted.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+
+\value{
+Returns an object of class "model" with the slot \code{model@fit[1]} set to the BIC value. 
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{model}}
 }
-\examples{
-data(BIC)
-## maybe str(BIC) ; plot(BIC) ...
-}
-\keyword{datasets}
+\keyword{ models }

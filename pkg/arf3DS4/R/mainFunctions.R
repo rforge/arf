@@ -8,8 +8,8 @@
 #processModel
 
 processModel <- 
-function(arfmodel,type=c('gauss','simple'),fast=T,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 
-#processModel does an entire arf-fitting pipeline (if fast=F). If fast=T it does fitting plus BIC/RMSEA without varcov and wald
+function(arfmodel,type=c('gauss','simple'),options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 
+#processModel does an entire arf-fitting pipeline 
 {
 	
 	#check if screen output is preferred

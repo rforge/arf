@@ -1,29 +1,28 @@
 \name{cropVolume}
 \Rdversion{1.1}
 \alias{cropVolume}
-\docType{data}
 \title{
-%%   ~~ data name/kind ... ~~
+Crop a 3 dimensional fMRI volume to specified dimensions.
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+cropVolume crops a fMRI volume to specified dimensions and saves (overwrites!) the cropped fMRI volume.
 }
-\usage{data(cropVolume)}
-\format{
-  The format is:
- chr "cropVolume"
+\usage{
+cropVolume(filename, resizeToDim, quiet = F)
+}
+\arguments{
+  \item{filename}{Name of the fmri volume to be cropped (NIFTI/ANALYZE format).}
+  \item{resizeToDim}{Dimensions to crop the volume to. Dimensions must be in a vector with the first element indicating the number of dimensions and the 2:4 elements indicating the x,y,z dimensions.}
+  \item{quiet}{If \code{FALSE} information on the cropping process is returned.}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+The resizeToDim vector is in this form compatible with the NIFTI dims slot (see \code{\linkS4class{nifti.header}}).
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns TRUE when succeeded.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{nifti.header}}
 }
-\examples{
-data(cropVolume)
-## maybe str(cropVolume) ; plot(cropVolume) ...
-}
-\keyword{datasets}
+\keyword{ models }

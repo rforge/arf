@@ -1,29 +1,26 @@
 \name{createAllAverages}
 \Rdversion{1.1}
 \alias{createAllAverages}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{Create Averages of trials for all conditions.}
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+CreateAllAverages creates averages of trials for all conditions in an arf-experiment. It calls \code{\link{createAverages}} for all known data-directories.
 }
-\usage{data(createAllAverages)}
-\format{
-  The format is:
- chr "createAllAverages"
+\usage{
+createAllAverages(experiment = .experiment)
 }
+\arguments{
+\item{experiment}{An arf experiment (object of class "experiment",see \code{\linkS4class{experiment}}).}
+}
+
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+When an arf experiment is loaded using \code{\link{loadExp}} createAllAverages can be called without passing an argument \code{createAllAverages()}.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns \code{TRUE} when no errors are encounterd.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\link{createAverages}},\code{\linkS4class{experiment}},\code{\link{loadExp}}
 }
-\examples{
-data(createAllAverages)
-## maybe str(createAllAverages) ; plot(createAllAverages) ...
-}
-\keyword{datasets}
+\keyword{ models }

@@ -12,18 +12,25 @@
 #fitSimpleModelOptim
 
 fitModel <- 
-function(arfmodel,type=c('gauss','simple'),options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 
+function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 
 # fitModel is a wrapper for NLM and optim based on the options
 {
-	type = match.arg(type)
 	
+	if(.model.modeltype(arfmodel)=='simple') {
+		type='simple'
+		if(.model.params(arfmodel)!=5) stop('Modeltype - parameter mismatch!')
+	} else {
+		if(.model.modeltype(arfmodel)=='gauss') { 
+			type='gauss'
+			if(.model.params(arfmodel)!=10) stop('Modeltype - parameter mismatch!')
+		} else stop('Type of model to fit cannot be found, check modeltype slot of arfmodel object.')
+	}
+		
 	if(.options.start.method(options)=='rect') {
 		if(type=='gauss') arfmodel <- determineStartRect(arfmodel)
 		if(type=='simple') arfmodel <- determineStartRectSimple(arfmodel) 	
 	}
 	
-	if(.options.start.method(options)=='load') .model.startval(arfmodel) <- loadStart(arfmodel)
-		
 	if(.options.min.routine(options)[1]=='nlm') {
 		if(type=='simple')	arfmodel = fitSimpleModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 		if(type=='gauss')	arfmodel = fitModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
@@ -48,9 +55,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	#set modelobjects
 	.options.min.routine(options)[1] <- 'nlm'
-	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='rpr'
-	.model.modeltype(arfmodel) <- 'gauss'
-	.model.params(arfmodel) <- 10
+	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='vpv'
+	if(.model.modeltype(arfmodel)!='gauss') stop('Called fit to Gauss model for non-gauss model object.')
+	if(.model.params(arfmodel)!=10) stop('Modeltype - parameter mismatch!')
 	.model.valid(arfmodel) <- TRUE
 	
 	#start_time
@@ -74,15 +81,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		return(arfmodel)
 	}
 	
-	#set which method of model calculation to use and set mask accordingly
-	if(.options.min.routine(options)[2]=='vpv') {
-		sumsofsquares = ssq.gauss
-		mask = .model.mask(arfmodel)
-	} else {
-		sumsofsquares = ssq.gauss.rpr
-		mask = rep(1,.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])		
-	}
-	
+	#set which method of model calculation to use 
+	if(.options.min.routine(options)[2]=='vpv') sumsofsquares = ssq.gauss else sumsofsquares = ssq.gauss.rpr
+		
 	#call NLM (within a try-loop)
 	nlm.output <- try(suppressWarnings(nlm(
 					sumsofsquares,
@@ -90,7 +91,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 					datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 					weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
 					np=.model.regions(arfmodel)*.model.params(arfmodel),
-					brain=mask,
+					brain=.model.mask(arfmodel),
 					dimx=.fmri.data.dims(dat)[2],
 					dimy=.fmri.data.dims(dat)[3],
 					dimz=.fmri.data.dims(dat)[4],
@@ -199,9 +200,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	#set modelobjects
 	.options.min.routine(options)[1] <- 'optim'
-	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='rpr'
-	.model.modeltype(arfmodel) <- 'gauss'
-	.model.params(arfmodel) <- 10
+	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='vpv'
+	if(.model.modeltype(arfmodel)!='gauss') stop('Called fit to Gauss model for non-gauss model object.')
+	if(.model.params(arfmodel)!=10) stop('Modeltype - parameter mismatch!')
 	.model.valid(arfmodel) <- TRUE
 	
 	#start_time
@@ -225,14 +226,8 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		angrad=FALSE
 	}
 	
-	#set which method of model calculation to use and set mask accordingly
-	if(.options.min.routine(options)[2]=='vpv') {
-		sumsofsquares = ssq.gauss
-		mask = .model.mask(arfmodel)
-	} else {
-		sumsofsquares = ssq.gauss.rpr
-		mask = rep(1,.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])		
-	}
+	#set which method of model calculation to use 
+	if(.options.min.routine(options)[2]=='vpv') sumsofsquares = ssq.gauss else sumsofsquares = ssq.gauss.rpr
 	
 	#set boundaries in L-BFGS-B mode
 	if(length(.options.opt.lower(options))==1 | length(.options.opt.upper(options))==1) {
@@ -267,7 +262,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 						upper=upbound,
 						datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 						weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
-						brain=mask,
+						brain=.model.mask(arfmodel),
 						np=.model.regions(arfmodel)*.model.params(arfmodel),
 						dimx=.fmri.data.dims(dat)[2],
 						dimy=.fmri.data.dims(dat)[3],
@@ -376,9 +371,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	#set routine to optim
 	.options.min.routine(options)[1] <- 'optim'
-	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='rpr'
-	.model.modeltype(arfmodel) <- 'simple'
-	.model.params(arfmodel) <- 5
+	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='vpv'
+	if(.model.modeltype(arfmodel)!='simple') stop('Called fit to simple model for non-simple model object.')
+	if(.model.params(arfmodel)!=5) stop('Modeltype - parameter mismatch!')
 	.model.valid(arfmodel) <- TRUE
 	
 	#start_time
@@ -404,14 +399,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		angrad=FALSE
 	}
 	
-	#set which method of model calculation to use and set mask accordingly
-	if(.options.min.routine(options)[2]=='vpv') {
-		sumsofsquares = ssq.simple
-		mask = .model.mask(arfmodel)
-	} else {
-		sumsofsquares = ssq.simple.rpr
-		mask = rep(1,.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])		
-	}
+	
+	#set which method of model calculation to use 
+	if(.options.min.routine(options)[2]=='vpv') sumsofsquares = ssq.simple else sumsofsquares = ssq.simple.rpr
 	
 	#set boundaries in L-BFGS-B mode
 	if(length(.options.opt.lower(options))==1 | length(.options.opt.upper(options))==1) {
@@ -446,7 +436,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 							upper=upbound,
 							datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 							weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
-							brain=mask,
+							brain=.model.mask(arfmodel),
 							np=.model.regions(arfmodel)*.model.params(arfmodel),
 							dimx=.fmri.data.dims(dat)[2],
 							dimy=.fmri.data.dims(dat)[3],
@@ -535,9 +525,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	#set routine to nlm
 	.options.min.routine(options)[1] <- 'nlm'
-	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='rpr'
-	.model.modeltype(arfmodel) <- 'simple'
-	.model.params(arfmodel) <- 5
+	if(is.na(.options.min.routine(options)[2])) .options.min.routine(options)[2]='vpv'
+	if(.model.modeltype(arfmodel)!='simple') stop('Called fit to simple model for non-simple model object.')
+	if(.model.params(arfmodel)!=5) stop('Modeltype - parameter mismatch!')
 	.model.valid(arfmodel) <- TRUE
 		
 	#start_time
@@ -562,15 +552,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		return(arfmodel)
 	}
 	
-	#set which method of model calculation to use and set mask accordingly
-	if(.options.min.routine(options)[2]=='vpv') {
-		sumsofsquares = ssq.simple
-		mask = .model.mask(arfmodel)
-	} else {
-		sumsofsquares = ssq.simple.rpr
-		mask = rep(1,.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])		
-	}
-	
+	#set which method of model calculation to use 
+	if(.options.min.routine(options)[2]=='vpv') sumsofsquares = ssq.simple else sumsofsquares = ssq.simple.rpr
+		
 	#call NLM (within a try-loop)
 	nlm.output <- try(suppressWarnings(nlm(
 							sumsofsquares,
@@ -578,7 +562,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 							datavec=.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],
 							weightvec=.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],
 							np=.model.regions(arfmodel)*.model.params(arfmodel),
-							brain=mask,
+							brain=.model.mask(arfmodel),
 							dimx=.fmri.data.dims(dat)[2],
 							dimy=.fmri.data.dims(dat)[3],
 							dimz=.fmri.data.dims(dat)[4],

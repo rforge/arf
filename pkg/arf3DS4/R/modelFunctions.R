@@ -19,7 +19,7 @@ show#############################################
 #updateClass
 
 newModel <- 
-function(modelname='defaultmodel',regions=1,subject='',condition='',experiment=.experiment,options=new('options'),overwrite=T) 
+function(modelname='defaultmodel',regions=1,subject='',condition='',type=c('gauss','simple'),options=new('options'),overwrite=T,experiment=.experiment) 
 #newModel makes a modeldirectory based on data and experiment information and a modelname
 {
 	#set separator
@@ -33,8 +33,7 @@ function(modelname='defaultmodel',regions=1,subject='',condition='',experiment=.
 	#checks
 	if(!class(arfdata)=='data') stop('Input must be of class \'data\'')
 	if(modelname=='') stop('Modelname cannot be empty')
-	
-	
+		
 	#check if Averages exist (else create)
 	if(!file.exists(.data.avgdatfile(arfdata)) | !file.exists(.data.avgWfile(arfdata)) | !file.exists(.data.avgtstatFile(arfdata))) {
 		if(overwrite) {
@@ -71,6 +70,14 @@ function(modelname='defaultmodel',regions=1,subject='',condition='',experiment=.
 	.model.modelDataFile(model) <- .experiment.modelDataFile(experiment)
 	.model.startFile(model) <- .experiment.startRda(experiment)
 	.model.logFile(model) <- .experiment.logFile(experiment)
+	
+	#set modeltype
+	type = match.arg(type)
+	.model.modeltype(model) <- type
+	if(type=='simple') .model.params(model) <- 5
+	if(type=='gauss') .model.params(model) <- 10
+	
+	
 		
 	#set number of regions
 	.model.regions(model) <- regions

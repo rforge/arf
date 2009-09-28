@@ -1,29 +1,26 @@
 \name{createFuncs}
 \Rdversion{1.1}
 \alias{createFuncs}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
+\title{ Create functional directories for trials of an arf condition.
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+createFuncs creates objects of class \code{\linkS4class{functional}} for each trial in a condition/data directory.
 }
-\usage{data(createFuncs)}
-\format{
-  The format is:
- chr "createFuncs"
+\usage{
+createFuncs(arfdata)
+}
+\arguments{
+  \item{arfdata}{An object of class "data" (\code{\linkS4class{data}}) from a condition.}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+Functional objects are automatically created when an experiment is made by \code{\link{getFSLdata}} when \code{doFuncs = TRUE}. Functional volumes must be linked using \code{\link{setFuncFiles}}. 
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+None.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{data}},\code{\linkS4class{functional}},\code{\link{getFSLdata}},\code{\link{setFuncFiles}}
 }
-\examples{
-data(createFuncs)
-## maybe str(createFuncs) ; plot(createFuncs) ...
-}
-\keyword{datasets}
+
+\keyword{ methods }

@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=5,
-		update=5,
-		svnrev=78
+		update=6,
+		svnrev=79
 	)
 )
 
@@ -202,7 +202,7 @@ setClass(
 		opt.upper=c(rep(Inf,3),rep(1,3),rep(.95,3),Inf),	#L-BFGS-U upper bound
 		min.analyticalgrad=T, 	#use analytical gradient
 		min.iterlim=5000,		#iteration limit
-		min.routine=c('optim','rpr'),	#which routine
+		min.routine=c('optim','vpv'),	#which routine
 		start.method='start',	
 		start.maxfac=1,
 		start.vector=c(0,0,0,0,0,0,.05,.05,.05,10),

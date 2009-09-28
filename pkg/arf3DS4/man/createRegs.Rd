@@ -1,29 +1,26 @@
 \name{createRegs}
 \Rdversion{1.1}
 \alias{createRegs}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
+\title{ Create registration directories for trials of an arf condition.
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+createRegs creates registration directories for trials of an arf condition and sets the appropriate paths.
 }
-\usage{data(createRegs)}
-\format{
-  The format is:
- chr "createRegs"
+\usage{
+createRegs(arfdata)
+}
+\arguments{
+  \item{arfdata}{An object of class "data" (\code{\linkS4class{data}}) from a condition.}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+Registration objects are automatically created when an experiment is made by \code{\link{getFSLdata}} when \code{doRegs = TRUE}. Registration matrices and volumes must be linked using \code{\link{setRegFiles}} and \code{\link{setRegParams}}.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+None
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{data}},\code{\linkS4class{registration}},\code{\link{getFSLdata}},\code{\link{setRegFiles}},\code{\link{setRegParams}}
 }
-\examples{
-data(createRegs)
-## maybe str(createRegs) ; plot(createRegs) ...
-}
-\keyword{datasets}
+
+\keyword{ methods }

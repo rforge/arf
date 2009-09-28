@@ -1,29 +1,25 @@
 \name{createAverages}
 \Rdversion{1.1}
 \alias{createAverages}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{Create averages of trials for a condition.}
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+CreateAverages creates averages of trials for a condition in an arf-experiment.
 }
-\usage{data(createAverages)}
-\format{
-  The format is:
- chr "createAverages"
+\usage{
+createAverages(arfdat, experiment = .experiment)
+}
+\arguments{
+  \item{arfdat}{An object of class "data" (\code{\linkS4class{data}}) from a condition.}
+  \item{experiment}{An arf experiment (object of class "experiment",see \code{\linkS4class{experiment}}).}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+When an arf experiment is loaded using \code{\link{loadExp}} createAverages can be called with only passing the \code{arfdat} object.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns the "data" object with the links to the average files in the slots \code{data@avgdatfile}, \code{data@avgWfile}, and \code{data@avgtstatfile}
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{data}},\code{\linkS4class{experiment}},\code{\link{loadExp}},\code{\linkS4class{data}}
 }
-\examples{
-data(createAverages)
-## maybe str(createAverages) ; plot(createAverages) ...
-}
-\keyword{datasets}
+\keyword{ models }
