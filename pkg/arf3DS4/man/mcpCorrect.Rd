@@ -1,29 +1,29 @@
 \name{mcpCorrect}
 \Rdversion{1.1}
 \alias{mcpCorrect}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{ Calculate Multiple Comparison Corrections }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+mcpCorrect calculates three types of multiple comparison corrections: 'uncorrected', 'bonferroni', and 'False Discovery Rate (FDR)'. mcpCorrect assumes the data are t-values.
 }
-\usage{data(mcpCorrect)}
-\format{
-  The format is:
- chr "mcpCorrect"
+\usage{
+mcpCorrect(fmridata, type = c("uncorrected", "bonferroni", "FDR"), alpha = 0.05, q = 0.05, cv = 1, df = 100, sig.steps = 10, adj.n = T)
 }
-\details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+\arguments{
+  \item{fmridata}{An object of class ".fmri.data" (see \code{\linkS4Class{fmri.data}}).}
+  \item{type}{Type of correction (\code{uncorrected},\code{bonferroni},\code{FDR})}
+  \item{alpha}{Nominal alpha level.}
+  \item{q}{q parameter for FDR.}
+  \item{cv}{Cv parameter for FDR.}
+  \item{df}{Degrees of freedom of the t values.}
+  \item{sig.steps}{Number of steps to divide p-values in.}
+  \item{adj.n}{Use only brain voxels when correcting?}
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns an object of class "fmri.data" with superthreshold voxels.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{fmri.data}}
 }
-\examples{
-data(mcpCorrect)
-## maybe str(mcpCorrect) ; plot(mcpCorrect) ...
-}
-\keyword{datasets}
+\keyword{ models }
+

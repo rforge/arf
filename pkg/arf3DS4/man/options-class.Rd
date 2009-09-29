@@ -52,7 +52,7 @@ Objects can be created by calls of the form \code{new("options", ...)}.
     \item{\code{min.analyticalgrad}:}{Use analytical gradient in minimization? }
     \item{\code{min.iterlim}:}{Iteration limit.}
     \item{\code{min.routine}:}{Minimization routine (nlm or optim). }
-    \item{\code{start.method}:}{Method of startingvalue calulation.}
+    \item{\code{start.method}:}{Method of startingvalue calulation (use,load,or rect)}
     \item{\code{start.maxfac}:}{Width of smoothing kernel used in starting value calculation.}
     \item{\code{start.vector}:}{Starting value template (used for default values).}
     \item{\code{chk.method}:}{Check method for minimized solution.}

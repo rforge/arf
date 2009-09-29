@@ -31,9 +31,10 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=5,
-		update=6,
-		svnrev=79
-	)
+		update=7,
+		svnrev=80
+	),
+	package='arf3DS4'
 )
 
 ## arf settings class (containing all standard directory names)
@@ -110,7 +111,8 @@ setClass(
 		lowresAvg='avglowres_struct',
 		logFile='arfprocess.log',
 		version=new('version')
-		)
+		),
+		package='arf3DS4'
 )
 
 ## arf/FSL registration class
@@ -137,7 +139,9 @@ setClass(
 	),
 	prototype=prototype(
 		version=new('version')
-	)
+	),
+	package='arf3DS4'
+	
 )
 
 ## arf/FSL functional_data class
@@ -153,7 +157,8 @@ setClass(
 	),
 	prototype=prototype(
 		version=new('version')
-	)
+	),
+	package='arf3DS4'
 )
 
 
@@ -168,7 +173,8 @@ setClass(
 		subject.names='character',	#names of subjects
 		condition.num='numeric',	#number of conditions
 		condition.names='character' #names of condition directories
-	)
+	),
+	package='arf3DS4'
 )
 
 ## arf (general) settings class (containing general settings on NLM, starting values and range checks)
@@ -203,7 +209,7 @@ setClass(
 		min.analyticalgrad=T, 	#use analytical gradient
 		min.iterlim=5000,		#iteration limit
 		min.routine=c('optim','vpv'),	#which routine
-		start.method='start',	
+		start.method='use',	
 		start.maxfac=1,
 		start.vector=c(0,0,0,0,0,0,.05,.05,.05,10),
 		chk.method='imagedim',
@@ -211,7 +217,8 @@ setClass(
 		sw.type='diag',
 		output.mode=c('log','screen'),
 		version=new('version')
-	)
+	),
+	package='arf3DS4'
 )
 
 ## make nifti.fileinfo class
@@ -232,7 +239,8 @@ setClass(
 		filetype='nifti',
 		endian=.Platform$endian,
 		version=new('version')
-	)
+	),
+	package='arf3DS4'
 )
 
 ## nifti.header class (inherits nifti.fileinfo)
@@ -332,7 +340,8 @@ setClass(
 		magic = 'n+1',					#magicstring
 		data.type = 'double',			#type of data
 		data.signed = TRUE				#signed data
-	)
+	),
+	package='arf3DS4'
 )
 
 ## fmri data class (inherits nifti.header)
@@ -341,7 +350,8 @@ setClass(
 	contains='nifti.header',
 	representation=representation(
 		datavec='numeric'
-	)
+	),
+	package='arf3DS4'
 )
 
 ## wald statistics class
@@ -353,7 +363,8 @@ setClass(
 		df1='numeric',		#df1
 		df2='numeric',		#df2
 		pvalues='matrix'	#pvalues
-	)
+	),
+	package='arf3DS4'
 )
 
 ## arf data class (containing info on the locations of the data and weightfiles, the dimensions, number of trials, and relevant nifti parameters.)
@@ -382,7 +393,8 @@ setClass(
 		avgdatfile='',
 		avgWfile='',
 		avgtstatFile=''
-	)
+	),
+	package='arf3DS4'
 )
 
 
@@ -428,7 +440,8 @@ setClass(
 			modeltype='gauss',
 			params=10,
 			wald=new('wald')
-	)
+	),
+	package='arf3DS4'
 )
 
 ## arf sequence class (containing info (fit, valid) on a sequence of models)
@@ -445,5 +458,20 @@ setClass(
 		prototype=prototype(
 				current=1,
 				minimum=0
-		)
+		),
+		package='arf3DS4'
 )
+
+## arf modelnames class, contains modelnames for a subject/condition
+setClass(
+		Class='mnames',
+		representation=representation(
+				experiment='ANY',
+				subject='character',
+				condition='character',
+				mnames='character'
+		),
+		package='arf3DS4'
+)
+
+

@@ -32,12 +32,13 @@ export(
 	determineStartRectSimple,
 	newModel,
 	saveModel,
+	showModels,
 	loadOptions,
 	loadStart,
-	loadReg,
 	loadRda,
 	loadData,
 	loadModel,
+	clearWarnings,
 	makeDiscreteImage,
 	makeDerivs,
 	makeResiduals,
@@ -61,7 +62,8 @@ exportClasses(
 	data,
 	model,
 	sequence,
-	wald
+	wald,
+	mnames
 )
 
 import(

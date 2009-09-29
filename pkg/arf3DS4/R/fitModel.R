@@ -31,6 +31,8 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		if(type=='simple') arfmodel <- determineStartRectSimple(arfmodel) 	
 	}
 	
+	if(.options.start.method(options)=='load') .model.startval(arfmodel) <- loadStart(arfmodel)
+		
 	if(.options.min.routine(options)[1]=='nlm') {
 		if(type=='simple')	arfmodel = fitSimpleModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 		if(type=='gauss')	arfmodel = fitModelNlm(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 

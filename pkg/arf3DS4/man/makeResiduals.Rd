@@ -1,29 +1,21 @@
 \name{makeResiduals}
 \Rdversion{1.1}
 \alias{makeResiduals}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{ Calculate model residuals }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+makeResiduals calculates residuals of an arf model and writes them to a binary file.
 }
-\usage{data(makeResiduals)}
-\format{
-  The format is:
- chr "makeResiduals"
+\usage{
+makeResiduals(arfmodel)
 }
-\details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+\arguments{
+  \item{arfmodel}{An arf model object (see \code{\linkS4Class{model}}).}
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns \code{TRUE} when successful.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{model}}
 }
-\examples{
-data(makeResiduals)
-## maybe str(makeResiduals) ; plot(makeResiduals) ...
-}
-\keyword{datasets}
+\keyword{ models }

@@ -73,6 +73,8 @@ function(filename,resizeToDim,quiet=F)
 		if(file.exists(.fmri.data.filename(dat))) file.remove(.fmri.data.filename(dat))
 		writeData(dat,as.vector(data_array))
 	}
+	
+	
 }
 
 

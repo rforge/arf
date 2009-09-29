@@ -1,29 +1,28 @@
 \name{makeExpDirs}
 \Rdversion{1.1}
 \alias{makeExpDirs}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{ Make Experiment directories.}
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+makeExpDirs makes an arf experiment directory structure.
 }
-\usage{data(makeExpDirs)}
-\format{
-  The format is:
- chr "makeExpDirs"
+\usage{
+makeExpDirs(path = getwd(), name = "default_experiment", subjectind = 1, conditionind = 1, settings = new("settings"))
+}
+\arguments{
+  \item{path}{Path in which to create the experiment directory.}
+  \item{name}{Name of the experiment (=name of the directory.}
+  \item{subjectind}{Vector of subject names for which to create directories.}
+  \item{conditionind}{Vector of condition names for which to create directories.}
+  \item{settings}{A "settings" object (see \code{\linkS4Class{settings}}).}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+makeExpDirs only makes the directory structure, data files must be copied to the directories manually. After copying a call to \code{\link{setExp}} or to \code{\link{loadExp}} in mode 'set', will set the experiment.Rda.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns an "experiment" object, probably with a lot of warnings as no data is in the directories.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{settings}}, \code{\link{setExp}}, \code{\link{loadExp}}
 }
-\examples{
-data(makeExpDirs)
-## maybe str(makeExpDirs) ; plot(makeExpDirs) ...
-}
-\keyword{datasets}
+\keyword{ models }

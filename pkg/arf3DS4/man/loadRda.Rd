@@ -1,29 +1,22 @@
 \name{loadRda}
 \Rdversion{1.1}
 \alias{loadRda}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{Load an .Rda file into a specified object.}
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+loadRda loads a standard .Rda file, and returns this object (instead of loading it into the R workspace).
 }
-\usage{data(loadRda)}
-\format{
-  The format is:
- chr "loadRda"
+\usage{
+loadRda(file)
+}
+\arguments{
+  \item{file}{Filename}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+loadRda assumes that only one object was saved. It cannot load an entire workspace.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns the object that was saved in the .Rda file.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
-}
-\examples{
-data(loadRda)
-## maybe str(loadRda) ; plot(loadRda) ...
-}
-\keyword{datasets}
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\keyword{ file }
+

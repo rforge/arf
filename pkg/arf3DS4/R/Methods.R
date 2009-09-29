@@ -225,3 +225,15 @@ setMethod('summary','fmri.data',
 			
 		}
 )
+
+setMethod('show','mnames',
+		function(object) {
+			cat('experiment:',.experiment.name(.mnames.experiment(object)),'\n')
+			cat('   subject:',.mnames.subject(object),'\n')
+			cat(' condition:',.mnames.condition(object),'\n')
+			cat('modelnames:',.mnames.mnames(object)[1],'\n')
+			for(i in 2:length(.mnames.mnames(object))) {
+				cat('           ',.mnames.mnames(object)[i],'\n')
+			}
+		}
+)

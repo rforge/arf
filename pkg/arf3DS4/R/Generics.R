@@ -3309,3 +3309,47 @@ standGen <- function(x, value) standardGeneric('.sequence.valid<-')
 standMethod <- function(x, value) {x@valid<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
+classname <-'mnames'
+funcname <-'.mnames.experiment'
+standGen <- function(object) standardGeneric('.mnames.experiment')
+standMethod <- function(object) object@experiment
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.mnames.experiment<-'
+standGen <- function(x, value) standardGeneric('.mnames.experiment<-')
+standMethod <- function(x, value) {x@experiment<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'mnames'
+funcname <-'.mnames.subject'
+standGen <- function(object) standardGeneric('.mnames.subject')
+standMethod <- function(object) object@subject
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.mnames.subject<-'
+standGen <- function(x, value) standardGeneric('.mnames.subject<-')
+standMethod <- function(x, value) {x@subject<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'mnames'
+funcname <-'.mnames.condition'
+standGen <- function(object) standardGeneric('.mnames.condition')
+standMethod <- function(object) object@condition
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.mnames.condition<-'
+standGen <- function(x, value) standardGeneric('.mnames.condition<-')
+standMethod <- function(x, value) {x@condition<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'mnames'
+funcname <-'.mnames.mnames'
+standGen <- function(object) standardGeneric('.mnames.mnames')
+standMethod <- function(object) object@mnames
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.mnames.mnames<-'
+standGen <- function(x, value) standardGeneric('.mnames.mnames<-')
+standMethod <- function(x, value) {x@mnames<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)

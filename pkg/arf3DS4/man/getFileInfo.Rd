@@ -1,29 +1,22 @@
 \name{getFileInfo}
 \Rdversion{1.1}
 \alias{getFileInfo}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
+\title{Get basic information of a NIFTI/ANALYZE file.}
+\description{getFileInfo obtains basic information on fmri data files (NIFTI/ANALYZE). This includes the extension (.nii or .hdr/.img), compression (.gz) and endianness.}
+\usage{
+getFileInfo(filename)
 }
-\description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+
+\arguments{
+  \item{filename}{Name of the fmri data file.}
 }
-\usage{data(getFileInfo)}
-\format{
-  The format is:
- chr "getFileInfo"
+\value{
+Returns an object of class \code{\linkS4class{nifti.fileinfo}}.
 }
-\details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+\references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.}
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{nifti.header}}
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
-}
-\references{
-%%  ~~ possibly secondary sources and usages ~~
-}
-\examples{
-data(getFileInfo)
-## maybe str(getFileInfo) ; plot(getFileInfo) ...
-}
-\keyword{datasets}
+\keyword{ models }
+\keyword{ methods }

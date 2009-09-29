@@ -1,4 +1,4 @@
-show#############################################
+#############################################
 # arf3DS4 S4 MODEL FUNCTIONS  	     		#
 # Copyright(c) 2009 Wouter D. Weeda			#
 # University of Amsterdam					#
@@ -17,6 +17,7 @@ show#############################################
 #loadReg
 #loadModel
 #updateClass
+#clearWarnings
 
 newModel <- 
 function(modelname='defaultmodel',regions=1,subject='',condition='',type=c('gauss','simple'),options=new('options'),overwrite=T,experiment=.experiment) 
@@ -226,14 +227,19 @@ saveStart <-
 function(startval,arfmodel) save(startval,file=paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.startFile(arfmodel),sep=''))  	
 #save startingvalues
 
-loadReg <- 
-function(arfmodel) return(loadRda(.model.regfile(arfmodel),sep=''))
-#loadReg
-
 loadModel <- 
-function(modelname,subject,condition,experiment=.experiment) 
-#load a model based on subject and conditions
+function(modelname,subject=NULL,condition,experiment=.experiment) 
+#load a model based on subject and conditions or on a mnames object
 {
+
+	if(class(modelname)=='mnames') {
+		if(is.null(subject)) num = 1 else num = subject
+		experiment = .mnames.experiment(modelname)
+		subject = .mnames.subject(modelname)
+		condition = .mnames.condition(modelname)
+		modelname = .mnames.mnames(modelname)[num]
+	}
+	
 	sp <- .Platform$file.sep
 	modname = paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.modelDir(experiment),sp,modelname,sp,.experiment.modelRda(experiment),sep='')
 	mod = loadRda(modname)
@@ -258,6 +264,29 @@ function(subject,condition,experiment=.experiment)
 	sp <- .Platform$file.sep
 	modname = paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.modelDir(experiment),sp,.experiment.modelnamesRda(experiment),sep='')
 	mod = loadRda(modname)
-	return(mod)
+
+	mnames = new('mnames')
+	
+	.mnames.experiment(mnames) <- experiment
+	.mnames.subject(mnames) <- subject
+	.mnames.condition(mnames) <- condition
+	.mnames.mnames(mnames) <- mod
+	
+	return(mnames)
 	
 }
+
+clearWarnings <- 
+function(arfmodel,resetValid=T) 
+#clears the warnings from a model and reset the valid object then save the object
+{ 
+	yn = readline('This will clear all warnings! Are you sure (y/n)')
+	
+	if(substr(yn,1,1)=='y') {
+		.model.warnings(arfmodel) = character(0)
+		if(resetValid) .model.valid(arfmodel) = T
+		saveModel(arfmodel)
+	}
+	
+}
+

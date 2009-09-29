@@ -72,7 +72,6 @@ function(arfmodel)
 	#set separator
 	sp <- .Platform$file.sep
 	
-	
 	if(.model.valid(arfmodel)) {
 	
 		#check for deriv and resid
@@ -133,6 +132,9 @@ function(arfmodel)
 	fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.residualFile(arfmodel),sep='')
 	if(file.exists(fn)) file.remove(fn)
 
+	#save the modelInfo
+	saveModel(arfmodel)
+	
 	#return the varcov
 	return(invisible(arfmodel))
 }
@@ -192,6 +194,9 @@ function(arfmodel,options=loadOptions(arfmodel))
 		.model.valid(arfmodel) <- FALSE
 	}
 	
+	#save the modelInfo
+	saveModel(arfmodel)
+	
 	return(invisible(arfmodel))
 	
 }
@@ -228,6 +233,9 @@ function(arfmodel,options=loadOptions(arfmodel))
 		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'No valid model. RMSEA not calculated')
 		.model.valid(arfmodel) <- FALSE
 	}
+	
+	#save the modelInfo
+	saveModel(arfmodel)
 	
 	return(invisible(arfmodel))
 	
@@ -331,6 +339,9 @@ function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel))
 		
 	} else	warning('No valid model. wald statistics not calculated.')
 	
+	#save the modelInfo
+	saveModel(arfmodel)
+	
 	return(invisible(arfmodel))
 	
 }
@@ -341,7 +352,7 @@ function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,
 #calulate the multiple comparison correction on fmri data (uncorrected,bonferroni or FDR)
 {
 	veclen <- length(.fmri.data.datavec(fmridata))
-	if(adj.n) n <- length(.fmri.data.datavec(fmridata)[.fmri.data.datavec(fmridata)!=0]) else n <- length(.fmri.data.datavec(fmridata))
+	if(adj.n) n <- sum(.fmri.data.mask(fmridata)) else n <- length(.fmri.data.datavec(fmridata))
 	pseq = seq(sig.steps,1,-1)
 	
 	which <- match.arg(type)

@@ -1,29 +1,21 @@
 \name{loadStart}
 \Rdversion{1.1}
 \alias{loadStart}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{ Load arf3DS4 starting values }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+Load the starting values of an arf model from the .Rda file
 }
-\usage{data(loadStart)}
-\format{
-  The format is:
- chr "loadStart"
+\usage{
+loadStart(arfmodel)
 }
-\details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+\arguments{
+  \item{arfmodel}{Object of class "model" (see \code{\linkS4Class{model}})}
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns a vector with starting values.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{model}}
 }
-\examples{
-data(loadStart)
-## maybe str(loadStart) ; plot(loadStart) ...
-}
-\keyword{datasets}
+\keyword{ models }

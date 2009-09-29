@@ -1,29 +1,27 @@
 \name{loadModel}
 \Rdversion{1.1}
 \alias{loadModel}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{ load an arf3DS4 model}
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+loadModel loads an arf model based on the modelname, subject name and condition name.
 }
-\usage{data(loadModel)}
-\format{
-  The format is:
- chr "loadModel"
+\usage{
+loadModel(modelname, subject = NULL, condition, experiment = .experiment)
+}
+\arguments{
+  \item{modelname}{Name of the model to be loaded.}
+  \item{subject}{Name of the subject.}
+  \item{condition}{Name of the condition.}
+  \item{experiment}{Object of class \code{\linkS4Class{experiment}}.}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+loadModel can also take as input an object of class \code{\linkS4Class{mnames}} with as a second (\code{subject}) argument an numerical indicator of which model to load.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns an object of class \code{\linkS4Class{model}}. 
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{model}}, \code{\linkS4class{experiment}}, \code{\linkS4class{mnames}}
 }
-\examples{
-data(loadModel)
-## maybe str(loadModel) ; plot(loadModel) ...
-}
-\keyword{datasets}
+\keyword{ models }

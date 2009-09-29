@@ -1,29 +1,28 @@
 \name{loadExp}
 \Rdversion{1.1}
 \alias{loadExp}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{ Load an arf3DS4 experiment }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+loadExp loads an arf3DS4 experiment.
 }
-\usage{data(loadExp)}
-\format{
-  The format is:
- chr "loadExp"
+\usage{
+loadExp(path = getwd(), method = c("fast", "set", "rda"))
+}
+\arguments{
+  \item{path}{Path in which to search for the experiment directory.}
+  \item{method}{Which method is used for loading.}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+If \code{method='fast'} the experiment.Rda is loaded without checks directly. Use this method to load an experiment which is unchanged (moved, added subjects, conditions etc.).
+If \code{method='set'} the experiment entirely build up by searching the directories of the experiment for subjects/conditions and models. Use this method if the experiment has changed (added subjects, moved to another directory etc.).
+If \code{method='rda'} the experiment is checked using the data in the experiment.Rda (except for the root-path). Use this method if the experiment has been moved (but the subjects/conditions have not changed).
+loadExp creates an object named \code{.experiment} in \code{.GlobalEnv}, this is to facilitate calls to arf3DS4 functions which have an 'experiment' object as input as all these functions by default use \code{.experiment}.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns an object of class \code{\linkS4Class{experiment}}.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{experiment}}
 }
-\examples{
-data(loadExp)
-## maybe str(loadExp) ; plot(loadExp) ...
-}
-\keyword{datasets}
+\keyword{ models }

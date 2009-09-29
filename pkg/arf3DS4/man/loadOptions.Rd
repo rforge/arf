@@ -1,29 +1,21 @@
 \name{loadOptions}
 \Rdversion{1.1}
 \alias{loadOptions}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{ Load arf3DS4 Options }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+Load an "options" object belonging to an arf model.
 }
-\usage{data(loadOptions)}
-\format{
-  The format is:
- chr "loadOptions"
+\usage{
+loadOptions(arfmodel)
 }
-\details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+\arguments{
+  \item{arfmodel}{Object of class "model" (see \code{\linkS4Class{model}})}
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns an object of class \code{\linkS4Class{options}}.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{model}}, \code{\linkS4class{options}}
 }
-\examples{
-data(loadOptions)
-## maybe str(loadOptions) ; plot(loadOptions) ...
-}
-\keyword{datasets}
+\keyword{ models }

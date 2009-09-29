@@ -1,29 +1,28 @@
 \name{loadData}
 \Rdversion{1.1}
 \alias{loadData}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{Load an arf3DS4 "data" object.}
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+loadData loads a "data" object for a given subject and condition.
 }
-\usage{data(loadData)}
-\format{
-  The format is:
- chr "loadData"
+\usage{
+loadData(subject, condition, exp = .experiment)
+}
+\arguments{
+  \item{subject}{Name of the subject.}
+  \item{condition}{Name of the condition}
+  \item{exp}{Object of class "experiment" (see \code{\linkS4class{experiment}})}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+loadData uses the loaded experiment as a default (see \code{\link{loadExp}}) on how to load experiments.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns an object of class "data" (see \code{\linkS4Class{data}}).
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{data}}, \code{\linkS4class{experiment}}, \code{\link{loadExp}}
 }
-\examples{
-data(loadData)
-## maybe str(loadData) ; plot(loadData) ...
-}
-\keyword{datasets}
+\keyword{ models }
+
