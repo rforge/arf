@@ -1,29 +1,24 @@
 \name{wald}
 \Rdversion{1.1}
 \alias{wald}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
+\title{Calculate Wald statistics for an arf model.}
+\description{Calculate Wald statistics for an arf model.}
+\usage{
+wald(arfmodel, waldobject = new("wald"), options = loadOptions(arfmodel))
 }
-\description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
-}
-\usage{data(wald)}
-\format{
-  The format is:
- chr "wald"
+\arguments{
+  \item{arfmodel}{A valid model object.}
+  \item{waldobject}{An object of class "wald".}
+  \item{options}{An object of class "options".}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+Wald requires a (co)variance matrix, it will give an error when the \code{model@varcov} slot does not exist. 
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns an object of class "model" with the appropriate slots.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{model}}, \code{\link{varcov}}, \code{\linkS4class{wald}}, \code{\linkS4class{options}}
 }
-\examples{
-data(wald)
-## maybe str(wald) ; plot(wald) ...
-}
-\keyword{datasets}
+\keyword{ models }

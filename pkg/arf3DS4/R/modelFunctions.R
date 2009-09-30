@@ -121,8 +121,6 @@ function(arfmodel,type=c('pos+neg','pos','neg','all','separate'))
 #save the modelBinary
 {
 	
-	#set separator
-	sp <- .Platform$file.sep
 	
 	#match type
 	type <- match.arg(type)
@@ -196,8 +194,6 @@ function(arfmodel)
 #save the modelBinary
 {
 	
-	#set separator
-	sp <- .Platform$file.sep
 
 	#get Header info from avgdatfile
 	headinf <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))

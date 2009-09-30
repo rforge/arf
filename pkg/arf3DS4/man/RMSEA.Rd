@@ -1,29 +1,29 @@
 \name{RMSEA}
 \Rdversion{1.1}
 \alias{RMSEA}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{Calculate Root Mean Square Error.}
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+Calculate RMSEA fit value.
 }
-\usage{data(RMSEA)}
-\format{
-  The format is:
- chr "RMSEA"
+\usage{
+RMSEA(arfmodel, options = loadOptions(arfmodel))
 }
+\arguments{
+  \item{arfmodel}{A fitted (and valid) arf-model object of class "model". }
+  \item{options}{An "options" object. The options object belonging to the arf-model is loaded by default.}
+}
+
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+RMSEA calculates the RMSEA value using the "effective" number of voxels. That is, only the brain-voxels (Set by the \code{model@mask} slot), are counted.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+
+\value{
+Returns an object of class "model" with the slot \code{model@fit[2]} set to the RMSEA value. 
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{model}},\code{\linkS4class{options}}
 }
-\examples{
-data(RMSEA)
-## maybe str(RMSEA) ; plot(RMSEA) ...
-}
-\keyword{datasets}
+\keyword{ models }
+

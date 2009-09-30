@@ -24,6 +24,6 @@ Returns an object of class "model" with the slot \code{model@fit[1]} set to the 
 
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{model}}
+	\code{\linkS4class{model}},\code{\linkS4class{options}}
 }
 \keyword{ models }

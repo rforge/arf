@@ -1,15 +1,21 @@
 \name{arf2MNI}
 \Rdversion{1.1}
 \alias{arf2MNI}
-\title{Convert arf-coordinates to MNI152 coordinates}
+\alias{MNI2arf}
+\alias{MNI2atlas}
+
+\title{Convert arf-coordinates to MNI152 coordinates and vice-versa}
 \description{
-arf2MNI converts arf-coordinates of a region to MNI152 coordinates. The function needs an object of class "registration" (\code{\linkS4class{registration}}) from the data the arf-model was fitted to.
+Converts arf-coordinates of a region to MNI152 coordinates and back, also convert MNI coordinates to MNI atlas coordinates. The function needs an object of class "registration" (\code{\linkS4class{registration}}) from the data the arf-model was fitted to.
 }
 \usage{
 arf2MNI(xyz_coor, registration)
+MNI2arf(xyz_coor, registration)
+MNI2atlas(xyz_coor, registration)
+
 }
 \arguments{
-  \item{xyz_coor}{Coorindate triple (x,y,z), containing coordinates to be converted.}
+  \item{xyz_coor}{Coordinate triple (x,y,z), containing coordinates to be converted.}
   \item{registration}{An object of class "registration"(\code{\linkS4class{registration}}).}
 }
 \details{

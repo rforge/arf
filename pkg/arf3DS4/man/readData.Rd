@@ -1,29 +1,21 @@
 \name{readData}
 \Rdversion{1.1}
 \alias{readData}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
+\title{read in a NIFTI/ANALYZE file.}
+\description{readData reads in a NIFTI/ANALYZE file.}
+\usage{
+readData(filename)
 }
-\description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+\arguments{
+  \item{filename}{Name of the file to be read in.}
 }
-\usage{data(readData)}
-\format{
-  The format is:
- chr "readData"
+\value{
+Returns an object of class \code{\linkS4Class{fmri.data}}.
 }
-\details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+\references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.}
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{fmri.data}}
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
-}
-\references{
-%%  ~~ possibly secondary sources and usages ~~
-}
-\examples{
-data(readData)
-## maybe str(readData) ; plot(readData) ...
-}
-\keyword{datasets}
+\keyword{ models }
+\keyword{ methods }

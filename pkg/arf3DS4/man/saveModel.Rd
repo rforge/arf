@@ -1,29 +1,22 @@
 \name{saveModel}
 \Rdversion{1.1}
 \alias{saveModel}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{Save a model object}
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+Save a model object to the model.Rda file.
 }
-\usage{data(saveModel)}
-\format{
-  The format is:
- chr "saveModel"
+\usage{
+saveModel(arfmodel)
 }
-\details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+\arguments{
+  \item{arfmodel}{An object of class \code{\linkS4Class{model}}.}
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+None
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{model}}
 }
-\examples{
-data(saveModel)
-## maybe str(saveModel) ; plot(saveModel) ...
-}
-\keyword{datasets}
+\keyword{ models }
+\keyword{ methods }

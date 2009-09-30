@@ -28,7 +28,7 @@ fitSimpleModelNlm(arfmodel, options = loadOptions(arfmodel), dat = readData(.mod
 fitModel calls one of the following functions based on the "options" object: \code{fitModelOptim},\code{fitModelNlm},\code{fitSimpleModelOptim},\code{fitSimpleModelNlm}. These functions can also be called directly. Models can be created by calling \code{\link{newModel}}.
 }
 \value{
-Returns an object of class "model" with the apropriate slots.
+Returns an object of class "model" with the appropriate slots.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

@@ -75,7 +75,7 @@ Objects can be created by calls of the form \code{new("options", ...)}.
 	\code{\linkS4class{model}}
 }
 \examples{
-showClass("option")
+showClass("options")
 }
 \keyword{classes}
 

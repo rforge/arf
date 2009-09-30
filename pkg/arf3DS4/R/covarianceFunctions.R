@@ -210,10 +210,8 @@ function(arfmodel,options=loadOptions(arfmodel))
 	if(.model.valid(arfmodel)) {
 		
 		#set number of voxels
-		Adata <- readData(.model.avgdatfile(arfmodel))
 		n <- .model.n(arfmodel) 
-		
-	
+			
 		#Hotellings T
 		HTs = .model.trials(arfmodel)*.model.minimum(arfmodel)
 		
@@ -272,7 +270,6 @@ function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel))
 	
 	if(length(.model.varcov(arfmodel))==0) stop('(co)variance matrix not yet calculated, cannot compute Wald statistics!')
 	
-
 	#define function to calculate Wald statistic 
 	W <- function(a,A,C) t(a)%*%solve(A%*%C%*%t(A))%*%a
 		
@@ -282,7 +279,6 @@ function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel))
 		if(dim(.wald.design(waldobject))[1]==0) .wald.design(waldobject) <- matrix(0,.model.regions(arfmodel),5)
 		
 		# get dimensions (set number of voxels)
-		Adata <- readData(.model.avgdatfile(arfmodel))
 		n <- .model.n(arfmodel) 
 		
 		#set relevant matrix sizes and dfs
@@ -352,7 +348,7 @@ function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,
 #calulate the multiple comparison correction on fmri data (uncorrected,bonferroni or FDR)
 {
 	veclen <- length(.fmri.data.datavec(fmridata))
-	if(adj.n) n <- sum(.fmri.data.mask(fmridata)) else n <- length(.fmri.data.datavec(fmridata))
+	if(adj.n) n <- length(.fmri.data.datavec(fmridata)[.fmri.data.datavec(fmridata)==0]) else n <- length(.fmri.data.datavec(fmridata))
 	pseq = seq(sig.steps,1,-1)
 	
 	which <- match.arg(type)

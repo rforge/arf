@@ -1,29 +1,32 @@
 \name{newModel}
 \Rdversion{1.1}
 \alias{newModel}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{Create a new arf model}
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+newModel creates a new model (including model directories) within a subject/condition, using the options specified.
 }
-\usage{data(newModel)}
-\format{
-  The format is:
- chr "newModel"
+\usage{
+newModel(modelname = "defaultmodel", regions = 1, subject = "", condition = "", type = c("gauss", "simple"), options = new("options"), overwrite = T, experiment = .experiment)
+}
+\arguments{
+  \item{modelname}{Name of the model.}
+  \item{regions}{Number of regions to fit.}
+  \item{subject}{Name of the subject.}
+  \item{condition}{Name of the condition.}
+  \item{type}{Type of model to fit (full Gaussian (\code{gauss}), simple Gaussian (\code{simple}).}
+  \item{options}{Options object (default creates a new instance of options, thus loading defaults).}
+  \item{overwrite}{Ovewrite the model if a model with the same name alreay exists?}
+  \item{experiment}{Experiment object (as default uses \code{.experiment}).}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+Calls to newModel also save an instance of a model.Rda in the apropriate directory.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns an object of class "model" with the apriopriate slots.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
-}
-\examples{
-data(newModel)
-## maybe str(newModel) ; plot(newModel) ...
-}
-\keyword{datasets}
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+ \code{\linkS4class{model}}, \code{\linkS4class{options}}, \code{\linkS4class{experiment}}
+ }
+\keyword{ models }
+

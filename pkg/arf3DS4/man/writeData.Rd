@@ -1,29 +1,26 @@
 \name{writeData}
 \Rdversion{1.1}
 \alias{writeData}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
+\title{Write NIFTI/ANALYZE data.}
+\description{Write a datavector to a NIFTI/ANALYZE file.}
+\usage{
+writeData(headinf, datavec)
 }
-\description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
-}
-\usage{data(writeData)}
-\format{
-  The format is:
- chr "writeData"
+\arguments{
+  \item{headinf}{An object of (at least) class "nifti.header".} 
+  \item{datavec}{The datavector to be saved (must be of the correct length).}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+\code{headinf} may also be an object of class "fmri.data" as this class extends the "nifti.header" class directly. 
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns \code{TRUE} when successful.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.}
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{fmri.data}}, \code{\linkS4class{nifti.header}}
 }
-\examples{
-data(writeData)
-## maybe str(writeData) ; plot(writeData) ...
-}
-\keyword{datasets}
+\keyword{ models }
+\keyword{ methods }
+

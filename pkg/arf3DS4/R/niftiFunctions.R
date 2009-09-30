@@ -228,7 +228,7 @@ function(fileinf)
 			if(.nifti.header.datatype(headinf)==1280) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
 			if(.nifti.header.datatype(headinf)==1536) { .nifti.header.data.type(headinf)<-'double';.nifti.header.data.signed(headinf)<-TRUE } else
 			if(.nifti.header.datatype(headinf)==1792) { .nifti.header.data.type(headinf)<-'complex';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==2048) { .nifti.header.data.type(headinf)(headinf)<-'complex';.nifti.header.data.signed(headinf)(headinf)<-TRUE } else { stop('Datatype is unknown!') }
+			if(.nifti.header.datatype(headinf)==2048) { .nifti.header.data.type(headinf)<-'complex';.nifti.header.data.signed(headinf)<-TRUE } else { stop('Datatype is unknown!') }
 			
 			return(headinf)
 		}
@@ -465,8 +465,6 @@ headToName <-
 function(headinf) 
 #turn header information to a filename
 {
-	#set separator
-	sp <- .Platform$file.sep
 	
 	#if extension is nii
 	if(.nifti.header.extension(headinf)=='nii') {

@@ -7,6 +7,7 @@
 #[CONTAINS]
 #cropVolume
 #cropVolumeAuto
+#readFSLmat
 #createRegs
 #createFuncs
 #setRegFiles
@@ -424,10 +425,6 @@ function(experiment=.experiment,func_data='filtered_func_data.nii.gz')
 		}
 		
 	}
-		
-	
-	#return registration object
-	return(invisible(functional))
 }
 
 euclidDist <-
@@ -477,7 +474,6 @@ function(arfdata,experiment=.experiment)
 		#read in lowres + highresfiles
 		examp = readData(.registration.linkedfile(registration))
 		highres = readData(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.highres(registration),sep=''))
-		ex2high = readFSLmat(paste(.registration.fullpath(registration),.Platform$file.sep,.registration.examp2high(registration),sep=''))
 		
 		
 		#set dimensions of highres image

@@ -1,29 +1,30 @@
 \name{setExp}
 \Rdversion{1.1}
 \alias{setExp}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
-}
+\title{Set values of an experiment}
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+Set values of an experiment using the data in the directory structure.
 }
-\usage{data(setExp)}
-\format{
-  The format is:
- chr "setExp"
+\usage{
+setExp(path = getwd(), tempsub = 1, tempcond = 1, auto = TRUE, createWeights = TRUE, overwrite = F, load = T)
+}
+\arguments{
+  \item{path}{Path to the experiment.}
+  \item{tempsub}{Template subject, used to obtain some values.}
+  \item{tempcond}{Template condition, used to obtain some values.}
+  \item{auto}{Automatically detect directories or ask?}
+  \item{createWeights}{Create weights for beta-values.}
+  \item{overwrite}{Overwrite old-values.}
+  \item{load}{Load experiment after setting?}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+setExp is called by \code{\link{loadExp}} when option is \code{'set'}
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns an object of class \code{\linkS4Class{experiment}}.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{experiment}}, \code{\link{loadExp}}
 }
-\examples{
-data(setExp)
-## maybe str(setExp) ; plot(setExp) ...
-}
-\keyword{datasets}
+\keyword{ models }

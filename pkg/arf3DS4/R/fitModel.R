@@ -627,7 +627,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
 		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] nlm internal error: ',nlm.output,sep=''))
-		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),optim.output)
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),nlm.output)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}

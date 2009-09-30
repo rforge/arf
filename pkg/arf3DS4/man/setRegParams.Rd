@@ -1,29 +1,27 @@
 \name{setRegParams}
 \Rdversion{1.1}
 \alias{setRegParams}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
+\title{Set the registration parameters.}
+\description{Set the registration matrices to the appropriate values given the files in the registration directory.
 }
-\description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+\usage{
+setRegParams(registration)
 }
-\usage{data(setRegParams)}
-\format{
-  The format is:
- chr "setRegParams"
+\arguments{
+  \item{registration}{Object of class "registration" with appropriate filenames.}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+First run \code{\link{setRegFiles}} to set the correct filenames.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns a registration object with the correct slots.
 }
 \references{
-%%  ~~ possibly secondary sources and usages ~~
+See \url{http://www.fmrib.ox.ac.uk/fsl/} on how to obtain FSL and licences.
 }
-\examples{
-data(setRegParams)
-## maybe str(setRegParams) ; plot(setRegParams) ...
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{registration}}, \code{\link{setRegFiles}}
 }
-\keyword{datasets}
+\keyword{ methods }
+\keyword{ models }

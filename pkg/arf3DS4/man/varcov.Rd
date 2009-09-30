@@ -1,29 +1,22 @@
 \name{varcov}
 \Rdversion{1.1}
 \alias{varcov}
-\docType{data}
-\title{
-%%   ~~ data name/kind ... ~~
+\title{Calculate (co)variance matrix of an arf model.}
+\description{Calculate (co)variance matrix of an arf model using Sandwich estimation.}
+\usage{
+varcov(arfmodel)
 }
-\description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
-}
-\usage{data(varcov)}
-\format{
-  The format is:
- chr "varcov"
+\arguments{
+  \item{arfmodel}{A valid arf model object.}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+Varcov needs first-order derivatives and residual matrices, if they do not exist, they are created by calls to \code{\link{makeDerivs}} and \code{\link{makeResiduals}}.
 }
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+\value{
+Returns an object of class "model" with the appropriate slots.
 }
-\references{
-%%  ~~ possibly secondary sources and usages ~~
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\linkS4class{model}}, \code{\link{makeDerivs}}, \code{\link{makeResiduals}}
 }
-\examples{
-data(varcov)
-## maybe str(varcov) ; plot(varcov) ...
-}
-\keyword{datasets}
+\keyword{ models }

@@ -587,7 +587,7 @@ function(vec,fwhm)
 #smooth a datavector (1D) using FWHM filter (used in startval detect)
 {
 	
-	len=length(vec)
+	
 	fl=50
 	filt=dnorm(1:100,mean=50,sd=fwhm)
 	
@@ -615,7 +615,7 @@ function(arfmodel)
 	.model.n(arfmodel) <- sum(brain)
 	
 	#get ssq_data
-	.model.ss(arfmodel) <- .C('ssqdata',as.double(.fmri.data.datavec(readData(.model.avgdatFile(arfmodel)))),as.double(.fmri.data.datavec(readData(.model.avgWFile(arfmodel)))),as.integer(brain),as.integer(length(avgstat)),as.double(numeric(1)))[[5]]
+	.model.ss(arfmodel) <- .C('ssqdata',as.double(.fmri.data.datavec(readData(.model.avgdatfile(arfmodel)))),as.double(.fmri.data.datavec(readData(.model.avgWfile(arfmodel)))),as.integer(brain),as.integer(length(avgtstat)),as.double(numeric(1)))[[5]]
 	
 	return(invisible(arfmodel))
 }

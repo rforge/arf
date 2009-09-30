@@ -18,8 +18,7 @@ function(datavec,zerotol=1e-03)
 	maxsteps = 64
 	
 	datavec[abs(datavec)<zerotol]=0
-	
-	
+		
 	max_dat = max(datavec)
 	min_dat = min(datavec)
 	total = abs(min_dat)+abs(max_dat)
@@ -29,7 +28,7 @@ function(datavec,zerotol=1e-03)
 	
 	pos_data = datavec[datavec>0]
 	neg_data = datavec[datavec<0]
-	zero_data = datavec[datavec==0]
+	
 		
 	if(max_dat>0 & min_dat<0) {
 		pq = quantile(pos_data,probs=seq(0,1,1/possteps)[-1])
