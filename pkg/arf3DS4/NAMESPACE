@@ -32,6 +32,8 @@ export(
 	determineStartRectSimple,
 	newModel,
 	saveModel,
+	saveModelBin,
+	saveModelBinSimple,
 	showModels,
 	loadOptions,
 	loadStart,
