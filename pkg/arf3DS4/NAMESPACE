@@ -12,6 +12,7 @@ export(
 	setRegParams,
 	createFuncs,
 	setFuncFiles,
+	arf2Excel,
 	arf2MNI,
 	MNI2arf,
 	MNI2atlas,
@@ -66,6 +67,13 @@ exportClasses(
 	sequence,
 	wald,
 	mnames
+)
+
+
+exportMethods(
+	show,
+	plot,
+	summary
 )
 
 import(

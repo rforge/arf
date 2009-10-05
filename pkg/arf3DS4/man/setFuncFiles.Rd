@@ -6,7 +6,7 @@
 Link the functional files in a data directory to the functional volume files.
 }
 \usage{
-setFuncFiles(experiment = .experiment, func_data = "filtered_func_data.nii.gz")
+setFuncFiles(experiment = NULL, func_data = "filtered_func_data.nii.gz")
 }
 \arguments{
   \item{experiment}{Object of class "experiment"}

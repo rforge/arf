@@ -47,14 +47,18 @@ function(file)
 }
 
 loadData <- 
-function(subject,condition,exp=.experiment)
+function(subject,condition,experiment=NULL)
 #with global environment variable loaded, load Data based on subject and condition
 {
+	
+	#check experiment
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	
 	#set separator
 	sp <- .Platform$file.sep
 	
 	#set filename based on subject and condition
-	filename <- paste(.experiment.path(exp),sp,.experiment.subjectDir(exp),sp,.experiment.subjectPrefix(exp),subject,sp,.experiment.conditionDir(exp),sp,.experiment.conditionPrefix(exp),condition,sp,.experiment.dataDir(exp),sp,.experiment.dataRda(exp),sep='')
+	filename <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,.experiment.subjectPrefix(experiment),subject,sp,.experiment.conditionDir(experiment),sp,.experiment.conditionPrefix(experiment),condition,sp,.experiment.dataDir(experiment),sp,.experiment.dataRda(experiment),sep='')
 	
 	return(invisible(loadRda(filename)))
 }
@@ -148,7 +152,7 @@ function(experiment,overwrite=F)
 						model <- loadRda(paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
 			
 						#version specific data to add to model (if not set by classDef, data prior to 1.3.0)
-						model <- updateClass(model,logFile=.experiment.logFile(experiment),gradient=0,params=0,modeltype='undef',avgtstatFile='',n=0,mask=0,ss=0)
+						#model <- updateClass(model,logFile=.experiment.logFile(experiment),gradient=0,params=0,modeltype='undef',avgtstatFile='',n=0,mask=0,ss=0)
 				
 						.model.modelpath(model) <- paste(modelpath,sp,mnames[mods],sep='')
 						.model.modeldatapath(model) <- paste(modelpath,sp,mnames[mods],sp,.experiment.modeldatDir(experiment),sep='')

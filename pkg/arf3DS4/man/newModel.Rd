@@ -6,7 +6,7 @@
 newModel creates a new model (including model directories) within a subject/condition, using the options specified.
 }
 \usage{
-newModel(modelname = "defaultmodel", regions = 1, subject = "", condition = "", type = c("gauss", "simple"), options = new("options"), overwrite = T, experiment = .experiment)
+newModel(modelname = "defaultmodel", regions = 1, subject = "", condition = "", type = c("gauss", "simple"), options = new("options"), overwrite = T, experiment = NULL)
 }
 \arguments{
   \item{modelname}{Name of the model.}

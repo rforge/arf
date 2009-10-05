@@ -5,8 +5,8 @@
 \title{Make low resolution structural image from high resolution T1 image.}
 \description{Make low resolution structural image from high resolution T1 image.}
 \usage{
-makeLowResStruct(arfdata, experiment = .experiment)
-makeLowResStructAvg(arfmodel, experiment = .experiment)
+makeLowResStruct(arfdata, experiment = NULL)
+makeLowResStructAvg(arfmodel, experiment = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

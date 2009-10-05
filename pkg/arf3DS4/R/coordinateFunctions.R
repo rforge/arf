@@ -394,9 +394,12 @@ function(arfdata)
 
 
 setFuncFiles <- 
-function(experiment=.experiment,func_data='filtered_func_data.nii.gz') 
+function(experiment=NULL,func_data='filtered_func_data.nii.gz') 
 ###
 {
+	#check experiment
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	
 	#set separator
 	sp <- .Platform$file.sep
 	
@@ -458,9 +461,13 @@ function(arfmodel,thres=5,quiet=T)
 
 
 makeLowResStruct <-
-function(arfdata,experiment=.experiment)
+function(arfdata,experiment=NULL)
 #make low resolution structural image from high_res T1 image
 {
+	
+	#check experiment
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	
 	#get trials from dataDir
 	trials = list.files(.data.regDir(arfdata),full=F)
 	
@@ -518,9 +525,11 @@ function(arfdata,experiment=.experiment)
 }
 
 makeLowResStructAvg <-
-function(arfmodel,experiment=.experiment)
+function(arfmodel,experiment=NULL)
 #make average of low_resolution structural image from multiple lowres images (and save in modeldir)
 {
+	#check experiment
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
 	
 	sp = .Platform$file.sep
 	

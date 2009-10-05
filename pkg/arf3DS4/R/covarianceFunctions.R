@@ -344,11 +344,12 @@ function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel))
 
 
 mcpCorrect <- 
-function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,df=100,sig.steps=10,adj.n=T) 
+function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,df=100,sig.steps=1,adj.n=T) 
 #calulate the multiple comparison correction on fmri data (uncorrected,bonferroni or FDR)
 {
 	veclen <- length(.fmri.data.datavec(fmridata))
 	if(adj.n) n <- length(.fmri.data.datavec(fmridata)[.fmri.data.datavec(fmridata)==0]) else n <- length(.fmri.data.datavec(fmridata))
+	
 	pseq = seq(sig.steps,1,-1)
 	
 	which <- match.arg(type)
@@ -357,7 +358,7 @@ function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,
 		adj.p = alpha/n
 		pvec = adj.p / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(.fmri.data.datavec(fmridata),df))]=1/pseq[i]
+		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
 	}
 	
 	if(which=='FDR') {
@@ -368,14 +369,14 @@ function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,
 		fdr=fdr.value[i]
 		pvec = fdr / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(.fmri.data.datavec(fmridata),df))]=1/pseq[i]
+		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
 	}
 	
 	if(which=='uncorrected') {
 		adj.p = alpha
 		pvec = adj.p / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(.fmri.data.datavec(fmridata),df))]=1/pseq[i]
+		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
 	}
 	
 	.fmri.data.datavec(fmridata) <- sigvec

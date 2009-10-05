@@ -6,7 +6,7 @@
 loadModel loads an arf model based on the modelname, subject name and condition name.
 }
 \usage{
-loadModel(modelname, subject = NULL, condition, experiment = .experiment)
+loadModel(modelname, subject = NULL, condition, experiment = NULL)
 }
 \arguments{
   \item{modelname}{Name of the model to be loaded.}

@@ -6,7 +6,7 @@
 CreateAllAverages creates averages of trials for all conditions in an arf-experiment. It calls \code{\link{createAverages}} for all known data-directories.
 }
 \usage{
-createAllAverages(experiment = .experiment)
+createAllAverages(experiment = NULL)
 }
 \arguments{
 \item{experiment}{An arf experiment (object of class "experiment",see \code{\linkS4class{experiment}}).}

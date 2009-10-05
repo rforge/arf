@@ -6,7 +6,7 @@
 CreateAverages creates averages of trials for a condition in an arf-experiment.
 }
 \usage{
-createAverages(arfdat, experiment = .experiment)
+createAverages(arfdat, experiment = NULL)
 }
 \arguments{
   \item{arfdat}{An object of class "data" (\code{\linkS4class{data}}) from a condition.}

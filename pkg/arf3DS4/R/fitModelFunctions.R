@@ -231,10 +231,14 @@ function(theta,np)
 }
 
 createAverages <- 
-function(arfdat,experiment=.experiment) 
+function(arfdat,experiment=NULL) 
 # createAverages averages of the data and weightfiles, set n mask and ss_data 
 {
 	
+	#check experiment
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	
+	#set filesep
 	sp=.Platform$file.sep
 	
 	# add trial data to avgdat and weightdat
@@ -307,9 +311,12 @@ function(arfdat,experiment=.experiment)
 }
 
 createAllAverages <- 
-function(experiment=.experiment) 
+function(experiment=NULL) 
 #create All averages is a wrapper to create all averages in an experiment
 {
+	
+	#check experiment
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
 	
 	#set filesep
 	sp <- .Platform$file.sep

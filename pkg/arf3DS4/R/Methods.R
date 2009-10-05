@@ -5,8 +5,8 @@
 #############################################
 
 #setGenerics for functions
-setGeneric('plot')
-setGeneric('summary')
+setGeneric('plot',package='graphics')
+setGeneric('summary',package='base')
 
 setMethod('show','experiment',
 	function(object) {
@@ -123,7 +123,7 @@ setMethod('show','model',
 					if(object@wald@pvalues[reg,4]<.05) {	
 						cat(' ',sprintf('[%5.1f %5.1f %5.1f ~ %5.1f %5.1f %5.1f]* ',object@estimates[4+(10*(reg-1))],object@estimates[5+(10*(reg-1))],object@estimates[6+(10*(reg-1))],object@estimates[7+(10*(reg-1))],object@estimates[8+(10*(reg-1))],object@estimates[9+(10*(reg-1))]))
 					} else cat(' ',sprintf('[%5.1f %5.1f %5.1f ~ %5.1f %5.1f %5.1f]  ',object@estimates[4+(10*(reg-1))],object@estimates[5+(10*(reg-1))],object@estimates[6+(10*(reg-1))],object@estimates[7+(10*(reg-1))],object@estimates[8+(10*(reg-1))],object@estimates[9+(10*(reg-1))]))
-					if(object@wald@pvalues[reg,4]<.05) {	
+					if(object@wald@pvalues[reg,5]<.05) {	
 						cat(' ',sprintf('[%7.0f]*',object@estimates[10+(10*(reg-1))]),'\n')
 					} else cat(' ',sprintf('[%7.0f] ',object@estimates[10+(10*(reg-1))]),'\n')
 				}

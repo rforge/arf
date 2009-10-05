@@ -6,7 +6,7 @@
 List all models for a subject/condition.
 }
 \usage{
-showModels(subject, condition, experiment = .experiment)
+showModels(subject, condition, experiment = NULL)
 }
 \arguments{
   \item{subject}{Name of the subject.}

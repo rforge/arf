@@ -20,9 +20,12 @@
 #clearWarnings
 
 newModel <- 
-function(modelname='defaultmodel',regions=1,subject='',condition='',type=c('gauss','simple'),options=new('options'),overwrite=T,experiment=.experiment) 
+function(modelname='defaultmodel',regions=1,subject='',condition='',type=c('gauss','simple'),options=new('options'),overwrite=T,experiment=NULL) 
 #newModel makes a modeldirectory based on data and experiment information and a modelname
 {
+	#check experiment
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	
 	#set separator
 	sp <- .Platform$file.sep
 	
@@ -224,10 +227,13 @@ function(startval,arfmodel) save(startval,file=paste(.model.modelpath(arfmodel),
 #save startingvalues
 
 loadModel <- 
-function(modelname,subject=NULL,condition,experiment=.experiment) 
+function(modelname,subject=NULL,condition,experiment=NULL) 
 #load a model based on subject and conditions or on a mnames object
 {
 
+	#check experiment
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	
 	if(class(modelname)=='mnames') {
 		if(is.null(subject)) num = 1 else num = subject
 		experiment = .mnames.experiment(modelname)
@@ -254,9 +260,13 @@ function(object,...)
 }
 
 showModels <-
-function(subject,condition,experiment=.experiment)
+function(subject,condition,experiment=NULL)
 #show all models in for a subject and condition
 {
+	
+	#check experiment
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	
 	sp <- .Platform$file.sep
 	modname = paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.modelDir(experiment),sp,.experiment.modelnamesRda(experiment),sep='')
 	mod = loadRda(modname)

@@ -7,12 +7,12 @@
 loadData loads a "data" object for a given subject and condition.
 }
 \usage{
-loadData(subject, condition, exp = .experiment)
+loadData(subject, condition, experiment = NULL)
 }
 \arguments{
   \item{subject}{Name of the subject.}
   \item{condition}{Name of the condition}
-  \item{exp}{Object of class "experiment" (see \code{\linkS4class{experiment}})}
+  \item{experiment}{Object of class "experiment" (see \code{\linkS4class{experiment}})}
 }
 \details{
 loadData uses the loaded experiment as a default (see \code{\link{loadExp}}) on how to load experiments.
