@@ -6,7 +6,7 @@
 mcpCorrect calculates three types of multiple comparison corrections: 'uncorrected', 'bonferroni', and 'False Discovery Rate (FDR)'. mcpCorrect assumes the data are t-values.
 }
 \usage{
-mcpCorrect(fmridata, type = c("uncorrected", "bonferroni", "FDR"), alpha = 0.05, q = 0.05, cv = 1, df = 100, sig.steps = 10, adj.n = T)
+mcpCorrect(fmridata, type = c("uncorrected", "bonferroni", "FDR"), alpha = 0.05, q = 0.05, cv = 1, df = 100, sig.steps = 1, adj.n = T)
 }
 \arguments{
   \item{fmridata}{An object of class ".fmri.data" (see \code{\linkS4Class{fmri.data}}).}

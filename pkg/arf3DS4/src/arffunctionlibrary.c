@@ -1726,7 +1726,7 @@ void dfsgtheta4(double *theta,int *dimx, int *dimy, int *dimz, double *grad) {
 
 
 
-void simTS(double *model, double *mb, double *snr, int *tslen, int *numvox, double *signal, double *weight)
+void simTS(double *model, double *mb, double *snr, int *tslen, int *numvox, double *signal, double *weight, double *errors)
 {
 
 	int c,r,p;
@@ -1743,7 +1743,7 @@ void simTS(double *model, double *mb, double *snr, int *tslen, int *numvox, doub
 
 		tssum=0e0;
 		for(c=0;c<(*tslen);c++) {
-			err = rnorm(0e0,sigma);
+			err = errors[r+c*(*tslen)];
 			tsvec[c]=model[r]+err*sq_tslen;
 			tssum = tssum + tsvec[c];
 		}
