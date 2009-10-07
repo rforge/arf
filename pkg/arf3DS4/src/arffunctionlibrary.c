@@ -550,7 +550,7 @@ void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char *
 		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
 		fread(Fv,sizeof(double),*n,fderiv);
 
-		for(j=0;j<(*n);j++) { // R matrix column loop
+		for(j=0;j<(*n);j++) { // R matrix column loop ) j = 1..n
 
 
 			for(l=0;l<(*trials);l++) { //trial loop
@@ -558,7 +558,7 @@ void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char *
 				fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
 				fread(Rv,sizeof(double),*n,fresid);
 
-				for(m=0;m<(*n);m++) {
+				for(m=0;m<(*n);m++) { // calculate mean residual vector (loop over all m = 1..n for each j)
 					*(Mr+m)=*(Mr+m)+((1/pow((double) *trials,2))**(Rv+j)**(Rv+m));
 				}
 
@@ -572,7 +572,7 @@ void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char *
 			}
 			*(Ft+j)=s;
 
-		}
+		} // end R loop
 
 		for(Bcol=(Brow+1);Bcol<(*p);Bcol++) { //BVEC COL LOOP
 			fseek(fderiv,sizeof(double)*(Bcol**n),SEEK_SET);
@@ -622,7 +622,7 @@ void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char *
 
 			*(Ft+j)=s;
 
-		}
+		} // end R loop
 
 		s=0;
 		for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
@@ -673,7 +673,7 @@ void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
  		*(Mr+m)=0e0;
  	}
 
-	for(l=0;l<(*trials);l++) { //make mean residual
+	for(l=0;l<(*trials);l++) { // make mean residual vectors
 
 		fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
 		fread(Rv,sizeof(double),*n,fresid);
@@ -700,7 +700,7 @@ void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 
 			*(Ft+j)=*(Fv+j)**(Mr+j);
 
-		}
+		} // end R loop
 
 
 		for(Bcol=(Brow+1);Bcol<(*p);Bcol++) { //BVEC COL LOOP
@@ -729,7 +729,7 @@ void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 
 			*(Ft+j)=*(Fv+j)**(Mr+j);
 
-		}
+		} // end R loop
 
 		s=0;
 		for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
@@ -751,6 +751,180 @@ void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 	}
 
 	fclose(fderiv);
+
+}
+
+void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **fnresid, char **fnweight, double *B)
+{
+
+	int i,j,k,l,m, Brow, Bcol,*bs,*be;
+	FILE *fderiv, *fresid, *fweight;
+	double *Fv,*Ft, *Rv, *Wv, *Mr, s, Bm[*p][*p];
+
+	Fv = (double *) R_alloc(*n,sizeof(double));
+	Ft = (double *) R_alloc(*n,sizeof(double));
+	Rv = (double *) R_alloc(*n,sizeof(double));
+ 	Wv = (double *) R_alloc(*n,sizeof(double));
+ 	Mr = (double *) R_alloc(*n,sizeof(double));
+
+ 	bs = (int *) R_alloc(*n,sizeof(int));
+ 	be = (int *) R_alloc(*n,sizeof(int));
+
+ 	fderiv=fopen(*fnderiv,"r"); //NxP derivs vector (n incr. fastest)
+ 	fresid=fopen(*fnresid,"r"); //Nxtrial residual vector (n incr fastest)
+ 	fweight=fopen(*fnweight,"r"); //N vector of weights
+
+ 	fread(Wv,sizeof(double),*n,fweight);
+ 	fclose(fweight);
+
+ 	for(m=0;m<(*n);m++) {
+ 		*(Mr+m)=0e0;
+ 	}
+
+ 	//make band start and stop vectors
+ 	for(i=0;i<(*n);i++) {
+		if(i<(*band)+1) {
+			bs[i] = 0;
+			be[i] = bs[i] + *band + i;
+
+		} else {
+			bs[i] = i-(*band);
+			be[i] = bs[i] + 2*(*band);
+		}
+
+		if(be[i]>*(n)-1) be[i] = (*n)-1;
+ 	}
+
+
+ 	// OFF DIAGONAL B, LOOP
+	for(Brow=0;Brow<(*p-1);Brow++) { //BVEC ROW LOOP
+
+		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
+		fread(Fv,sizeof(double),*n,fderiv);
+
+		for(j=0;j<(*n);j++) { // R matrix column loop ) j = 1..n
+
+
+			for(l=0;l<(*trials);l++) { //trial loop
+
+				fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
+				fread(Rv,sizeof(double),*n,fresid);
+
+				for(m=bs[j];m<(be[j]+1);m++) { // calculate mean residual vector (loop over all m = 1..n for each j)
+					*(Mr+m)=*(Mr+m)+((1/pow((double) *trials,2))**(Rv+j)**(Rv+m));
+				}
+
+			}
+
+			s=0;
+			for(i=bs[j];i<(be[j]+1);i++) {  // R matrix row loop
+				s=s+*(Fv+i)*(*(Mr+i)/(*(Wv+j)**(Wv+i)));
+				*(Mr+i)=0e0;
+
+			}
+			*(Ft+j)=s;
+
+		} // end R loop
+
+		for(Bcol=(Brow+1);Bcol<(*p);Bcol++) { //BVEC COL LOOP
+			fseek(fderiv,sizeof(double)*(Bcol**n),SEEK_SET);
+			fread(Fv,sizeof(double),*n,fderiv);
+
+			s=0;
+			for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
+				s=s+Fv[i]*Ft[i];
+
+			}
+
+			Bm[Brow][Bcol]=s;
+			Bm[Bcol][Brow]=s;
+			//Rprintf("Done %d %d\n",Brow,Bcol);
+
+		}
+
+	}
+
+	for(m=0;m<(*n);m++) {
+		*(Mr+m)=0e0;
+	}
+
+	//DIAGONAL B, LOOP
+	for(Brow=0;Brow<(*p);Brow++) { //BVEC ROW LOOP
+
+		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
+		fread(Fv,sizeof(double),*n,fderiv);
+
+		for(j=0;j<(*n);j++) { // R matrix column loop
+
+			for(l=0;l<(*trials);l++) { //trial loop
+
+				fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
+				fread(Rv,sizeof(double),*n,fresid);
+
+				for(m=bs[j];m<(be[j]+1);m++) {
+					*(Mr+m)=*(Mr+m)+((1/pow((double) *trials,2))**(Rv+j)**(Rv+m));
+				}
+			}
+
+			s=0;
+			for(i=bs[j];i<(be[j]+1);i++) {  // R matrix row loop
+				s=s+*(Fv+i)*(*(Mr+i)/(*(Wv+j)**(Wv+i)));
+				*(Mr+i)=0e0;
+			}
+
+			*(Ft+j)=s;
+
+		} // end R loop
+
+		s=0;
+		for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
+			s=s+Fv[i]*Ft[i];
+		}
+
+		Bm[Brow][Brow]=s;
+		//Rprintf("Done %d %d\n",Brow,Brow);
+	}
+
+
+
+	k=0;
+	for(Bcol=0;Bcol<(*p);Bcol++) {
+		for(Brow=0;Brow<(*p);Brow++) {
+			*(B+k)=Bm[Brow][Bcol];
+			k++;
+		}
+	}
+
+	fclose(fderiv);
+	fclose(fresid);
+
+}
+
+
+void swtest(int *n, int *band)
+{
+	//make band start and stop vectors
+
+	int i;
+	int *bs,*be;
+
+		bs = (int *) R_alloc(*n,sizeof(int));
+	 	be = (int *) R_alloc(*n,sizeof(int));
+
+	 	for(i=0;i<(*n);i++) {
+	 		if(i<(*band)+1) {
+	 			bs[i] = 0;
+				be[i] = bs[i] + *band + i;
+
+	 		} else {
+	 			bs[i] = i-(*band);
+	 			be[i] = bs[i] + 2*(*band);
+	 		}
+
+	 		if(be[i]>*(n)-1) be[i] = (*n)-1;
+
+	 		Rprintf("%d \t %d \n",bs[i]+1,be[i]+1); //compatible with R
+	 	}
 
 }
 
@@ -1739,13 +1913,14 @@ void simTS(double *model, double *mb, double *snr, int *tslen, int *numvox, doub
 
 	GetRNGstate();
 
+	p=0;
 	for(r=0;r<(*numvox);r++) {
 
 		tssum=0e0;
 		for(c=0;c<(*tslen);c++) {
-			err = errors[r+c*(*tslen)];
-			tsvec[c]=model[r]+err*sq_tslen;
+			tsvec[c]=model[r]+errors[p]*sq_tslen;
 			tssum = tssum + tsvec[c];
+			p++;
 		}
 
 		signal_mean = tssum/(*tslen);
