@@ -231,9 +231,11 @@ setMethod('show','mnames',
 			cat('experiment:',.experiment.name(.mnames.experiment(object)),'\n')
 			cat('   subject:',.mnames.subject(object),'\n')
 			cat(' condition:',.mnames.condition(object),'\n')
-			cat('modelnames:',.mnames.mnames(object)[1],'\n')
-			for(i in 2:length(.mnames.mnames(object))) {
-				cat('           ',.mnames.mnames(object)[i],'\n')
+			cat('modelnames: [1]',.mnames.mnames(object)[1],'\n')
+			if(length(.mnames.mnames(object))>1) {
+				for(i in 2:length(.mnames.mnames(object))) {
+			cat('            [',i,'] ',.mnames.mnames(object)[i],'\n',sep='')
+				}
 			}
 		}
 )

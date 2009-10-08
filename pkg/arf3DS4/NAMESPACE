@@ -69,7 +69,6 @@ exportClasses(
 	mnames
 )
 
-
 exportMethods(
 	show,
 	plot,
@@ -81,4 +80,36 @@ import(
 	graphics
 )
 
-useDynLib(arf3DS4,gauss,ssqgauss,ssqdata,dfssq,dfgauss,simplegauss,simplessqgauss,simplegaussrpr,simplessqgaussrpr,gaussrpr,ssqgaussrpr,dfsimplegauss,dfsimplessq,innerSW,innerSWdiag,innerSWband,approxHessian,dfgaussFile,dftheta0,dftheta1,dftheta2,dftheta3,dftheta4,dftheta5,dftheta6,dftheta7,dftheta8,dftheta9,simTS)
+useDynLib(
+	arf3DS4,
+	gauss,
+	ssqgauss,
+	ssqdata,
+	dfssq,
+	dfgauss,
+	simplegauss,
+	simplessqgauss,
+	simplegaussrpr,
+	simplessqgaussrpr,
+	gaussrpr,
+	ssqgaussrpr,
+	dfsimplegauss,
+	dfsimplessq,
+	innerSW,
+	innerSWdiag,
+	innerSWband,
+	innerSWfast,
+	approxHessian,
+	dfgaussFile,
+	dftheta0,
+	dftheta1,
+	dftheta2,
+	dftheta3,
+	dftheta4,
+	dftheta5,
+	dftheta6,
+	dftheta7,
+	dftheta8,
+	dftheta9,
+	simTS
+)

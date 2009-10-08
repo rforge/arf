@@ -89,13 +89,20 @@ function(arfmodel)
 			n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
 			
 			#perform the inner_sandwich procedure
-			if(.model.sandwichmethod(arfmodel)=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
-			if(.model.sandwichmethod(arfmodel)=='full') B <- try(.C('innerSW',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
-			
-			band = 2
-			
-			if(.model.sandwichmethod(arfmodel)=='band') B <- try(.C('innerSWband',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.integer(band),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[8]],silen=T)
-		
+			if(.model.sandwichmethod(arfmodel)[1]=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
+			if(.model.sandwichmethod(arfmodel)[1]=='full') B <- try(.C('innerSW',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
+			if(.model.sandwichmethod(arfmodel)[1]=='band') {
+				if(length(.model.sandwichmethod(arfmodel))<2) {
+					warning('no band indicator found in sandwichmethod, using band 10')
+					.model.sandwichmethod(arfmodel)=c(.model.sandwichmethod(arfmodel),10)
+				}
+				#B <- try(.C('innerSWband',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.integer(as.numeric(.model.sandwichmethod(arfmodel)[2])),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[8]],silen=T)
+				B <- try(.C('innerSWfast',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
+				
+			}
+			cat('\n')
+			print(matrix(B,10))
+			cat('\n')
 			
 			#check if innersandwich works
 			if(is.null(attr(B,'class'))) {

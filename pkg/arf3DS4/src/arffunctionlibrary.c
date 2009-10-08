@@ -5,14 +5,17 @@
 
 #include<R.h>
 #include<Rmath.h>
+#include <R_ext/Utils.h>
 #include<math.h>
 #include<stdio.h>
+
 
 void gauss(double *theta, int *np, int *dimx, int *dimy, int *dimz, double *gx)
 {
 
 	int reg,x,y,z,p;
 	double f,theta_x,theta_y,theta_z,sig_x,sig_y,sig_z,sig_xy,sig_xz,sig_yz,det_sig,dif_x,dif_y,dif_z;
+
 
 	//theta 1,2,3 = x,y,z coordinates
 	//theta 4,5,6 = sd's of x,y,z
@@ -61,6 +64,9 @@ void gauss(double *theta, int *np, int *dimx, int *dimy, int *dimz, double *gx)
 			}
 		}
 	}
+
+	void R_CheckUserInterrupt(void);
+
 }
 
 void ssqgauss(double *theta, double *dat, double *W, int *brain, int *np, int *dimx, int *dimy, int *dimz, double *ss)
@@ -122,6 +128,8 @@ void ssqgauss(double *theta, double *dat, double *W, int *brain, int *np, int *d
 			}
 		}
 	}
+
+	void R_CheckUserInterrupt(void);
 
 	//set ss to g
 	ss[0]=g;
@@ -190,6 +198,8 @@ void simplegauss(double *theta, int *np, int *dimx, int *dimy, int *dimz, double
 			}
 		}
 	}
+
+	void R_CheckUserInterrupt(void);
 }
 
 
@@ -197,7 +207,7 @@ void simplessqgauss(double *theta, double *dat, double *W, int *brain, int *np, 
 {
 
 	int reg,x,y,z,p;
-	double f,g,theta_x,theta_y,theta_z,sig_x,sig_y,sig_z,sig_xy,sig_xz,sig_yz,det_sig,dif_x,dif_y,dif_z;
+	double f,g,theta_x,theta_y,theta_z,sig_x,det_sig,dif_x,dif_y,dif_z;
 
 	//theta 1,2,3 = x,y,z coordinates
 	//theta 4,5,6 = sd's of x,y,z
@@ -245,6 +255,8 @@ void simplessqgauss(double *theta, double *dat, double *W, int *brain, int *np, 
 		}
 	}
 
+	void R_CheckUserInterrupt(void);
+
 	//set ss to g
 	ss[0]=g;
 }
@@ -285,6 +297,8 @@ void simplegaussrpr(double *theta, int *np, int *dimx, int *dimy, int *dimz, dou
 
 		if(z_min<1) z_min = 1;
 		if(z_max>*dimz) z_max = *dimz;
+
+		void R_CheckUserInterrupt(void);
 
 		for(z=z_min;z<(z_max+1);z++) {
 			for(y=y_min;y<(y_max+1);y++) {
@@ -345,6 +359,8 @@ void simplessqgaussrpr(double *theta, double *dat, double *W, int *brain, int *n
 		if(z_min<1) z_min = 1;
 		if(z_max>*dimz) z_max = *dimz;
 
+		void R_CheckUserInterrupt(void);
+
 		for(z=z_min;z<(z_max+1);z++) {
 			for(y=y_min;y<(y_max+1);y++) {
 				for(x=x_min;x<(x_max+1);x++) {
@@ -381,7 +397,7 @@ void gaussrpr(double *theta, double *eigen, int *np, int *dimx, int *dimy, int *
 
 	int reg,x,y,z,p,q;
 	int x_min,y_min,z_min,x_max,y_max,z_max;
-	double theta_x,theta_y,theta_z,sig_x,sig_y,sig_z,sig_xy,sig_xz,sig_yz,det_sig,dif_x,dif_y,dif_z,f;
+	double theta_x,theta_y,theta_z,sig_x,sig_y,sig_z,sig_xy,sig_xz,sig_yz,det_sig,dif_x,dif_y,dif_z;
 
 	q=0;
 	for(reg=0;reg<(*np);reg=reg+10) {
@@ -421,6 +437,8 @@ void gaussrpr(double *theta, double *eigen, int *np, int *dimx, int *dimy, int *
 
 		if(z_min<1) z_min = 1;
 		if(z_max>*dimz) z_max = *dimz;
+
+		void R_CheckUserInterrupt(void);
 
 		for(z=z_min;z<(z_max+1);z++) {
 			for(y=y_min;y<(y_max+1);y++) {
@@ -487,6 +505,8 @@ void ssqgaussrpr(double *theta, double *eigen, double *dat, double *W, int *brai
 
 		if(z_min<1) z_min = 1;
 		if(z_max>*dimz) z_max = *dimz;
+
+		void R_CheckUserInterrupt(void);
 
 		for(z=z_min;z<(z_max+1);z++) {
 			for(y=y_min;y<(y_max+1);y++) {
@@ -586,6 +606,7 @@ void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char *
 
 			Bm[Brow][Bcol]=s;
 			Bm[Bcol][Brow]=s;
+			void R_CheckUserInterrupt(void);
 			//Rprintf("Done %d %d\n",Brow,Bcol);
 
 		}
@@ -621,7 +642,7 @@ void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char *
 			}
 
 			*(Ft+j)=s;
-
+			//Rprintf("%f\n",s);
 		} // end R loop
 
 		s=0;
@@ -630,6 +651,7 @@ void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char *
 		}
 
 		Bm[Brow][Brow]=s;
+		void R_CheckUserInterrupt(void);
 		//Rprintf("Done %d %d\n",Brow,Brow);
 	}
 
@@ -757,18 +779,21 @@ void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **fnresid, char **fnweight, double *B)
 {
 
-	int i,j,k,l,m, Brow, Bcol,*bs,*be;
+	int i,j,k,l,m, Brow, Bcol,*bs,*be,b,b2;
 	FILE *fderiv, *fresid, *fweight;
 	double *Fv,*Ft, *Rv, *Wv, *Mr, s, Bm[*p][*p];
+
+	//Rprintf("band1: %d\n",*band);
 
 	Fv = (double *) R_alloc(*n,sizeof(double));
 	Ft = (double *) R_alloc(*n,sizeof(double));
 	Rv = (double *) R_alloc(*n,sizeof(double));
  	Wv = (double *) R_alloc(*n,sizeof(double));
- 	Mr = (double *) R_alloc(*n,sizeof(double));
+ 	Mr = (double *) R_alloc((((*band)*2)+1)*(*n),sizeof(double));
 
  	bs = (int *) R_alloc(*n,sizeof(int));
  	be = (int *) R_alloc(*n,sizeof(int));
+
 
  	fderiv=fopen(*fnderiv,"r"); //NxP derivs vector (n incr. fastest)
  	fresid=fopen(*fnresid,"r"); //Nxtrial residual vector (n incr fastest)
@@ -777,16 +802,11 @@ void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **
  	fread(Wv,sizeof(double),*n,fweight);
  	fclose(fweight);
 
- 	for(m=0;m<(*n);m++) {
- 		*(Mr+m)=0e0;
- 	}
-
  	//make band start and stop vectors
  	for(i=0;i<(*n);i++) {
 		if(i<(*band)+1) {
 			bs[i] = 0;
-			be[i] = bs[i] + *band + i;
-
+			be[i] = bs[i] + (*band) + i;
 		} else {
 			bs[i] = i-(*band);
 			be[i] = bs[i] + 2*(*band);
@@ -795,34 +815,79 @@ void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **
 		if(be[i]>*(n)-1) be[i] = (*n)-1;
  	}
 
+ 	//if band = zero do the diagonal
+ 	if((*band)==0) {
+ 		for(i=0;i<(*n);i++) {
+ 			be[i]=i;
+ 			bs[i]=i;
+ 		}
+
+ 	}
+
+	//set Mr to zero
+	for(i=0;i<((*band)*2)+1;i++) {
+		for(j=0;j<(*n);j++) {
+			*(Mr+j+i**n)=0e0;
+		}
+ 	}
+
+	for(j=0;j<(*n);j++) {
+		*(Ft+j)=0e0;
+		*(Fv+j)=0e0;
+	}
+
+ 	//Rprintf("band: %d\n",*band);
+ 	//Rprintf("bandwidth: %d\n",((*band)*2)+1);
+
+ 	//make mean residual band vectors
+
+	for(l=0;l<(*trials);l++) { //trial loop
+		fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
+		fread(Rv,sizeof(double),*n,fresid);
+
+		for(i=0;i<((*band)*2)+1;i++) {
+
+			if(i<(*band)) b = (*band)-i;
+			if(i==(*band)) b = 0;
+			if(i>(*band)) b = i-(*band);
+
+			for(j=0;j<(*n);j++) {
+				Rprintf("\n");
+				Rprintf("loc: %d + %d\t",j,i**n);
+				Rprintf("val: %d x %d",j,j+b);
+				if(j+b<*n) *(Mr+j+i**n)=*(Mr+j+i**n)+((1/pow((double) *trials,2))**(Rv+j+b)**(Rv+j));
+
+			} //end voxel loop
+		} //end
+ 	} // end trial
+
+ 	//Rprintf("Made mean residual band vectors\n");
+
 
  	// OFF DIAGONAL B, LOOP
-	for(Brow=0;Brow<(*p-1);Brow++) { //BVEC ROW LOOP
+ 	for(Brow=0;Brow<(*p-1);Brow++) { //BVEC ROW LOOP
 
 		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
 		fread(Fv,sizeof(double),*n,fderiv);
 
+		b2=0;
 		for(j=0;j<(*n);j++) { // R matrix column loop ) j = 1..n
 
+			if(bs[j]<(*band)) {
+				b=(*band)-b2;
+				b2++;
+				if(b<0) b=0;
+			} else b=0;
 
-			for(l=0;l<(*trials);l++) { //trial loop
-
-				fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
-				fread(Rv,sizeof(double),*n,fresid);
-
-				for(m=bs[j];m<(be[j]+1);m++) { // calculate mean residual vector (loop over all m = 1..n for each j)
-					*(Mr+m)=*(Mr+m)+((1/pow((double) *trials,2))**(Rv+j)**(Rv+m));
-				}
-
-			}
-
-			s=0;
+			s=0e0;
 			for(i=bs[j];i<(be[j]+1);i++) {  // R matrix row loop
-				s=s+*(Fv+i)*(*(Mr+i)/(*(Wv+j)**(Wv+i)));
-				*(Mr+i)=0e0;
-
+				s=s+*(Fv+i)*(*(Mr+j+b**n)/(*(Wv+j)**(Wv+i)));
+				//Rprintf("%d\n",j+b**n);
+				b++;
 			}
+			//Rprintf("\n");
 			*(Ft+j)=s;
+
 
 		} // end R loop
 
@@ -830,7 +895,7 @@ void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **
 			fseek(fderiv,sizeof(double)*(Bcol**n),SEEK_SET);
 			fread(Fv,sizeof(double),*n,fderiv);
 
-			s=0;
+			s=0e0;
 			for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
 				s=s+Fv[i]*Ft[i];
 
@@ -838,15 +903,13 @@ void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **
 
 			Bm[Brow][Bcol]=s;
 			Bm[Bcol][Brow]=s;
+			void R_CheckUserInterrupt(void);
 			//Rprintf("Done %d %d\n",Brow,Bcol);
 
 		}
 
 	}
 
-	for(m=0;m<(*n);m++) {
-		*(Mr+m)=0e0;
-	}
 
 	//DIAGONAL B, LOOP
 	for(Brow=0;Brow<(*p);Brow++) { //BVEC ROW LOOP
@@ -854,34 +917,32 @@ void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **
 		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
 		fread(Fv,sizeof(double),*n,fderiv);
 
-		for(j=0;j<(*n);j++) { // R matrix column loop
+		b2=0;
+		for(j=0;j<(*n);j++) { // R matrix column loop ) j = 1..n
 
-			for(l=0;l<(*trials);l++) { //trial loop
+			if(bs[j]<(*band)-1) {
+				b=(*band)-b2;
+				b2++;
+				if(b<0) b=0;
+			} else b=0;
 
-				fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
-				fread(Rv,sizeof(double),*n,fresid);
-
-				for(m=bs[j];m<(be[j]+1);m++) {
-					*(Mr+m)=*(Mr+m)+((1/pow((double) *trials,2))**(Rv+j)**(Rv+m));
-				}
-			}
-
-			s=0;
+			s=0e0;
 			for(i=bs[j];i<(be[j]+1);i++) {  // R matrix row loop
-				s=s+*(Fv+i)*(*(Mr+i)/(*(Wv+j)**(Wv+i)));
-				*(Mr+i)=0e0;
+				s=s+*(Fv+i)*(*(Mr+j+b**n)/(*(Wv+j)**(Wv+i)));
+				b++;
 			}
 
 			*(Ft+j)=s;
-
+			//Rprintf("%f\n",s);
 		} // end R loop
 
-		s=0;
+		s=0e0;
 		for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
 			s=s+Fv[i]*Ft[i];
 		}
 
 		Bm[Brow][Brow]=s;
+		void R_CheckUserInterrupt(void);
 		//Rprintf("Done %d %d\n",Brow,Brow);
 	}
 
@@ -895,39 +956,136 @@ void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **
 		}
 	}
 
-	fclose(fderiv);
+
+ 	fclose(fderiv);
 	fclose(fresid);
 
 }
 
-
-void swtest(int *n, int *band)
+void innerSWfast(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, double *B)
 {
-	//make band start and stop vectors
 
-	int i;
-	int *bs,*be;
+	int i,j,k,l,m, Brow, Bcol;
+	FILE *fderiv, *fresid, *fweight;
+	double *Fv,*Ft, *Rv, *Wv, *Mr, s, Bm[*p][*p];
 
-		bs = (int *) R_alloc(*n,sizeof(int));
-	 	be = (int *) R_alloc(*n,sizeof(int));
+	//Rprintf("band1: %d\n",*band);
 
-	 	for(i=0;i<(*n);i++) {
-	 		if(i<(*band)+1) {
-	 			bs[i] = 0;
-				be[i] = bs[i] + *band + i;
+	Fv = (double *) R_alloc(*n,sizeof(double));
+	Ft = (double *) R_alloc(*n,sizeof(double));
+	Rv = (double *) R_alloc(*n,sizeof(double));
+ 	Wv = (double *) R_alloc(*n,sizeof(double));
+ 	Mr = (double *) R_alloc((*n)*(*n),sizeof(double));
 
-	 		} else {
-	 			bs[i] = i-(*band);
-	 			be[i] = bs[i] + 2*(*band);
-	 		}
+ 	fderiv=fopen(*fnderiv,"r"); //NxP derivs vector (n incr. fastest)
+ 	fresid=fopen(*fnresid,"r"); //Nxtrial residual vector (n incr fastest)
+ 	fweight=fopen(*fnweight,"r"); //N vector of weights
 
-	 		if(be[i]>*(n)-1) be[i] = (*n)-1;
+ 	fread(Wv,sizeof(double),*n,fweight);
+ 	fclose(fweight);
 
-	 		Rprintf("%d \t %d \n",bs[i]+1,be[i]+1); //compatible with R
-	 	}
+	for(m=0;m<(*n);m++) {
+		for(j=0;j<(*n);j++) {
+			*(Mr+m+j**n)=0e0;
+		}
+ 	}
+
+ 	//make mean residuals
+
+	for(l=0;l<(*trials);l++) { //trial loop
+
+		fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
+		fread(Rv,sizeof(double),*n,fresid);
+
+		for(i=0;i<(*n);i++) {
+			for(j=0;j<(*n);j++) {
+				*(Mr+j+i**n)=*(Mr+j+i**n)+((1/pow((double) *trials,2))**(Rv+i)**(Rv+j));
+
+			} //end column loop
+		} //end trial loop
+ 	} // end row loop
+
+ 	Rprintf("Made mean residual band vectors\n");
+
+
+ 	// OFF DIAGONAL B, LOOP
+ 	for(Brow=0;Brow<(*p-1);Brow++) { //BVEC ROW LOOP
+
+		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
+		fread(Fv,sizeof(double),*n,fderiv);
+
+		for(j=0;j<(*n);j++) { // R matrix column loop ) j = 1..n
+			s=0e0;
+			for(i=0;i<(*n);i++) {  // R matrix row loop
+				s=s+*(Fv+i)*(*(Mr+j+i**n)/(*(Wv+j)**(Wv+i)));
+			}
+
+			*(Ft+j)=s;
+
+		} // end R loop
+
+		for(Bcol=(Brow+1);Bcol<(*p);Bcol++) { //BVEC COL LOOP
+			fseek(fderiv,sizeof(double)*(Bcol**n),SEEK_SET);
+			fread(Fv,sizeof(double),*n,fderiv);
+
+			s=0e0;
+			for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
+				s=s+Fv[i]*Ft[i];
+
+			}
+
+			Bm[Brow][Bcol]=s;
+			Bm[Bcol][Brow]=s;
+			void R_CheckUserInterrupt(void);
+			//Rprintf("Done %d %d\n",Brow,Bcol);
+
+		}
+
+	}
+
+
+	//DIAGONAL B, LOOP
+	for(Brow=0;Brow<(*p);Brow++) { //BVEC ROW LOOP
+
+		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
+		fread(Fv,sizeof(double),*n,fderiv);
+
+		for(j=0;j<(*n);j++) { // R matrix column loop ) j = 1..n
+			s=0e0;
+			for(i=0;i<(*n);i++) {  // R matrix row loop
+				s=s+*(Fv+i)*(*(Mr+j+i**n)/(*(Wv+j)**(Wv+i)));
+			}
+
+			*(Ft+j)=s;
+
+		} // end R loop
+
+
+		s=0e0;
+		for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
+			s=s+Fv[i]*Ft[i];
+		}
+
+		Bm[Brow][Brow]=s;
+		void R_CheckUserInterrupt(void);
+		//Rprintf("Done %d %d\n",Brow,Brow);
+	}
+
+
+
+	k=0;
+	for(Bcol=0;Bcol<(*p);Bcol++) {
+		for(Brow=0;Brow<(*p);Brow++) {
+			*(B+k)=Bm[Brow][Bcol];
+			k++;
+		}
+	}
+
+
+ 	fclose(fderiv);
+	fclose(fresid);
 
 }
-
 
 void approxHessian(int *np, int *n, char **dffile, char **wfile, double *hessian) {
 

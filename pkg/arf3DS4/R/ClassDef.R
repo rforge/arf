@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=6,
-		update=2,
-		svnrev=85
+		update=3,
+		svnrev=86
 	),
 	package='arf3DS4'
 )
@@ -214,7 +214,7 @@ setClass(
 		start.vector=c(0,0,0,0,0,0,.05,.05,.05,10),
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,0,0,-.95,-.95,-.95,-1e+64,0,0,0,0,0,0,.95,.95,.95,1e+64),
-		sw.type='diag',
+		sw.type=c('diag',0),
 		output.mode=c('log','screen'),
 		version=new('version')
 	),
