@@ -824,6 +824,9 @@ void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **
 
 	//set Mr to zero
  	for(i=0;i<(*n);i++) {
+
+ 		*(WRW+i)=0e0;
+
  		for(j=0;j<((*band)*2)+1;j++) {
 			*(Mr+i+j**n)=0e0;
 		}

@@ -99,7 +99,7 @@ function(arfmodel)
 				}
 				B <- try(.C('innerSWband',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.integer(as.numeric(.model.sandwichmethod(arfmodel)[2])),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[8]],silen=T)
 			}
-
+			
 			#check if innersandwich works
 			if(is.null(attr(B,'class'))) {
 				#set B to be a matrix
