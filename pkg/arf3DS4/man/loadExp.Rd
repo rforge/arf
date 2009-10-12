@@ -19,7 +19,7 @@ If \code{method='rda'} the experiment is checked using the data in the experimen
 loadExp creates an object named \code{.experiment} in \code{.GlobalEnv}, this is to facilitate calls to arf3DS4 functions which have an 'experiment' object as input as all these functions by default use \code{.experiment}.
 }
 \value{
-Returns an object of class \code{\linkS4Class{experiment}}.
+Returns an object of class \code{\linkS4class{experiment}}.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

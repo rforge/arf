@@ -9,10 +9,10 @@ Load an "options" object belonging to an arf model.
 loadOptions(arfmodel)
 }
 \arguments{
-  \item{arfmodel}{Object of class "model" (see \code{\linkS4Class{model}})}
+  \item{arfmodel}{Object of class "model" (see \code{\linkS4class{model}})}
 }
 \value{
-Returns an object of class \code{\linkS4Class{options}}.
+Returns an object of class \code{\linkS4class{options}}.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

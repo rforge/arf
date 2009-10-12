@@ -10,7 +10,7 @@ readData(filename)
   \item{filename}{Name of the file to be read in.}
 }
 \value{
-Returns an object of class \code{\linkS4Class{fmri.data}}.
+Returns an object of class \code{\linkS4class{fmri.data}}.
 }
 \references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.}
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }

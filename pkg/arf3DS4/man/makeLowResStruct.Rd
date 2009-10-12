@@ -10,9 +10,9 @@ makeLowResStructAvg(arfmodel, experiment = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{arfdata}{An arf "data" object (see \code{\linkS4Class{data}}.)}
-  \item{arfmodel}{An arf "model" object (see \code{\linkS4Class{model}}.)}
-  \item{experiment}{An arf "experiment" object (see \code{\linkS4Class{experiment}}.)}
+  \item{arfdata}{An arf "data" object (see \code{\linkS4class{data}}.)}
+  \item{arfmodel}{An arf "model" object (see \code{\linkS4class{model}}.)}
+  \item{experiment}{An arf "experiment" object (see \code{\linkS4class{experiment}}.)}
 }
 \details{
 makeLowResStructAvg makes use of the images created by makeLowResStruct so this must be run first. makeLowResStruct has to be run only once for each condition. 

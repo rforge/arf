@@ -8,7 +8,7 @@ arf2Excel(mod, filename = "estimates.txt")
 }
 
 \arguments{
-  \item{mod}{An arf model object (see \code{\linkS4Class{model}})}
+  \item{mod}{An arf model object (see \code{\linkS4class{model}})}
   \item{filename}{Name of the exported file.}
 }
 \value{

@@ -9,7 +9,7 @@ Clearwarnings clears all warnings of a model object and sets the valid slot to \
 clearWarnings(arfmodel, resetValid = T)
 }
 \arguments{
-  \item{arfmodel}{Object of class "model" (see \code{\linkS4Class{model}})}
+  \item{arfmodel}{Object of class "model" (see \code{\linkS4class{model}})}
   \item{resetValid}{Set the \code{valid} slot to \code{TRUE}}
 }
 \details{

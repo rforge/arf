@@ -14,7 +14,7 @@ showModels(subject, condition, experiment = NULL)
   \item{experiment}{Object of class "experiment".}
 }
 \value{
-Returns an object of class \code{\linkS4Class{mnames}} with modelinformation.
+Returns an object of class \code{\linkS4class{mnames}} with modelinformation.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

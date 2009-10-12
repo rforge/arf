@@ -686,3 +686,25 @@ function(arfmodel)
 	return(invisible(arfmodel))
 	
 }
+
+
+checkBound <- 
+function(arfmodel,lowbound,upbound) 
+#check if parameters are on the bound
+{
+	
+	estimates = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
+
+	for(i in 1:.model.params(arfmodel)) {
+		regs = which(estimates[i,]==lowbound[i] | estimates[i,]==upbound[i])
+		
+		if(length(regs)>0) {
+			mess = paste('[optim] Parameter',i,'is at boundary for regions ',regs,'\n')
+			.model.warnings(arfmodel) = c(.model.warnings(arfmodel),mess)
+		}
+		
+	}
+	
+	return(arfmodel)
+	
+}

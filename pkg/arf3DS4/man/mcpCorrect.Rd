@@ -9,7 +9,7 @@ mcpCorrect calculates three types of multiple comparison corrections: 'uncorrect
 mcpCorrect(fmridata, type = c("uncorrected", "bonferroni", "FDR"), alpha = 0.05, q = 0.05, cv = 1, df = 100, sig.steps = 1, adj.n = T)
 }
 \arguments{
-  \item{fmridata}{An object of class ".fmri.data" (see \code{\linkS4Class{fmri.data}}).}
+  \item{fmridata}{An object of class ".fmri.data" (see \code{\linkS4class{fmri.data}}).}
   \item{type}{Type of correction (\code{uncorrected},\code{bonferroni},\code{FDR})}
   \item{alpha}{Nominal alpha level.}
   \item{q}{q parameter for FDR.}

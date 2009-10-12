@@ -9,7 +9,7 @@ Load the starting values of an arf model from the .Rda file
 loadStart(arfmodel)
 }
 \arguments{
-  \item{arfmodel}{Object of class "model" (see \code{\linkS4Class{model}})}
+  \item{arfmodel}{Object of class "model" (see \code{\linkS4class{model}})}
 }
 \value{
 Returns a vector with starting values.

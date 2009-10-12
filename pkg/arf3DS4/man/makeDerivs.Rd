@@ -9,7 +9,7 @@ makeDerivs calculates analytical first-order derivatives of an arf model. It wri
 makeDerivs(arfmodel)
 }
 \arguments{
-  \item{arfmodel}{An arf model object (see \code{\linkS4Class{model}}).}
+  \item{arfmodel}{An arf model object (see \code{\linkS4class{model}}).}
 }
 \value{
 Returns \code{TRUE} when successful.

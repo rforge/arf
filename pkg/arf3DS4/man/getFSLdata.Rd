@@ -13,16 +13,16 @@ getFSLdata(fsldir = getwd(), subjectlist, contrastnums, expname = "FSLtoARF", ex
   \item{contrastnums}{Vector of numbers of contrasts (COPE/VARCOPE numbers).}
   \item{expname}{Name of the (to be created) arf experiment to which the files will be copied.}
   \item{expdir}{Path of the directory where the experiment will be saved.}
-  \item{settings}{A "settings" object (see \code{\linkS4Class{settings}}).}
+  \item{settings}{A "settings" object (see \code{\linkS4class{settings}}).}
   \item{quiet}{Should progress information be printed during copying?}
   \item{doReg}{Copy optional registration files?}
   \item{doFunc}{Copy optional functional volumes?}
 }
 \details{
-getFSLdata checks for additional FEAT directories (.feat+ etc.) and takes each directory as an individual trial. It also creates and sets appropriate \code{\linkS4Class{registration}} and \code{\linkS4Class{functional}} objects (if called for).
+getFSLdata checks for additional FEAT directories (.feat+ etc.) and takes each directory as an individual trial. It also creates and sets appropriate \code{\linkS4class{registration}} and \code{\linkS4class{functional}} objects (if called for).
 }
 \value{
-Returns an object of class "experiment" \code{\linkS4Class{experiment}}
+Returns an object of class "experiment" \code{\linkS4class{experiment}}
 }
 \references{
 See \url{http://www.fmrib.ox.ac.uk/fsl/} on how to obtain FSL and the appropriate licences.

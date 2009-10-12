@@ -540,7 +540,7 @@ void ssqgaussrpr(double *theta, double *eigen, double *dat, double *W, int *brai
 
 
 
-void innerSW(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, double *B)
+void innerSWfull(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, double *B)
 {
 
 	int i,j,k,l,m, Brow, Bcol;
@@ -779,21 +779,20 @@ void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **fnresid, char **fnweight, double *B)
 {
 
-	int i,j,k,l,m, Brow, Bcol,*bs,*be,b,b2;
+	int i,j,k,l, Brow, Bcol,*bs,*be;
+	double s, *Fv,*Ft, *Rv, *Wv, *Mr, *WRW, Bm[*p][*p];
 	FILE *fderiv, *fresid, *fweight;
-	double *Fv,*Ft, *Rv, *Wv, *Mr, s, Bm[*p][*p];
-
-	//Rprintf("band1: %d\n",*band);
 
 	Fv = (double *) R_alloc(*n,sizeof(double));
 	Ft = (double *) R_alloc(*n,sizeof(double));
 	Rv = (double *) R_alloc(*n,sizeof(double));
  	Wv = (double *) R_alloc(*n,sizeof(double));
+
  	Mr = (double *) R_alloc((((*band)*2)+1)*(*n),sizeof(double));
+ 	WRW  = (double *) R_alloc(*n,sizeof(double));
 
  	bs = (int *) R_alloc(*n,sizeof(int));
  	be = (int *) R_alloc(*n,sizeof(int));
-
 
  	fderiv=fopen(*fnderiv,"r"); //NxP derivs vector (n incr. fastest)
  	fresid=fopen(*fnresid,"r"); //Nxtrial residual vector (n incr fastest)
@@ -821,146 +820,105 @@ void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **
  			be[i]=i;
  			bs[i]=i;
  		}
-
  	}
 
 	//set Mr to zero
-	for(i=0;i<((*band)*2)+1;i++) {
-		for(j=0;j<(*n);j++) {
-			*(Mr+j+i**n)=0e0;
+ 	for(i=0;i<(*n);i++) {
+ 		for(j=0;j<((*band)*2)+1;j++) {
+			*(Mr+i+j**n)=0e0;
 		}
  	}
 
-	for(j=0;j<(*n);j++) {
-		*(Ft+j)=0e0;
-		*(Fv+j)=0e0;
-	}
+ 	//make mean W R W matrix
+ 	for(l=0;l<(*trials);l++) { //trial loop
+ 		fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
+ 		fread(Rv,sizeof(double),*n,fresid);
 
- 	//Rprintf("band: %d\n",*band);
- 	//Rprintf("bandwidth: %d\n",((*band)*2)+1);
-
- 	//make mean residual band vectors
-
-	for(l=0;l<(*trials);l++) { //trial loop
-		fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
-		fread(Rv,sizeof(double),*n,fresid);
-
-		for(i=0;i<((*band)*2)+1;i++) {
-
-			if(i<(*band)) b = (*band)-i;
-			if(i==(*band)) b = 0;
-			if(i>(*band)) b = i-(*band);
-
-			for(j=0;j<(*n);j++) {
-				Rprintf("\n");
-				Rprintf("loc: %d + %d\t",j,i**n);
-				Rprintf("val: %d x %d",j,j+b);
-				if(j+b<*n) *(Mr+j+i**n)=*(Mr+j+i**n)+((1/pow((double) *trials,2))**(Rv+j+b)**(Rv+j));
-
-			} //end voxel loop
-		} //end
- 	} // end trial
-
- 	//Rprintf("Made mean residual band vectors\n");
-
+		for(i=0;i<(*n);i++) {
+			k=0;
+			for(j=bs[i];j<(be[i]+1);j++) {
+				*(Mr+i+k**n) =  *(Mr+i+k**n) +((1/pow((double) *trials,2))**(Rv+i)**(Rv+j));
+			k++;
+			}
+		}
+ 	}
 
  	// OFF DIAGONAL B, LOOP
- 	for(Brow=0;Brow<(*p-1);Brow++) { //BVEC ROW LOOP
+ 	 	for(Brow=0;Brow<(*p-1);Brow++) { //BVEC ROW LOOP
 
-		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
-		fread(Fv,sizeof(double),*n,fderiv);
+ 			fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
+ 			fread(Fv,sizeof(double),*n,fderiv);
 
-		b2=0;
-		for(j=0;j<(*n);j++) { // R matrix column loop ) j = 1..n
+ 			for(i=0;i<(*n);i++) {
+ 				k=0;
+ 				for(j=bs[i];j<be[i]+1;j++) {
+ 					*(WRW+i) = *(WRW+i) + *(Fv+j)**(Mr+i+k**n)/(*(Wv+i)**(Wv+j));
+ 					k++;
+ 				}
+ 			}
 
-			if(bs[j]<(*band)) {
-				b=(*band)-b2;
-				b2++;
-				if(b<0) b=0;
-			} else b=0;
+ 			for(Bcol=(Brow+1);Bcol<(*p);Bcol++) { //BVEC COL LOOP
+ 				fseek(fderiv,sizeof(double)*(Bcol**n),SEEK_SET);
+ 				fread(Fv,sizeof(double),*n,fderiv);
 
-			s=0e0;
-			for(i=bs[j];i<(be[j]+1);i++) {  // R matrix row loop
-				s=s+*(Fv+i)*(*(Mr+j+b**n)/(*(Wv+j)**(Wv+i)));
-				//Rprintf("%d\n",j+b**n);
-				b++;
-			}
-			//Rprintf("\n");
-			*(Ft+j)=s;
+				s=0e0;
+				for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
+					s=s+*(WRW+i)**(Fv+i);
+				}
 
+ 				Bm[Brow][Bcol]=s;
+ 				Bm[Bcol][Brow]=s;
+ 				void R_CheckUserInterrupt(void);
 
-		} // end R loop
+ 			}
 
-		for(Bcol=(Brow+1);Bcol<(*p);Bcol++) { //BVEC COL LOOP
-			fseek(fderiv,sizeof(double)*(Bcol**n),SEEK_SET);
-			fread(Fv,sizeof(double),*n,fderiv);
+ 			for(i=0;i<(*n);i++) {
+ 				*(WRW+i)=0e0;
+ 			}
 
-			s=0e0;
+ 		}
+
+ 		//DIAGONAL B, LOOP
+ 		for(Brow=0;Brow<(*p);Brow++) { //BVEC ROW LOOP
+
+ 			fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
+ 			fread(Fv,sizeof(double),*n,fderiv);
+
+ 			for(i=0;i<(*n);i++) {
+ 				k=0;
+ 				for(j=bs[i];j<be[i]+1;j++) {
+ 					*(WRW+i) = *(WRW+i) + *(Fv+j)**(Mr+i+k**n)/(*(Wv+i)**(Wv+j));
+ 					k++;
+ 				}
+ 			}
+
+ 			s=0e0;
 			for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
-				s=s+Fv[i]*Ft[i];
-
-			}
-
-			Bm[Brow][Bcol]=s;
-			Bm[Bcol][Brow]=s;
-			void R_CheckUserInterrupt(void);
-			//Rprintf("Done %d %d\n",Brow,Bcol);
-
-		}
-
-	}
+				s=s+*(WRW+i)**(Fv+i);
+				*(WRW+i)=0e0;
+ 			}
 
 
-	//DIAGONAL B, LOOP
-	for(Brow=0;Brow<(*p);Brow++) { //BVEC ROW LOOP
+ 			Bm[Brow][Brow]=s;
+ 			void R_CheckUserInterrupt(void);
 
-		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
-		fread(Fv,sizeof(double),*n,fderiv);
+ 		}
 
-		b2=0;
-		for(j=0;j<(*n);j++) { // R matrix column loop ) j = 1..n
-
-			if(bs[j]<(*band)-1) {
-				b=(*band)-b2;
-				b2++;
-				if(b<0) b=0;
-			} else b=0;
-
-			s=0e0;
-			for(i=bs[j];i<(be[j]+1);i++) {  // R matrix row loop
-				s=s+*(Fv+i)*(*(Mr+j+b**n)/(*(Wv+j)**(Wv+i)));
-				b++;
-			}
-
-			*(Ft+j)=s;
-			//Rprintf("%f\n",s);
-		} // end R loop
-
-		s=0e0;
-		for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
-			s=s+Fv[i]*Ft[i];
-		}
-
-		Bm[Brow][Brow]=s;
-		void R_CheckUserInterrupt(void);
-		//Rprintf("Done %d %d\n",Brow,Brow);
-	}
+ 		k=0;
+ 		for(Bcol=0;Bcol<(*p);Bcol++) {
+ 			for(Brow=0;Brow<(*p);Brow++) {
+ 				*(B+k)=Bm[Brow][Bcol];
+ 				k++;
+ 			}
+ 		}
 
 
-
-	k=0;
-	for(Bcol=0;Bcol<(*p);Bcol++) {
-		for(Brow=0;Brow<(*p);Brow++) {
-			*(B+k)=Bm[Brow][Bcol];
-			k++;
-		}
-	}
-
-
- 	fclose(fderiv);
-	fclose(fresid);
+ 	 	fclose(fderiv);
+ 		fclose(fresid);
 
 }
+
+
 
 void innerSWfast(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, double *B)
 {
@@ -1005,7 +963,7 @@ void innerSWfast(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 		} //end trial loop
  	} // end row loop
 
- 	Rprintf("Made mean residual band vectors\n");
+ 	//Rprintf("Made mean residual band vectors\n");
 
 
  	// OFF DIAGONAL B, LOOP

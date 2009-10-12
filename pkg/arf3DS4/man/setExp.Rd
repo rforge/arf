@@ -21,7 +21,7 @@ setExp(path = getwd(), tempsub = 1, tempcond = 1, auto = TRUE, createWeights = T
 setExp is called by \code{\link{loadExp}} when option is \code{'set'}
 }
 \value{
-Returns an object of class \code{\linkS4Class{experiment}}.
+Returns an object of class \code{\linkS4class{experiment}}.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

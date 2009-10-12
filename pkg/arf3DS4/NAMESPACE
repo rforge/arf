@@ -95,7 +95,7 @@ useDynLib(
 	ssqgaussrpr,
 	dfsimplegauss,
 	dfsimplessq,
-	innerSW,
+	innerSWfull,
 	innerSWdiag,
 	innerSWband,
 	innerSWfast,

@@ -18,7 +18,7 @@ loadData(subject, condition, experiment = NULL)
 loadData uses the loaded experiment as a default (see \code{\link{loadExp}}) on how to load experiments.
 }
 \value{
-Returns an object of class "data" (see \code{\linkS4Class{data}}).
+Returns an object of class "data" (see \code{\linkS4class{data}}).
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

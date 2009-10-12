@@ -9,7 +9,7 @@ Save a model object to the model.Rda file.
 saveModel(arfmodel)
 }
 \arguments{
-  \item{arfmodel}{An object of class \code{\linkS4Class{model}}.}
+  \item{arfmodel}{An object of class \code{\linkS4class{model}}.}
 }
 \value{
 None

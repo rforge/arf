@@ -289,6 +289,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		
 		if(optim.output$convergence <= 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 		
+		#check boundaries
+		arfmodel <- checkBound(arfmodel,lowbound,upbound)		
+
 		#set model objects
 		.model.minimum(arfmodel) <- optim.output$value
 		.model.estimates(arfmodel) <- optim.output$par
@@ -297,8 +300,6 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T)
-		
-		
 	
 		if(.model.valid(arfmodel)) {
 			#save the ModelBinary
@@ -468,9 +469,10 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		.model.iterates(arfmodel) <- optim.output$counts[1]
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		
-		if(.model.valid(arfmodel)) {
+		#check boundaries
+		arfmodel <- checkBound(arfmodel,lowbound,upbound)	
 		
-			
+		if(.model.valid(arfmodel)) {
 			#save the ModelBinary
 			arfmodel <- saveModelBinSimple(arfmodel)
 			

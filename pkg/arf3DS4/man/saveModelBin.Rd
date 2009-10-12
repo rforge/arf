@@ -11,7 +11,7 @@ saveModelBin(arfmodel, type = c("pos+neg", "pos", "neg", "all", "separate"))
 saveModelBinSimple(arfmodel)
 }
 \arguments{
-  \item{arfmodel}{An object of class \code{\linkS4Class{model}}.}
+  \item{arfmodel}{An object of class \code{\linkS4class{model}}.}
   \item{type}{What to save: \code{pos+neg}=positive + negative file, \code{pos}=Only positive, \code{neg}=Only negative, \code{all}=Positive and Negative summed, \code{separate}=Individual files for each region.}
 }
 \details{

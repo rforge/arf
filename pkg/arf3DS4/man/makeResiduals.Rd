@@ -9,7 +9,7 @@ makeResiduals calculates residuals of an arf model and writes them to a binary f
 makeResiduals(arfmodel)
 }
 \arguments{
-  \item{arfmodel}{An arf model object (see \code{\linkS4Class{model}}).}
+  \item{arfmodel}{An arf model object (see \code{\linkS4class{model}}).}
 }
 \value{
 Returns \code{TRUE} when successful.

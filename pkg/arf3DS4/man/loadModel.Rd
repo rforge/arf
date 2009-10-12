@@ -12,13 +12,13 @@ loadModel(modelname, subject = NULL, condition, experiment = NULL)
   \item{modelname}{Name of the model to be loaded.}
   \item{subject}{Name of the subject.}
   \item{condition}{Name of the condition.}
-  \item{experiment}{Object of class \code{\linkS4Class{experiment}}.}
+  \item{experiment}{Object of class \code{\linkS4class{experiment}}.}
 }
 \details{
-loadModel can also take as input an object of class \code{\linkS4Class{mnames}} with as a second (\code{subject}) argument an numerical indicator of which model to load.
+loadModel can also take as input an object of class \code{\linkS4class{mnames}} with as a second (\code{subject}) argument an numerical indicator of which model to load.
 }
 \value{
-Returns an object of class \code{\linkS4Class{model}}. 
+Returns an object of class \code{\linkS4class{model}}. 
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

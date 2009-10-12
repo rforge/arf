@@ -13,7 +13,7 @@ makeExpDirs(path = getwd(), name = "default_experiment", subjectind = 1, conditi
   \item{name}{Name of the experiment (=name of the directory.}
   \item{subjectind}{Vector of subject names for which to create directories.}
   \item{conditionind}{Vector of condition names for which to create directories.}
-  \item{settings}{A "settings" object (see \code{\linkS4Class{settings}}).}
+  \item{settings}{A "settings" object (see \code{\linkS4class{settings}}).}
 }
 \details{
 makeExpDirs only makes the directory structure, data files must be copied to the directories manually. After copying a call to \code{\link{setExp}} or to \code{\link{loadExp}} in mode 'set', will set the experiment.Rda.
