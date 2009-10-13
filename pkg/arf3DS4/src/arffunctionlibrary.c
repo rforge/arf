@@ -607,7 +607,7 @@ void innerSWfull(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 			Bm[Brow][Bcol]=s;
 			Bm[Bcol][Brow]=s;
 			void R_CheckUserInterrupt(void);
-			//Rprintf("Done %d %d\n",Brow,Bcol);
+			Rprintf("Done %d %d\n",Brow,Bcol);
 
 		}
 
@@ -921,6 +921,113 @@ void innerSWband(int *n, int *p, int *trials, int *band, char **fnderiv, char **
 
 }
 
+/*void innerSWdim(int *n, int *p, int *trials, int *band, int *dimx, int *dimy, int *dimz, char **fnderiv, char **fnresid, char **fnweight, double *B)
+{
+
+	int i,j,k,l, Brow, Bcol,*x_bs,*x_be,*y_bs,*y_be,*z_bs,*z_be,x,y,z,a;
+	double s, *Fv,*Ft, *Rv, *Wv, *Mr, *WRW, Bm[*p][*p],bw,*loc;
+	FILE *fderiv, *fresid, *fweight;
+
+	Fv = (double *) R_alloc(*n,sizeof(double));
+	Ft = (double *) R_alloc(*n,sizeof(double));
+	Rv = (double *) R_alloc(*n,sizeof(double));
+ 	Wv = (double *) R_alloc(*n,sizeof(double));
+
+ 	bw = pow((double) (*band)*2+1,3);
+
+ 	Mr = (double *) R_alloc(bw*(*n),sizeof(double));
+ 	loc = (double *) R_alloc(bw*(*n),sizeof(double));
+ 	WRW  = (double *) R_alloc(*n,sizeof(double));
+
+ 	x_bs = (int *) R_alloc(*n,sizeof(int));
+ 	x_be = (int *) R_alloc(*n,sizeof(int));
+ 	y_bs = (int *) R_alloc(*n,sizeof(int));
+ 	y_be = (int *) R_alloc(*n,sizeof(int));
+ 	z_bs = (int *) R_alloc(*n,sizeof(int));
+ 	z_be = (int *) R_alloc(*n,sizeof(int));
+
+ 	fderiv=fopen(*fnderiv,"r"); //NxP derivs vector (n incr. fastest)
+ 	fresid=fopen(*fnresid,"r"); //Nxtrial residual vector (n incr fastest)
+ 	fweight=fopen(*fnweight,"r"); //N vector of weights
+
+ 	fread(Wv,sizeof(double),*n,fweight);
+ 	fclose(fweight);
+
+ 	//make boxes for each voxel location
+ 	a=0;
+ 	for(z=0;z<(*dimz);z++) {
+ 		for(y=0;y<(*dimy);y++) {
+ 			for(x=0;x<(*dimx);x++) {
+				x_bs[a] = x-(*band);
+				x_be[a] = x+(*band);
+				if(x_bs[a]<0) x_bs[a] = -1;
+				if(x_be[a]>(*n-1)) x_be[a] = (*n-1);
+
+				y_bs[a] = y-(*band);
+				y_be[a] = y+(*band);
+
+				if(y_bs[a]<0) y_bs[a] = -1;
+				if(y_be[a]>(*n-1)) y_be[a] = -1;
+
+				z_bs[a] = z-(*band);
+				z_be[a] = z+(*band);
+				if(z_bs[a]<0) z_bs[a] = -1;
+				if(z_be[a]>(*n-1)) z_be[a] = -1;
+
+ 				a++;
+ 		 	}
+ 	 	}
+ 	}
+ 	Rprintf("Finished boxes\n");
+
+ 	//make location matrices for each n
+ 	for(a=0;a<(*n);a++) {
+ 		i=0;
+ 		for(z=z_bs[a];z<(z_be[a]+1);z++) {
+ 			for(y=y_bs[a];y<(y_be[a]+1);y++) {
+ 				for(x=x_bs[a];x<(x_be[a]+1);x++) {
+ 					if(x>-1 & y>-1 & z>-1)
+ 						*(loc+a+i**n) = x+y**dimy+z**dimz;
+ 					else
+ 						*(loc+a+i**n) = -1;
+ 					i++;
+ 				}
+ 			}
+ 		}
+ 	}
+
+ 	Rprintf("Finished locations\n");
+
+	//set Mr to zero
+ 	for(i=0;i<(*n);i++) {
+ 		*(WRW+i)=0e0;
+ 		for(j=0;j<bw;j++) {
+			*(Mr+i+j**n)=0e0;
+		}
+ 	}
+
+ 	//make mean W R W matrix
+ 	for(l=0;l<(*trials);l++) { //trial loop
+ 		fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
+ 		fread(Rv,sizeof(double),*n,fresid);
+
+		for(i=0;i<(*n);i++) {
+			for(j=0;j<bw;j++) {
+				if((*loc+i+j**n)>-1)
+					*(Mr+i+j**n) =  *(Mr+i+j**n) +((1/pow((double) *trials,2))**(Rv+i)**(Rv+(*loc+i+j**n)));
+				else
+					*(Mr+i+j**n) = 0;
+
+			}
+		}
+ 	}
+
+ 	Rprintf("Made mean WRW matrix\n");
+
+
+
+
+}*/
 
 
 void innerSWfast(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, double *B)
@@ -1048,6 +1155,7 @@ void innerSWfast(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 
 }
 
+
 void approxHessian(int *np, int *n, char **dffile, char **wfile, double *hessian) {
 
 	int r,c,j,k;
@@ -1116,7 +1224,7 @@ void approxHessian(int *np, int *n, char **dffile, char **wfile, double *hessian
 
 }
 
-void dfgaussFile(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, char **filename)
+void dfgaussFile(int *np, int *brain, int *dimx, int *dimy, int *dimz, double *thetavec, char **filename)
 {
 
 	void dftheta0();
@@ -1130,11 +1238,13 @@ void dfgaussFile(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, cha
 	void dftheta8();
 	void dftheta9();
 
-	int i,n=(*dimx)*(*dimy)*(*dimz), reg;
+	int i,n=(*dimx)*(*dimy)*(*dimz), reg,p;
 	double *grad, *theta;
 	grad = (double *) R_alloc((n),sizeof(double));
 	theta = (double *) R_alloc((10),sizeof(double));
 
+	p=0;
+	for(i=0;i<n;i++) p=p + brain[i];
 
 	FILE *f;
 	f=fopen(*filename,"w");
@@ -1145,33 +1255,34 @@ void dfgaussFile(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, cha
 			*(theta+i)=*(thetavec+reg+i);
 		}
 
-		dftheta0(theta,dimx,dimy,dimz,grad);
-		fwrite(grad,sizeof(double),n,f);
-		dftheta1(theta,dimx,dimy,dimz,grad);
-		fwrite(grad,sizeof(double),n,f);
-		dftheta2(theta,dimx,dimy,dimz,grad);
-		fwrite(grad,sizeof(double),n,f);
-		dftheta3(theta,dimx,dimy,dimz,grad);
-		fwrite(grad,sizeof(double),n,f);
-		dftheta4(theta,dimx,dimy,dimz,grad);
-		fwrite(grad,sizeof(double),n,f);
-		dftheta5(theta,dimx,dimy,dimz,grad);
-		fwrite(grad,sizeof(double),n,f);
-		dftheta6(theta,dimx,dimy,dimz,grad);
-		fwrite(grad,sizeof(double),n,f);
-		dftheta7(theta,dimx,dimy,dimz,grad);
-		fwrite(grad,sizeof(double),n,f);
-		dftheta8(theta,dimx,dimy,dimz,grad);
-		fwrite(grad,sizeof(double),n,f);
-		dftheta9(theta,dimx,dimy,dimz,grad);
-		fwrite(grad,sizeof(double),n,f);
+
+		dftheta0(theta,brain,dimx,dimy,dimz,grad);
+		fwrite(grad,sizeof(double),p,f);
+		dftheta1(theta,brain,dimx,dimy,dimz,grad);
+		fwrite(grad,sizeof(double),p,f);
+		dftheta2(theta,brain,dimx,dimy,dimz,grad);
+		fwrite(grad,sizeof(double),p,f);
+		dftheta3(theta,brain,dimx,dimy,dimz,grad);
+		fwrite(grad,sizeof(double),p,f);
+		dftheta4(theta,brain,dimx,dimy,dimz,grad);
+		fwrite(grad,sizeof(double),p,f);
+		dftheta5(theta,brain,dimx,dimy,dimz,grad);
+		fwrite(grad,sizeof(double),p,f);
+		dftheta6(theta,brain,dimx,dimy,dimz,grad);
+		fwrite(grad,sizeof(double),p,f);
+		dftheta7(theta,brain,dimx,dimy,dimz,grad);
+		fwrite(grad,sizeof(double),p,f);
+		dftheta8(theta,brain,dimx,dimy,dimz,grad);
+		fwrite(grad,sizeof(double),p,f);
+		dftheta9(theta,brain,dimx,dimy,dimz,grad);
+		fwrite(grad,sizeof(double),p,f);
 
 	}
 
 	fclose(f);
 }
 
-void dfgauss(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, double *derivs)
+void dfgauss(int *np, int *brain, int *dimx, int *dimy, int *dimz, double *thetavec, double *derivs)
 {
 
 	void dftheta0();
@@ -1185,7 +1296,7 @@ void dfgauss(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, double 
 	void dftheta8();
 	void dftheta9();
 
-	int i,j,n=(*dimx)*(*dimy)*(*dimz), reg;
+	int i,j,n=(*dimx)*(*dimy)*(*dimz), reg,p;
 	double *grad, *theta;
 	grad = (double *) R_alloc((n),sizeof(double));
 	theta = (double *) R_alloc((10),sizeof(double));
@@ -1197,42 +1308,101 @@ void dfgauss(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, double 
 			*(theta+i)=*(thetavec+reg+i);
 		}
 
-		dftheta0(theta,dimx,dimy,dimz,grad);
-		for(j=0;j<n;j++) derivs[j+(0*n)+(n*reg)]=grad[j];
+		dftheta0(theta,brain,dimx,dimy,dimz,grad);
+		p=0;
+		for(j=0;j<n;j++) {
+			if(brain[j]!=0) {
+				derivs[p+(0*n)+(n*reg)]=grad[p];
+				p++;
+			}
+		}
 
-		dftheta1(theta,dimx,dimy,dimz,grad);
-		for(j=0;j<n;j++) derivs[j+(1*n)+(n*reg)]=grad[j];
+		dftheta1(theta,brain,dimx,dimy,dimz,grad);
+		p=0;
+		for(j=0;j<n;j++) {
+			if(brain[j]!=0) {
+				derivs[p+(1*n)+(n*reg)]=grad[p];
+				p++;
+			}
+		}
 
 		dftheta2(theta,dimx,dimy,dimz,grad);
-		for(j=0;j<n;j++) derivs[j+(2*n)+(n*reg)]=grad[j];
+		p=0;
+		for(j=0;j<n;j++) {
+			if(brain[j]!=0) {
+				derivs[p+(2*n)+(n*reg)]=grad[p];
+				p++;
+			}
+		}
 
-		dftheta3(theta,dimx,dimy,dimz,grad);
-		for(j=0;j<n;j++) derivs[j+(3*n)+(n*reg)]=grad[j];
+		dftheta3(theta,brain,dimx,dimy,dimz,grad);
+		p=0;
+		for(j=0;j<n;j++) {
+			if(brain[j]!=0) {
+				derivs[p+(3*n)+(n*reg)]=grad[p];
+				p++;
+			}
+		}
 
-		dftheta4(theta,dimx,dimy,dimz,grad);
-		for(j=0;j<n;j++) derivs[j+(4*n)+(n*reg)]=grad[j];
+		dftheta4(theta,brain,dimx,dimy,dimz,grad);
+		p=0;
+		for(j=0;j<n;j++) {
+			if(brain[j]!=0) {
+				derivs[p+(4*n)+(n*reg)]=grad[p];
+				p++;
+			}
+		}
 
-		dftheta5(theta,dimx,dimy,dimz,grad);
-		for(j=0;j<n;j++) derivs[j+(5*n)+(n*reg)]=grad[j];
+		dftheta5(theta,brain,dimx,dimy,dimz,grad);
+		p=0;
+		for(j=0;j<n;j++) {
+			if(brain[j]!=0) {
+				derivs[p+(5*n)+(n*reg)]=grad[p];
+				p++;
+			}
+		}
 
-		dftheta6(theta,dimx,dimy,dimz,grad);
-		for(j=0;j<n;j++) derivs[j+(6*n)+(n*reg)]=grad[j];
+		dftheta6(theta,brain,dimx,dimy,dimz,grad);
+		p=0;
+		for(j=0;j<n;j++) {
+			if(brain[j]!=0) {
+				derivs[p+(6*n)+(n*reg)]=grad[p];
+				p++;
+			}
+		}
 
-		dftheta7(theta,dimx,dimy,dimz,grad);
-		for(j=0;j<n;j++) derivs[j+(7*n)+(n*reg)]=grad[j];
+		dftheta7(theta,brain,dimx,dimy,dimz,grad);
+		p=0;
+		for(j=0;j<n;j++) {
+			if(brain[j]!=0) {
+				derivs[p+(7*n)+(n*reg)]=grad[p];
+				p++;
+			}
+		}
 
-		dftheta8(theta,dimx,dimy,dimz,grad);
-		for(j=0;j<n;j++) derivs[j+(8*n)+(n*reg)]=grad[j];
+		dftheta8(theta,brain,dimx,dimy,dimz,grad);
+		p=0;
+		for(j=0;j<n;j++) {
+			if(brain[j]!=0) {
+				derivs[p+(8*n)+(n*reg)]=grad[p];
+				p++;
+			}
+		}
 
-		dftheta9(theta,dimx,dimy,dimz,grad);
-		for(j=0;j<n;j++) derivs[j+(9*n)+(n*reg)]=grad[j];
-
+		dftheta9(theta,brain,dimx,dimy,dimz,grad);
+		p=0;
+		for(j=0;j<n;j++) {
+			if(brain[j]!=0) {
+				derivs[p+(9*n)+(n*reg)]=grad[p];
+				p++;
+			}
+		}
 	}
 
 }
 
 
-void dfssq(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, double *data, double *model, double *weights, double *ssqgrad)
+void dfssq(int *np, int *brain, int *dimx, int *dimy, int *dimz, double *thetavec, double *data, double *model, double *weights, double *ssqgrad)
 {
 
 	void dftheta0();
@@ -1246,13 +1416,10 @@ void dfssq(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, double *d
 	void dftheta8();
 	void dftheta9();
 
-
-
-	int i,j,n=(*dimx)*(*dimy)*(*dimz), reg;
+	int i,j,n=(*dimx)*(*dimy)*(*dimz), reg,p;
 	double *grad, *theta;
 	grad = (double *) R_alloc((n),sizeof(double));
 	theta = (double *) R_alloc((10),sizeof(double));
-
 
 	for(reg=0;reg<(*np);reg=reg+10) {
 
@@ -1260,55 +1427,116 @@ void dfssq(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, double *d
 			*(theta+i)=*(thetavec+reg+i);
 		}
 
-		dftheta0(theta,dimx,dimy,dimz,grad);
+		dftheta0(theta,brain,dimx,dimy,dimz,grad);
 		*(ssqgrad+reg+0)=0e0;
-		for(j=0;j<n;j=j+1) *(ssqgrad+reg+0)=*(ssqgrad+reg+0)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		p=0;
+		for(j=0;j<n;j=j+1) {
+			if(brain[j]!=0) {
+				*(ssqgrad+reg+0)=*(ssqgrad+reg+0)+((1/(*(weights+j)))**(grad+p)*(*(data+j)-(*(model+j))));
+				p++;
+			}
+		}
 		*(ssqgrad+reg+0)=*(ssqgrad+reg+0)*-2;
 
-		dftheta1(theta,dimx,dimy,dimz,grad);
+		dftheta1(theta,brain,dimx,dimy,dimz,grad);
 		*(ssqgrad+reg+1)=0e0;
-		for(j=0;j<n;j=j+1) *(ssqgrad+reg+1)=*(ssqgrad+reg+1)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		p=0;
+		for(j=0;j<n;j=j+1) {
+			if(brain[j]!=0) {
+				*(ssqgrad+reg+1)=*(ssqgrad+reg+1)+((1/(*(weights+j)))**(grad+p)*(*(data+j)-(*(model+j))));
+				p++;
+			}
+		}
 		*(ssqgrad+reg+1)=*(ssqgrad+reg+1)*-2;
 
-		dftheta2(theta,dimx,dimy,dimz,grad);
+		dftheta2(theta,brain,dimx,dimy,dimz,grad);
 		*(ssqgrad+reg+2)=0e0;
-		for(j=0;j<n;j=j+1) *(ssqgrad+reg+2)=*(ssqgrad+reg+2)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		p=0;
+		for(j=0;j<n;j=j+1) {
+			if(brain[j]!=0) {
+				*(ssqgrad+reg+2)=*(ssqgrad+reg+2)+((1/(*(weights+j)))**(grad+p)*(*(data+j)-(*(model+j))));
+				p++;
+			}
+		}
 		*(ssqgrad+reg+2)=*(ssqgrad+reg+2)*-2;
 
-		dftheta3(theta,dimx,dimy,dimz,grad);
+		dftheta3(theta,brain,dimx,dimy,dimz,grad);
 		*(ssqgrad+reg+3)=0e0;
-		for(j=0;j<n;j=j+1) *(ssqgrad+reg+3)=*(ssqgrad+reg+3)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		p=0;
+		for(j=0;j<n;j=j+1) {
+			if(brain[j]!=0) {
+				*(ssqgrad+reg+3)=*(ssqgrad+reg+3)+((1/(*(weights+j)))**(grad+p)*(*(data+j)-(*(model+j))));
+				p++;
+			}
+		}
 		*(ssqgrad+reg+3)=*(ssqgrad+reg+3)*-2;
 
-		dftheta4(theta,dimx,dimy,dimz,grad);
+		dftheta4(theta,brain,dimx,dimy,dimz,grad);
 		*(ssqgrad+reg+4)=0e0;
-		for(j=0;j<n;j=j+1) *(ssqgrad+reg+4)=*(ssqgrad+reg+4)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		p=0;
+		for(j=0;j<n;j=j+1) {
+			if(brain[j]!=0) {
+				*(ssqgrad+reg+4)=*(ssqgrad+reg+4)+((1/(*(weights+j)))**(grad+p)*(*(data+j)-(*(model+j))));
+				p++;
+			}
+		}
 		*(ssqgrad+reg+4)=*(ssqgrad+reg+4)*-2;
 
-		dftheta5(theta,dimx,dimy,dimz,grad);
+		dftheta5(theta,brain,dimx,dimy,dimz,grad);
 		*(ssqgrad+reg+5)=0e0;
-		for(j=0;j<n;j=j+1) *(ssqgrad+reg+5)=*(ssqgrad+reg+5)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		p=0;
+		for(j=0;j<n;j=j+1) {
+			if(brain[j]!=0) {
+				*(ssqgrad+reg+5)=*(ssqgrad+reg+5)+((1/(*(weights+j)))**(grad+p)*(*(data+j)-(*(model+j))));
+				p++;
+			}
+		}
 		*(ssqgrad+reg+5)=*(ssqgrad+reg+5)*-2;
 
-		dftheta6(theta,dimx,dimy,dimz,grad);
+		dftheta6(theta,brain,dimx,dimy,dimz,grad);
 		*(ssqgrad+reg+6)=0e0;
-		for(j=0;j<n;j=j+1) *(ssqgrad+reg+6)=*(ssqgrad+reg+6)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		p=0;
+		for(j=0;j<n;j=j+1) {
+			if(brain[j]!=0) {
+				*(ssqgrad+reg+6)=*(ssqgrad+reg+6)+((1/(*(weights+j)))**(grad+p)*(*(data+j)-(*(model+j))));
+				p++;
+			}
+		}
 		*(ssqgrad+reg+6)=*(ssqgrad+reg+6)*-2;
 
-		dftheta7(theta,dimx,dimy,dimz,grad);
+		dftheta7(theta,brain,dimx,dimy,dimz,grad);
 		*(ssqgrad+reg+7)=0e0;
-		for(j=0;j<n;j=j+1) *(ssqgrad+reg+7)=*(ssqgrad+reg+7)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		p=0;
+		for(j=0;j<n;j=j+1) {
+			if(brain[j]!=0) {
+				*(ssqgrad+reg+7)=*(ssqgrad+reg+7)+((1/(*(weights+j)))**(grad+p)*(*(data+j)-(*(model+j))));
+				p++;
+			}
+		}
 		*(ssqgrad+reg+7)=*(ssqgrad+reg+7)*-2;
 
-		dftheta8(theta,dimx,dimy,dimz,grad);
+		dftheta8(theta,brain,dimx,dimy,dimz,grad);
 		*(ssqgrad+reg+8)=0e0;
-		for(j=0;j<n;j=j+1) *(ssqgrad+reg+8)=*(ssqgrad+reg+8)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		p=0;
+		for(j=0;j<n;j=j+1) {
+			if(brain[j]!=0) {
+				*(ssqgrad+reg+8)=*(ssqgrad+reg+8)+((1/(*(weights+j)))**(grad+p)*(*(data+j)-(*(model+j))));
+				p++;
+			}
+		}
 		*(ssqgrad+reg+8)=*(ssqgrad+reg+8)*-2;
 
-		dftheta9(theta,dimx,dimy,dimz,grad);
+		dftheta9(theta,brain,dimx,dimy,dimz,grad);
 		*(ssqgrad+reg+9)=0e0;
-		for(j=0;j<n;j=j+1) *(ssqgrad+reg+9)=*(ssqgrad+reg+9)+((1/(*(weights+j)))**(grad+j)*(*(data+j)-(*(model+j))));
+		p=0;
+		for(j=0;j<n;j=j+1) {
+			if(brain[j]!=0) {
+				*(ssqgrad+reg+9)=*(ssqgrad+reg+9)+((1/(*(weights+j)))**(grad+p)*(*(data+j)-(*(model+j))));
+				p++;
+			}
+		}
 		*(ssqgrad+reg+9)=*(ssqgrad+reg+9)*-2;
+
 	}
 
 
@@ -1409,472 +1637,517 @@ void dfsimplessq(int *np, int *dimx, int *dimy, int *dimz, double *thetavec, dou
 
 
 
-void dftheta0(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {
+void dftheta0(double *theta, int *brain, int *dimx, int *dimy, int *dimz, double *grad) {
 
     double ev[199];
-    int x,y,z,p;
+    int x,y,z,p,a;
 
     p=0;
+    a=0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
-				ev[4] = pow(*(theta+3),2);
-				ev[5] = pow(*(theta+4),2);
-				ev[6] = ev[4] * ev[5];
-				ev[7] = pow(*(theta+5),2);
-				ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
-				ev[11] = ev[4] * ev[10];
-				ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
-				ev[16] = ev[15] * ev[15];
-				ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
-				ev[21] = ev[15] * ev[20];
-				ev[24] = ev[20] * ev[15];
-				ev[27] = ev[20] * ev[5];
-				ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
-				ev[33] = *(theta+9) * (1/(pow(sqrt(2 * M_PI),3) * sqrt(ev[29])));
-				ev[35] = x - *(theta+0);
-				ev[39] = ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]);
-				ev[40] = y - *(theta+1);
-				ev[46] = z - *(theta+2);
-				ev[47] = ev[15] * ev[10];
-				ev[51] = ev[39] + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]);
-				ev[56] = ev[20] * ev[10] - ev[7] * ev[15];
-				ev[69] = ev[47] - ev[27];
-				ev[82] = exp(-0.5 * (ev[35] * ev[51]/ev[29] + ev[40] * (ev[35] * ev[56] + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]))/ev[29] + ev[46] * (ev[35] * ev[69] + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]))/ev[29]));
 
-				*(grad+p) = ev[33] * (ev[82] * (0.5 * (ev[46] * ev[69]/ev[29] + (ev[40] * ev[56]/ev[29] + (ev[39] + ev[51])/ev[29]))));
+				if(brain[a]!=0) {
+					ev[4] = pow(*(theta+3),2);
+					ev[5] = pow(*(theta+4),2);
+					ev[6] = ev[4] * ev[5];
+					ev[7] = pow(*(theta+5),2);
+					ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
+					ev[11] = ev[4] * ev[10];
+					ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
+					ev[16] = ev[15] * ev[15];
+					ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
+					ev[21] = ev[15] * ev[20];
+					ev[24] = ev[20] * ev[15];
+					ev[27] = ev[20] * ev[5];
+					ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
+					ev[33] = *(theta+9) * (1/(pow(sqrt(2 * M_PI),3) * sqrt(ev[29])));
+					ev[35] = x - *(theta+0);
+					ev[39] = ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]);
+					ev[40] = y - *(theta+1);
+					ev[46] = z - *(theta+2);
+					ev[47] = ev[15] * ev[10];
+					ev[51] = ev[39] + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]);
+					ev[56] = ev[20] * ev[10] - ev[7] * ev[15];
+					ev[69] = ev[47] - ev[27];
+					ev[82] = exp(-0.5 * (ev[35] * ev[51]/ev[29] + ev[40] * (ev[35] * ev[56] + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]))/ev[29] + ev[46] * (ev[35] * ev[69] + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]))/ev[29]));
 
-				p++;
+					*(grad+p) = ev[33] * (ev[82] * (0.5 * (ev[46] * ev[69]/ev[29] + (ev[40] * ev[56]/ev[29] + (ev[39] + ev[51])/ev[29]))));
+
+					p++;
+				}
+				a++;
 			}
 		}
 	}
 
 }
 
-void dftheta1(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {
+void dftheta1(double *theta, int *brain, int *dimx, int *dimy, int *dimz, double *grad) {
 
     double ev[199];
-    int x,y,z,p;
+    int x,y,z,p,a;
 
     p=0;
+    a=0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
-				ev[4] = pow(*(theta+3),2);
-				ev[5] = pow(*(theta+4),2);
-				ev[6] = ev[4] * ev[5];
-				ev[7] = pow(*(theta+5),2);
-				ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
-				ev[11] = ev[4] * ev[10];
-				ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
-				ev[16] = ev[15] * ev[15];
-				ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
-				ev[21] = ev[15] * ev[20];
-				ev[24] = ev[20] * ev[15];
-				ev[27] = ev[20] * ev[5];
-				ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
-				ev[33] = *(theta+9) * (1/(pow(sqrt(2 * M_PI),3) * sqrt(ev[29])));
-				ev[35] = x - *(theta+0);
-				ev[40] = y - *(theta+1);
-				ev[43] = ev[10] * ev[20] - ev[15] * ev[7];
-				ev[46] = z - *(theta+2);
-				ev[47] = ev[15] * ev[10];
-				ev[61] = ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]);
-				ev[65] = ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[61] + ev[46] * (ev[21] - ev[11]);
-				ev[72] = ev[24] - ev[10] * ev[4];
-				ev[82] = exp(-0.5 * (ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * ev[43] + ev[46] * (ev[47] - ev[5] * ev[20]))/ev[29] + ev[40] * ev[65]/ev[29] + ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * ev[72] + ev[46] * (ev[6] - ev[16]))/ev[29]));
 
-				*(grad+p) = ev[33] * (ev[82] * (0.5 * (ev[46] * ev[72]/ev[29] + ((ev[61] + ev[65])/ev[29] + ev[35] * ev[43]/ev[29]))));
+				if(brain[a]!=0) {
+					ev[4] = pow(*(theta+3),2);
+					ev[5] = pow(*(theta+4),2);
+					ev[6] = ev[4] * ev[5];
+					ev[7] = pow(*(theta+5),2);
+					ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
+					ev[11] = ev[4] * ev[10];
+					ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
+					ev[16] = ev[15] * ev[15];
+					ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
+					ev[21] = ev[15] * ev[20];
+					ev[24] = ev[20] * ev[15];
+					ev[27] = ev[20] * ev[5];
+					ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
+					ev[33] = *(theta+9) * (1/(pow(sqrt(2 * M_PI),3) * sqrt(ev[29])));
+					ev[35] = x - *(theta+0);
+					ev[40] = y - *(theta+1);
+					ev[43] = ev[10] * ev[20] - ev[15] * ev[7];
+					ev[46] = z - *(theta+2);
+					ev[47] = ev[15] * ev[10];
+					ev[61] = ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]);
+					ev[65] = ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[61] + ev[46] * (ev[21] - ev[11]);
+					ev[72] = ev[24] - ev[10] * ev[4];
+					ev[82] = exp(-0.5 * (ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * ev[43] + ev[46] * (ev[47] - ev[5] * ev[20]))/ev[29] + ev[40] * ev[65]/ev[29] + ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * ev[72] + ev[46] * (ev[6] - ev[16]))/ev[29]));
 
-				p++;
+					*(grad+p) = ev[33] * (ev[82] * (0.5 * (ev[46] * ev[72]/ev[29] + ((ev[61] + ev[65])/ev[29] + ev[35] * ev[43]/ev[29]))));
+
+					p++;
+				}
+				a++;
 			}
 		}
 	}
 }
 
-void dftheta2(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {
+void dftheta2(double *theta, int *brain, int *dimx, int *dimy, int *dimz, double *grad) {
 
     double ev[199];
-    int x,y,z,p;
+    int x,y,z,p,a;
 
     p=0;
+    a=0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
-     			ev[4] = pow(*(theta+3),2);
-				ev[5] = pow(*(theta+4),2);
-				ev[6] = ev[4] * ev[5];
-				ev[7] = pow(*(theta+5),2);
-				ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
-				ev[11] = ev[4] * ev[10];
-				ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
-				ev[16] = ev[15] * ev[15];
-				ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
-				ev[21] = ev[15] * ev[20];
-				ev[24] = ev[20] * ev[15];
-				ev[27] = ev[20] * ev[5];
-				ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
-				ev[33] = *(theta+9) * (1/(pow(sqrt(2 * M_PI),3) * sqrt(ev[29])));
-				ev[35] = x - *(theta+0);
-				ev[40] = y - *(theta+1);
-				ev[46] = z - *(theta+2);
-				ev[47] = ev[15] * ev[10];
-				ev[49] = ev[47] - ev[5] * ev[20];
-				ev[63] = ev[21] - ev[11];
-				ev[76] = ev[46] * (ev[6] - ev[16]);
-				ev[77] = ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[76];
-				ev[82] = exp(-0.5 * (ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) +  ev[46] * ev[49])/ev[29] + ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * ev[63])/ev[29] + ev[46] * ev[77]/ev[29]));
 
-				*(grad+p) = ev[33] * (ev[82] * (0.5 * ((ev[76] + ev[77])/ev[29] + (ev[40] * ev[63]/ev[29] + ev[35] * ev[49]/ev[29]))));
+				if(brain[a]!=0) {
+					ev[4] = pow(*(theta+3),2);
+					ev[5] = pow(*(theta+4),2);
+					ev[6] = ev[4] * ev[5];
+					ev[7] = pow(*(theta+5),2);
+					ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
+					ev[11] = ev[4] * ev[10];
+					ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
+					ev[16] = ev[15] * ev[15];
+					ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
+					ev[21] = ev[15] * ev[20];
+					ev[24] = ev[20] * ev[15];
+					ev[27] = ev[20] * ev[5];
+					ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
+					ev[33] = *(theta+9) * (1/(pow(sqrt(2 * M_PI),3) * sqrt(ev[29])));
+					ev[35] = x - *(theta+0);
+					ev[40] = y - *(theta+1);
+					ev[46] = z - *(theta+2);
+					ev[47] = ev[15] * ev[10];
+					ev[49] = ev[47] - ev[5] * ev[20];
+					ev[63] = ev[21] - ev[11];
+					ev[76] = ev[46] * (ev[6] - ev[16]);
+					ev[77] = ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[76];
+					ev[82] = exp(-0.5 * (ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) +  ev[46] * ev[49])/ev[29] + ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * ev[63])/ev[29] + ev[46] * ev[77]/ev[29]));
 
-				p++;
+					*(grad+p) = ev[33] * (ev[82] * (0.5 * ((ev[76] + ev[77])/ev[29] + (ev[40] * ev[63]/ev[29] + ev[35] * ev[49]/ev[29]))));
+
+					p++;
+				}
+				a++;
 			}
 		}
 	}
 }
 
 
-void dftheta3(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {
+void dftheta3(double *theta, int *brain, int *dimx, int *dimy, int *dimz, double *grad) {
 
     double ev[199];
-    int x,y,z,p;
+    int x,y,z,p,a;
 
     p=0;
+    a=0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
-				ev[3] = pow(sqrt(2 * M_PI),3);
-				ev[4] = pow(*(theta+3),2);
-				ev[5] = pow(*(theta+4),2);
-				ev[6] = ev[4] * ev[5];
-				ev[7] = pow(*(theta+5),2);
-				ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
-				ev[11] = ev[4] * ev[10];
-				ev[14] = *(theta+6) * *(theta+4);
-				ev[15] = ev[14] * *(theta+3);
-				ev[16] = ev[15] * ev[15];
-				ev[19] = *(theta+7) * *(theta+5);
-				ev[20] = ev[19] * *(theta+3);
-				ev[21] = ev[15] * ev[20];
-				ev[24] = ev[20] * ev[15];
-				ev[27] = ev[20] * ev[5];
-				ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
-				ev[31] = ev[3] * sqrt(ev[29]);
-				ev[33] = *(theta+9) * (1/ev[31]);
-				ev[35] = x - *(theta+0);
-				ev[40] = y - *(theta+1);
-				ev[46] = z - *(theta+2);
-				ev[47] = ev[15] * ev[10];
-				ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
-				ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
-				ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
-				ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
-				ev[88] = ev[14] * ev[10];
-				ev[95] = 2 * *(theta+3);
-				ev[96] = ev[95] * ev[5];
-				ev[98] = ev[95] * ev[10];
-				ev[103] = ev[14] * ev[15] + ev[15] * ev[14];
-				ev[108] = ev[14] * ev[20] + ev[15] * ev[19];
-				ev[113] = ev[19] * ev[15] + ev[20] * ev[14];
-				ev[116] = ev[19] * ev[5];
-				ev[120] = ev[96] * ev[7] - ev[98] * ev[10] - ev[103] * ev[7] + ev[108] * ev[10] + ev[113] * ev[10] - (ev[116] * ev[20] + ev[27] * ev[19]);
-				ev[122] = pow(ev[29],2);
 
-				*(grad+p)= -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[40] * (ev[10] * ev[19] - ev[14] * ev[7]) + ev[46] * (ev[88] - ev[5] * ev[19]))/ev[29] - ev[52] * ev[120]/ev[122] + (ev[40] * (ev[35] * (ev[19] * ev[10] - ev[7] * ev[14]) + ev[40] * (ev[95] * ev[7] - (ev[19] * ev[20] + ev[20] * ev[19])) + ev[46] * (ev[108] - ev[98]))/ev[29] - ev[66] * ev[120]/ev[122]) + (ev[46] * (ev[35] * (ev[88] - ev[116]) + ev[40] * (ev[113] - ev[10] * ev[95]) + ev[46] * (ev[96] - ev[103]))/ev[29] - ev[78] * ev[120]/ev[122])))) + *(theta+9) * (ev[3] * (0.5 * (ev[120] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
+				if(brain[a]!=0) {
+					ev[3] = pow(sqrt(2 * M_PI),3);
+					ev[4] = pow(*(theta+3),2);
+					ev[5] = pow(*(theta+4),2);
+					ev[6] = ev[4] * ev[5];
+					ev[7] = pow(*(theta+5),2);
+					ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
+					ev[11] = ev[4] * ev[10];
+					ev[14] = *(theta+6) * *(theta+4);
+					ev[15] = ev[14] * *(theta+3);
+					ev[16] = ev[15] * ev[15];
+					ev[19] = *(theta+7) * *(theta+5);
+					ev[20] = ev[19] * *(theta+3);
+					ev[21] = ev[15] * ev[20];
+					ev[24] = ev[20] * ev[15];
+					ev[27] = ev[20] * ev[5];
+					ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
+					ev[31] = ev[3] * sqrt(ev[29]);
+					ev[33] = *(theta+9) * (1/ev[31]);
+					ev[35] = x - *(theta+0);
+					ev[40] = y - *(theta+1);
+					ev[46] = z - *(theta+2);
+					ev[47] = ev[15] * ev[10];
+					ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
+					ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
+					ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
+					ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
+					ev[88] = ev[14] * ev[10];
+					ev[95] = 2 * *(theta+3);
+					ev[96] = ev[95] * ev[5];
+					ev[98] = ev[95] * ev[10];
+					ev[103] = ev[14] * ev[15] + ev[15] * ev[14];
+					ev[108] = ev[14] * ev[20] + ev[15] * ev[19];
+					ev[113] = ev[19] * ev[15] + ev[20] * ev[14];
+					ev[116] = ev[19] * ev[5];
+					ev[120] = ev[96] * ev[7] - ev[98] * ev[10] - ev[103] * ev[7] + ev[108] * ev[10] + ev[113] * ev[10] - (ev[116] * ev[20] + ev[27] * ev[19]);
+					ev[122] = pow(ev[29],2);
 
-				p++;
+					*(grad+p)= -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[40] * (ev[10] * ev[19] - ev[14] * ev[7]) + ev[46] * (ev[88] - ev[5] * ev[19]))/ev[29] - ev[52] * ev[120]/ev[122] + (ev[40] * (ev[35] * (ev[19] * ev[10] - ev[7] * ev[14]) + ev[40] * (ev[95] * ev[7] - (ev[19] * ev[20] + ev[20] * ev[19])) + ev[46] * (ev[108] - ev[98]))/ev[29] - ev[66] * ev[120]/ev[122]) + (ev[46] * (ev[35] * (ev[88] - ev[116]) + ev[40] * (ev[113] - ev[10] * ev[95]) + ev[46] * (ev[96] - ev[103]))/ev[29] - ev[78] * ev[120]/ev[122])))) + *(theta+9) * (ev[3] * (0.5 * (ev[120] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
+
+					p++;
+				}
+				a++;
 			}
 		}
 	}
 }
 
-void dftheta4(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {
+void dftheta4(double *theta, int *brain, int *dimx, int *dimy, int *dimz, double *grad) {
 
     double ev[199];
-    int x,y,z,p;
+    int x,y,z,p,a;
 
     p=0;
+    a=0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
-				ev[3] = pow(sqrt(2 * M_PI),3);
-				ev[4] = pow(*(theta+3),2);
-				ev[5] = pow(*(theta+4),2);
-				ev[6] = ev[4] * ev[5];
-				ev[7] = pow(*(theta+5),2);
-				ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
-				ev[11] = ev[4] * ev[10];
-				ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
-				ev[16] = ev[15] * ev[15];
-				ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
-				ev[21] = ev[15] * ev[20];
-				ev[24] = ev[20] * ev[15];
-				ev[27] = ev[20] * ev[5];
-				ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
-				ev[31] = ev[3] * sqrt(ev[29]);
-				ev[33] = *(theta+9) * (1/ev[31]);
-				ev[35] = x - *(theta+0);
-				ev[40] = y - *(theta+1);
-				ev[46] = z - *(theta+2);
-				ev[47] = ev[15] * ev[10];
-				ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
-				ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
-				ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
-				ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
-				ev[84] = 2 * *(theta+4);
-				ev[86] = *(theta+8) * *(theta+5);
-				ev[93] = *(theta+6) * *(theta+3);
-				ev[100] = ev[93] * ev[10] + ev[15] * ev[86];
-				ev[107] = ev[4] * ev[84];
-				ev[109] = ev[4] * ev[86];
-				ev[116] = ev[93] * ev[15] + ev[15] * ev[93];
-				ev[119] = ev[93] * ev[20];
-				ev[124] = ev[20] * ev[93];
-				ev[129] = ev[20] * ev[84];
-				ev[131] = ev[107] * ev[7] - (ev[109] * ev[10] + ev[11] * ev[86]) - ev[116] * ev[7] + (ev[119] * ev[10] + ev[21] * ev[86]) + (ev[124] * ev[10] + ev[24] * ev[86]) - ev[129] * ev[20];
-				ev[133] = pow(ev[29],2);
 
-				*(grad+p) = -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[35] * (ev[84] * ev[7] - (ev[86] * ev[10] + ev[10] * ev[86])) + ev[40] * (ev[86] * ev[20] - ev[93] * ev[7]) + ev[46] * (ev[100] - ev[84] * ev[20]))/ev[29] - ev[52] * ev[131]/ev[133] + (ev[40] * (ev[35] * (ev[20] * ev[86] - ev[7] * ev[93]) + ev[46] * (ev[119] - ev[109]))/ev[29] - ev[66] * ev[131]/ev[133]) + (ev[46] * (ev[35] * (ev[100] - ev[129]) + ev[40] * (ev[124] - ev[86] * ev[4]) + ev[46] * (ev[107] - ev[116]))/ev[29] - ev[78] * ev[131]/ev[133])))) + *(theta+9) * (ev[3] * (0.5 * (ev[131] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
+				if(brain[a]!=0) {
+					ev[3] = pow(sqrt(2 * M_PI),3);
+					ev[4] = pow(*(theta+3),2);
+					ev[5] = pow(*(theta+4),2);
+					ev[6] = ev[4] * ev[5];
+					ev[7] = pow(*(theta+5),2);
+					ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
+					ev[11] = ev[4] * ev[10];
+					ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
+					ev[16] = ev[15] * ev[15];
+					ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
+					ev[21] = ev[15] * ev[20];
+					ev[24] = ev[20] * ev[15];
+					ev[27] = ev[20] * ev[5];
+					ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
+					ev[31] = ev[3] * sqrt(ev[29]);
+					ev[33] = *(theta+9) * (1/ev[31]);
+					ev[35] = x - *(theta+0);
+					ev[40] = y - *(theta+1);
+					ev[46] = z - *(theta+2);
+					ev[47] = ev[15] * ev[10];
+					ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
+					ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
+					ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
+					ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
+					ev[84] = 2 * *(theta+4);
+					ev[86] = *(theta+8) * *(theta+5);
+					ev[93] = *(theta+6) * *(theta+3);
+					ev[100] = ev[93] * ev[10] + ev[15] * ev[86];
+					ev[107] = ev[4] * ev[84];
+					ev[109] = ev[4] * ev[86];
+					ev[116] = ev[93] * ev[15] + ev[15] * ev[93];
+					ev[119] = ev[93] * ev[20];
+					ev[124] = ev[20] * ev[93];
+					ev[129] = ev[20] * ev[84];
+					ev[131] = ev[107] * ev[7] - (ev[109] * ev[10] + ev[11] * ev[86]) - ev[116] * ev[7] + (ev[119] * ev[10] + ev[21] * ev[86]) + (ev[124] * ev[10] + ev[24] * ev[86]) - ev[129] * ev[20];
+					ev[133] = pow(ev[29],2);
 
-				p++;
+					*(grad+p) = -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[35] * (ev[84] * ev[7] - (ev[86] * ev[10] + ev[10] * ev[86])) + ev[40] * (ev[86] * ev[20] - ev[93] * ev[7]) + ev[46] * (ev[100] - ev[84] * ev[20]))/ev[29] - ev[52] * ev[131]/ev[133] + (ev[40] * (ev[35] * (ev[20] * ev[86] - ev[7] * ev[93]) + ev[46] * (ev[119] - ev[109]))/ev[29] - ev[66] * ev[131]/ev[133]) + (ev[46] * (ev[35] * (ev[100] - ev[129]) + ev[40] * (ev[124] - ev[86] * ev[4]) + ev[46] * (ev[107] - ev[116]))/ev[29] - ev[78] * ev[131]/ev[133])))) + *(theta+9) * (ev[3] * (0.5 * (ev[131] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
+
+					p++;
+				}
+				a++;
 			}
 		}
 	}
 }
 
-void dftheta5(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {
+void dftheta5(double *theta, int *brain, int *dimx, int *dimy, int *dimz, double *grad) {
 
     double ev[199];
-    int x,y,z,p;
+    int x,y,z,p,a;
 
     p=0;
+    a=0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
 
-				ev[3] = pow(sqrt(2 * M_PI),3);
-				ev[4] = pow(*(theta+3),2);
-				ev[5] = pow(*(theta+4),2);
-				ev[6] = ev[4] * ev[5];
-				ev[7] = pow(*(theta+5),2);
-				ev[9] = *(theta+8) * *(theta+4);
-				ev[10] = ev[9] * *(theta+5);
-				ev[11] = ev[4] * ev[10];
-				ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
-				ev[16] = ev[15] * ev[15];
-				ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
-				ev[21] = ev[15] * ev[20];
-				ev[24] = ev[20] * ev[15];
-				ev[27] = ev[20] * ev[5];
-				ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
-				ev[31] = ev[3] * sqrt(ev[29]);
-				ev[33] = *(theta+9) * (1/ev[31]);
-				ev[35] = x - *(theta+0);
-				ev[40] = y - *(theta+1);
-				ev[46] = z - *(theta+2);
-				ev[47] = ev[15] * ev[10];
-				ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
-				ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
-				ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
-				ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
-				ev[84] = 2 * *(theta+5);
-				ev[92] = *(theta+7) * *(theta+3);
-				ev[99] = ev[15] * ev[9];
-				ev[107] = ev[4] * ev[9];
-				ev[114] = ev[15] * ev[92];
-				ev[119] = ev[92] * ev[15];
-				ev[124] = ev[92] * ev[5];
-				ev[128] = ev[6] * ev[84] - (ev[107] * ev[10] + ev[11] * ev[9]) - ev[16] * ev[84] + (ev[114] * ev[10] + ev[21] * ev[9]) + (ev[119] * ev[10] + ev[24] * ev[9]) - (ev[124] * ev[20] + ev[27] * ev[92]);
-				ev[130] = pow(ev[29],2);
+				if(brain[a]!=0) {
+					ev[3] = pow(sqrt(2 * M_PI),3);
+					ev[4] = pow(*(theta+3),2);
+					ev[5] = pow(*(theta+4),2);
+					ev[6] = ev[4] * ev[5];
+					ev[7] = pow(*(theta+5),2);
+					ev[9] = *(theta+8) * *(theta+4);
+					ev[10] = ev[9] * *(theta+5);
+					ev[11] = ev[4] * ev[10];
+					ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
+					ev[16] = ev[15] * ev[15];
+					ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
+					ev[21] = ev[15] * ev[20];
+					ev[24] = ev[20] * ev[15];
+					ev[27] = ev[20] * ev[5];
+					ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
+					ev[31] = ev[3] * sqrt(ev[29]);
+					ev[33] = *(theta+9) * (1/ev[31]);
+					ev[35] = x - *(theta+0);
+					ev[40] = y - *(theta+1);
+					ev[46] = z - *(theta+2);
+					ev[47] = ev[15] * ev[10];
+					ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
+					ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
+					ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
+					ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
+					ev[84] = 2 * *(theta+5);
+					ev[92] = *(theta+7) * *(theta+3);
+					ev[99] = ev[15] * ev[9];
+					ev[107] = ev[4] * ev[9];
+					ev[114] = ev[15] * ev[92];
+					ev[119] = ev[92] * ev[15];
+					ev[124] = ev[92] * ev[5];
+					ev[128] = ev[6] * ev[84] - (ev[107] * ev[10] + ev[11] * ev[9]) - ev[16] * ev[84] + (ev[114] * ev[10] + ev[21] * ev[9]) + (ev[119] * ev[10] + ev[24] * ev[9]) - (ev[124] * ev[20] + ev[27] * ev[92]);
+					ev[130] = pow(ev[29],2);
 
-				*(grad+p)= -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[35] * (ev[5] * ev[84] - (ev[9] * ev[10] + ev[10] * ev[9])) + ev[40] * (ev[9] * ev[20] + ev[10] * ev[92] - ev[15] * ev[84]) + ev[46] * (ev[99] - ev[5] * ev[92]))/ev[29] - ev[52] * ev[128]/ev[130] + (ev[40] * (ev[35] * (ev[92] * ev[10] + ev[20] * ev[9] - ev[84] * ev[15]) + ev[40] * (ev[4] * ev[84] - (ev[92] * ev[20] + ev[20] * ev[92])) + ev[46] * (ev[114] - ev[107]))/ev[29] - ev[66] * ev[128]/ev[130]) + (ev[46] * (ev[35] * (ev[99] - ev[124]) + ev[40] * (ev[119] - ev[9] * ev[4]))/ev[29] - ev[78] * ev[128]/ev[130])))) + *(theta+9) * (ev[3] * (0.5 * (ev[128] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
+					*(grad+p)= -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[35] * (ev[5] * ev[84] - (ev[9] * ev[10] + ev[10] * ev[9])) + ev[40] * (ev[9] * ev[20] + ev[10] * ev[92] - ev[15] * ev[84]) + ev[46] * (ev[99] - ev[5] * ev[92]))/ev[29] - ev[52] * ev[128]/ev[130] + (ev[40] * (ev[35] * (ev[92] * ev[10] + ev[20] * ev[9] - ev[84] * ev[15]) + ev[40] * (ev[4] * ev[84] - (ev[92] * ev[20] + ev[20] * ev[92])) + ev[46] * (ev[114] - ev[107]))/ev[29] - ev[66] * ev[128]/ev[130]) + (ev[46] * (ev[35] * (ev[99] - ev[124]) + ev[40] * (ev[119] - ev[9] * ev[4]))/ev[29] - ev[78] * ev[128]/ev[130])))) + *(theta+9) * (ev[3] * (0.5 * (ev[128] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
 
-				p++;
+					p++;
+				}
+				a++;
 			}
 		}
 	}
 }
 
-void dftheta6(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {
+void dftheta6(double *theta, int *brain, int *dimx, int *dimy, int *dimz, double *grad) {
 
     double ev[199];
-    int x,y,z,p;
+    int x,y,z,p,a;
 
     p=0;
+    a=0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
 
-				ev[3] = pow(sqrt(2 * M_PI),3);
-				ev[4] = pow(*(theta+3),2);
-				ev[5] = pow(*(theta+4),2);
-				ev[6] = ev[4] * ev[5];
-				ev[7] = pow(*(theta+5),2);
-				ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
-				ev[11] = ev[4] * ev[10];
-				ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
-				ev[16] = ev[15] * ev[15];
-				ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
-				ev[21] = ev[15] * ev[20];
-				ev[24] = ev[20] * ev[15];
-				ev[27] = ev[20] * ev[5];
-				ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
-				ev[31] = ev[3] * sqrt(ev[29]);
-				ev[33] = *(theta+9) * (1/ev[31]);
-				ev[35] = x - *(theta+0);
-				ev[40] = y - *(theta+1);
-				ev[46] = z - *(theta+2);
-				ev[47] = ev[15] * ev[10];
-				ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
-				ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
-				ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
-				ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
-				ev[84] = *(theta+4) * *(theta+3);
-				ev[85] = ev[84] * ev[10];
-				ev[92] = ev[84] * ev[20];
-				ev[96] = ev[84] * ev[15] + ev[15] * ev[84];
-				ev[99] = ev[20] * ev[84];
-				ev[101] = ev[92] * ev[10] - ev[96] * ev[7] + ev[99] * ev[10];
-				ev[103] = pow(ev[29],2);
+				if(brain[a]!=0) {
+					ev[3] = pow(sqrt(2 * M_PI),3);
+					ev[4] = pow(*(theta+3),2);
+					ev[5] = pow(*(theta+4),2);
+					ev[6] = ev[4] * ev[5];
+					ev[7] = pow(*(theta+5),2);
+					ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
+					ev[11] = ev[4] * ev[10];
+					ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
+					ev[16] = ev[15] * ev[15];
+					ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
+					ev[21] = ev[15] * ev[20];
+					ev[24] = ev[20] * ev[15];
+					ev[27] = ev[20] * ev[5];
+					ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
+					ev[31] = ev[3] * sqrt(ev[29]);
+					ev[33] = *(theta+9) * (1/ev[31]);
+					ev[35] = x - *(theta+0);
+					ev[40] = y - *(theta+1);
+					ev[46] = z - *(theta+2);
+					ev[47] = ev[15] * ev[10];
+					ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
+					ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
+					ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
+					ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
+					ev[84] = *(theta+4) * *(theta+3);
+					ev[85] = ev[84] * ev[10];
+					ev[92] = ev[84] * ev[20];
+					ev[96] = ev[84] * ev[15] + ev[15] * ev[84];
+					ev[99] = ev[20] * ev[84];
+					ev[101] = ev[92] * ev[10] - ev[96] * ev[7] + ev[99] * ev[10];
+					ev[103] = pow(ev[29],2);
 
-				*(grad+p) = -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[46] * ev[85] - ev[40] * (ev[84] * ev[7]))/ev[29] - ev[52] * ev[101]/ev[103] + (ev[40] * (ev[46] * ev[92] - ev[35] * (ev[7] * ev[84]))/ev[29] - ev[66] * ev[101]/ev[103]) + (ev[46] * (ev[35] * ev[85] + ev[40] * ev[99] - ev[46] * ev[96])/ev[29] - ev[78] * ev[101]/ev[103])))) + *(theta+9) * (ev[3] * (0.5 * (ev[101] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
+					*(grad+p) = -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[46] * ev[85] - ev[40] * (ev[84] * ev[7]))/ev[29] - ev[52] * ev[101]/ev[103] + (ev[40] * (ev[46] * ev[92] - ev[35] * (ev[7] * ev[84]))/ev[29] - ev[66] * ev[101]/ev[103]) + (ev[46] * (ev[35] * ev[85] + ev[40] * ev[99] - ev[46] * ev[96])/ev[29] - ev[78] * ev[101]/ev[103])))) + *(theta+9) * (ev[3] * (0.5 * (ev[101] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
 
-				p++;
+					p++;
+				}
+				a++;
 			}
 		}
 	}
 }
 
-void dftheta7(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {
+void dftheta7(double *theta, int *brain, int *dimx, int *dimy, int *dimz, double *grad) {
 
     double ev[199];
-    int x,y,z,p;
+    int x,y,z,p,a;
 
     p=0;
+    a=0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
 
-				ev[3] = pow(sqrt(2 * M_PI),3);
-				ev[4] = pow(*(theta+3),2);
-				ev[5] = pow(*(theta+4),2);
-				ev[6] = ev[4] * ev[5];
-				ev[7] = pow(*(theta+5),2);
-				ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
-				ev[11] = ev[4] * ev[10];
-				ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
-				ev[16] = ev[15] * ev[15];
-				ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
-				ev[21] = ev[15] * ev[20];
-				ev[24] = ev[20] * ev[15];
-				ev[27] = ev[20] * ev[5];
-				ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
-				ev[31] = ev[3] * sqrt(ev[29]);
-				ev[33] = *(theta+9) * (1/ev[31]);
-				ev[35] = x - *(theta+0);
-				ev[40] = y - *(theta+1);
-				ev[46] = z - *(theta+2);
-				ev[47] = ev[15] * ev[10];
-				ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
-				ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
-				ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
-				ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
-				ev[84] = *(theta+5) * *(theta+3);
-				ev[92] = ev[15] * ev[84];
-				ev[94] = ev[84] * ev[15];
-				ev[97] = ev[84] * ev[5];
-				ev[101] = ev[92] * ev[10] + ev[94] * ev[10] - (ev[97] * ev[20] + ev[27] * ev[84]);
-				ev[103] = pow(ev[29],2);
+				if(brain[a]!=0) {
+					ev[3] = pow(sqrt(2 * M_PI),3);
+					ev[4] = pow(*(theta+3),2);
+					ev[5] = pow(*(theta+4),2);
+					ev[6] = ev[4] * ev[5];
+					ev[7] = pow(*(theta+5),2);
+					ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
+					ev[11] = ev[4] * ev[10];
+					ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
+					ev[16] = ev[15] * ev[15];
+					ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
+					ev[21] = ev[15] * ev[20];
+					ev[24] = ev[20] * ev[15];
+					ev[27] = ev[20] * ev[5];
+					ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
+					ev[31] = ev[3] * sqrt(ev[29]);
+					ev[33] = *(theta+9) * (1/ev[31]);
+					ev[35] = x - *(theta+0);
+					ev[40] = y - *(theta+1);
+					ev[46] = z - *(theta+2);
+					ev[47] = ev[15] * ev[10];
+					ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
+					ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
+					ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
+					ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
+					ev[84] = *(theta+5) * *(theta+3);
+					ev[92] = ev[15] * ev[84];
+					ev[94] = ev[84] * ev[15];
+					ev[97] = ev[84] * ev[5];
+					ev[101] = ev[92] * ev[10] + ev[94] * ev[10] - (ev[97] * ev[20] + ev[27] * ev[84]);
+					ev[103] = pow(ev[29],2);
 
-				*(grad+p)= -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[40] * (ev[10] * ev[84]) - ev[46] * (ev[5] * ev[84]))/ev[29] - ev[52] * ev[101]/ev[103] + (ev[40] * (ev[35] * (ev[84] * ev[10]) - ev[40] * (ev[84] * ev[20] + ev[20] * ev[84]) + ev[46] * ev[92])/ev[29] - ev[66] * ev[101]/ev[103]) + (ev[46] * (ev[40] * ev[94] - ev[35] * ev[97])/ev[29] - ev[78] * ev[101]/ev[103])))) + *(theta+9) * (ev[3] * (0.5 * (ev[101] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
+					*(grad+p)= -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[40] * (ev[10] * ev[84]) - ev[46] * (ev[5] * ev[84]))/ev[29] - ev[52] * ev[101]/ev[103] + (ev[40] * (ev[35] * (ev[84] * ev[10]) - ev[40] * (ev[84] * ev[20] + ev[20] * ev[84]) + ev[46] * ev[92])/ev[29] - ev[66] * ev[101]/ev[103]) + (ev[46] * (ev[40] * ev[94] - ev[35] * ev[97])/ev[29] - ev[78] * ev[101]/ev[103])))) + *(theta+9) * (ev[3] * (0.5 * (ev[101] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
 
-				p++;
+					p++;
+				}
+				a++;
 			}
 		}
 	}
 }
 
-void dftheta8(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {
+void dftheta8(double *theta, int *brain, int *dimx, int *dimy, int *dimz, double *grad) {
 
     double ev[199];
-    int x,y,z,p;
+    int x,y,z,p,a;
 
     p=0;
+    a=0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
 
-				ev[3] = pow(sqrt(2 * M_PI),3);
-				ev[4] = pow(*(theta+3),2);
-				ev[5] = pow(*(theta+4),2);
-				ev[6] = ev[4] * ev[5];
-				ev[7] = pow(*(theta+5),2);
-				ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
-				ev[11] = ev[4] * ev[10];
-				ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
-				ev[16] = ev[15] * ev[15];
-				ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
-				ev[21] = ev[15] * ev[20];
-				ev[24] = ev[20] * ev[15];
-				ev[27] = ev[20] * ev[5];
-				ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
-				ev[31] = ev[3] * sqrt(ev[29]);
-				ev[33] = *(theta+9) * (1/ev[31]);
-				ev[35] = x - *(theta+0);
-				ev[40] = y - *(theta+1);
-				ev[46] = z - *(theta+2);
-				ev[47] = ev[15] * ev[10];
-				ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
-				ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
-				ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
-				ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
-				ev[84] = *(theta+4) * *(theta+5);
-				ev[92] = ev[15] * ev[84];
-				ev[98] = ev[4] * ev[84];
-				ev[104] = ev[21] * ev[84] - (ev[98] * ev[10] + ev[11] * ev[84]) + ev[24] * ev[84];
-				ev[106] = pow(ev[29],2);
+				if(brain[a]!=0) {
+					ev[3] = pow(sqrt(2 * M_PI),3);
+					ev[4] = pow(*(theta+3),2);
+					ev[5] = pow(*(theta+4),2);
+					ev[6] = ev[4] * ev[5];
+					ev[7] = pow(*(theta+5),2);
+					ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
+					ev[11] = ev[4] * ev[10];
+					ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
+					ev[16] = ev[15] * ev[15];
+					ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
+					ev[21] = ev[15] * ev[20];
+					ev[24] = ev[20] * ev[15];
+					ev[27] = ev[20] * ev[5];
+					ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
+					ev[31] = ev[3] * sqrt(ev[29]);
+					ev[33] = *(theta+9) * (1/ev[31]);
+					ev[35] = x - *(theta+0);
+					ev[40] = y - *(theta+1);
+					ev[46] = z - *(theta+2);
+					ev[47] = ev[15] * ev[10];
+					ev[52] = ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]));
+					ev[66] = ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]));
+					ev[78] = ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]));
+					ev[82] = exp(-0.5 * (ev[52]/ev[29] + ev[66]/ev[29] + ev[78]/ev[29]));
+					ev[84] = *(theta+4) * *(theta+5);
+					ev[92] = ev[15] * ev[84];
+					ev[98] = ev[4] * ev[84];
+					ev[104] = ev[21] * ev[84] - (ev[98] * ev[10] + ev[11] * ev[84]) + ev[24] * ev[84];
+					ev[106] = pow(ev[29],2);
 
-				*(grad+p) = -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[40] * (ev[84] * ev[20]) - ev[35] * (ev[84] * ev[10] + ev[10] * ev[84]) + ev[46] * ev[92])/ev[29] - ev[52] * ev[104]/ev[106] + (ev[40] * (ev[35] * (ev[20] * ev[84]) - ev[46] * ev[98])/ev[29] - ev[66] * ev[104]/ev[106]) + (ev[46] * (ev[35] * ev[92] - ev[40] * (ev[84] * ev[4]))/ev[29] - ev[78] * ev[104]/ev[106])))) + *(theta+9) * (ev[3] * (0.5 * (ev[104] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
+					*(grad+p) = -(ev[33] * (ev[82] * (0.5 * (ev[35] * (ev[40] * (ev[84] * ev[20]) - ev[35] * (ev[84] * ev[10] + ev[10] * ev[84]) + ev[46] * ev[92])/ev[29] - ev[52] * ev[104]/ev[106] + (ev[40] * (ev[35] * (ev[20] * ev[84]) - ev[46] * ev[98])/ev[29] - ev[66] * ev[104]/ev[106]) + (ev[46] * (ev[35] * ev[92] - ev[40] * (ev[84] * ev[4]))/ev[29] - ev[78] * ev[104]/ev[106])))) + *(theta+9) * (ev[3] * (0.5 * (ev[104] * (1/sqrt(ev[29]))))/pow(ev[31],2)) * ev[82]);
 
-				p++;
+					p++;
+				}
+				a++;
 			}
 		}
 	}
 }
 
-void dftheta9(double *theta, int *dimx, int *dimy, int *dimz, double *grad) {
+void dftheta9(double *theta, int *brain, int *dimx, int *dimy, int *dimz, double *grad) {
 
     double ev[199];
-    int x,y,z,p;
+    int x,y,z,p,a;
 
     p=0;
+    a=0;
 	for(z=1;z<(*dimz+1);z++) {
 		for(y=1;y<(*dimy+1);y++) {
 			for(x=1;x<(*dimx+1);x++) {
 
-				ev[4] = pow(*(theta+3),2);
-				ev[5] = pow(*(theta+4),2);
-				ev[6] = ev[4] * ev[5];
-				ev[7] = pow(*(theta+5),2);
-				ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
-				ev[11] = ev[4] * ev[10];
-				ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
-				ev[16] = ev[15] * ev[15];
-				ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
-				ev[21] = ev[15] * ev[20];
-				ev[24] = ev[20] * ev[15];
-				ev[27] = ev[20] * ev[5];
-				ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
-				ev[32] = 1/(pow(sqrt(2 * M_PI),3) * sqrt(ev[29]));
-				ev[35] = x - *(theta+0);
-				ev[40] = y - *(theta+1);
-				ev[46] = z - *(theta+2);
-				ev[47] = ev[15] * ev[10];
-				ev[82] = exp(-0.5 * (ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]))/ev[29] + ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]))/ev[29] + ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]))/ev[29]));
+				if(brain[a]!=0) {
+					ev[4] = pow(*(theta+3),2);
+					ev[5] = pow(*(theta+4),2);
+					ev[6] = ev[4] * ev[5];
+					ev[7] = pow(*(theta+5),2);
+					ev[10] = *(theta+8) * *(theta+4) * *(theta+5);
+					ev[11] = ev[4] * ev[10];
+					ev[15] = *(theta+6) * *(theta+4) * *(theta+3);
+					ev[16] = ev[15] * ev[15];
+					ev[20] = *(theta+7) * *(theta+5) * *(theta+3);
+					ev[21] = ev[15] * ev[20];
+					ev[24] = ev[20] * ev[15];
+					ev[27] = ev[20] * ev[5];
+					ev[29] = ev[6] * ev[7] - ev[11] * ev[10] - ev[16] * ev[7] + ev[21] * ev[10] + ev[24] * ev[10] - ev[27] * ev[20];
+					ev[32] = 1/(pow(sqrt(2 * M_PI),3) * sqrt(ev[29]));
+					ev[35] = x - *(theta+0);
+					ev[40] = y - *(theta+1);
+					ev[46] = z - *(theta+2);
+					ev[47] = ev[15] * ev[10];
+					ev[82] = exp(-0.5 * (ev[35] * (ev[35] * (ev[5] * ev[7] - ev[10] * ev[10]) + ev[40] * (ev[10] * ev[20] - ev[15] * ev[7]) + ev[46] * (ev[47] - ev[5] * ev[20]))/ev[29] + ev[40] * (ev[35] * (ev[20] * ev[10] - ev[7] * ev[15]) + ev[40] * (ev[4] * ev[7] - ev[20] * ev[20]) + ev[46] * (ev[21] - ev[11]))/ev[29] + ev[46] * (ev[35] * (ev[47] - ev[27]) + ev[40] * (ev[24] - ev[10] * ev[4]) + ev[46] * (ev[6] - ev[16]))/ev[29]));
 
-				*(grad+p) = ev[32] * ev[82];
+					*(grad+p) = ev[32] * ev[82];
 
-				p++;
+					p++;
+				}
+				a++;
 			}
 		}
 	}

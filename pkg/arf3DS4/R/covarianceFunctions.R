@@ -29,7 +29,7 @@ function(arfmodel)
 		fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
 		
 		#calculate and write the derivatives
-		invisible(.C('dfgaussFile',as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(.model.estimates(arfmodel)),as.character(fn)))
+		invisible(.C('dfgaussFile',as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.mask(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(.model.estimates(arfmodel)),as.character(fn)))
 	
 		return(invisible(TRUE))
 	
@@ -52,9 +52,18 @@ function(arfmodel)
 		#open a binary connection to the residualfile
 		con <- file(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''),'wb') 
 	
+		nonbrain = which(.model.mask(arfmodel)==0)
+		if(length(nonbrain)>0) model = model[-nonbrain]
+		
 		#write the residuals per trial
-		for(bfile in .model.betafiles(arfmodel)) writeBin(.fmri.data.datavec(readData(bfile))-model,con,double())
+		for(bfile in .model.betafiles(arfmodel)) {
+			
+			data = .fmri.data.datavec(readData(bfile))
+			if(length(nonbrain)>0) data = data[-nonbrain]
+			
+			writeBin(data-model,con,double())
 	
+		}
 		#close the connection
 		close(con)
 	
@@ -86,7 +95,9 @@ function(arfmodel)
 		#check if hessian is good
 		if(is.null(attr(hessian,'class')))  {
 			weights <- readData(.model.avgWfile(arfmodel))
-			n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
+			
+			#n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
+			n = .model.n(arfmodel)
 			
 			#perform the inner_sandwich procedure
 			if(.model.sandwichmethod(arfmodel)[1]=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
@@ -401,11 +412,14 @@ function(arfmodel)
 	
 	fn = paste(.model.modeldatapath(arfmodel),sp,.model.fullmodelDataFile(arfmodel),sep='')
 	dat = readData(fn)
-	n = .fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4]
+	#n = .fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4]
+	n= sum(.model.mask(arfmodel))
 	rm(dat)
 	p = .model.regions(arfmodel)*.model.params(arfmodel)
 	fn = paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')
 
+	
+	
 	if(file.exists(fn)) {
 		con <- file(fn,open='rb')		
 		dfvec <- readBin(con,double(),n=n*p,size=.Machine$sizeof.longlong,endian=.Platform$endian)

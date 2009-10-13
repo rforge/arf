@@ -36,7 +36,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 	}
 	
 	if(is.nan(ssqdat) | ssqdat==Inf | is.na(ssqdat) | ssqdat==-Inf) ssqdat=ss_data
-	#cat('ssqdat',ssqdat,'\n')
+	cat('ssqdat',ssqdat,'\n')
 	return(invisible(ssqdat))	
 	
 }
@@ -62,9 +62,10 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 	} else model=NA
 	
 	if(length(model[is.na(model) | is.nan(model) | model==Inf | model==-Inf])==0) {
-		grad <- .C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]]
+		grad <- .C('dfssq',as.integer(np),as.integer(brain),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[10]]
 	} else grad=rep(1e+12,np) 
 	
+	cat('gradient',grad,'\n')
 	return(grad)
 
 }
@@ -157,7 +158,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 	} else model=NA
 	
 	if(length(model[is.na(model) | is.nan(model) | model==Inf | model==-Inf])==0) {
-		grad <- .C('dfssq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]]
+		grad <- .C('dfssq',as.integer(np),as.integer(brain),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[10]]
 	} else grad=rep(1e+12,np) 
 	
 	return(grad)
