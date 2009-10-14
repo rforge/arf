@@ -7,6 +7,7 @@
 #[CONTAINS]
 #makeDerivs
 #makeResiduals
+#makeWeightsBin
 #varcov
 #BIC
 #RMSEA
@@ -73,6 +74,23 @@ function(arfmodel)
 
 }
 
+makeWeightsBin <-
+function(arfmodel) 
+#make binary weightsfile
+{
+
+	weights = readData(.model.avgWfile(arfmodel))
+	weightdata = .fmri.data.datavec(weights)
+	
+	rem = which(.model.mask(arfmodel)==0)
+	if(length(rem)>0) weightdata = weightdata[-rem]
+	
+	con <- file(paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.weightFile(arfmodel),sep=''),'wb')
+	writeBin(weightdata,con,double())
+	close(con)
+	
+}
+
 
 varcov <- 
 function(arfmodel)
@@ -86,6 +104,7 @@ function(arfmodel)
 		#check for deriv and resid
 		if(!file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep=''))) makeResiduals(arfmodel) 
 		if(!file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep=''))) makeDerivs(arfmodel)
+		if(!file.exists(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep=''))) makeWeightsBin(arfmodel)
 		
 		st_time <- Sys.time()
 		
@@ -95,21 +114,12 @@ function(arfmodel)
 		#check if hessian is good
 		if(is.null(attr(hessian,'class')))  {
 			weights <- readData(.model.avgWfile(arfmodel))
-			
-			#n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
 			n = .model.n(arfmodel)
 			
 			#perform the inner_sandwich procedure
 			if(.model.sandwichmethod(arfmodel)[1]=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
-			if(.model.sandwichmethod(arfmodel)[1]=='full') B <- try(.C('innerSWfull',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
 			if(.model.sandwichmethod(arfmodel)[1]=='fast') B <- try(.C('innerSWfast',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
-			if(.model.sandwichmethod(arfmodel)[1]=='band') {
-				if(length(.model.sandwichmethod(arfmodel))<2) {
-					warning('no band indicator found in sandwichmethod, using band 100')
-					.model.sandwichmethod(arfmodel)=c(.model.sandwichmethod(arfmodel),100)
-				}
-				B <- try(.C('innerSWband',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.integer(as.numeric(.model.sandwichmethod(arfmodel)[2])),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[8]],silen=T)
-			}
+			if(.model.sandwichmethod(arfmodel)[1]=='full') B <- try(.C('innerSWfull',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[8]],silen=T)
 			
 			#check if innersandwich works
 			if(is.null(attr(B,'class'))) {
@@ -147,8 +157,12 @@ function(arfmodel)
 	
 	#remove derivatives and residuals
 	fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
+	if(file.exists(fn)) file.remove(fn)	
+	fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
 	if(file.exists(fn)) file.remove(fn)
 	fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.residualFile(arfmodel),sep='')
+	if(file.exists(fn)) file.remove(fn)
+	fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,'mean',.model.residualFile(arfmodel),sep='')
 	if(file.exists(fn)) file.remove(fn)
 
 	#save the modelInfo

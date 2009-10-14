@@ -97,7 +97,6 @@ useDynLib(
 	dfsimplessq,
 	innerSWfull,
 	innerSWdiag,
-	innerSWband,
 	innerSWfast,
 	approxHessian,
 	dfgaussFile,

@@ -20,6 +20,7 @@
 #fwhm.filter
 #setMask
 #validStart
+#checkBound
 
 
 ssq.gauss <- 
@@ -36,7 +37,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 	}
 	
 	if(is.nan(ssqdat) | ssqdat==Inf | is.na(ssqdat) | ssqdat==-Inf) ssqdat=ss_data
-	cat('ssqdat',ssqdat,'\n')
+	#cat('ssqdat',ssqdat,'\n')
 	return(invisible(ssqdat))	
 	
 }
@@ -65,7 +66,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 		grad <- .C('dfssq',as.integer(np),as.integer(brain),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[10]]
 	} else grad=rep(1e+12,np) 
 	
-	cat('gradient',grad,'\n')
+	#cat('gradient',grad,'\n')
 	return(grad)
 
 }
@@ -690,14 +691,14 @@ function(arfmodel)
 
 
 checkBound <- 
-function(arfmodel,lowbound,upbound) 
+function(arfmodel,lowbound,upbound,thres=8) 
 #check if parameters are on the bound
 {
 	
 	estimates = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
 
 	for(i in 1:.model.params(arfmodel)) {
-		regs = which(estimates[i,]==lowbound[i] | estimates[i,]==upbound[i])
+		regs = which(round(estimates[i,],thres)==round(lowbound[i],thres) | round(estimates[i,],thres)==round(upbound[i],thres))
 		
 		if(length(regs)>0) {
 			mess = paste('[optim] Parameter',i,'is at boundary for regions ',regs,'\n')

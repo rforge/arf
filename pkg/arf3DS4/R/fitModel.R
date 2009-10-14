@@ -133,10 +133,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			arfmodel <- saveModelBin(arfmodel)
 						
 			#save the weights in a binary file
-			weights <- readData(.model.avgWfile(arfmodel))
-			con <- file(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep=''),'wb')
-			writeBin(.fmri.data.datavec(weights),con,double())
-			close(con)
+			makeWeightsBin(arfmodel)
 			
 			#make Derivatives 
 			makeDerivs(arfmodel)
@@ -170,6 +167,8 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
 			if(file.exists(fn)) file.remove(fn)
 			fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.residualFile(arfmodel),sep='')
+			if(file.exists(fn)) file.remove(fn)
+			fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.weightFile(arfmodel),sep='')
 			if(file.exists(fn)) file.remove(fn)
 			
 		} else .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] nlm did not converge.',sep=''))
@@ -306,12 +305,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			arfmodel <- saveModelBin(arfmodel)
 			
 			#save the weights in a binary file
-			con <- file(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep=''),'wb')
-			weightdata = .fmri.data.datavec(weights)
-			rem = which(.model.mask(arfmodel)==0)
-			if(length(rem)>0) weightdata = weightdata[-rem]
-			writeBin(weightdata,con,double())
-			close(con)
+			makeWeightsBin(arfmodel)	
 			
 			#make Derivatives 
 			makeDerivs(arfmodel)
@@ -345,6 +339,8 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
 			if(file.exists(fn)) file.remove(fn)
 			fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.residualFile(arfmodel),sep='')
+			if(file.exists(fn)) file.remove(fn)
+			fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.weightFile(arfmodel),sep='')
 			if(file.exists(fn)) file.remove(fn)
 			
 			
