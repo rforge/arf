@@ -176,7 +176,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
-		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] nlm internal error: ',nlm.output,sep=''))
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] nlm internal error: ',gsub('\n','',nlm.output),sep=''))
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}
@@ -283,8 +283,8 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		if(optim.output$convergence==0) .model.convergence(arfmodel) <- paste('Optim converged in ',optim.output$counts[1],' iterations.',sep='')
 		if(optim.output$convergence==1) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.'
 		if(optim.output$convergence==10) .model.convergence(arfmodel) <- 'Degeneracy of the Nelder-Mead Simplex'
-		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',optim.output$message,sep='')
-		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',optim.output$message,sep='')
+		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',gsub('\n','',optim.output$message),sep='')
+		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',gsub('\n','',optim.output$message),sep='')
 		
 		if(optim.output$convergence <= 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 		
@@ -349,7 +349,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
-		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim internal error: ',optim.output,sep=''))
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim internal error: ',gsub('\n','',optim.output),sep=''))
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}
@@ -458,8 +458,8 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		if(optim.output$convergence==0) .model.convergence(arfmodel) <- paste('Optim converged in ',optim.output$counts[1],' iterations.',sep='')
 		if(optim.output$convergence==1) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.'
 		if(optim.output$convergence==10) .model.convergence(arfmodel) <- 'Degeneracy of the Nelder-Mead Simplex'
-		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',optim.output$message,sep='')
-		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',optim.output$message,sep='')
+		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',gsub('\n','',optim.output$message),sep='')
+		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',gsub('\n','',optim.output$message),sep='')
 		
 		if(optim.output$convergence <= 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 		
@@ -503,7 +503,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
-		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim internal error: ',optim.output,sep=''))
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim internal error: ',gsub('\n','',optim.output),sep=''))
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
 	}
@@ -627,7 +627,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		
 	} else {
 		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
-		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] nlm internal error: ',nlm.output,sep=''))
+		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] nlm internal error: ',gsub('\n','',nlm.output),sep=''))
 		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),nlm.output)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE

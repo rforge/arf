@@ -134,15 +134,15 @@ function(arfmodel)
 					.model.varcov(arfmodel) <- SW
 					.model.valid(arfmodel) <- TRUE
 				} else { #outersandiwch not good
-					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'[varcov] outerSandwich did not compute.',paste('[varcov] error: ',SW,'\n',sep='')) 
+					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[varcov] outerSandwich did not compute: ',gsub('\n','',SW),sep='')) 
 					.model.valid(arfmodel) <- FALSE
 				}
 			} else { #innersandiwch not good
-				.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'[varcov] innerSandwich did not compute.',paste('[varcov] error: ',B,'\n',sep='')) 
+				.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[varcov] innerSandwich did not compute: ',gsub('\n','',B),sep='')) 
 				.model.valid(arfmodel) <- FALSE
 			}
 		} else { #hessian not good
-			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'[varcov] Hessian is singular.',paste('[varcov] error: ',hessian,'\n',sep='')) 
+			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[varcov] Hessian is singular: ',gsub('\n','',hessian),sep='')) 
 			.model.valid(arfmodel) <- FALSE
 		}
 	

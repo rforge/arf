@@ -50,7 +50,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	#save the model
 	saveModel(arfmodel)
 	
-	if(pr) cat(' modelfile saved in \'',.model.modelpath(arfmodel),.Platform$file.sep,.model.modelFile(arfmodel),'\'\n',sep='')
+	if(pr) show(arfmodel)
+	
+	if(pr) cat(' \nmodelfile saved in \'',.model.modelpath(arfmodel),.Platform$file.sep,.model.modelFile(arfmodel),'\'\n',sep='')
 	if(pr) cat(' arf process stopped at',as.character(Sys.time()),'\n\n')
 	
 	return(invisible(arfmodel))
