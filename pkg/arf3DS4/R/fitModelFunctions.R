@@ -697,7 +697,6 @@ function(arfmodel,lowbound,upbound,thres=6)
 	
 	estimates = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
 
-
 	for(i in 1:.model.params(arfmodel)) {
 		regs = which(round(estimates[i,],thres)==round(lowbound[i],thres) | round(estimates[i,],thres)==round(upbound[i],thres))
 		if(length(regs)>0) {

@@ -6,12 +6,13 @@
 Checkbound checks if estimated paramters are at the boundaries set by optim.
 }
 \usage{
-checkBound(arfmodel, lowbound, upbound)
+checkBound(arfmodel, lowbound, upbound, thres = 6)
 }
 \arguments{
   \item{arfmodel}{An arf model object.}
   \item{lowbound}{Vector with lower boundaries for each parameter.}
   \item{upbound}{Vector with upper boundaries for each parameter.}
+  \item{thres}{Number of digits in equality test.}
 }
 \value{
 Returns an object of class 'model'.

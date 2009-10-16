@@ -651,7 +651,7 @@ void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 void innerSWfull(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, char **fnmeanresid, double *B)
 {
 
-	int i,j,k,l,m, Brow, Bcol;
+	int i,j,k,l, Brow, Bcol;
 	FILE *fderiv, *fresid, *fweight, *fmeanres;
 	double *Fv,*Ft, *Rv, *Wv, *Mr, s, Bm[*p][*p], *mrv;
 
@@ -2038,7 +2038,7 @@ void simTS(double *model, double *mb, double *snr, int *tslen, int *numvox, doub
 {
 
 	int c,r,p;
-	double *tsvec,sigma,tssum,varsum,signal_var,signal_mean,signal_sd,signal_se,signal_weight,sq_tslen,err;
+	double *tsvec,sigma,tssum,varsum,signal_var,signal_mean,signal_sd,signal_se,signal_weight,sq_tslen;
 
 	tsvec = (double *) R_alloc(*tslen,sizeof(double));
 
