@@ -9,6 +9,7 @@
 #sliceColor
 #makeDiscreteImage
 #reqFlip
+#progressWatcher
 
 makeDiscreteImage <-
 function(datavec,zerotol=1e-03)
@@ -142,6 +143,95 @@ function(fmridata)
 	} #else warning('sform_code not set, assuming radiological orientation')
 	
 	return(flip)
+	
+}
+
+
+newProgress <-
+function()
+#make an object of S3 class progress
+{
+	
+}
+
+newProgressWindow <-
+function(arfmodel)
+#make a new Progress Window, return an object of class progress (S3)
+{
+	
+	tt <- tktoplevel()
+	tktitle(tt) <- 'ARF Progress'
+	
+	#create heading
+	text.heading <- tclVar(paste(.model.name(arfmodel),'process started',as.character(Sys.time())))
+	label.heading <- tklabel(tt,width='40')
+	tkconfigure(label.heading,textvariable=text.heading)
+	
+	
+	#create shared comps
+	text.1 <- tclVar('value')
+	label.1 <- tklabel(tt,width=12)
+	tkconfigure(label.1,textvariable=text.1)
+	
+	text.2 <- tclVar('iterate')
+	label.2 <- tklabel(tt,width=12)
+	tkconfigure(label.2,textvariable=text.2)
+	
+	text.3 <- tclVar('norm')
+	label.3 <- tklabel(tt,width=12)
+	tkconfigure(label.3,textvariable=text.3)
+	
+	text.4 <- tclVar('iterate')
+	label.4 <- tklabel(tt,width=12)
+	tkconfigure(label.4,textvariable=text.4)
+	
+	#create ssq
+	text.ssq <- tclVar('objective')
+	label.ssq <- tklabel(tt,width=12)
+	tkconfigure(label.ssq,textvariable=text.ssq)
+	
+	text.ssq.val <- tclVar('0')
+	label.ssq.val <- tklabel(tt,width=12)
+	tkconfigure(label.ssq.val,textvariable=text.ssq.val)
+	
+	text.ssq.it <- tclVar('0')
+	label.ssq.it <- tklabel(tt,width=12)
+	tkconfigure(label.ssq.it,textvariable=text.ssq.it)
+		
+	#create gradient
+	text.grad <- tclVar('gradient')
+	label.grad <- tklabel(tt,width=12)
+	tkconfigure(label.grad,textvariable=text.grad)
+	
+	text.grad.val <- tclVar('0')
+	label.grad.val <- tklabel(tt,width=12)
+	tkconfigure(label.grad.val,textvariable=text.grad.val)
+	
+	text.grad.it <- tclVar('0')
+	label.grad.it <- tklabel(tt,width=12)
+	tkconfigure(label.grad.it,textvariable=text.grad.it)
+	
+
+	#place at grid
+	tkgrid(label.heading,columnspan=3)
+	tkgrid(label.ssq, label.1, label.ssq.val)
+	tkgrid(label.2, label.ssq.it,columnspan=2)
+	tkgrid(label.grad, label.3, label.grad.val)
+	tkgrid(label.4, label.grad.it,columnspan=2)
+	
+	
+	tkgrid.configure(label.ssq, label.grad, sticky='e')
+	tkgrid.configure(label.2, label.4, sticky='e')
+	tkgrid.configure(label.ssq.val, label.ssq.it, label.grad.val, label.grad.it, sticky='w')
+	
+	
+	progress = list(ssq.val.tkobj=text.ssq.val,ssq.it.tkobj=text.ssq.it,grad.val.tkobj=text.grad.val,grad.it.tkobj=text.grad.it)
+	attr(progress,'class') <- 'progress'
+		
+	assign('.gradit',1,envir=.GlobalEnv)
+	assign('.objit',1,envir=.GlobalEnv)
+	
+	return(progress)
 	
 }
 

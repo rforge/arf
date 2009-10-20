@@ -543,3 +543,13 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 	
 	return(invisible(experiment))
 }
+
+
+prettyTime <- 
+function(pstime) 
+#Return time in pretty format
+{
+	
+	
+	
+}

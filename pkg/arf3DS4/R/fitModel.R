@@ -61,6 +61,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	if(.model.modeltype(arfmodel)!='gauss') stop('Called fit to Gauss model for non-gauss model object.')
 	if(.model.params(arfmodel)!=10) stop('Modeltype - parameter mismatch!')
 	.model.valid(arfmodel) <- TRUE
+	progress = 'progresswatcher'
 	
 	#start_time
 	st_time <- Sys.time()
@@ -102,6 +103,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 					print.level=printlevel,
 					hessian=T,
 					check.analyticals=F,
+					progress=progress,
 					iterlim=.options.min.iterlim(options),
 					gradtol=.options.nlm.gradtol(options),
 					steptol=.options.nlm.steptol(options)
@@ -126,7 +128,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		.model.iterates(arfmodel) <- nlm.output$iterations
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
-		if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T)
+		if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T,progress=progress)
 		
 		if(.model.valid(arfmodel)) {
 			#save the ModelBinary
@@ -253,7 +255,10 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		saveModel(arfmodel)	
 		return(arfmodel)
 	}
-		
+	
+	#make progressWindow
+	progress = newProgressWindow(arfmodel)
+	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 						.model.startval(arfmodel),
@@ -271,6 +276,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 						ss_data=.model.ss(arfmodel),
 						analyticalgrad=angrad,
 						method=.options.opt.method(options),
+						progress=progress,
 						control=list(trace=printlevel,maxit=.options.min.iterlim(options)),
 						hessian=T
 					)),silen=try.silen)
@@ -288,9 +294,6 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		
 		if(optim.output$convergence <= 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 		
-		#check boundaries
-		arfmodel <- checkBound(arfmodel,lowbound,upbound)		
-
 		#set model objects
 		.model.minimum(arfmodel) <- optim.output$value
 		.model.estimates(arfmodel) <- optim.output$par
@@ -298,7 +301,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		.model.iterates(arfmodel) <- optim.output$counts[1]
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
-		if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T)
+		if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T,progress=progress)
 	
 		if(.model.valid(arfmodel)) {
 			#save the ModelBinary
@@ -377,6 +380,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	if(.model.modeltype(arfmodel)!='simple') stop('Called fit to simple model for non-simple model object.')
 	if(.model.params(arfmodel)!=5) stop('Modeltype - parameter mismatch!')
 	.model.valid(arfmodel) <- TRUE
+	progress = 'progresswatcher'
 	
 	#start_time
 	st_time <- Sys.time()
@@ -446,6 +450,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 							ss_data=.model.ss(arfmodel),
 							analyticalgrad=angrad,
 							method=.options.opt.method(options),
+							progress=progress,
 							control=list(trace=printlevel,maxit=.options.min.iterlim(options)),
 							hessian=F
 					)),silen=try.silen)
@@ -467,10 +472,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		.model.estimates(arfmodel) <- optim.output$par
 		.model.iterates(arfmodel) <- optim.output$counts[1]
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
-		
-		#check boundaries
-		arfmodel <- checkBound(arfmodel,lowbound,upbound)	
-		
+			
 		if(.model.valid(arfmodel)) {
 			#save the ModelBinary
 			arfmodel <- saveModelBinSimple(arfmodel)
@@ -492,7 +494,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 				.model.estimates(arfmodel)[10+(10*(i-1))] <- optim.output$par[5+(5*(i-1))]
 			}
 					
-			if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T)
+			if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T,progress=progress)
 		
 			if(.model.valid(arfmodel)) {
 				#caluclate fits
@@ -532,7 +534,8 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	if(.model.modeltype(arfmodel)!='simple') stop('Called fit to simple model for non-simple model object.')
 	if(.model.params(arfmodel)!=5) stop('Modeltype - parameter mismatch!')
 	.model.valid(arfmodel) <- TRUE
-		
+	progress = 'progresswatcher'
+	
 	#start_time
 	st_time <- Sys.time()
 
@@ -574,6 +577,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 							print.level=printlevel,
 							hessian=F,
 							check.analyticals=F,
+							progress=progress,
 							iterlim=.options.min.iterlim(options),
 							gradtol=.options.nlm.gradtol(options),
 							steptol=.options.nlm.steptol(options)
@@ -616,7 +620,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 				.model.estimates(arfmodel)[10+(10*(i-1))] <- nlm.output$estimate[5+(5*(i-1))]
 			}
 			
-			if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T)
+			if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.simple(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T,progress=progress)
 			
 					
 			if(.model.valid(arfmodel)) {

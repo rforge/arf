@@ -286,13 +286,13 @@ clearWarnings <-
 function(arfmodel,resetValid=T) 
 #clears the warnings from a model and reset the valid object then save the object
 { 
-	yn = readline('This will clear all warnings! Are you sure (y/n)')
+	yn = readline('This will clear all warnings! Are you sure (y/n) ')
 	
 	if(substr(yn,1,1)=='y') {
 		.model.warnings(arfmodel) = character(0)
 		if(resetValid) .model.valid(arfmodel) = T
 		saveModel(arfmodel)
 	}
-	
+	return(arfmodel)
 }
 

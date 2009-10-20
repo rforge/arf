@@ -31,11 +31,12 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	if(.model.valid(arfmodel)) {
 		
-		if(pr) cat(' modelfit:\n')
-		if(pr) cat('  BIC  :',round(.model.fit(arfmodel)[1]),'\n')
-		if(pr) cat('  RMSEA:',round(.model.fit(arfmodel)[2],1),'\n')
+		if(pr) cat(' <modelfit>\n')
+		if(pr) cat('  minimum:',round(.model.minimum(arfmodel)),'\n')
+		if(pr) cat('    BIC  :',round(.model.fit(arfmodel)[1]),'\n')
+		if(pr) cat('    RMSEA:',round(.model.fit(arfmodel)[2],1),'\n')
 		
-		if(pr) cat(' calculating variance/covariance matrix...')
+		if(pr) cat('\n calculating variance/covariance matrix...')
 		arfmodel = varcov(arfmodel)
 		if(.model.valid(arfmodel)) {if(pr) {cat('ok\n')}} else {if(pr) {cat('fail\n')}} 
 		
@@ -43,7 +44,10 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			if(pr) cat(' calculating wald statistics...')
 			arfmodel = wald(arfmodel)
 			if(.model.valid(arfmodel)) {if(pr) {cat('ok\n')}} else {if(pr) {cat('fail\n')}} 
-		} 
+		} else {
+			if(pr) cat(' wald statistics not calculated.\n')
+			
+		}
 	
 	} 
 	

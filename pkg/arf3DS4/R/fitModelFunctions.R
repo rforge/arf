@@ -21,10 +21,11 @@
 #setMask
 #validStart
 #checkBound
+#checkSolution
 
 
 ssq.gauss <- 
-function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 ##ssq.gauss returns the ssq of the full gauss model with an anlytical gradient attached
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
@@ -37,7 +38,12 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 	}
 	
 	if(is.nan(ssqdat) | ssqdat==Inf | is.na(ssqdat) | ssqdat==-Inf) ssqdat=ss_data
-	#cat('ssqdat',ssqdat,'\n')
+		
+	tclvalue(progress$ssq.val.tkobj) = paste(round(ssqdat))
+	tclvalue(progress$ssq.it.tkobj) = as.character(.objit)
+	
+	assign('.objit',.objit+1,envir=.GlobalEnv)
+	
 	return(invisible(ssqdat))	
 	
 }
@@ -55,7 +61,7 @@ function(theta,np,dimx,dimy,dimz)
 }
 
 gradient.gauss <- 
-function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 #gradient returns the analytical gradient of the ssq to the thetaparameters
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0) {
@@ -66,13 +72,16 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 		grad <- .C('dfssq',as.integer(np),as.integer(brain),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[10]]
 	} else grad=rep(1e+12,np) 
 	
-	#cat('gradient',grad,'\n')
+	tclvalue(progress$grad.val.tkobj) = paste(round(sqrt(sum(grad^2))))
+	tclvalue(progress$grad.it.tkobj) = as.character(.gradit)
+	assign('.gradit',.gradit+1,envir=.GlobalEnv)
+	
 	return(grad)
 
 }
 
 ssq.simple <- 
-function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 ##ssq.simple returns the ssq of the simple gauss model with an anlytical gradient attached
 {
 	ssqdat <- .C('simplessqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
@@ -101,7 +110,7 @@ function(theta,np,dimx,dimy,dimz)
 }
 
 gradient.simple <- 
-function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 #gradient returns the analytical gradient of the ssq to the thetaparameters
 {
 	model <- .C('simplegauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[6]]
@@ -114,7 +123,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 }
 
 ssq.gauss.rpr <- 
-function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 ##ssq.gauss returns the ssq of the full gauss model with an anlytical gradient attached
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
@@ -149,7 +158,7 @@ function(theta,np,dimx,dimy,dimz)
 }
 
 gradient.gauss.rpr <- 
-function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 #gradient returns the analytical gradient of the ssq to the thetaparameters
 {
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0) {
@@ -167,7 +176,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad)
 }
 
 ssq.simple.rpr <- 
-function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 ##ssq.simple returns the ssq of the simple gauss model with an anlytical gradient attached
 {
 	ssqdat <- .C('simplessqgaussrpr',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
@@ -196,7 +205,7 @@ function(theta,np,dimx,dimy,dimz)
 }
 
 gradient.simple.rpr <- 
-function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad) 
+function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 #gradient returns the analytical gradient of the ssq to the thetaparameters
 {
 	model <- .C('simplegaussrpr',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[6]]
@@ -698,9 +707,10 @@ function(arfmodel,lowbound,upbound,thres=6)
 	estimates = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
 
 	for(i in 1:.model.params(arfmodel)) {
-		regs = which(round(estimates[i,],thres)==round(lowbound[i],thres) | round(estimates[i,],thres)==round(upbound[i],thres))
+		regs = which(round(estimates[i,],thres)<=round(lowbound[i],thres) | round(estimates[i,],thres)>=round(upbound[i],thres))
+		
 		if(length(regs)>0) {
-			mess = paste('[optim] Parameter',i,'is at boundary for region(s)',regs)
+			mess = paste('[optim] Parameter',i,'is at boundary for region(s)',paste(regs,collapse=","))
 			.model.warnings(arfmodel) = c(.model.warnings(arfmodel),mess)
 		}
 		
@@ -708,4 +718,31 @@ function(arfmodel,lowbound,upbound,thres=6)
 	
 	return(arfmodel)
 	
+}
+
+
+checkSolution <- 
+function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),thres=6) 
+#check the solution for boundaries
+{
+	
+	#set boundaries in L-BFGS-B mode
+	if(length(.options.opt.lower(options))==1 | length(.options.opt.upper(options))==1) {
+		lowbound=-Inf
+		upbound=Inf
+	} else {
+		#set location to maximal dim
+		max_loc = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
+		
+		#set width parameters to maxdim divided by tphe value given in the options
+		max_width =  c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4]) / c(.options.opt.upper(options)[4],.options.opt.upper(options)[5],.options.opt.upper(options)[6])
+		
+		upbound = rep(c(max_loc,max_width,.options.opt.upper(options)[7:10]),.model.regions(arfmodel))
+		lowbound = rep(.options.opt.lower(options),.model.regions(arfmodel))
+	}
+	
+	arfmodel = checkBound(arfmodel,lowbound,upbound,thres=thres)
+	
+	return(arfmodel)
+
 }
