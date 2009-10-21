@@ -146,14 +146,6 @@ function(fmridata)
 	
 }
 
-
-newProgress <-
-function()
-#make an object of S3 class progress
-{
-	
-}
-
 newProgressWindow <-
 function(arfmodel)
 #make a new Progress Window, return an object of class progress (S3)
@@ -166,8 +158,7 @@ function(arfmodel)
 	text.heading <- tclVar(paste(.model.name(arfmodel),'process started',as.character(Sys.time())))
 	label.heading <- tklabel(tt,width='40')
 	tkconfigure(label.heading,textvariable=text.heading)
-	
-	
+		
 	#create shared comps
 	text.1 <- tclVar('value')
 	label.1 <- tklabel(tt,width=12)
