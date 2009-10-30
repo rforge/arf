@@ -7,6 +7,7 @@
 #[CONTAINS]
 #cropVolume
 #cropVolumeAuto
+#makeROImask
 #readFSLmat
 #createRegs
 #createFuncs
@@ -34,12 +35,13 @@ function(filename,resizeToDim,quiet=F)
 	x=.fmri.data.dims(dat)[2]
 	y=.fmri.data.dims(dat)[3]
 	z=.fmri.data.dims(dat)[4]
+	t=.fmri.data.dims(dat)[5]
+	
+	dim(data_array) <- c(x,y,z,t)
 	
 	nx=resizeToDim[2]
 	ny=resizeToDim[3]
 	nz=resizeToDim[4]
-	
-	dim(data_array) <- c(x,y,z)
 	
 	doCrop=TRUE
 	
@@ -47,35 +49,37 @@ function(filename,resizeToDim,quiet=F)
 	if(nx==x & ny==y & nz==z) {doCrop=FALSE}
 	
 	if(doCrop) {
+		
 		if(!quiet) cat('Dims',.fmri.data.dims(dat),'>> ')
 			
 		if(nx<x) {
 			remx <- seq(nx+1,x,1)
-			data_array <- data_array[-remx,,]
+			data_array <- data_array[-remx,,,]
 			.fmri.data.dims(dat)[2]=nx
 		} 
 		
 		if(ny<y) {
 			remy <- seq(ny+1,y,1)
-			data_array <- data_array[,-remy,]
+			data_array <- data_array[,-remy,,]
 			.fmri.data.dims(dat)[3]=ny
 		} 
 		
 		if(nz<z) {
 			remz <- seq(nz+1,z,1)
-			data_array <- data_array[,,-remz]
+			data_array <- data_array[,,-remz,]
 			.fmri.data.dims(dat)[4]=nz
 		} 
 		
+	
 		if(!quiet) cat(.fmri.data.dims(dat),'\n')
 		if(!quiet) cat('filename',.fmri.data.filename(dat),'\n')	
-		if(!quiet) cat('datavec should be',nx*ny*nz,'long and is now',length(as.vector(data_array)),'\n')
-		cat(paste('[crop] cropped file ',.fmri.data.filename(dat),' (',x,'x',y,'x',z,') to: ',nx,'x',ny,'x',nz,sep=''),'\n')
+		if(!quiet) cat('datavec should be',nx*ny*nz*t,'long and is now',length(as.vector(data_array)),'\n')
+		cat(paste('[crop] cropped file ',.fmri.data.filename(dat),' (',x,'x',y,'x',z,'x',t,') to: ',nx,'x',ny,'x',nz,'x',t,sep=''),'\n')
 		if(file.exists(.fmri.data.filename(dat))) file.remove(.fmri.data.filename(dat))
 		writeData(dat,as.vector(data_array))
 	}
 	
-	
+		
 }
 
 
@@ -120,7 +124,17 @@ function(filename)
 	return(invisible(mat))
 }
 
+makeROImask <-
+function(fmridata,maskdata) 
+#function to mask fmridata with non-zero elements in maskdata
+{
+	whichzero = which(.fmri.data.datavec(maskdata)==0)
+	
+	if(length(wichzero)>0) .fmri.data.datavec(fmridata)[whichzero]=0
 
+	return(fmridata)
+
+} 
  
 createRegs <- 
 function(arfdata) 
@@ -791,10 +805,7 @@ function(arfmodel,regtrial=1,saveastext=F)
 	}
 	
 	if(saveastext) sink()
-	
-	
+
 	return(invisible(atlas))
 	
 }
-
-
