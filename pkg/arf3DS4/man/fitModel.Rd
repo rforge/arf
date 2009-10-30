@@ -2,9 +2,8 @@
 \Rdversion{1.1}
 \alias{fitModel}
 \alias{fitModelOptim}
-\alias{fitModelNlm}
 \alias{fitSimpleModelOptim}
-\alias{fitSimpleModelNlm}
+
 \title{ Fit an arf model}
 \description{
 fitModel starts the fitting procedure of an arf model based on the values in the "option" object. 

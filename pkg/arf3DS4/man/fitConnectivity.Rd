@@ -8,12 +8,12 @@ Estimate connectivity of an ARF model
 fitConnectivity estimates the functional connectivity between activated regions using a 'single-event' volume.
 }
 \usage{
-fitConnectivity(arfmodel, fname = "single_events")
+fitConnectivity(arfmodel, funcfilename="single_events.nii.gz")
 }
 
 \arguments{
   \item{arfmodel}{An arf model object (class \code{\linkS4class{model}})}
-  \item{fname}{Filename of the volume to extract the time-series.}
+  \item{funcfilename}{Filename of the volume to extract the time-series.}
 }
 \details{
 Each volume of the file specified in fname should contain estimates of single-trial events (see \code{\link{makeSingleTrialEvents}}).
