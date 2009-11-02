@@ -130,7 +130,7 @@ function(fmridata,maskdata)
 {
 	whichzero = which(.fmri.data.datavec(maskdata)==0)
 	
-	if(length(wichzero)>0) .fmri.data.datavec(fmridata)[whichzero]=0
+	if(length(whichzero)>0) .fmri.data.datavec(fmridata)[whichzero]=0
 
 	return(fmridata)
 

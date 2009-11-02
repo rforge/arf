@@ -11,9 +11,8 @@ fitModel starts the fitting procedure of an arf model based on the values in the
 \usage{
 fitModel(arfmodel, options = loadOptions(arfmodel), dat = readData(.model.avgdatfile(arfmodel)), weights = readData(.model.avgWfile(arfmodel)), printlevel = 0, try.silen = T)
 fitModelOptim(arfmodel, options = loadOptions(arfmodel), dat = readData(.model.avgdatfile(arfmodel)), weights = readData(.model.avgWfile(arfmodel)), printlevel = 0, try.silen = T)
-fitModelNlm(arfmodel, options = loadOptions(arfmodel), dat = readData(.model.avgdatfile(arfmodel)), weights = readData(.model.avgWfile(arfmodel)), printlevel = 0, try.silen = T)
 fitSimpleModelOptim(arfmodel, options = loadOptions(arfmodel), dat = readData(.model.avgdatfile(arfmodel)), weights = readData(.model.avgWfile(arfmodel)), printlevel = 0, try.silen = T)
-fitSimpleModelNlm(arfmodel, options = loadOptions(arfmodel), dat = readData(.model.avgdatfile(arfmodel)), weights = readData(.model.avgWfile(arfmodel)), printlevel = 0, try.silen = T)
+
 }
 \arguments{
   \item{arfmodel}{An arf model object (class \code{\linkS4class{model}})}

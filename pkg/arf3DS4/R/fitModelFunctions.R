@@ -22,7 +22,8 @@
 #validStart
 #checkBound
 #checkSolution
-
+#checkSolutionReturn
+#checkGradientReturn
 
 ssq.gauss <- 
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
@@ -626,4 +627,69 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	return(arfmodel)
 
+}
+
+
+checkSolutionReturn <- 
+function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),thres=6) 
+#check the solution for boundaries
+{
+	
+	#set boundaries in L-BFGS-B mode
+	if(length(.options.opt.lower(options))==1 | length(.options.opt.upper(options))==1) {
+		lowbound=-Inf
+		upbound=Inf
+	} else {
+		#set location to maximal dim
+		max_loc = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
+		
+		#set width parameters to maxdim divided by tphe value given in the options
+		max_width =  c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4]) / c(.options.opt.upper(options)[4],.options.opt.upper(options)[5],.options.opt.upper(options)[6])
+		
+		upbound = rep(c(max_loc,max_width,.options.opt.upper(options)[7:10]),.model.regions(arfmodel))
+		lowbound = rep(.options.opt.lower(options),.model.regions(arfmodel))
+	}
+	
+	#fill matrix (params, by regs with bounded params)	
+	estimates = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
+	whichwhat = matrix(0,.model.params(arfmodel),.model.regions(arfmodel))
+	
+	for(i in 1:.model.params(arfmodel)) {
+		regs = which(round(estimates[i,],thres)<=round(lowbound[i],thres) | round(estimates[i,],thres)>=round(upbound[i],thres))
+		
+		if(length(regs)>0) {
+			whichwhat[i,regs] = 1 
+		}
+		
+	}
+	
+	#check whichwhat
+	regstodel = which(apply(whichwhat,2,sum)>0)	
+
+	return(regstodel)	
+	
+}
+
+checkGradientReturn <- 
+function(arfmodel,absthres=10) 
+#check the solution for boundaries
+{
+
+	#fill matrix (params, by regs with bounded params)	
+	gradient = matrix(.model.gradient(arfmodel),.model.params(arfmodel))
+	whichwhat = matrix(0,.model.params(arfmodel),.model.regions(arfmodel))
+	
+	for(i in 1:.model.params(arfmodel)) {
+		regs = which(abs(gradient[i,])>=absthres)
+		if(length(regs)>0) {
+			whichwhat[i,regs] = 1 
+		}
+		
+	}
+	
+	#check whichwhat
+	regstodel = which(apply(whichwhat,2,sum)>0)	
+	
+	return(regstodel)	
+	
 }

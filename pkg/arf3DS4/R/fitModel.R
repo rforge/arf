@@ -42,8 +42,6 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 }
 
 
-
-
 fitModelOptim <- 
 function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 
 # fitModelOptim calls the minimization routine (OPTIM)
@@ -73,7 +71,8 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	#set analyticalgrad options
 	if(.options.min.analyticalgrad(options)) {
-		if(.options.min.routine(options)[2]=='vpv') gradfunc=gradient.gauss else gradfunc=gradient.gauss.rpr
+		gradfunc=gradient.gauss		
+		#if(.options.min.routine(options)[2]=='vpv') gradfunc=gradient.gauss else gradfunc=gradient.gauss.rpr
 		angrad=FALSE
 	} else {
 		gradfunc=NULL
@@ -81,8 +80,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	}
 	
 	#set which method of model calculation to use 
-	if(.options.min.routine(options)[2]=='vpv') sumsofsquares = ssq.gauss else sumsofsquares = ssq.gauss.rpr
-	
+	#if(.options.min.routine(options)[2]=='vpv') sumsofsquares = ssq.gauss else sumsofsquares = ssq.gauss.rpr
+	sumsofsquares = ssq.gauss	
+
 	#set boundaries in L-BFGS-B mode
 	if(length(.options.opt.lower(options))==1 | length(.options.opt.upper(options))==1) {
 		lowbound=-Inf
@@ -249,7 +249,8 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	#set analyticalgrad options
 	if(.options.min.analyticalgrad(options)) {
-		if(.options.min.routine(options)[2]=='vpv') gradfunc=gradient.simple else gradfunc=gradient.simple.rpr
+		#if(.options.min.routine(options)[2]=='vpv') gradfunc=gradient.simple else gradfunc=gradient.simple.rpr
+		gradfunc=gradient.simple
 		angrad=FALSE
 	} else {
 		gradfunc=NULL
@@ -258,7 +259,8 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	
 	#set which method of model calculation to use 
-	if(.options.min.routine(options)[2]=='vpv') sumsofsquares = ssq.simple else sumsofsquares = ssq.simple.rpr
+	#if(.options.min.routine(options)[2]=='vpv') sumsofsquares = ssq.simple else sumsofsquares = ssq.simple.rpr
+	sumsofsquares = ssq.simple
 	
 	#set boundaries in L-BFGS-B mode
 	if(length(.options.opt.lower(options))==1 | length(.options.opt.upper(options))==1) {

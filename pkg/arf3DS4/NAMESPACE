@@ -29,6 +29,7 @@ export(
 	makeSingleTrialEvents,
 	partialCor,
 	processModel,
+	processSequence,
 	createAverages,
 	createAllAverages,
 	determineStartRect,

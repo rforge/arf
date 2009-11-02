@@ -27,7 +27,7 @@ Objects can be created by calls of the form \code{new("sequence", ...)}.
     \item{\code{mnames}:}{Vector of modelnames of the sequence.}
     \item{\code{fit}:}{Vector of fit indices for each model.}
     \item{\code{minimum}:}{Which model currently fits the best? }
-    \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}}) }
+    \item{\code{valid}:}{Logical vector indicating valid models.}
   }
 }
 \section{Methods}{
