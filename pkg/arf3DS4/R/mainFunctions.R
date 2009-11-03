@@ -6,6 +6,7 @@
 
 #[CONTAINS]
 #processModel
+#processSequence
 
 processModel <- 
 function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),pr=T,printlevel=0,try.silen=T) 
@@ -65,13 +66,14 @@ function(modelname='defaultmodel',seedreg=10,subject='',condition='',options=new
 {
 	
 	if(pr) cat('[',modelname,'] @ seed',seedreg,'- started',as.character(Sys.time()),'\n')
+	
 	#run a simple model
 	.options.start.method(options) = 'rect'
 	simple_model = newModel(paste('simple_',modelname,sep=''),regions=seedreg,subject=subject,condition=condition,type='simple',options=options,overwrite=overwrite,experiment=experiment)
 	
 	if(pr) cat(as.character(Sys.time()),'fitting simple model...')
 	simple_model = fitModel(simple_model)
-	if(pr) cat('ok\n')
+	if(pr) 	if(.model.valid(simple_model))	cat('ok\n') else cat('fail\n')
 	
 	if(.model.valid(simple_model)) .options.start.method(options) = 'use' else .options.start.method(options) = 'rect'
 	
@@ -84,8 +86,9 @@ function(modelname='defaultmodel',seedreg=10,subject='',condition='',options=new
 		saveModel(full_model)
 		if(pr) cat(as.character(Sys.time()),'fitting full model...')
 		full_model = fitModel(full_model)
-		if(pr) cat('ok\n')
-	} else model = NULL #no valid models 
+		if(pr) 	if(.model.valid(full_model))	cat('ok\n') else cat('fail\n')
+		
+	} else model = simple_model #no valid models 
 	
 	#run prune sequence
 	#pruned model
@@ -122,10 +125,12 @@ function(modelname='defaultmodel',seedreg=10,subject='',condition='',options=new
 			prune_num = prune_num + 1
 			
 		} #end prune while
-	
+		
+		if(pr) 	if(.model.valid(pruned_model))	cat('ok\n') else cat('fail\n')
+		
 		model = pruned_model
 		
-	} else 	model = simple_model #full_model not valid
+	} else 	model = full_model #full_model not valid
 	
 	
 	return(model)

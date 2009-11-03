@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=1,
 		build=7,
-		update=5,
-		svnrev=97
+		update=6,
+		svnrev=98
 	),
 	package='arf3DS4'
 )
@@ -204,10 +204,10 @@ setClass(
 		nlm.gradtol=1e-6,		#NLM gradient tolerance
 		nlm.steptol=1e-3,		#NLM stepsize tolerance
 		opt.method='L-BFGS-B',	#optim method
-		opt.lower=c(rep(0,3),rep(0,3),rep(-.90,3),-Inf),	#L-BFGS-U lower bound
+		opt.lower=c(rep(0,3),rep(0.5,3),rep(-.90,3),-Inf),	#L-BFGS-U lower bound
 		opt.upper=c(rep(Inf,3),rep(1,3),rep(.90,3),Inf),	#L-BFGS-U upper bound
 		min.analyticalgrad=T, 	#use analytical gradient
-		min.iterlim=20000,		#iteration limit
+		min.iterlim=8000,		#iteration limit
 		min.routine=c('optim','vpv'),	#which routine
 		start.method='use',	
 		start.maxfac=1,
