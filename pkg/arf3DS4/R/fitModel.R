@@ -6,10 +6,9 @@
 
 #[CONTAINS]
 #fitModel
-#fitModelNlm
 #fitModelOptim
-#fitSimpleModelNlm
 #fitSimpleModelOptim
+#pruneModel
 
 fitModel <- 
 function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 
@@ -372,4 +371,41 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	return(invisible(arfmodel))
 }
 
+pruneModel <- 
+#prune a given model until neat
+function(arfmodel)
+{
+	stop_prune = FALSE
+	prune_num = 1
+	
+	pruned_model = arfmodel
+	
+	while(stop_prune==FALSE) 
+	{
+		ests = matrix(.model.estimates(pruned_model),10)
+		
+		b_del = checkSolutionReturn(pruned_model)
+		g_del = checkGradientReturn(pruned_model)
+		del = unique(c(b_del,g_del))
+		
+		if(length(del)>0) {
+			ests = ests[,-del]
+			.options.start.method(options) = 'use'
+			pruned_model = newModel(paste('pruned',prune_num,'_',modelname,sep=''),regions=ncol(ests),subject=subject,condition=condition,type='gauss',options=options,overwrite=overwrite,experiment=experiment)
+			.model.startval(pruned_model) = as.vector(ests)
+			saveModel(pruned_model)
+			pruned_model = fitModel(pruned_model)
+			
+		} else {
+			model = pruned_model 
+			stop_prune = TRUE
+		}
+		
+		prune_num = prune_num + 1
+		
+	} #end prune while
+	
+	return(pruned_model)
+	
+}
 

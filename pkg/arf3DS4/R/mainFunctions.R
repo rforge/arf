@@ -91,45 +91,12 @@ function(modelname='defaultmodel',seedreg=10,subject='',condition='',options=new
 	} else model = simple_model #no valid models 
 	
 	#run prune sequence
-	#pruned model
 	if(.model.valid(full_model)) {
 	
-		stop_prune = FALSE
-		prune_num = 1
-		
-		pruned_model = full_model
-		
-		while(stop_prune==FALSE) 
-		{
-			if(pr) cat(as.character(Sys.time()),'fitting pruned',prune_num,'model.')
-			ests = matrix(.model.estimates(pruned_model),10)
-			
-			b_del = checkSolutionReturn(pruned_model)
-			g_del = checkGradientReturn(pruned_model)
-			del = unique(c(b_del,g_del))
-			
-			if(length(del)>0) {
-				ests = ests[,-del]
-				.options.start.method(options) = 'use'
-				pruned_model = newModel(paste('pruned',prune_num,'_',modelname,sep=''),regions=ncol(ests),subject=subject,condition=condition,type='gauss',options=options,overwrite=overwrite,experiment=experiment)
-				.model.startval(pruned_model) = as.vector(ests)
-				saveModel(pruned_model)
-				pruned_model = processModel(pruned_model,pr=pr)
-				
-			} else {
-				cat('no pruning required!\n')
-				model = full_model #pruned_model not valid
-				stop_prune = TRUE
-			}
-			
-			prune_num = prune_num + 1
-			
-		} #end prune while
+		model = pruneModel(full_model)
 		
 		if(pr) 	if(.model.valid(pruned_model))	cat('ok\n') else cat('fail\n')
-		
-		model = pruned_model
-		
+				
 	} else 	model = full_model #full_model not valid
 	
 	
