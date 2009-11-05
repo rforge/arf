@@ -166,23 +166,23 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			#create residuals
 			makeResiduals(arfmodel)
 			
-			if(.options.min.analyticalgrad(options)) {
-				df_fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
-				w_fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.weightFile(arfmodel),sep='')
-				n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
-				p = .model.regions(arfmodel)*.model.params(arfmodel)
-				hessian <- try(.C('approxHessian',as.integer(p),as.integer(.model.n(arfmodel)),as.character(df_fn),as.character(w_fn),as.double(numeric(p*p))),silen=try.silen)
-				
-				if(is.null(attr(hessian,'class'))) {
-					hessian <- hessian[[5]]
-					dim(hessian) = c(p,p)
-					.model.hessian(arfmodel) <- hessian 	
-				} else {
-					.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),' [min] could not approximate Hessian with analytical gradient.')
-					.model.valid(arfmodel) <- FALSE
-					
-				}
-			}
+			#if(.options.min.analyticalgrad(options)) {
+			#	df_fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
+			#	w_fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.weightFile(arfmodel),sep='')
+			#	n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
+			#	p = .model.regions(arfmodel)*.model.params(arfmodel)
+			#	hessian <- try(.C('approxHessian',as.integer(p),as.integer(.model.n(arfmodel)),as.character(df_fn),as.character(w_fn),as.double(numeric(p*p))),silen=try.silen)
+			#	
+			#	if(is.null(attr(hessian,'class'))) {
+			#		hessian <- hessian[[5]]
+			#		dim(hessian) = c(p,p)
+			#		.model.hessian(arfmodel) <- hessian 	
+			#	} else {
+			#		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),' [min] could not approximate Hessian with analytical gradient.')
+			#		.model.valid(arfmodel) <- FALSE
+			#		
+			#	}
+			#}
 			
 			#caluclate fits
 			arfmodel = BIC(arfmodel,options=options)
@@ -373,12 +373,16 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 
 pruneModel <- 
 #prune a given model until neat
-function(arfmodel)
+function(arfmodel,modelname,subject,condition,options,overwrite,experiment=NULL)
 {
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	
 	stop_prune = FALSE
 	prune_num = 1
 	
 	pruned_model = arfmodel
+	
+	cat('pruning model with',.model.regions(arfmodel),'regions\n')
 	
 	while(stop_prune==FALSE) 
 	{
@@ -394,6 +398,7 @@ function(arfmodel)
 			pruned_model = newModel(paste('pruned',prune_num,'_',modelname,sep=''),regions=ncol(ests),subject=subject,condition=condition,type='gauss',options=options,overwrite=overwrite,experiment=experiment)
 			.model.startval(pruned_model) = as.vector(ests)
 			saveModel(pruned_model)
+			cat(' * fitting pruned model with',.model.regions(pruned_model),'regions\n')
 			pruned_model = fitModel(pruned_model)
 			
 		} else {

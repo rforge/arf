@@ -671,7 +671,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 }
 
 checkGradientReturn <- 
-function(arfmodel,absthres=10) 
+function(arfmodel,absthres=1000) 
 #check the solution for boundaries
 {
 

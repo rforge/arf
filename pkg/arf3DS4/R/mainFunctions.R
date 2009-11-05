@@ -65,6 +65,8 @@ function(modelname='defaultmodel',seedreg=10,subject='',condition='',options=new
 #process a sequence based on a seed number of regions
 {
 	
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	
 	if(pr) cat('[',modelname,'] @ seed',seedreg,'- started',as.character(Sys.time()),'\n')
 	
 	#run a simple model
@@ -93,7 +95,7 @@ function(modelname='defaultmodel',seedreg=10,subject='',condition='',options=new
 	#run prune sequence
 	if(.model.valid(full_model)) {
 	
-		model = pruneModel(full_model)
+		model = pruneModel(full_model,modelname,subject,condition,overwrite,options,experiment)
 		
 		if(pr) 	if(.model.valid(pruned_model))	cat('ok\n') else cat('fail\n')
 				
