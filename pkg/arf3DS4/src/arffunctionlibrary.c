@@ -1031,6 +1031,131 @@ void innerSWbw(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv, ch
 }
 
 
+void innerSWbwfast(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv, char **fnderiv, char **fnresid, char **fnweight, char **fnmeanresid, double *B)
+{
+
+	int i,j,k,l, Brow, Bcol,loc;
+	FILE *fderiv, *fresid, *fweight, *fmeanres;
+	double *Fv,*Ft, *Rv, *Wv, *Mr, s, Bm[*p][*p], *mrv;
+
+	Fv = (double *) R_alloc(*n,sizeof(double));
+	Ft = (double *) R_alloc(*n,sizeof(double));
+	Rv = (double *) R_alloc(*trials**n,sizeof(double));
+ 	Wv = (double *) R_alloc(*n,sizeof(double));
+ 	Mr = (double *) R_alloc((*n),sizeof(double));
+ 	mrv = (double *) R_alloc((*n)**bw,sizeof(double));
+ 	//mrv = (double *) R_alloc((int) 1,sizeof(double));
+
+ 	fweight=fopen(*fnweight,"r"); //N vector of weights
+ 	fread(Wv,sizeof(double),*n,fweight);
+ 	fclose(fweight);
+
+ 	fresid=fopen(*fnresid,"r"); //Nxtrial residual vector (n incr fastest)
+ 	fread(Rv,sizeof(double),*trials**n,fresid);
+ 	fclose(fresid);
+
+  	fderiv=fopen(*fnderiv,"r"); //NxP derivs vector (n incr. fastest)
+
+ 	//make mean residuals
+	//fmeanres = fopen(*fnmeanresid,"w");
+	for(i=0;i<(*n);i++) {
+		for(j=0;j<(*bw);j++) {
+			for(l=0;l<(*trials);l++) { //trial loop
+				loc = Lv[i+j**n];
+				if(loc!=*escapevar)	*(mrv+i+j**n) = *(mrv+i+j**n) + ((1/pow((double) *trials,2))**(Rv+i+l**n)**(Rv+loc+l**n));
+				else *(mrv+i+j**n)=0;
+
+			} //end trial loop
+			//fwrite(mrv,sizeof(double),1,fmeanres);
+		} //end row loop
+	} // end column loop
+
+ 	//void R_CheckUserInterrupt(void);
+ 	//Rprintf("Finished MEANRES\n");
+
+ 	//fclose(fmeanres);
+ 	//fmeanres = fopen(*fnmeanresid,"r");
+
+ 	// OFF DIAGONAL B, LOOP
+ 	for(Brow=0;Brow<(*p-1);Brow++) { //BVEC ROW LOOP
+
+		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
+		fread(Fv,sizeof(double),*n,fderiv);
+
+		for(j=0;j<(*n);j++) { // R matrix column loop ) j = 1..n
+
+			s=0e0;
+			for(i=0;i<(*bw);i++) {  // R matrix row loop
+				loc = Lv[j+i**n];
+				if(loc!=*escapevar)	s=s+*(Fv+loc)*(*(mrv+j+i**n)/(*(Wv+j)**(Wv+loc)));
+
+			}
+
+			*(Ft+j)=s;
+
+		} // end R loop
+
+		for(Bcol=(Brow+1);Bcol<(*p);Bcol++) { //BVEC COL LOOP
+			fseek(fderiv,sizeof(double)*(Bcol**n),SEEK_SET);
+			fread(Fv,sizeof(double),*n,fderiv);
+
+			s=0e0;
+			for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
+				s=s+Fv[i]*Ft[i];
+
+			}
+
+			Bm[Brow][Bcol]=s;
+			Bm[Bcol][Brow]=s;
+			//void R_CheckUserInterrupt(void);
+			//Rprintf("Done %d %d\n",Brow,Bcol);
+
+		}
+
+	}
+
+
+ 	//DIAGONAL B, LOOP
+	for(Brow=0;Brow<(*p);Brow++) { //BVEC ROW LOOP
+
+		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
+		fread(Fv,sizeof(double),*n,fderiv);
+
+		for(j=0;j<(*n);j++) { // R matrix column loop ) j = 1..n
+
+			s=0e0;
+			for(i=0;i<(*bw);i++) {  // R matrix row loop
+				loc = Lv[j+i**n];
+				if(loc!=*escapevar)	s=s+*(Fv+loc)*(*(mrv+j+i**n)/(*(Wv+j)**(Wv+loc)));
+			}
+			*(Ft+j)=s;
+
+		} // end R loop
+
+		s=0e0;
+		for(i=0;i<(*n);i++) { // (t(F)%*%R)%*%F LOOP
+			s=s+Fv[i]*Ft[i];
+
+		}
+
+		Bm[Brow][Brow]=s;
+		//void R_CheckUserInterrupt(void);
+		//Rprintf("Done %d %d\n",Brow,Brow);
+	}
+
+	k=0;
+	for(Bcol=0;Bcol<(*p);Bcol++) {
+		for(Brow=0;Brow<(*p);Brow++) {
+			*(B+k)=Bm[Brow][Bcol];
+			k++;
+		}
+	}
+
+ 	fclose(fderiv);
+
+}
+
+
 void approxHessian(int *np, int *n, char **dffile, char **wfile, double *hessian) {
 
 	int r,c,j,k;

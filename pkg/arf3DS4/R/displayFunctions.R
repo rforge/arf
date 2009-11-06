@@ -27,6 +27,9 @@ function(datavec,zerotol=1e-03)
 	possteps = round(maxsteps*(abs(max_dat)/total))
 	negsteps = round(maxsteps*(abs(min_dat)/total))
 	
+	possteps = max_dat*stepfac
+	negsteps = abs(min_dat)*stepfac
+	
 	pos_data = datavec[datavec>0]
 	neg_data = datavec[datavec<0]
 	
