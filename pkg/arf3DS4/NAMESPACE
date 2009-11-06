@@ -104,6 +104,7 @@ useDynLib(
 	innerSWfull,
 	innerSWdiag,
 	innerSWfast,
+	innerSWbw,
 	approxHessian,
 	dfgaussFile,
 	dftheta0,

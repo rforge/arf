@@ -156,7 +156,7 @@ function(arfmodel)
 	
 	#create heading
 	text.heading <- tclVar(paste(.model.name(arfmodel),'process started',as.character(Sys.time())))
-	label.heading <- tklabel(tt,width='40')
+	label.heading <- tklabel(tt,width='60')
 	tkconfigure(label.heading,textvariable=text.heading)
 		
 	#create shared comps

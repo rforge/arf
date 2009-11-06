@@ -16,6 +16,8 @@
 #mcpCorrect
 #readDerivs
 #approxHessianR
+#makeBWlocs
+#getlocsquare
 
 makeDerivs <- 
 function(arfmodel)
@@ -120,6 +122,12 @@ function(arfmodel)
 			if(.model.sandwichmethod(arfmodel)[1]=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
 			if(.model.sandwichmethod(arfmodel)[1]=='fast') B <- try(.C('innerSWfast',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
 			if(.model.sandwichmethod(arfmodel)[1]=='full') B <- try(.C('innerSWfull',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[8]],silen=T)
+			if(.model.sandwichmethod(arfmodel)[1]=='bw') {
+				bw = as.numeric(.model.sandwichmethod(arfmodel)[2])
+				escapevar = .model.n(arfmodel)+1
+				Lv = makeBWLocations(arfmodel,escapevar)	
+				B <- try(.C('innerSWbw',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.integer(((bw*2)+1)^3),as.integer(escapevar),as.integer(Lv),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[11]],silen=T)
+			}
 			
 			#check if innersandwich works
 			if(is.null(attr(B,'class'))) {
@@ -458,4 +466,63 @@ function(arfmodel)
 	return(hessian)
 	
 }
+
+getlocsquare <-
+function(x,y,z,dx,dy,dz,bw,escapevar) 
+#return voxel-vector locations from a box with width bw*2 + 1
+{
+	fw = (bw*2)+1
+	lv = numeric(fw^3)
+	
+	xv = (x-bw):(x+bw)
+	yv = (y-bw):(y+bw)
+	zv = (z-bw):(z+bw)
+	
+	i=1;
+	for(zz in zv) {
+		for(yy in yv) {
+			for(xx in xv) {
+				if(xx<1 | xx>dx | yy<1 | yy>dy | zz<1 | zz>dz ) lv[i]=escapevar else lv[i] = (xx + (yy-1)*(dx) + (zz-1)*(dx)*(dy))-1
+				i=i+1
+			}
+		}
+	}
+	
+	#returns location in c-style (starting at zero)
+	return(lv)
+	
+}
+
+makeBWLocations <-
+function(arfmodel,escapevar)
+#make Bandwidth location matrix
+{
+	
+	bw = as.numeric(.model.sandwichmethod(arfmodel)[2])
+	
+	dat = readData(.model.avgdatfile(arfmodel))
+	dx = .fmri.data.dims(dat)[2]
+	dy = .fmri.data.dims(dat)[3]
+	dz = .fmri.data.dims(dat)[4]
+		
+	
+	#make and fill locations matrix
+	lv = matrix(NA,length(which(.model.mask(arfmodel)!=0)),((bw*2)+1)^3)
+	i=j=1
+	for(z in 1:dz) {
+		for(y in 1:dy) { 
+			for(x in 1:dx) {
+				if(.model.mask(arfmodel)[j]!=0) {
+					lv[i,] = getlocsquare(x,y,z,dx,dy,dz,bw,escapevar)
+					i=i+1
+				}
+				j=j+1
+			}
+		}
+	}
+	
+	return(as.vector(lv))
+}
+
+
  
