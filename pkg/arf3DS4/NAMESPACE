@@ -25,6 +25,7 @@ export(
 	fitModelOptim,
 	fitSimpleModelOptim,
 	fitModel,
+	pruneModel,
 	fitConnectivity,
 	makeSingleTrialEvents,
 	partialCor,
@@ -35,6 +36,8 @@ export(
 	determineStartRect,
 	determineStartRectSimple,
 	checkSolution,
+	checkSolutionReturn,
+	checkGradientReturn,
 	validStart,
 	newModel,
 	saveModel,
@@ -56,6 +59,8 @@ export(
 	mcpCorrect,
 	wald
 )
+
+exportPattern("^[\\.]")
 
 exportClasses(
 	version,
@@ -95,10 +100,6 @@ useDynLib(
 	dfgauss,
 	simplegauss,
 	simplessqgauss,
-	simplegaussrpr,
-	simplessqgaussrpr,
-	gaussrpr,
-	ssqgaussrpr,
 	dfsimplegauss,
 	dfsimplessq,
 	innerSWfull,
@@ -108,15 +109,5 @@ useDynLib(
 	innerSWbwfast,
 	approxHessian,
 	dfgaussFile,
-	dftheta0,
-	dftheta1,
-	dftheta2,
-	dftheta3,
-	dftheta4,
-	dftheta5,
-	dftheta6,
-	dftheta7,
-	dftheta8,
-	dftheta9,
 	simTS
 )

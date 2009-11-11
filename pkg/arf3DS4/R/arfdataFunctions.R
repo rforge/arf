@@ -60,7 +60,9 @@ function(subject,condition,experiment=NULL)
 	#set filename based on subject and condition
 	filename <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,.experiment.subjectPrefix(experiment),subject,sp,.experiment.conditionDir(experiment),sp,.experiment.conditionPrefix(experiment),condition,sp,.experiment.dataDir(experiment),sp,.experiment.dataRda(experiment),sep='')
 	
-	return(invisible(loadRda(filename)))
+	if(file.exists(filename)) dat = loadRda(filename) else warning('[loadData] File does not exist.')
+	
+	return(invisible(dat))
 }
 
 

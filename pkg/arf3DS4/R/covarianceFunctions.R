@@ -128,7 +128,6 @@ function(arfmodel)
 				Lv = makeBWLocations(arfmodel,escapevar)	
 				B <- try(.C('innerSWbw',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.integer(((bw*2)+1)^3),as.integer(escapevar),as.integer(Lv),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[11]],silen=T)
 			}
-			
 			if(.model.sandwichmethod(arfmodel)[1]=='bwf') {
 				bw = as.numeric(.model.sandwichmethod(arfmodel)[2])
 				escapevar = .model.n(arfmodel)+1

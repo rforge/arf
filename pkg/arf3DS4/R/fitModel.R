@@ -137,12 +137,12 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	# check for internal errors and set relevant arf model values
 	if(is.null(attr(optim.output,'class'))) {
 		if(optim.output$convergence==0) .model.convergence(arfmodel) <- paste('Optim converged in ',optim.output$counts[1],' iterations.',sep='')
-		if(optim.output$convergence==1) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.'
+		if(optim.output$convergence==1) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.';.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim did not converge.',sep=''))
 		if(optim.output$convergence==10) .model.convergence(arfmodel) <- 'Degeneracy of the Nelder-Mead Simplex'
 		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',gsub('\n','',optim.output$message),sep='')
 		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',gsub('\n','',optim.output$message),sep='')
 		
-		if(optim.output$convergence <= 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
+		if(optim.output$convergence <= 1) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 		
 		#set model objects
 		.model.minimum(arfmodel) <- optim.output$value
@@ -284,7 +284,10 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		saveModel(arfmodel)	
 		return(arfmodel)
 	}
-		
+	
+	#make progressWindow
+	progress = newProgressWindow(arfmodel)
+	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 							.model.startval(arfmodel),
@@ -313,12 +316,12 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	# check for internal errors and set relevant arf model values
 	if(is.null(attr(optim.output,'class'))) {
 		if(optim.output$convergence==0) .model.convergence(arfmodel) <- paste('Optim converged in ',optim.output$counts[1],' iterations.',sep='')
-		if(optim.output$convergence==1) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.'
+		if(optim.output$convergence==1) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.';.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim did not converge.',sep=''))
 		if(optim.output$convergence==10) .model.convergence(arfmodel) <- 'Degeneracy of the Nelder-Mead Simplex'
 		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',gsub('\n','',optim.output$message),sep='')
 		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',gsub('\n','',optim.output$message),sep='')
 		
-		if(optim.output$convergence <= 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
+		if(optim.output$convergence <= 1) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 		
 		#set model essentials
 		.model.estimates(arfmodel) <- optim.output$par
@@ -373,7 +376,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 
 pruneModel <- 
 #prune a given model until neat
-function(arfmodel,modelname,subject,condition,options,overwrite,experiment=NULL)
+function(arfmodel,modelname='defaultmodel',subject='',condition='',grad=1000,bound=8,ns=T,alpha=.05,options=new('options'),overwrite=T,experiment=NULL)
 {
 	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
 	
@@ -382,24 +385,34 @@ function(arfmodel,modelname,subject,condition,options,overwrite,experiment=NULL)
 	
 	pruned_model = arfmodel
 	
-	cat('pruning model with',.model.regions(arfmodel),'regions\n')
+	cat(as.character(Sys.time()),'pruning model with',.model.regions(arfmodel),'regions\n')
 	
 	while(stop_prune==FALSE) 
 	{
 		ests = matrix(.model.estimates(pruned_model),10)
 		
-		b_del = checkSolutionReturn(pruned_model)
-		g_del = checkGradientReturn(pruned_model)
-		del = unique(c(b_del,g_del))
+		b_del = checkSolutionReturn(pruned_model,thres=bound)
+		g_del = checkGradientReturn(pruned_model,absthres=grad)
+		if(ns) ns_del = checkNonSigReturn(pruned_model,alpha=alpha) else ns_del=numeric(0)
+		
+		del = unique(c(b_del,g_del,ns_del))
 		
 		if(length(del)>0) {
-			ests = ests[,-del]
-			.options.start.method(options) = 'use'
-			pruned_model = newModel(paste('pruned',prune_num,'_',modelname,sep=''),regions=ncol(ests),subject=subject,condition=condition,type='gauss',options=options,overwrite=overwrite,experiment=experiment)
-			.model.startval(pruned_model) = as.vector(ests)
-			saveModel(pruned_model)
-			cat(' * fitting pruned model with',.model.regions(pruned_model),'regions\n')
-			pruned_model = fitModel(pruned_model)
+			if(length(del)!=ncol(ests)) {
+				ests = ests[,-del]
+				ests = as.vector(ests)
+				.options.start.method(options) = 'use'
+				pruned_model = newModel(paste('pruned',prune_num,'_',modelname,sep=''),regions=length(ests)/10,subject=subject,condition=condition,type='gauss',options=options,overwrite=overwrite,experiment=experiment)
+			
+				.model.startval(pruned_model) = ests 
+				saveModel(pruned_model)
+				cat(as.character(Sys.time()),'*fitting pruned model with',.model.regions(pruned_model),'regions\n')
+				pruned_model = fitModel(pruned_model)
+			} else {
+				model = pruned_model
+				cat(as.character(Sys.time()),'Pruned all regions\n')
+				stop_prune = TRUE
+			}
 			
 		} else {
 			model = pruned_model 

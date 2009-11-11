@@ -18,6 +18,8 @@
 #loadModel
 #updateClass
 #clearWarnings
+#showModels
+
 
 newModel <- 
 function(modelname='defaultmodel',regions=1,subject='',condition='',type=c('gauss','simple'),options=new('options'),overwrite=T,experiment=NULL) 
@@ -139,11 +141,12 @@ function(arfmodel,type=c('pos+neg','pos','neg','all','separate'))
 	
 	#set fullpaths
 	.nifti.header.fullpath(headinf) <- .model.modeldatapath(arfmodel)
+	.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 	
 	#write the Data to the modelNiftiFile
 	if(full) {
 		.nifti.header.filename(headinf) <- .model.modelDataFile(arfmodel)
-		.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
+		#.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 		writeData(headinf,.C('gauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
 	}
 	
@@ -156,7 +159,7 @@ function(arfmodel,type=c('pos+neg','pos','neg','all','separate'))
 		thetavec = as.vector(theta)
 		
 		.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_pos',sep='')
-		.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
+		#.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 		
 		writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
 	}
@@ -169,7 +172,7 @@ function(arfmodel,type=c('pos+neg','pos','neg','all','separate'))
 		thetavec = as.vector(theta)
 		
 		.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_neg',sep='')
-		.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
+		#.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 		
 		writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
 	}
@@ -181,7 +184,7 @@ function(arfmodel,type=c('pos+neg','pos','neg','all','separate'))
 		for(i in 1:ncol(theta)) {
 			thetavec = as.vector(theta[,i])
 			.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_region',i,sep='')
-			.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
+			#.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 			writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
 		}
 		
@@ -197,7 +200,6 @@ function(arfmodel)
 #save the modelBinary
 {
 	
-
 	#get Header info from avgdatfile
 	headinf <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))
 
@@ -227,7 +229,7 @@ function(startval,arfmodel) save(startval,file=paste(.model.modelpath(arfmodel),
 #save startingvalues
 
 loadModel <- 
-function(modelname,subject=NULL,condition,experiment=NULL) 
+function(modelname,subject=NA,condition,experiment=NULL) 
 #load a model based on subject and conditions or on a mnames object
 {
 
@@ -235,7 +237,7 @@ function(modelname,subject=NULL,condition,experiment=NULL)
 	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
 	
 	if(class(modelname)=='mnames') {
-		if(is.null(subject)) num = 1 else num = subject
+		if(is.na(subject)) num = 1 else num = subject
 		experiment = .mnames.experiment(modelname)
 		subject = .mnames.subject(modelname)
 		condition = .mnames.condition(modelname)

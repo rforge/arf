@@ -61,13 +61,13 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 
 
 processSequence <-
-function(modelname='defaultmodel',seedreg=10,subject='',condition='',options=new('options'),overwrite=T,pr=T,printlevel=0,try.silen=T,experiment=NULL)
+function(modelname='defaultmodel',seedreg=10,subject='',condition='',grad=1000,bound=8,ns=T,alpha=.05,options=new('options'),overwrite=T,pr=T,printlevel=0,try.silen=T,experiment=NULL)
 #process a sequence based on a seed number of regions
 {
 	
 	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
 	
-	if(pr) cat('[',modelname,'] @ seed',seedreg,'- started',as.character(Sys.time()),'\n')
+	if(pr) cat('[',modelname,'] @ seed',seedreg,'- started',as.character(Sys.time()),'\n\n')
 	
 	#run a simple model
 	.options.start.method(options) = 'rect'
@@ -95,9 +95,9 @@ function(modelname='defaultmodel',seedreg=10,subject='',condition='',options=new
 	#run prune sequence
 	if(.model.valid(full_model)) {
 	
-		model = pruneModel(full_model,modelname,subject,condition,overwrite,options,experiment)
+		model = pruneModel(full_model,modelname,subject,condition,grad,bound,ns,alpha,options,overwrite,experiment)
 		
-		if(pr) 	if(.model.valid(pruned_model))	cat('ok\n') else cat('fail\n')
+		#if(pr) 	if(.model.valid(model))	cat('ok\n') else cat('fail\n')
 				
 	} else 	model = full_model #full_model not valid
 	

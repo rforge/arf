@@ -61,6 +61,12 @@ function(path=getwd(),name='default_experiment',subjectind=1,conditionind=1,sett
 	
 	#check if path exists
 	if(path=='') path=paste(getwd(),sp,name,sep='') else path=paste(path,sp,name,sep='')
+	
+	if(file.exists(path)) {
+		warning('Directory already exists!')
+		remove.file(list.files(path,'.Rda'))	
+	}
+	
 	if(!file.exists(path)) dir.create(path,recursive=T)
 	
 	#set path separator at end

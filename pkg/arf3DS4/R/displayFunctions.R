@@ -9,7 +9,7 @@
 #sliceColor
 #makeDiscreteImage
 #reqFlip
-#progressWatcher
+#newprogressWindow
 
 makeDiscreteImage <-
 function(datavec,zerotol=1e-03)
@@ -26,9 +26,6 @@ function(datavec,zerotol=1e-03)
 	
 	possteps = round(maxsteps*(abs(max_dat)/total))
 	negsteps = round(maxsteps*(abs(min_dat)/total))
-	
-	possteps = max_dat*stepfac
-	negsteps = abs(min_dat)*stepfac
 	
 	pos_data = datavec[datavec>0]
 	neg_data = datavec[datavec<0]
@@ -81,18 +78,13 @@ function(datavec,gray=FALSE)
 	pos_dat = datasort[datasort>0]
 	
 	if(gray) {
-		
 		pos_col = gray(seq(0,1,1/length(pos_dat))[-1])
 		neg_col = gray(seq(1,0,-1/length(neg_dat))[-length(seq(1,0,-1/length(neg_dat)))])
 		zero_col = gray(0)
-		
-	
 	} else {
-				
 		pos_col <- rgb(1,seq(0,1,1/length(pos_dat))[-1],0)
 		neg_col <- rgb(seq(.5,0,-.5/length(neg_dat))[-1],seq(.5,0,-.5/length(neg_dat))[-1],1)
 		zero_col <- rgb(0,0,0)
-		
 	}
 	
 	colvec <-c(neg_col,zero_col,pos_col) 
@@ -155,11 +147,13 @@ function(arfmodel)
 {
 	
 	tt <- tktoplevel()
-	tktitle(tt) <- 'ARF Progress'
+	mt = .model.modeltype(arfmodel)
+	nr = .model.regions(arfmodel)
+	tktitle(tt) <- paste('ARF Progress [ ',mt,' @ ',nr,' ]',sep='')
 	
 	#create heading
 	text.heading <- tclVar(paste(.model.name(arfmodel),'process started',as.character(Sys.time())))
-	label.heading <- tklabel(tt,width='60')
+	label.heading <- tklabel(tt,width='50')
 	tkconfigure(label.heading,textvariable=text.heading)
 		
 	#create shared comps
@@ -213,15 +207,15 @@ function(arfmodel)
 	tkgrid(label.grad, label.3, label.grad.val)
 	tkgrid(label.4, label.grad.it,columnspan=2)
 	
-	
 	tkgrid.configure(label.ssq, label.grad, sticky='e')
 	tkgrid.configure(label.2, label.4, sticky='e')
 	tkgrid.configure(label.ssq.val, label.ssq.it, label.grad.val, label.grad.it, sticky='w')
 	
-	
+	#make progress object (S3)
 	progress = list(ssq.val.tkobj=text.ssq.val,ssq.it.tkobj=text.ssq.it,grad.val.tkobj=text.grad.val,grad.it.tkobj=text.grad.it)
 	attr(progress,'class') <- 'progress'
-		
+	
+	#assign global counters
 	assign('.gradit',1,envir=.GlobalEnv)
 	assign('.objit',1,envir=.GlobalEnv)
 	

@@ -33,16 +33,11 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 		ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
 	} else ssqdat=ss_data
 	
-	if(analyticalgrad) {
-		grad = gradient.gauss(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data)
-		attr(ssqdat,'gradient') <- grad
-	}
-	
 	if(is.nan(ssqdat) | ssqdat==Inf | is.na(ssqdat) | ssqdat==-Inf) ssqdat=ss_data
 		
+	#progress Watcher
 	tclvalue(progress$ssq.val.tkobj) = paste(round(ssqdat))
 	tclvalue(progress$ssq.it.tkobj) = as.character(.objit)
-	
 	assign('.objit',.objit+1,envir=.GlobalEnv)
 	
 	return(invisible(ssqdat))	
@@ -73,6 +68,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 		grad <- .C('dfssq',as.integer(np),as.integer(brain),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[10]]
 	} else grad=rep(1e+12,np) 
 	
+	#Progress Watcher
 	tclvalue(progress$grad.val.tkobj) = paste(round(sqrt(sum(grad^2))))
 	tclvalue(progress$grad.it.tkobj) = as.character(.gradit)
 	assign('.gradit',.gradit+1,envir=.GlobalEnv)
@@ -85,14 +81,16 @@ ssq.simple <-
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 ##ssq.simple returns the ssq of the simple gauss model with an anlytical gradient attached
 {
-	ssqdat <- .C('simplessqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
-	
-	if(analyticalgrad) {
-		grad = gradient.simple(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data)
-		attr(ssqdat,'gradient') <- grad
-	}
-	
+	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
+		ssqdat <- .C('simplessqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
+	} else ssqdat=ss_data
+		
 	if(is.nan(ssqdat) | ssqdat==Inf | is.na(ssqdat) | ssqdat==-Inf) ssqdat=ss_data
+	
+	#progress Watcher
+	tclvalue(progress$ssq.val.tkobj) = paste(round(ssqdat))
+	tclvalue(progress$ssq.it.tkobj) = as.character(.objit)
+	assign('.objit',.objit+1,envir=.GlobalEnv)
 	
 	return(invisible(ssqdat))	
 	
@@ -114,10 +112,18 @@ gradient.simple <-
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 #gradient returns the analytical gradient of the ssq to the thetaparameters
 {
-	model <- .C('simplegauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[6]]
-	grad <- try(.C('dfsimplessq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]],silen=T)
+	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0) {
+		model <- .C('simplegauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[6]]
+	} else model=NA
 	
-	if(!is.null(attr(grad,'class'))) grad=rep(1e+12,np) 
+	if(length(model[is.na(model) | is.nan(model) | model==Inf | model==-Inf])==0) {
+		grad <- .C('dfsimplessq',as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[9]]
+	} else grad=rep(1e+12,np) 
+
+	#Progress Watcher
+	tclvalue(progress$grad.val.tkobj) = paste(round(sqrt(sum(grad^2))))
+	tclvalue(progress$grad.it.tkobj) = as.character(.gradit)
+	assign('.gradit',.gradit+1,envir=.GlobalEnv)
 	
 	return(grad)
 	
@@ -181,7 +187,6 @@ function(arfdat,experiment=NULL)
 	avgtstat[is.nan(avgtstat)]=0
 	
 	writeData(headinf,avgtstat)
-	
 	
 	#define mask
 	brain <- rep(1,length(avgtstat))
@@ -631,7 +636,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 
 
 checkSolutionReturn <- 
-function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),thres=6) 
+function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),thres=8) 
 #check the solution for boundaries
 {
 	
@@ -691,5 +696,22 @@ function(arfmodel,absthres=1000)
 	regstodel = which(apply(whichwhat,2,sum)>0)	
 	
 	return(regstodel)	
+	
+}
+
+
+checkNonSigReturn <-
+function(arfmodel,alpha=.05) 
+#check for non_sigs
+{
+	
+	if(length(.model.varcov(arfmodel))==0) arfmodel = varcov(arfmodel)
+	if(length(.wald.pvalues(.model.wald(arfmodel)))==0) arfmodel = wald(arfmodel)
+	if(.model.valid(arfmodel)) {
+		ns_del = which(.wald.pvalues(.model.wald(arfmodel))[,4]>=alpha)
+	} else 	ns_del = numeric(0)
+		
+	return(ns_del)
+	
 	
 }
