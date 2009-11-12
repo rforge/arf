@@ -7,7 +7,7 @@
 Save the arf model predictions to one or more NIFTI files.
 }
 \usage{
-saveModelBin(arfmodel, type = c("pos+neg", "pos", "neg", "all", "separate"))
+saveModelBin(arfmodel, type = c("full", "pos", "neg", "all", "separate"))
 saveModelBinSimple(arfmodel)
 }
 \arguments{

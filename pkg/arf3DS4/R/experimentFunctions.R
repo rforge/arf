@@ -64,7 +64,7 @@ function(path=getwd(),name='default_experiment',subjectind=1,conditionind=1,sett
 	
 	if(file.exists(path)) {
 		warning('Directory already exists!')
-		remove.file(list.files(path,'.Rda'))	
+		file.remove(list.files(path,'.Rda'))	
 	}
 	
 	if(!file.exists(path)) dir.create(path,recursive=T)

@@ -781,10 +781,11 @@ void innerSWbwfast(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv
 		for(j=0;j<(*bw);j++) {
 			for(l=0;l<(*trials);l++) { //trial loop
 				loc = Lv[i+j**n];
+				//Rprintf("loc%d, i%d, j%d, l%d ijn%d\n",loc,i,j,l,i+j**n);
 				if(loc!=*escapevar)	*(mrv+i+j**n) = *(mrv+i+j**n) + ((1/pow((double) *trials,2))**(Rv+i+l**n)**(Rv+loc+l**n));
 				else *(mrv+i+j**n)=0;
-
 			} //end trial loop
+
 			//fwrite(mrv,sizeof(double),1,fmeanres);
 		} //end row loop
 	} // end column loop
@@ -798,11 +799,16 @@ void innerSWbwfast(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv
  	// OFF DIAGONAL B, LOOP
  	for(Brow=0;Brow<(*p-1);Brow++) { //BVEC ROW LOOP
 
-		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
+ 		//Rprintf("brow: %d\n",Brow);
+ 		//void R_CheckUserInterrupt(void);
+
+ 		fseek(fderiv,sizeof(double)*(Brow**n),SEEK_SET);
 		fread(Fv,sizeof(double),*n,fderiv);
 
 		for(j=0;j<(*n);j++) { // R matrix column loop ) j = 1..n
 
+			//Rprintf("j%d\n",j);
+			//void R_CheckUserInterrupt(void);
 			s=0e0;
 			for(i=0;i<(*bw);i++) {  // R matrix row loop
 				loc = Lv[j+i**n];

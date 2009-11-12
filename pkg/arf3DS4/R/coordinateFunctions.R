@@ -128,7 +128,8 @@ makeROImask <-
 function(fmridata,maskdata) 
 #function to mask fmridata with non-zero elements in maskdata
 {
-	whichzero = which(.fmri.data.datavec(maskdata)==0)
+
+	if(class(maskdata)=='fmri.data') whichzero = which(.fmri.data.datavec(maskdata)==0) else whichzero = which(maskdata==0)
 	
 	if(length(whichzero)>0) .fmri.data.datavec(fmridata)[whichzero]=0
 

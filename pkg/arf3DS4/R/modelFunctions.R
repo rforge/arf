@@ -122,7 +122,7 @@ function(arfmodel) save(arfmodel,file=paste(.model.modelpath(arfmodel),.Platform
 #save the model to the model.Rda
 
 saveModelBin <- 
-function(arfmodel,type=c('pos+neg','pos','neg','all','separate')) 
+function(arfmodel,type=c('full','pos','neg','all','separate')) 
 #save the modelBinary
 {
 	
@@ -130,11 +130,12 @@ function(arfmodel,type=c('pos+neg','pos','neg','all','separate'))
 	#match type
 	type <- match.arg(type)
 	pos=neg=full=FALSE
-	if(type=='pos+neg') full=T
+	if(type=='full') full=T
 	if(type=='neg') neg=T
 	if(type=='pos') pos=T
 	if(type=='all') full=neg=pos=T
 	
+	sp = .Platform$file.sep
 	
 	#get Header info from avgdatfile
 	headinf <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))
@@ -146,8 +147,14 @@ function(arfmodel,type=c('pos+neg','pos','neg','all','separate'))
 	#write the Data to the modelNiftiFile
 	if(full) {
 		.nifti.header.filename(headinf) <- .model.modelDataFile(arfmodel)
-		#.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 		writeData(headinf,.C('gauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
+
+		fmridat = readData(paste(.model.modeldatapath(arfmodel),sp,headToName(headinf),sep=''))
+		fmridat = makeROImask(fmridat,.model.mask(arfmodel))
+		
+		.nifti.header.filename(fmridat) <- paste('masked_',.model.modelDataFile(arfmodel),sep='')
+		writeData(fmridat,.fmri.data.datavec(fmridat))
+	
 	}
 	
 	if(pos)	{
@@ -159,9 +166,12 @@ function(arfmodel,type=c('pos+neg','pos','neg','all','separate'))
 		thetavec = as.vector(theta)
 		
 		.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_pos',sep='')
-		#.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
-		
 		writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
+	
+		#fmridat = readData(paste(.model.fullmodelDataFile(arfmodel),'_pos',sep=''))
+		#fmridat = makeROImask(fmridat,.model.mask(arfmodel))
+		#writeData(fmridat,.fmri.data.datavec(fmridat))
+		
 	}
 	
 	if(neg)	{
