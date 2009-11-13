@@ -129,7 +129,8 @@ function(arfmodel,type=c('full','pos','neg','all','separate'))
 	
 	#match type
 	type <- match.arg(type)
-	pos=neg=full=FALSE
+	pos=neg=FALSE
+	full=T
 	if(type=='full') full=T
 	if(type=='neg') neg=T
 	if(type=='pos') pos=T
@@ -142,19 +143,12 @@ function(arfmodel,type=c('full','pos','neg','all','separate'))
 	
 	#set fullpaths
 	.nifti.header.fullpath(headinf) <- .model.modeldatapath(arfmodel)
-	.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 	
 	#write the Data to the modelNiftiFile
 	if(full) {
 		.nifti.header.filename(headinf) <- .model.modelDataFile(arfmodel)
+		.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 		writeData(headinf,.C('gauss',as.double(.model.estimates(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
-
-		fmridat = readData(paste(.model.modeldatapath(arfmodel),sp,headToName(headinf),sep=''))
-		fmridat = makeROImask(fmridat,.model.mask(arfmodel))
-		
-		.nifti.header.filename(fmridat) <- paste('masked_',.model.modelDataFile(arfmodel),sep='')
-		writeData(fmridat,.fmri.data.datavec(fmridat))
-	
 	}
 	
 	if(pos)	{
@@ -167,11 +161,6 @@ function(arfmodel,type=c('full','pos','neg','all','separate'))
 		
 		.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_pos',sep='')
 		writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
-	
-		#fmridat = readData(paste(.model.fullmodelDataFile(arfmodel),'_pos',sep=''))
-		#fmridat = makeROImask(fmridat,.model.mask(arfmodel))
-		#writeData(fmridat,.fmri.data.datavec(fmridat))
-		
 	}
 	
 	if(neg)	{
@@ -182,8 +171,6 @@ function(arfmodel,type=c('full','pos','neg','all','separate'))
 		thetavec = as.vector(theta)
 		
 		.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_neg',sep='')
-		#.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
-		
 		writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
 	}
 	
@@ -194,7 +181,6 @@ function(arfmodel,type=c('full','pos','neg','all','separate'))
 		for(i in 1:ncol(theta)) {
 			thetavec = as.vector(theta[,i])
 			.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_region',i,sep='')
-			#.model.fullmodelDataFile(arfmodel) <- headToName(headinf)
 			writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
 		}
 		
