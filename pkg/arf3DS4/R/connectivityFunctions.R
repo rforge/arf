@@ -9,6 +9,10 @@
 #gamma.fmri
 #convol.fmri
 #makeSingleTrialEvents
+#tscor
+#partialCor
+#cor.test.matrix
+#processCorrelations
 
 fitConnectivity <- 
 function(arfmodel,funcfilename='single_events.nii.gz')
@@ -44,8 +48,12 @@ function(arfmodel,funcfilename='single_events.nii.gz')
 		b[,p] = Xp%*%y
 		p=p+1
 	}
-			
-	return(b)
+	
+	#make correlation matrix and return matrices
+	cmat <- cor.test.matrix(t(b),alpha=.05,bonf=F) 
+	out <- list(ts=b,cor=cmat$cor,p=cmat$p)
+	
+	return(out)
 	
 }
 
