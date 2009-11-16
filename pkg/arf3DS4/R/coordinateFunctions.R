@@ -451,6 +451,7 @@ function(arfmodel,thres=5,quiet=T)
 {
 	
 	theta = matrix(.model.estimates(arfmodel),10)
+	distmat = matrix(0,ncol(theta),ncol(theta))
 	
 	p=0
 	#for all off-diagonal elements calculate Euclidian distance
@@ -459,7 +460,7 @@ function(arfmodel,thres=5,quiet=T)
 			
 			dist=0
 			for(k in 1:3) dist = dist + (theta[k,i]-theta[k,j])^2
-			distmat[i,j]=c(sqrt(dist))
+			distmat[i,j]=distmat[j,i]=c(sqrt(dist))
 			
 			opp=FALSE
 			if(theta[10,j]<0 & theta[10,i]>0) opp=TRUE

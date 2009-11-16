@@ -28,6 +28,7 @@ export(
 	pruneModel,
 	fitConnectivity,
 	makeSingleTrialEvents,
+	processCorrelations,
 	partialCor,
 	processModel,
 	processSequence,

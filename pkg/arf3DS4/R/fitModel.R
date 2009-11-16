@@ -142,7 +142,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',gsub('\n','',optim.output$message),sep='')
 		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',gsub('\n','',optim.output$message),sep='')
 		
-		if(optim.output$convergence <= 1) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
+		if(optim.output$convergence <= 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 		
 		#set model objects
 		.model.minimum(arfmodel) <- optim.output$value
@@ -321,7 +321,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',gsub('\n','',optim.output$message),sep='')
 		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',gsub('\n','',optim.output$message),sep='')
 		
-		if(optim.output$convergence <= 1) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
+		if(optim.output$convergence <= 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 		
 		#set model essentials
 		.model.estimates(arfmodel) <- optim.output$par
