@@ -122,7 +122,7 @@ function(arfmodel) save(arfmodel,file=paste(.model.modelpath(arfmodel),.Platform
 #save the model to the model.Rda
 
 saveModelBin <- 
-function(arfmodel,type=c('full','pos','neg','all','separate')) 
+function(arfmodel,type=c('full','pos','neg','fpn','separate','sig')) 
 #save the modelBinary
 {
 	
@@ -134,8 +134,8 @@ function(arfmodel,type=c('full','pos','neg','all','separate'))
 	if(type=='full') full=T
 	if(type=='neg') neg=T
 	if(type=='pos') pos=T
-	if(type=='all') full=neg=pos=T
-	
+	if(type=='fpn') full=neg=pos=T
+		
 	sp = .Platform$file.sep
 	
 	#get Header info from avgdatfile
@@ -183,6 +183,27 @@ function(arfmodel,type=c('full','pos','neg','all','separate'))
 			.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_region',i,sep='')
 			writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])
 		}
+		
+	}
+	
+	if(type=='sig') {
+		theta = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
+		wald = .model.wald(arfmodel)
+		
+		if(length(wald)!=0) {
+			
+			which_sig = which(.wald.pvalues(wald)[,4]<.05 & .wald.pvalues(wald)[,5]<.05)
+		
+			if(length(which_sig)>0) theta = theta[,which_sig]
+			regs = ncol(theta)
+			thetavec = as.vector(theta)
+			
+			.nifti.header.filename(headinf) <- paste(.model.modelDataFile(arfmodel),'_sig',sep='')
+			writeData(headinf,.C('gauss',as.double(thetavec),as.integer(regs*.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]])	
+			
+			
+		} else warning('Wald statistics not calculated! No models saved.')
+		
 		
 	}
 	

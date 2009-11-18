@@ -3,13 +3,14 @@
 \title{Process Interregion correlations.}
 \description{Process functional connectivity between regions (inter-region correlations) based on the time-series data.}
 \usage{
-processCorrelations(tsdata, arfmodel, alpha = 0.05, bonf = T, sort = c("euclid", "correlation", "pvalue", "region"))
+processCorrelations(tsdata, arfmodel, alpha = 0.05, bonf = T, pc = T, sort = c("euclid", "correlation", "pvalue", "region"))
 }
 \arguments{
   \item{tsdata}{Time by region matrix of time-series data.}
   \item{arfmodel}{An arf model object (class \code{\linkS4class{model}})}
   \item{alpha}{Alpha to test the correlations.}
   \item{bonf}{Correct for multiple comparisons?}
+  \item{pc}{Use Partial Correlations to select connectivity.}
   \item{sort}{Sort the output by Euclidian Distance, Highest correlation, Lowest p-value, or Region number.}
 }
 \value{

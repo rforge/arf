@@ -141,7 +141,15 @@ setMethod('show','fmri.data',
 		function(object) {
 			
 			cat('[ ',object@filename,' ]\n\n')
+			
+			cat('<location>\n')
+			cat('path:           ',object@fullpath,'\n')			
+			cat('filename:       ',object@filename,'\n')			
+			cat('extension:       ',object@extension,sep='')
+			if(object@gzipped) cat('.gz\n') else cat('\n')
+			cat('\n')
 			cat('<file>\n')
+			cat('filetype:       ',object@filetype,'\n')			#size of header (must be 348))
 			cat('size of header: ',object@sizeof_hdr,'\n')			#size of header (must be 348))
 			cat('type of data:   ',object@datatype,'\n')			#storage data type
 			cat('bits_per_pixel: ',object@bitpix,'\n') 			#bits per pixel
