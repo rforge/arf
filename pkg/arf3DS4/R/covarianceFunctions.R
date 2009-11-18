@@ -458,14 +458,14 @@ function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,
 		fdr=fdr.value[i]
 		pvec = fdr / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
+		for(i in 1:sig.steps) 	sigvec[pvec[i]>(dt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
 	}
 	
 	if(which=='uncorrected') {
 		adj.p = alpha
 		pvec = adj.p / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
+		for(i in 1:sig.steps) 	sigvec[pvec[i]>(dt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
 	}
 	
 	.fmri.data.datavec(fmridata) <- sigvec
