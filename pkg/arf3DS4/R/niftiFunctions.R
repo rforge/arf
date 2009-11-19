@@ -319,13 +319,15 @@ function(headinf)
 }
 
 writeData <- 
-function(headinf,datavec) 
+function(headinf,datavec=NULL) 
 #write data to a nifti file
 {
 	## writeData writes both Header and Data info to a file
 	## input is headerinfo and datavector
 	## output is logical
 	sp <- .Platform$file.sep
+	
+	if(is.null(datavec)) datavec = .fmri.data.datavec(headinf)
 	
 	# set correct extension
 	if(.nifti.header.extension(headinf)=='hdr') extension='img' else extension <- .nifti.header.extension(headinf)

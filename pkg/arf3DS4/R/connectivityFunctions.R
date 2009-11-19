@@ -210,18 +210,21 @@ function(tsmat,regnames=NULL)
 }
 
 partialCor <-
-function(R)
+function(R,n)
 #calculate partial correlations
 {
 	Ri=solve(R)
-	pC=matrix(NA,nrow(R),ncol(R))
+	pC=sigPc=matrix(NA,nrow(R),ncol(R))
 	for(col in 1:ncol(R)) {
 		for(row in 1:nrow(R)) {
-			pC[row,col] = (-1*Ri[row,col]) / sqrt((Ri[row,row]) * (Ri[col,col]))			
+			pC[row,col] = (-1*Ri[row,col]) / sqrt((Ri[row,row]) * (Ri[col,col]))
+			tval = pC[row,col]/sqrt((1-pC[row,col]^2)/(n-2))
+			sigPc[row,col]=dt(tval,(n-2))
+			
 		}
 	}
 	
-	return(pC)
+	return(list(pcor=pC,p=sigPc))
 	
 }
 
@@ -307,7 +310,6 @@ function(tsdata,arfmodel,alpha=.05,bonf=T,pc=T,sort=c('euclid','correlation','pv
 	if(sort=='euclid') o = order(corlist$siglist[,11],decreasing=T)
 	if(sort=='correlation') o = order(abs(corlist$siglist[,3]),decreasing=T)
 	if(sort=='pvalue') o = order(corlist$siglist[,4],decreasing=F)
-	
 		
 	if(sort=='region') {
 		o = order(corlist$siglist[,1],decreasing=F)
