@@ -8,10 +8,12 @@ Calculate partial correlations
 Calculate partial correlations of a correlation matrix.
 }
 \usage{
-partialCor(R)
+partialCor(R,n)
 }
 \arguments{
   \item{R}{An invertible correlation matrix.}
+  \item{n}{Number of samples to obtain test-statistic.}
+  
 }
 
 \value{

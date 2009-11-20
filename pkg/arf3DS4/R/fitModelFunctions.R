@@ -705,8 +705,11 @@ function(arfmodel,alpha=.05)
 #check for non_sigs
 {
 	
-	if(length(.model.varcov(arfmodel))==0) arfmodel = varcov(arfmodel)
-	if(length(.wald.pvalues(.model.wald(arfmodel)))==0) arfmodel = wald(arfmodel)
+	if(length(.model.varcov(arfmodel))==0) {
+		arfmodel = varcov(arfmodel)
+		arfmodel = wald(arfmodel)
+	}
+	
 	if(.model.valid(arfmodel)) {
 		ns_del = which(.wald.pvalues(.model.wald(arfmodel))[,4]>=alpha)
 	} else 	ns_del = numeric(0)

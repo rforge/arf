@@ -49,10 +49,7 @@ function(arfmodel,funcfilename='single_events.nii.gz')
 		p=p+1
 	}
 	
-	#demean b
-	for(i in 1:length(regs)) b[i,]=b[i,]-mean(b[i,])
-		
-
+	
 	#make correlation matrix and return matrices
 	cmat <- cor.test.matrix(t(b),alpha=.05,bonf=F) 
 	out <- list(ts=b,cor=cmat$cor,p=cmat$p)
@@ -259,7 +256,7 @@ function(data,alpha=.05,bonf=T)
 		}
 	}
 	
-	pcor = partialCor(cormat)
+	pcor = partialCor(cormat,ncol(data))
 	
 	delsig = which(is.na(siglist[,1]))
 	if(length(delsig)>0) siglist = siglist[-delsig,]
