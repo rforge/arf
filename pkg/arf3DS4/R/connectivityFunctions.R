@@ -27,6 +27,10 @@ function(arfmodel,funcfilename='single_events.nii.gz')
 	X = matrix(NA,n,length(regs))
 	theta = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
 	
+	#set theta amplitudes to one (all)
+	theta[10,]=rep(1,.model.regions(arfmodel))
+	
+	
 	p=1
 	for(i in regs) {
 		thetavec = as.vector(theta[,i])
