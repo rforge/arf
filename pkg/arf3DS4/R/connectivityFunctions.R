@@ -192,39 +192,6 @@ function(hrf, prot, ...)
 	return(conv)
 }
 
-tscor <-
-function(tsmat,regnames=NULL) 
-#calculate correlation of timeseries matrix
-{
-	
-	R = cor(t(tsmat))
-	if(!is.null(regnames)) {
-		rownames(R) = regnames
-		colnames(R) = regnames
-	}
-
-	return(R)
-}
-
-partialCor <-
-function(R,n)
-#calculate partial correlations
-{
-	Ri=solve(R)
-	pC=sigPc=matrix(NA,nrow(R),ncol(R))
-	for(col in 1:ncol(R)) {
-		for(row in 1:nrow(R)) {
-			pC[row,col] = (-1*Ri[row,col]) / sqrt((Ri[row,row]) * (Ri[col,col]))
-			tval = pC[row,col]/sqrt((1-pC[row,col]^2)/(n-2))
-			sigPc[row,col]=dt(tval,(n-2))
-			
-		}
-	}
-	
-	return(list(pcor=pC,p=sigPc))
-	
-}
-
 cor.test.matrix <- 
 function(data,alpha=.05,bonf=T) 
 #calculate correlation test of a matrix
@@ -269,66 +236,90 @@ function(data,alpha=.05,bonf=T)
 }
 
 
-processCorrelations <- 
-function(tsdata,arfmodel,alpha=.05,bonf=T,pc=T,sort=c('euclid','correlation','pvalue','region')) 
-#calculate interregion correlations (with Eucliddistances)
+tsCor <-
+function(tsmat,regnames=NULL) 
+#calculate correlation of timeseries matrix
 {
 	
-	corlist = cor.test.matrix(tsdata,alpha,bonf)
-	
-	siglist = corlist$siglist[,1:4]
+	R = cor(t(tsmat))
+	if(!is.null(regnames)) {
+		rownames(R) = regnames
+		colnames(R) = regnames
+	}
 
-	if(pc) {
-		del=numeric(0)
-		for(i in 1:nrow(siglist)) if(corlist$pcor[siglist[i,1],siglist[i,2]]<=0) del=c(del,i)
-		if(length(del)>0) siglist = siglist[-del,]
-	}
-	
-	eudist = euclidDist(arfmodel)
-		
-	ncor = nrow(siglist)
-	loc1 = loc2 = matrix(NA,ncor,3)
-	eud = matrix(NA,ncor,1)
-	
-	estmat = matrix(.model.estimates(arfmodel),10)
-	
-	for(i in 1:ncor) {
-		loc1[i,] = round(estmat[c(1,2,3),siglist[i,1]])
-		loc2[i,] = round(estmat[c(1,2,3),siglist[i,2]])
-		eud[i,] = round(eudist[siglist[i,1],siglist[i,2]])
-	}
-	
-	corlist$siglist = cbind(siglist,loc1,loc2,eud)
-	colnames(corlist$siglist) =  c('region1','region2','estimate','p-value','r1x','r1y','r1z','r2x','r2y','r2z','euclid')
-	
-	sort = match.arg(sort)
-	
-	
-	if(sort=='euclid') o = order(corlist$siglist[,11],decreasing=T)
-	if(sort=='correlation') o = order(abs(corlist$siglist[,3]),decreasing=T)
-	if(sort=='pvalue') o = order(corlist$siglist[,4],decreasing=F)
-		
-	if(sort=='region') {
-		o = order(corlist$siglist[,1],decreasing=F)
-		to = corlist$siglist[o,]
-		
-		for(i in unique(to[,1]))
-		{
-			to2 = as.matrix(to[which(to[,1]==i),])
-			if(ncol(to2)>1) {
-				o2 = order(to2[,2],decreasing=F)
-				to[which(to[,1]==i),] =	to2[o2,]
-			}
-		}
-		corlist$siglist = to
-	}
-	
-	if(!sort=='region') corlist$siglist = corlist$siglist[o,]
-	
-	
-	
-	
-	return(data.frame(corlist$siglist))
+	return(R)
 }
+
+partialCor <-
+function(R,n)
+#calculate partial correlations
+{
+	Ri=solve(R)
+	pC=sigPc=matrix(NA,nrow(R),ncol(R))
+	for(col in 1:ncol(R)) {
+		for(row in 1:nrow(R)) {
+			pC[row,col] = (-1*Ri[row,col]) / sqrt((Ri[row,row]) * (Ri[col,col]))
+			tval = pC[row,col]/sqrt((1-pC[row,col]^2)/(n-2))
+			sigPc[row,col]=dt(tval,(n-2))
+			
+		}
+	}
+	
+	return(list(pcor=pC,p=sigPc))
+	
+}
+
+
+differenceCor <-
+function(c1,c2,n1,n2=n1) 
+#test if correlations are different
+{
+	
+	diffscore = zval = pval = z1 = z2 = matrix(0,dim(c1)[1],dim(c1)[2])
+	
+	for(i in 1:dim(c1)[1]) {
+		for(j in 1:dim(c1)[2]) {
+			
+			#fischer z transform correlations
+			zscore1 = log(abs((c1[i,j]+1)/(c1[i,j]-1)))/2
+			zscore2 = log(abs((c2[i,j]+1)/(c2[i,j]-1)))/2
+			
+			#reverse the sign if correlations are negative
+			if(c1[i,j]<0 & zscore1>0) zscore1=zscore1*-1
+			if(c2[i,j]<0 & zscore2>0) zscore2=zscore2*-1
+			
+			#calculate the difference between z values
+			diffz = zscore1-zscore2
+			
+			#calculate standard error of correlations
+			SE = sqrt((1/(n1 - 3)) + (1/(n2 - 3)))
+			
+			#calculate z-value of the difference
+			zv = diffz/SE		
+			
+			#check if zv=NaN (only when one of the correlations is one)
+			if(is.nan(zv)) {
+				z1[i,j]=0
+				z2[i,j]=0
+				zval[i,j] = 0
+				diffscore[i,j] = 0
+				pval[i,j]=1
+			} else {
+				#fill in matrices with zscores/differences/zvaluesdifference and p-values
+				z1[i,j]=zscore1
+				z2[i,j]=zscore2
+				zval[i,j]=zv
+				diffscore[i,j]=diffz
+				pval[i,j] = dnorm(zval[i,j])
+			} 
+		}
+	}
+	return(list(z1=z1,z2=z2,dif=diffscore,z=zval,pval=pval))
+}
+
+
+
+
+
 
 
