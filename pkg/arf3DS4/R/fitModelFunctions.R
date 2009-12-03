@@ -35,10 +35,17 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	
 	if(is.nan(ssqdat) | ssqdat==Inf | is.na(ssqdat) | ssqdat==-Inf) ssqdat=ss_data
 		
-	#progress Watcher
+	#Progress Watcher
+	olgrad = get('.gradit',envir=.GlobalEnv)
+	gradobj = round(olgrad-ssqdat,6)
+	assign('.gradit',ssqdat,envir=.GlobalEnv)
+	
+	tclvalue(progress$grad.val.tkobj) = gradobj 
 	tclvalue(progress$ssq.val.tkobj) = paste(round(ssqdat))
 	tclvalue(progress$ssq.it.tkobj) = as.character(.objit)
 	assign('.objit',.objit+1,envir=.GlobalEnv)
+	
+	
 	
 	return(invisible(ssqdat))	
 	
@@ -68,10 +75,8 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 		grad <- .C('dfssq',as.integer(np),as.integer(brain),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[10]]
 	} else grad=rep(1e+12,np) 
 	
-	#Progress Watcher
-	tclvalue(progress$grad.val.tkobj) = paste(round(sqrt(sum(grad^2))))
-	tclvalue(progress$grad.it.tkobj) = as.character(.gradit)
-	assign('.gradit',.gradit+1,envir=.GlobalEnv)
+	#progress Watcher
+	tclvalue(progress$grad.it.tkobj) = as.character(round(sqrt(sum(grad^2))))
 	
 	return(grad)
 

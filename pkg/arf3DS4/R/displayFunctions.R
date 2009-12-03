@@ -165,11 +165,11 @@ function(arfmodel)
 	label.2 <- tklabel(tt,width=12)
 	tkconfigure(label.2,textvariable=text.2)
 	
-	text.3 <- tclVar('norm')
+	text.3 <- tclVar('decrease')
 	label.3 <- tklabel(tt,width=12)
 	tkconfigure(label.3,textvariable=text.3)
 	
-	text.4 <- tclVar('iterate')
+	text.4 <- tclVar('norm')
 	label.4 <- tklabel(tt,width=12)
 	tkconfigure(label.4,textvariable=text.4)
 	
@@ -204,8 +204,8 @@ function(arfmodel)
 	tkgrid(label.heading,columnspan=3)
 	tkgrid(label.ssq, label.1, label.ssq.val)
 	tkgrid(label.2, label.ssq.it,columnspan=2)
-	tkgrid(label.grad, label.3, label.grad.val)
-	tkgrid(label.4, label.grad.it,columnspan=2)
+	tkgrid(label.3, label.grad.val,columnspan=2)
+	tkgrid(label.grad, label.4, label.grad.it)
 	
 	tkgrid.configure(label.ssq, label.grad, sticky='e')
 	tkgrid.configure(label.2, label.4, sticky='e')
@@ -216,7 +216,7 @@ function(arfmodel)
 	attr(progress,'class') <- 'progress'
 	
 	#assign global counters
-	assign('.gradit',1,envir=.GlobalEnv)
+	assign('.gradit',0,envir=.GlobalEnv)
 	assign('.objit',1,envir=.GlobalEnv)
 	
 	return(progress)
