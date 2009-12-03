@@ -7,6 +7,7 @@
 #setGenerics for functions
 setGeneric('plot',package='graphics')
 setGeneric('summary',package='base')
+setGeneric('as.array',package='base')
 
 setMethod('show','experiment',
 	function(object) {
@@ -245,5 +246,26 @@ setMethod('show','mnames',
 			cat('            [',i,'] ',.mnames.mnames(object)[i],'\n',sep='')
 				}
 			}
+		}
+)
+
+
+
+setMethod('as.array','fmri.data',
+		function(x) {
+			
+			dx = x@dims[2]
+			dy = x@dims[3]
+			dz = x@dims[4]
+			dt = x@dims[5]
+			
+			
+			out = x@datavec
+			if(x@dims[1]==3) dim(out) = c(dx,dy,dz)
+			if(x@dims[1]==4) dim(out) = c(dx,dy,dz,dt)
+			
+			
+			return(out)
+			
 		}
 )
