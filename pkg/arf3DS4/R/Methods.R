@@ -9,6 +9,9 @@ setGeneric('plot',package='graphics')
 setGeneric('summary',package='base')
 setGeneric('as.array',package='base')
 
+
+
+#### EXPERIMENT METHODS ####
 setMethod('show','experiment',
 	function(object) {
 		
@@ -26,6 +29,7 @@ setMethod('show','experiment',
 	}
 )
 
+#### FMRI DATA METHODS ####
 setMethod('plot',signature(x='fmri.data',y='missing'),
 	function(x,y,zerotol=1e-3,what=c('all','pos','neg'),col=c('rgb','gray'),...) {
 		
@@ -74,69 +78,6 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		
 	}		
 )
-
-setMethod('plot',signature(x='model',y='missing'),
-		function(x,y,...) {
-			
-			mod = readData(paste(x@modeldatapath,.Platform$file.sep,x@fullmodelDataFile,sep=''))
-			plot(mod,...)
-			
-		}
-
-)
-
-
-setMethod('show','data',
-		function(object) {
-			cat('[ ARF data ]\n')
-			cat('name:          ',toupper(object@name),'\n')
-			cat('path:          ',object@fullpath,'\n')
-			cat('betafiles:     ',length(object@betafiles),'\n')
-			cat('weightfiles:   ',length(object@betafiles),'\n')
-			cat('avgbetafile:   ')
-			if(length(object@avgdatfile)>0)	if(!file.exists(object@avgdatfile)) cat('not available\n') else cat('exists\n')
-			cat('avgweightfile: ')
-			if(length(object@avgWfile)>0) if(!file.exists(object@avgWfile)) cat('not available\n') else cat('exists\n')
-			
-		}
-)
-
-
-
-setMethod('show','model',
-		function(object) {
-			cat(paste('[ ARF ',tolower(object@modelname),' ]\n',sep=''))
-			cat(' regions: ',object@regions,'\n')
-			cat(' valid:   ',object@valid,'\n')
-			cat(' warnings:\n')
-			for(warns in object@warnings) cat('  ',warns,'\n')
-			cat('\n')
-			if(object@valid==T) {
-				cat(' modelinfo:\n')
-				cat(' ',object@convergence,'\n')
-				cat('  fit (BIC,RMSEA):',round(object@fit[1]),round(object@fit[2],1),'\n')
-				cat('  minimum:   ',object@minimum,'\n')
-				cat('  estimates:\n')
-				if(length(object@wald@pvalues)==0) {object@wald@pvalues=matrix(1,object@regions,5);w=FALSE} else w=TRUE
-				
-				for(reg in 1:object@regions) {
-					cat('  ',sprintf('[%3d]  (%3.0f,%3.0f,%3.0f)',reg,object@estimates[1+(10*(reg-1))],object@estimates[2+(10*(reg-1))],object@estimates[3+(10*(reg-1))]))
-					if(object@wald@pvalues[reg,4]<.05) {	
-						cat(' ',sprintf('[%5.1f %5.1f %5.1f ~ %5.1f %5.1f %5.1f]* ',object@estimates[4+(10*(reg-1))],object@estimates[5+(10*(reg-1))],object@estimates[6+(10*(reg-1))],object@estimates[7+(10*(reg-1))],object@estimates[8+(10*(reg-1))],object@estimates[9+(10*(reg-1))]))
-					} else cat(' ',sprintf('[%5.1f %5.1f %5.1f ~ %5.1f %5.1f %5.1f]  ',object@estimates[4+(10*(reg-1))],object@estimates[5+(10*(reg-1))],object@estimates[6+(10*(reg-1))],object@estimates[7+(10*(reg-1))],object@estimates[8+(10*(reg-1))],object@estimates[9+(10*(reg-1))]))
-					if(object@wald@pvalues[reg,5]<.05) {	
-						cat(' ',sprintf('[%7.0f]*',object@estimates[10+(10*(reg-1))]),'\n')
-					} else cat(' ',sprintf('[%7.0f] ',object@estimates[10+(10*(reg-1))]),'\n')
-				}
-				cat('\n')
-				if(w) cat('  * Wald tests significant at .05 (uncorrected for number of regions)\n')
-				if(!w) cat('  Wald statistics not calculated\n')
-				cat('\n')
-			}
-			
-		}
-)
-
 
 setMethod('show','fmri.data',
 		function(object) {
@@ -235,22 +176,6 @@ setMethod('summary','fmri.data',
 		}
 )
 
-setMethod('show','mnames',
-		function(object) {
-			cat('experiment:',.experiment.name(.mnames.experiment(object)),'\n')
-			cat('   subject:',.mnames.subject(object),'\n')
-			cat(' condition:',.mnames.condition(object),'\n')
-			cat('modelnames: [1]',.mnames.mnames(object)[1],'\n')
-			if(length(.mnames.mnames(object))>1) {
-				for(i in 2:length(.mnames.mnames(object))) {
-			cat('            [',i,'] ',.mnames.mnames(object)[i],'\n',sep='')
-				}
-			}
-		}
-)
-
-
-
 setMethod('as.array','fmri.data',
 		function(x) {
 			
@@ -269,3 +194,83 @@ setMethod('as.array','fmri.data',
 			
 		}
 )
+
+#### ARF MODEL METHODS ####
+setMethod('plot',signature(x='model',y='missing'),
+		function(x,y,...) {
+			
+			mod = readData(paste(x@modeldatapath,.Platform$file.sep,x@fullmodelDataFile,sep=''))
+			plot(mod,...)
+			
+		}
+
+)
+setMethod('show','model',
+		function(object) {
+			cat(paste('[ ARF ',tolower(object@modelname),' ]\n',sep=''))
+			cat(' regions: ',object@regions,'\n')
+			cat(' valid:   ',object@valid,'\n')
+			cat(' warnings:\n')
+			for(warns in object@warnings) cat('  ',warns,'\n')
+			cat('\n')
+			if(object@valid==T) {
+				cat(' modelinfo:\n')
+				cat(' ',object@convergence,'\n')
+				cat('  fit (BIC,RMSEA):',round(object@fit[1]),round(object@fit[2],1),'\n')
+				cat('  minimum:   ',object@minimum,'\n')
+				cat('  estimates:\n')
+				if(length(object@wald@pvalues)==0) {object@wald@pvalues=matrix(1,object@regions,5);w=FALSE} else w=TRUE
+				
+				for(reg in 1:object@regions) {
+					cat('  ',sprintf('[%3d]  (%3.0f,%3.0f,%3.0f)',reg,object@estimates[1+(10*(reg-1))],object@estimates[2+(10*(reg-1))],object@estimates[3+(10*(reg-1))]))
+					if(object@wald@pvalues[reg,4]<.05) {	
+						cat(' ',sprintf('[%5.1f %5.1f %5.1f ~ %5.1f %5.1f %5.1f]* ',object@estimates[4+(10*(reg-1))],object@estimates[5+(10*(reg-1))],object@estimates[6+(10*(reg-1))],object@estimates[7+(10*(reg-1))],object@estimates[8+(10*(reg-1))],object@estimates[9+(10*(reg-1))]))
+					} else cat(' ',sprintf('[%5.1f %5.1f %5.1f ~ %5.1f %5.1f %5.1f]  ',object@estimates[4+(10*(reg-1))],object@estimates[5+(10*(reg-1))],object@estimates[6+(10*(reg-1))],object@estimates[7+(10*(reg-1))],object@estimates[8+(10*(reg-1))],object@estimates[9+(10*(reg-1))]))
+					if(object@wald@pvalues[reg,5]<.05) {	
+						cat(' ',sprintf('[%7.0f]*',object@estimates[10+(10*(reg-1))]),'\n')
+					} else cat(' ',sprintf('[%7.0f] ',object@estimates[10+(10*(reg-1))]),'\n')
+				}
+				cat('\n')
+				if(w) cat('  * Wald tests significant at .05 (uncorrected for number of regions)\n')
+				if(!w) cat('  Wald statistics not calculated\n')
+				cat('\n')
+			}
+			
+		}
+)
+
+#### ARF DATA METHODS ####
+setMethod('show','data',
+		function(object) {
+			cat('[ ARF data ]\n')
+			cat('name:          ',toupper(object@name),'\n')
+			cat('path:          ',object@fullpath,'\n')
+			cat('betafiles:     ',length(object@betafiles),'\n')
+			cat('weightfiles:   ',length(object@betafiles),'\n')
+			cat('avgbetafile:   ')
+			if(length(object@avgdatfile)>0)	if(!file.exists(object@avgdatfile)) cat('not available\n') else cat('exists\n')
+			cat('avgweightfile: ')
+			if(length(object@avgWfile)>0) if(!file.exists(object@avgWfile)) cat('not available\n') else cat('exists\n')
+			
+		}
+)
+
+
+#### ARF MNAMES METHODS ####
+setMethod('show','mnames',
+		function(object) {
+			cat('experiment:',.experiment.name(.mnames.experiment(object)),'\n')
+			cat('   subject:',.mnames.subject(object),'\n')
+			cat(' condition:',.mnames.condition(object),'\n')
+			cat('modelnames: [1]',.mnames.mnames(object)[1],'\n')
+			if(length(.mnames.mnames(object))>1) {
+				for(i in 2:length(.mnames.mnames(object))) {
+			cat('            [',i,'] ',.mnames.mnames(object)[i],'\n',sep='')
+				}
+			}
+		}
+)
+
+
+
+

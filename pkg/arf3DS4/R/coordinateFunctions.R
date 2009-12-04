@@ -17,6 +17,7 @@
 #MNI2arf
 #MNI2atlas
 #setFuncFile
+#reqFlip
 #flipAxis
 #euclidDist
 #makeLowResStruct
@@ -322,6 +323,25 @@ function(xyz_coor,registration)
 			
 	#return arf
 	return(stand_mni_flipped [-length(stand_mni_flipped)]+1)
+}
+
+reqFlip <-
+function(fmridata)
+#check if a flip is required 
+{
+	flip = c(T,F,F)
+	
+	if(.fmri.data.sform_code(fmridata)>0) {
+		
+		if(.fmri.data.srow_x(fmridata)[1]<0) flip[1]=F
+		if(.fmri.data.srow_y(fmridata)[2]<0) flip[2]=T
+		if(.fmri.data.srow_z(fmridata)[3]<0) flip[3]=T
+		
+		
+	} #else warning('sform_code not set, assuming radiological orientation')
+	
+	return(flip)
+	
 }
 
 flipAxis <-
