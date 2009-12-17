@@ -29,8 +29,7 @@ function(arfmodel,funcfilename='single_events.nii.gz')
 	
 	#set theta amplitudes to one (all)
 	theta[10,]=rep(1,.model.regions(arfmodel))
-	
-	
+		
 	p=1
 	for(i in regs) {
 		thetavec = as.vector(theta[,i])
@@ -138,7 +137,7 @@ function(arfmodel,sefilename='single_events')
 		}
 	}
 	
-	#make new file for fileterd single events
+	#make new file for filetered single events
 	.fmri.data.filename(fmrivolume) = sefilename
 	.fmri.data.dims(fmrivolume)[5] = totdim
 	.fmri.data.pixdim(fmrivolume)[5] = 1

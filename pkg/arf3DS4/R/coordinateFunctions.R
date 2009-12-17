@@ -248,27 +248,37 @@ function(xyz_coor,registration)
 	
 	#examp_vox to mm
 	examp_mm = .registration.Dex(registration)%*%xyz
+	#cat('examp_mm',examp_mm,'\n')
 	
 	#examp_mm to high_mm
 	high_mm = .registration.Aex2hi(registration)%*%examp_mm
+	#cat('hiigh_mm',high_mm,'\n')
 	
+	#FLIP
 	#high_mm to high_vox
 	high_vox = solve(.registration.Dhi(registration))%*%high_mm
+	#cat('high_vox',high_vox,'\n')	
 	
 	#x-axis flipped
 	high_vox_flipped = .registration.SXhi(registration)%*%high_vox
+	#cat('high_vox_flipped',high_vox_flipped,'\n')
 	
 	#high_vox to high_mm
 	high_mm_flipped = .registration.Dhi(registration)%*%high_vox_flipped
+	#cat('high_mm_flipped',high_mm_flipped,'\n')
+	#END FLIP
 	
 	#high_mm to standard_mm
 	stand_mm_flipped = .registration.Ahi2st(registration)%*%high_mm_flipped
+	#cat('stand_mm_flipped',stand_mm_flipped,'\n')
 	
 	#standard_mm to standard_vox 
 	stand_vox_flipped = solve(.registration.Dst(registration))%*%stand_mm_flipped
-
+	#cat('stand_vox_flipped',stand_vox_flipped,'\n')
+	
 	#standard_vox to MNI (origin offset)
 	stand_mni_flipped = .registration.OXst(registration)%*%stand_vox_flipped
+	#cat('stand_mni_flipped',stand_mni_flipped,'\n')
 	
 	#return MNI
 	return(stand_mni_flipped[-length(stand_mni_flipped)])
@@ -294,22 +304,45 @@ function(xyz_coor,registration)
 	#inverse high_vox to high_mm
 	high_mm_flipped = solve(.registration.Dhi(registration))%*%stand_mm_flipped
 	
+	#FLIP
 	#inverse x-axis flipped
 	high_vox_flipped = solve(.registration.SXhi(registration))%*%high_mm_flipped
-	
+		
 	#inverse high_mm to high_vox
 	high_vox = (.registration.Dhi(registration))%*%high_vox_flipped
-	
+		
 	#inverse examp_mm to high_mm
 	high_mm = solve(.registration.Aex2hi(registration))%*%high_vox
+	#END FLIP
 	
 	#inverse examp_vox to mm
 	examp_mm = solve(.registration.Dex(registration))%*%high_mm
-			
+	
 	#return arf
 	return(examp_mm[-length(examp_mm)]+1)
 	
 }
+
+
+arf2high <- 
+#arfToMNI converts arf-native mm locations to highres subject scan.		
+function(xyz_coor,registration) 
+{
+	#minus one to correct for vector in FSL starting at zero	
+	xyz = c(xyz_coor-1,1)
+	
+	#examp_vox to mm
+	examp_mm = .registration.Dex(registration)%*%xyz
+	
+	#examp_mm to high_mm
+	high_mm = .registration.Aex2hi(registration)%*%examp_mm
+	
+	#return highres
+	return(high_mm[-length(high_mm)])
+	
+}
+
+
 
 MNI2atlas <- 
 #MNI converts MNI_152 standard coordinates to atlas index coordinates 		
@@ -830,4 +863,37 @@ function(arfmodel,regtrial=1,saveastext=F)
 
 	return(invisible(atlas))
 	
+}
+
+
+highresBlobs <-
+function(arfmodel,registration) 
+#make highresolution blobs (with outlines at 95% spat.ext)
+{
+	
+	ests = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
+	
+	centers = matrix(NA,.model.regions(arfmodel),3)
+	
+	for(reg in 1:ncol(ests)) {
+		#minus one to correct for vector in FSL starting at zero	
+		xyz = c(ests[c(1,2,3),reg]-1,1)
+		
+		#examp_vox to mm
+		examp_mm = .registration.Dex(registration)%*%xyz
+		
+		#examp_mm to high_mm
+		high_mm = .registration.Aex2hi(registration)%*%examp_mm
+		
+		#high_mm to high_vox
+		high_vox = solve(.registration.Dhi(registration))%*%high_mm
+	
+		#set center locations in highres vox coordinates
+		centers[reg,] = round(high_vox[-length(high_vox)])-1	
+		
+		#calculate sigma matrix
+		sigma = matrix(c(ests[4,reg]^2,ests[4,reg]*ests[5,reg]*ests[7,reg],ests[4,reg]*ests[6,reg]*ests[8,reg],ests[4,reg]*ests[5,reg]*ests[7,reg],ests[5,reg]^2,ests[5,reg]*ests[6,reg]*ests[9,reg],ests[4,reg]*ests[6,reg]*ests[8,reg],ests[5,reg]*ests[6,reg]*ests[9,reg],ests[6,reg]^2),3)
+		
+	}
+	return(centers)
 }

@@ -13,18 +13,18 @@ Activated Region Fitting (ARF) is an analysis method for fMRI data. The method u
 \tabular{ll}{
 Package: \tab arf3DS4\cr
 Type: \tab Package\cr
-Version: \tab 1.9-7\cr
-Date: \tab 2009-12-04\cr
+Version: \tab 1.9-8\cr
+Date: \tab 2009-12-17\cr
 Depends: \tab R (>= 2.9.1), methods\cr
 URL: \tab http://arf.r-forge.r-project.org/\cr
 License: \tab GNU (GPL)\cr
 LazyLoad: \tab yes\cr
 Repository: \tab R-Forge\cr
 Repository/R-Forge/Project: \tab arf\cr
-Repository/R-Forge/Revision: \tab 117\cr
-Publication: \tab 2009-12-04 15:58:11\cr
-Packaged: \tab 2009-12-04 15:58:11; rforge\cr
-Built: \tab R 2.10.0; universal-apple-darwin9.8.0; 2009-12-04 15:58:11; unix\cr
+Repository/R-Forge/Revision: \tab 118\cr
+Publication: \tab 2009-12-17 15:13:17\cr
+Packaged: \tab 2009-12-17 15:13:17; rforge\cr
+Built: \tab R 2.10.0; universal-apple-darwin9.8.0; 2009-12-17 15:13:17; unix\cr
 }
 To get a feeling of the arf3DS4 package, it is recommended to read the manual first. More details can also be found in the ARF paper (see reference section).
 arf3DS4 stores all its data in a predefined directory structure, this is mainly because of the size of fMRI data files. To save memory the data is often not stored directly in an R object, but the location where the files can be found is stored instead. 

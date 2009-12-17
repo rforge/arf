@@ -15,6 +15,7 @@ export(
 	setFuncFiles,
 	arf2Excel,
 	arf2MNI,
+	arf2high, 
 	MNI2arf,
 	MNI2atlas,
 	euclidDist,
