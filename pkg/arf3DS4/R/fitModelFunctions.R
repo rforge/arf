@@ -723,3 +723,62 @@ function(arfmodel,alpha=.05)
 	
 	
 }
+
+
+setIsoContour <- 
+function(arfmodel,conf.int=95)
+{
+	#set confidence interval and Chi-square threshold
+	CI = (conf.int/100)
+	Chi = qchisq(CI,3)
+	
+	#read dat, set dims, and create new 0-filled object
+	arfdat = readData(.model.avgdatfile(arfmodel))
+	dimx = .fmri.data.dims(arfdat)[2]
+	dimy = .fmri.data.dims(arfdat)[3]
+	dimz = .fmri.data.dims(arfdat)[4]
+	
+	
+	totvec = numeric(0)
+	
+	#read in estimates in a matrix
+	ests = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
+	
+	#for each region set the confidence interval based on X'C-1X <= Chi3
+	for(reg in 1:.model.regions(arfmodel)) {
+	
+		newdat = array(0,c(dimx,dimy,dimz))
+		
+		theta = ests[,reg]
+		Sigma = matrix(c(theta[4]^2,theta[4]*theta[5]*theta[7],theta[4]*theta[6]*theta[8],theta[4]*theta[5]*theta[7],theta[5]^2,theta[5]*theta[6]*theta[9],theta[4]*theta[6]*theta[8],theta[5]*theta[6]*theta[9],theta[6]^2),3)
+		SI = solve(Sigma)
+		
+		#cat(det(Sigma),'\n')
+		
+		for(z in 1:dimz) {
+			for(y in 1:dimy) {
+				for(x in 1:dimx) {
+					
+					X = c(x-theta[1],y-theta[2],z-theta[3]) 
+					C = t(X)%*%SI%*%X
+					if(C<=Chi) newdat[x,y,z] = 1
+					
+				}
+			}
+		}
+		
+		totvec = c(totvec,as.vector(newdat))
+	}
+
+	#set new data object attributes (path and name)
+	.fmri.data.dims(arfdat)[1] = 4
+	.fmri.data.dims(arfdat)[5] = .model.regions(arfmodel)
+	.fmri.data.fullpath(arfdat) = .model.modeldatapath(arfmodel)
+	.fmri.data.filename(arfdat) = paste('iscontours_CI',as.character(conf.int),sep='')
+	.fmri.data.datavec(arfdat) = as.vector(totvec)
+	
+	writeData(arfdat)
+	
+	return(arfdat)
+	
+}

@@ -41,6 +41,7 @@ export(
 	checkSolutionReturn,
 	checkGradientReturn,
 	validStart,
+	setIsoContour,
 	newModel,
 	saveModel,
 	saveModelBin,
