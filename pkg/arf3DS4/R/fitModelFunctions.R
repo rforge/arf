@@ -24,6 +24,8 @@
 #checkSolution
 #checkSolutionReturn
 #checkGradientReturn
+#checkNonSigReturn
+#setIsoContour
 
 ssq.gauss <- 
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
@@ -775,6 +777,7 @@ function(arfmodel,conf.int=95)
 	.fmri.data.dims(arfdat)[5] = .model.regions(arfmodel)
 	.fmri.data.fullpath(arfdat) = .model.modeldatapath(arfmodel)
 	.fmri.data.filename(arfdat) = paste('iscontours_CI',as.character(conf.int),sep='')
+	.fmri.data.descrip(arfdat) = 'ARF regions Isocontours'
 	.fmri.data.datavec(arfdat) = as.vector(totvec)
 	
 	writeData(arfdat)

@@ -14,6 +14,7 @@
 #writeHeaderPart
 #writeDataPart
 #headToName
+#getIntent
 
 getFileInfo <- 
 function(filename)
@@ -486,5 +487,61 @@ function(headinf)
 	#return filename
 	return(filename)
 		
+}
+
+
+getIntent <- 
+function(code) 
+#get Nifti Intent code
+{
+	intent = 'Unkown code'
+	
+	#statistics
+	if(as.numeric(code)==2) intent = 'correlation'
+	if(as.numeric(code)==3) intent = 't-test'
+	if(as.numeric(code)==4) intent = 'F-test'
+	if(as.numeric(code)==5) intent = 'z-score'
+	if(as.numeric(code)==6) intent = 'chisq'
+	if(as.numeric(code)==7) intent = 'beta'
+	if(as.numeric(code)==8) intent = 'binom'
+	if(as.numeric(code)==9) intent = 'gamma'
+	if(as.numeric(code)==10) intent = 'poisson'
+	if(as.numeric(code)==11) intent = 'normal'
+	if(as.numeric(code)==12) intent = 'F-test nonc'
+	if(as.numeric(code)==13) intent = 'chisq nonc'
+	if(as.numeric(code)==14) intent = 'logistic'
+	if(as.numeric(code)==15) intent = 'laplace'
+	if(as.numeric(code)==16) intent = 'uniform'
+	if(as.numeric(code)==17) intent = 't-test nonc'
+	if(as.numeric(code)==18) intent = 'weibull'
+	if(as.numeric(code)==19) intent = 'Chi'
+	if(as.numeric(code)==20) intent = 'invgauss'
+	if(as.numeric(code)==21) intent = 'extval (p-val)'
+	if(as.numeric(code)==22) intent = 'p-value'
+	if(as.numeric(code)==23) intent = 'logpval'
+	if(as.numeric(code)==24) intent = 'log10pval'
+	
+	#Non-stat
+	if(as.numeric(code)==1001) intent = 'estimate'
+	if(as.numeric(code)==1002) intent = 'label'
+	if(as.numeric(code)==1003) intent = 'neuroname'
+	if(as.numeric(code)==1004) intent = 'genmatrix'
+	if(as.numeric(code)==1005) intent = 'symmatrix'
+	if(as.numeric(code)==1006) intent = 'displacement'
+	if(as.numeric(code)==1007) intent = 'vector'
+	if(as.numeric(code)==1008) intent = 'pointset'
+	if(as.numeric(code)==1009) intent = 'triangle'
+	if(as.numeric(code)==1010) intent = 'quaternion'
+	if(as.numeric(code)==1011) intent = 'dimless'
+	
+	#gifti
+	if(as.numeric(code)==2001) intent = 'timeseries'
+	if(as.numeric(code)==2002) intent = 'node'
+	if(as.numeric(code)==2003) intent = 'rgb-triplet'
+	if(as.numeric(code)==2004) intent = 'rgba-vector'
+	if(as.numeric(code)==2005) intent = 'shape'
+	
+
+	return(intent)
 }
 

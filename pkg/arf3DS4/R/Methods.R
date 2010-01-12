@@ -107,7 +107,7 @@ setMethod('show','fmri.data',
 			#cat('intent p1:      ',object@intent_p1,'\n') 
 			#cat('intent p2:      ',object@intent_p2,'\n') 
 			#cat('intent p3:      ',object@intent_p3,'\n') 
-			#cat('intentname:     ',object@intent_name,'\n')		#meaning of data
+			cat('intentname:     ',object@intent_name,'\n')		#meaning of data
 			#cat('data type:      ',object@data_type,'\n')		
 			#cat('db name:        ',object@db_name,'\n')			
 			cat('\n')
@@ -184,14 +184,11 @@ setMethod('as.array','fmri.data',
 			dz = x@dims[4]
 			dt = x@dims[5]
 			
-			
 			out = x@datavec
 			if(x@dims[1]==3) dim(out) = c(dx,dy,dz)
 			if(x@dims[1]==4) dim(out) = c(dx,dy,dz,dt)
-			
-			
+
 			return(out)
-			
 		}
 )
 
