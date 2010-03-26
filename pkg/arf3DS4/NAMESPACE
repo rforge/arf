@@ -37,6 +37,7 @@ export(
 	createAllAverages,
 	determineStartRect,
 	determineStartRectSimple,
+	regressAmplitudes,
 	checkSolution,
 	checkSolutionReturn,
 	checkGradientReturn,
