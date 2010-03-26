@@ -133,17 +133,17 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 
 	#end_time
 	en_time <- Sys.time()
-
+	
 	# check for internal errors and set relevant arf model values
 	if(is.null(attr(optim.output,'class'))) {
 		if(optim.output$convergence==0) .model.convergence(arfmodel) <- paste('Optim converged in ',optim.output$counts[1],' iterations.',sep='')
-		if(optim.output$convergence==1) .model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.';.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim did not converge.',sep=''))
+		if(optim.output$convergence==1) {.model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.';.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim did not converge.',sep=''))}
 		if(optim.output$convergence==10) .model.convergence(arfmodel) <- 'Degeneracy of the Nelder-Mead Simplex'
 		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',gsub('\n','',optim.output$message),sep='')
 		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',gsub('\n','',optim.output$message),sep='')
 		
 		if(optim.output$convergence == 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
-		
+	
 		#set model objects
 		.model.minimum(arfmodel) <- optim.output$value
 		.model.estimates(arfmodel) <- optim.output$par
@@ -152,7 +152,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T,progress=progress)
-	
+		
 		if(.model.valid(arfmodel)) {
 			#save the ModelBinary
 			arfmodel <- saveModelBin(arfmodel)
@@ -205,8 +205,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim internal error: ',gsub('\n','',optim.output),sep=''))
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 		.model.valid(arfmodel) <- FALSE
+		
 	}
-	
+		
 	if(!.model.valid(arfmodel)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),.model.convergence(arfmodel)) 
 	
 	#save the modelInfo

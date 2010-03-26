@@ -11,7 +11,7 @@ setIsoContour(arfmodel, conf.int = 95)
   \item{conf.int}{Confidence Interval (in percentage) for the isocontour.}
 }
 \value{An object of class code{\linkS4class{fmri.data}} with a fourth dimension equal to the number of regions. Each volume contains the voxels within the isocontour for that specific region.}
-\\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
 	\code{\linkS4class{model}}, \code{\linkS4class{fmri.data}}
 }

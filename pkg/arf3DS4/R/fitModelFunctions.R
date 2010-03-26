@@ -15,6 +15,7 @@
 #createAllAverages
 #determineStartRect
 #determineStartRectSimple
+#regressAmpitudes
 #isEdge
 #fallOff
 #fwhm.filter
@@ -330,6 +331,8 @@ function(arfmodel,options=loadOptions(arfmodel))
 
 	}
 	
+	#regressamplitudes
+	theta[((1:.model.regions(arfmodel))*10)]=regressAmplitudes(arfmodel,'start')
 	
 	#save startingvalues
 	.model.startval(arfmodel) <- theta
@@ -449,6 +452,46 @@ function(arfmodel,options=loadOptions(arfmodel))
 	return(invisible(arfmodel))
 	
 }
+
+regressAmplitudes <-
+function(arfmodel,which='start')
+{
+	
+	which = match.arg(which,c('start','estimates'))
+	
+	#get Header info from avgdatfile
+	headinf <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))
+	n = .nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4]
+	regs = 1:.model.regions(arfmodel)
+	
+	#make model design matrix
+	X = matrix(NA,n,length(regs))
+	if(which=='estimates') theta = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
+	if(which=='start') theta = matrix(.model.startval(arfmodel),.model.params(arfmodel))
+		
+	#set theta amplitudes to one (all)
+	theta[10,]=rep(1,.model.regions(arfmodel))
+	
+	p=1
+	for(i in regs) {
+		thetavec = as.vector(theta[,i])
+		X[,p] = .C('gauss',as.double(thetavec),as.integer(.model.params(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(numeric(.nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4])))[[6]]
+		p=p+1
+	}
+	
+	
+	funcdata = readData(.model.avgdatfile(arfmodel))	
+	funcvolume = .fmri.data.datavec(funcdata)
+	dim(funcvolume) = c(.fmri.data.dims(funcdata)[2],.fmri.data.dims(funcdata)[3],.fmri.data.dims(funcdata)[4])
+	
+	Xp = solve(t(X)%*%X)%*%t(X)
+	y = as.vector(funcvolume)
+	b = Xp%*%y
+	
+	return(b)
+	
+}
+
 
 isEdge <-  
 function(mask,xvec,yvec,zvec)
