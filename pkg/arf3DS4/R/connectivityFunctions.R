@@ -230,8 +230,8 @@ function(data,alpha=.05,bonf=T)
 	
 	delsig = which(is.na(siglist[,1]))
 	if(length(delsig)>0) siglist = siglist[-delsig,]
-	o = order(abs(siglist[,3]),decreasing=T)
-	siglist = siglist[o,]
+	#o = order(abs(siglist[,3]),decreasing=T)
+	#siglist = siglist[o,]
 	
 	corlist= list(cor=cormat,p=pmat,sig=sigmat,pcor=pcor,siglist=siglist)
 	
