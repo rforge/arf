@@ -31,13 +31,14 @@ setMethod('show','experiment',
 
 #### FMRI DATA METHODS ####
 setMethod('plot',signature(x='fmri.data',y='missing'),
-	function(x,y,zerotol=1e-3,what=c('all','pos','neg'),col=c('rgb','gray'),...) {
+	function(x,y,zerotol=1e-3,what=c('all','pos','neg'),col=c('rgb','gray'),volume=1,...) {
 		
 		dimx <- x@dims[2]
 		dimy <- x@dims[3]
 		dimz <- x@dims[4]
 		
-		data <- x@datavec[1:(dimx*dimy*dimz)]
+		if(x@dims[1]==4) data <- x@datavec[(1:(dimx*dimy*dimz))+(dimx*dimy*dimz)*(volume-1)] else data <- x@datavec[1:(dimx*dimy*dimz)]
+		
 		dim(data) <- c(dimx,dimy,dimz)
 		
 		if(reqFlip(x)[1]) data <- flipAxis(data,'x')
@@ -51,6 +52,8 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		what = match.arg(what)
 		col = match.arg(col)
 		
+		asp = dimy/dimx
+		
 		if(what=='pos') data[data<0]=0
 		if(what=='neg') data[data>0]=0
 		if(col=='gray') gray = TRUE else gray=FALSE
@@ -62,7 +65,7 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		for(i in 1:dimz) {
 			colvec = sliceColor(as.vector(newdata[,,i]),colors)
 			par(mgp=c(1.1,0,0))
-			image(1:dimx,1:dimy,newdata[,,i],bty='n',main='',axes=F,col=colvec,xlab='',ylab='')
+			image(1:dimx,1:dimy,newdata[,,i],bty='n',main='',axes=F,col=colvec,xlab='',ylab='',asp=asp)
 			axis(1,at=round(dimx/2),labels='P',tick=F)
 			axis(2,at=round(dimy/2),labels='R',tick=F)
 			axis(3,at=c(1,round(dimx/2)),labels=c(i,'A'),tick=F)
@@ -71,7 +74,7 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		}
 		
 		par(las=1,mar=c(2, 6, 1, 1) + 0.1,mgp=c(3,1,0))
-		image(x=c(1),y=colors$data,z=matrix(colors$data,1),axes=F,col=colors$colvec,xlab='',ylab='')
+		image(x=c(1),y=colors$data,z=matrix(colors$data,1),axes=F,col=colors$colvec,xlab='',ylab='',asp=asp)
 		axis(2,at=c(min(colors$data),0,max(colors$data)),labels=c(round(min(data),2),0,round(max(data),2)),cex=1.5)
 		
 		if(((m*m-dimz)-1)>0) for(i in 1:((m*m-dimz)-1)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F,xlab='',ylab='')			

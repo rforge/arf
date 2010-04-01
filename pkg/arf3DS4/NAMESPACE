@@ -28,6 +28,7 @@ export(
 	fitModel,
 	pruneModel,
 	fitConnectivity,
+	roiConnectivity,
 	makeSingleTrialEvents,
 	differenceCor,
 	partialCor,

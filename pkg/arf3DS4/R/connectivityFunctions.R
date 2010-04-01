@@ -13,6 +13,7 @@
 #partialCor
 #cor.test.matrix
 #processCorrelations
+#roiConnectivity
 
 fitConnectivity <- 
 function(arfmodel,funcfilename='single_events.nii.gz')
@@ -321,7 +322,51 @@ function(c1,c2,n1,n2=n1)
 }
 
 
+roiConnectivity <-
+function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events.nii.gz',type=c('avg','ev'))
+{
+	#match type argument
+	type = match.arg(type,c('avg','ev'))
+	
+	#make isocontours of model estimates
+	roidataarray = as.array(roidata)
+	roi = vector('list',.fmri.data.dims(roidata)[5])
+	for(i in 1:.fmri.data.dims(roidata)[5]) roi[[i]] = which(as.vector(roidataarray[,,,i])>0)
+		
+	#load functional data
+	funcdata = readData(paste(.model.funcDir(arfmodel),.Platform$file.sep,funcfilename,sep=''))	
+	funcvolume = .fmri.data.datavec(funcdata)
+	dim(funcvolume) = c(.fmri.data.dims(funcdata)[2],.fmri.data.dims(funcdata)[3],.fmri.data.dims(funcdata)[4],.fmri.data.dims(funcdata)[5])
+	
+	#create time-series for each volume and blob
+	b =  matrix(NA,.fmri.data.dims(roidata)[5],.fmri.data.dims(funcdata)[5])
 
+	for(tm in 1:.fmri.data.dims(funcdata)[5]) {
+		for(blob in 1:.fmri.data.dims(roidata)[5]) {
+	
+			#unweighted average
+			if(type=='avg') ev = rep(1,length(roi[[blob]]))
+	
+			#weigthed average by first spatial eigenvector
+			if(type=='ev') {
+				nvec = as.vector(funcvolume[,,,tm])[roi[[blob]]]
+				NN = t(t(nvec))%*%nvec
+				ev = eigen(NN, symmetric=TRUE, only.values = FALSE, EISPACK = FALSE)$vectors[,1]
+			}
+			
+			#create average
+			b[blob,tm] = mean((as.vector(funcvolume[,,,tm])[roi[[blob]]])*ev)
+		
+		}
+	}
+	
+	#make correlation matrix and return matrices
+	cmat <- cor.test.matrix(t(b),alpha=.05,bonf=F) 
+	out <- list(ts=b,cor=cmat$cor,p=cmat$p)
+	attr(out,'class') <- 'arfcorrelation'
+	
+	return(out)
+}
 
 
 
