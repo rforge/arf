@@ -323,7 +323,7 @@ function(c1,c2,n1,n2=n1)
 
 
 roiConnectivity <-
-function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events.nii.gz',type=c('avg','ev'))
+function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events.nii.gz',type=c('avg','ev'),evmodel=c('moddat','avgdat','roi'))
 {
 	#match type argument
 	type = match.arg(type,c('avg','ev'))
@@ -341,18 +341,29 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 	#create time-series for each volume and blob
 	b =  matrix(NA,.fmri.data.dims(roidata)[5],.fmri.data.dims(funcdata)[5])
 
+	#create weigthed average first spatial eigenvector
+	if(type=='ev') {
+		eigenvec = vector('list',.fmri.data.dims(roidata)[5])
+		if(evmodel=='moddat') modeldat = readData(paste(.model.modeldatapath(arfmodel),'/',.model.fullmodelDataFile(arfmodel),sep=''))
+		if(evmodel=='avgdat') modeldat = readData(.model.avgdatfile(arfmodel))
+		if(evmodel=='roi') modeldat = roidata
+					
+		for(blob in 1:.fmri.data.dims(roidata)[5]) {
+			nvec = .fmri.data.datavec(modeldat)[roi[[blob]]]
+			NN = t(t(nvec))%*%nvec
+			eigenvec[[blob]] = eigen(NN, symmetric=TRUE, only.values = FALSE, EISPACK = FALSE)$vectors[,1]
+		}
+	}
+	
+	#calculate beta time-series estimates
 	for(tm in 1:.fmri.data.dims(funcdata)[5]) {
 		for(blob in 1:.fmri.data.dims(roidata)[5]) {
 	
 			#unweighted average
 			if(type=='avg') ev = rep(1,length(roi[[blob]]))
-	
-			#weigthed average by first spatial eigenvector
-			if(type=='ev') {
-				nvec = as.vector(funcvolume[,,,tm])[roi[[blob]]]
-				NN = t(t(nvec))%*%nvec
-				ev = eigen(NN, symmetric=TRUE, only.values = FALSE, EISPACK = FALSE)$vectors[,1]
-			}
+		
+			#weighted average
+			if(type=='ev') ev = eigenvec[[blob]]
 			
 			#create average
 			b[blob,tm] = mean((as.vector(funcvolume[,,,tm])[roi[[blob]]])*ev)
