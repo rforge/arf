@@ -323,10 +323,11 @@ function(c1,c2,n1,n2=n1)
 
 
 roiConnectivity <-
-function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events.nii.gz',type=c('avg','ev'),evmodel=c('moddat','avgdat','roi'))
+function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events.nii.gz',type=c('avg','ev'),evmodel=c('spatial','spatiotemporal'))
 {
 	#match type argument
 	type = match.arg(type,c('avg','ev'))
+	evmodel = match.arg(evmodel,c('spatial','spatiotemporal'))
 	
 	#make isocontours of model estimates
 	roidataarray = as.array(roidata)
@@ -343,32 +344,57 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 
 	#create weigthed average first spatial eigenvector
 	if(type=='ev') {
-		eigenvec = vector('list',.fmri.data.dims(roidata)[5])
-		if(evmodel=='moddat') modeldat = readData(paste(.model.modeldatapath(arfmodel),'/',.model.fullmodelDataFile(arfmodel),sep=''))
-		if(evmodel=='avgdat') modeldat = readData(.model.avgdatfile(arfmodel))
-		if(evmodel=='roi') modeldat = roidata
-					
-		for(blob in 1:.fmri.data.dims(roidata)[5]) {
-			nvec = .fmri.data.datavec(modeldat)[roi[[blob]]]
-			NN = t(t(nvec))%*%nvec
-			eigenvec[[blob]] = eigen(NN, symmetric=TRUE, only.values = FALSE, EISPACK = FALSE)$vectors[,1]
+		
+		if(evmodel=='spatiotemporal') {
+			
+			eigenvec = vector('list',.fmri.data.dims(roidata)[5])
+			
+			for(blob in 1:.fmri.data.dims(roidata)[5]) {
+				timebyvox = matrix(NA,.fmri.data.dims(funcdata)[5],length(roi[[blob]]))
+				
+				for(tm in 1:.fmri.data.dims(funcdata)[5]) {
+					timebyvox[tm,] = as.vector(funcvolume[,,,tm])[roi[[blob]]]
+				}
+				
+				blobsvd = svd(timebyvox)
+				eigenvec[[blob]] = (blobsvd$u[,1]*blobsvd$d[1])%*%t(blobsvd$v[,1])
+			
+			}
 		}
+		
+		if(evmodel=='spatial') {
+			
+			eigenvec = vector('list',.fmri.data.dims(roidata)[5])
+			avgdata = readData(.model.avgdatfile(arfmodel))
+			
+			for(blob in 1:.fmri.data.dims(roidata)[5]) {
+				NN = matrix(.fmri.data.datavec(avgdata)[roi[[blob]]],,1)%*%matrix(.fmri.data.datavec(avgdata)[roi[[blob]]],1,)
+				eigenvec[[blob]] = eigen(NN)$vectors[,1]
+				
+			}
+		}
+		
+		
 	}
 	
 	#calculate beta time-series estimates
-	for(tm in 1:.fmri.data.dims(funcdata)[5]) {
-		for(blob in 1:.fmri.data.dims(roidata)[5]) {
-	
-			#unweighted average
-			if(type=='avg') ev = rep(1,length(roi[[blob]]))
+	for(blob in 1:.fmri.data.dims(roidata)[5]) {
 		
-			#weighted average
-			if(type=='ev') ev = eigenvec[[blob]]
-			
-			#create average
-			b[blob,tm] = mean((as.vector(funcvolume[,,,tm])[roi[[blob]]])*ev)
-		
+		if(type=='avg') {
+			for(tm in 1:.fmri.data.dims(funcdata)[5]) b[blob,tm] = mean((as.vector(funcvolume[,,,tm])[roi[[blob]]]))
 		}
+		
+		if(type=='ev') {
+			if(evmodel=='spatiotemporal') {
+				for(tm in 1:.fmri.data.dims(funcdata)[5]) b[blob,tm] = mean(eigenvec[[blob]][tm,])
+			}
+			
+			if(evmodel=='spatial') {
+				for(tm in 1:.fmri.data.dims(funcdata)[5]) b[blob,tm] = mean((as.vector(funcvolume[,,,tm])[roi[[blob]]])*eigenvec[[blob]])
+			}
+			
+		}
+		
 	}
 	
 	#make correlation matrix and return matrices
