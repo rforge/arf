@@ -15,6 +15,8 @@
 #writeDataPart
 #headToName
 #getIntent
+#fmri2array
+
 
 getFileInfo <- 
 function(filename)
@@ -543,5 +545,22 @@ function(code)
 	
 
 	return(intent)
+}
+
+
+fmri2array <- function(fmridat) 
+#converts a fmri.data object to an array
+{
+	dx = .fmri.data.dims(fmridat)[2]
+	dy = .fmri.data.dims(fmridat)[3]
+	dz = .fmri.data.dims(fmridat)[4]
+	dt = .fmri.data.dims(fmridat)[5]
+	
+	out = .fmri.data.datavec(fmridat)
+	
+	if(.fmri.data.dims(fmridat)[1]==3) dim(out) = c(dx,dy,dz)
+	if(.fmri.data.dims(fmridat)[1]==4) dim(out) = c(dx,dy,dz,dt)
+	
+	return(out)
 }
 

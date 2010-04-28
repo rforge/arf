@@ -330,7 +330,7 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 	evmodel = match.arg(evmodel,c('spatial','spatiotemporal'))
 	
 	#make isocontours of model estimates
-	roidataarray = as.array(roidata)
+	roidataarray = fmri2array(roidata)
 	roi = vector('list',.fmri.data.dims(roidata)[5])
 	for(i in 1:.fmri.data.dims(roidata)[5]) roi[[i]] = which(as.vector(roidataarray[,,,i])>0)
 		

@@ -7,8 +7,6 @@
 #setGenerics for functions
 setGeneric('plot',package='graphics')
 setGeneric('summary',package='base')
-setGeneric('as.array',package='base')
-
 
 
 #### EXPERIMENT METHODS ####
@@ -179,19 +177,38 @@ setMethod('summary','fmri.data',
 		}
 )
 
-setMethod('as.array','fmri.data',
-		function(x) {
+setMethod('[','fmri.data',
+		function(x,i,j,k,l,drop='missing') {
+			if(x@dims[1]>3) dat = array(x@datavec,dim=c(x@dims[2],x@dims[3],x@dims[4],x@dims[5])) else dat = array(x@datavec,dim=c(x@dims[2],x@dims[3],x@dims[4]))
+		
+			if(missing(i)) i = NULL
+			if(missing(j)) j = NULL
+			if(missing(k)) k = NULL
+			if(missing(l)) l = NULL
 			
-			dx = x@dims[2]
-			dy = x@dims[3]
-			dz = x@dims[4]
-			dt = x@dims[5]
-			
-			out = x@datavec
-			if(x@dims[1]==3) dim(out) = c(dx,dy,dz)
-			if(x@dims[1]==4) dim(out) = c(dx,dy,dz,dt)
-
+			if(x@dims[1]>3) out = eval(parse(text=paste('dat[',i,',',j,',',k,',',l,']',sep=''))) else out = eval(parse(text=paste('dat[',i,',',j,',',k,']',sep='')))
+				
 			return(out)
+		}
+)
+
+setMethod('[<-','fmri.data',
+		function(x,i,j,k,l,value,drop='missing') {
+			if(x@dims[1]>3) dat = array(x@datavec,dim=c(x@dims[2],x@dims[3],x@dims[4],x@dims[5])) else dat = array(x@datavec,dim=c(x@dims[2],x@dims[3],x@dims[4]))
+			
+			if(missing(i)) i = NULL
+			if(missing(j)) j = NULL
+			if(missing(k)) k = NULL
+			
+			if(x@dims[1]>3) {
+				if(missing(l)) l = NULL
+			} else value = l
+			
+			if(x@dims[1]>3) out = eval(parse(text=paste('dat[',i,',',j,',',k,',',l,']<-value',sep=''))) else out = eval(parse(text=paste('dat[',i,',',j,',',k,']<-value',sep='')))
+			
+			x@datavec = as.vector(dat) 
+					
+			return(x)
 		}
 )
 
