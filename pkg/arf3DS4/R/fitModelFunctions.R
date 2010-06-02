@@ -331,11 +331,13 @@ function(arfmodel,options=loadOptions(arfmodel))
 
 	}
 	
-	#regressamplitudes
+	#save startvalues to arfmodel
+	.model.startval(arfmodel) <- theta
+	
+	#regress amplitudes
 	theta[((1:.model.regions(arfmodel))*10)]=regressAmplitudes(arfmodel,'start')
 	
 	#save startingvalues
-	.model.startval(arfmodel) <- theta
 	saveStart(.model.startval(arfmodel),arfmodel)
 	
 	#save startmap
@@ -483,6 +485,7 @@ function(arfmodel,which='start')
 	funcdata = readData(.model.avgdatfile(arfmodel))	
 	funcvolume = .fmri.data.datavec(funcdata)
 	dim(funcvolume) = c(.fmri.data.dims(funcdata)[2],.fmri.data.dims(funcdata)[3],.fmri.data.dims(funcdata)[4])
+	
 	
 	Xp = solve(t(X)%*%X)%*%t(X)
 	y = as.vector(funcvolume)

@@ -29,7 +29,7 @@ setMethod('show','experiment',
 
 #### FMRI DATA METHODS ####
 setMethod('plot',signature(x='fmri.data',y='missing'),
-	function(x,y,zerotol=1e-3,what=c('all','pos','neg'),col=c('rgb','gray'),volume=1,...) {
+	function(x,y,zerotol=1e-3,what=c('all','pos','neg'),col=c('rgb','gray'),volume=1,slices=1:x@dims[4],...) {
 		
 		dimx <- x@dims[2]
 		dimy <- x@dims[3]
@@ -43,7 +43,10 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		if(reqFlip(x)[2]) data <- flipAxis(data,'y')
 		if(reqFlip(x)[3]) data <- flipAxis(data,'z')
 		
-		m <- round(sqrt(dimz+1)+.5)
+		#make layout of slices
+		numslices=length(slices)
+		m <- round(sqrt(numslices+1)+.5)
+		if(numslices==1) m=1
 		layout(matrix(1:m^2,m,m,byrow=T))
 		par(mar=c(2,2,1,1),las=1)
 		
@@ -60,7 +63,8 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		colors = makeColors(newdata,gray)
 		dim(newdata) <- c(dimx,dimy,dimz)	
 	
-		for(i in 1:dimz) {
+		#fill slices
+		for(i in slices) {
 			colvec = sliceColor(as.vector(newdata[,,i]),colors)
 			par(mgp=c(1.1,0,0))
 			image(1:dimx,1:dimy,newdata[,,i],bty='n',main='',axes=F,col=colvec,xlab='',ylab='',asp=asp)
@@ -71,12 +75,14 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 			
 		}
 		
-		par(las=1,mar=c(2, 6, 1, 1) + 0.1,mgp=c(3,1,0))
-		image(x=c(1),y=colors$data,z=matrix(colors$data,1),axes=F,col=colors$colvec,xlab='',ylab='',asp=asp)
-		axis(2,at=c(min(colors$data),0,max(colors$data)),labels=c(round(min(data),2),0,round(max(data),2)),cex=1.5)
+		#only add if numslices is > 1
+		if(numslices>1) {
+			par(las=1,mar=c(2, 6, 1, 1) + 0.1,mgp=c(3,1,0))
+			image(x=c(1),y=colors$data,z=matrix(colors$data,1),axes=F,col=colors$colvec,xlab='',ylab='',asp=asp)
+			axis(2,at=c(min(colors$data),0,max(colors$data)),labels=c(round(min(data),2),0,round(max(data),2)),cex=1.5)
 		
-		if(((m*m-dimz)-1)>0) for(i in 1:((m*m-dimz)-1)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F,xlab='',ylab='')			
-		
+			if(((m*m-numslices)-1)>0) for(i in 1:((m*m-numslices)-1)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F,xlab='',ylab='')			
+		}
 	}		
 )
 
