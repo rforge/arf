@@ -29,7 +29,7 @@ setMethod('show','experiment',
 
 #### FMRI DATA METHODS ####
 setMethod('plot',signature(x='fmri.data',y='missing'),
-	function(x,y,zerotol=1e-3,what=c('all','pos','neg'),col=c('rgb','gray'),volume=1,slices=1:x@dims[4],...) {
+	function(x,y,zerotol=1e-3,what=c('all','pos','neg'),col=c('rgb','gray'),volume=1,slices=1:x@dims[4],max.asp=2,...) {
 		
 		dimx <- x@dims[2]
 		dimy <- x@dims[3]
@@ -54,6 +54,7 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		col = match.arg(col)
 		
 		asp = dimy/dimx
+		if(asp>max.asp) asp=max.asp
 		
 		if(what=='pos') data[data<0]=0
 		if(what=='neg') data[data>0]=0
@@ -66,6 +67,13 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		#fill slices
 		for(i in slices) {
 			colvec = sliceColor(as.vector(newdata[,,i]),colors)
+			
+			unvec = unique(as.vector(newdata[,,i]))
+			if(length(unvec)<=2) {
+				if(any(unvec<0)) colvec=colors$colvec
+				if(any(unvec>0)) colvec=colors$colvec
+			}  
+				
 			par(mgp=c(1.1,0,0))
 			image(1:dimx,1:dimy,newdata[,,i],bty='n',main='',axes=F,col=colvec,xlab='',ylab='',asp=asp)
 			axis(1,at=round(dimx/2),labels='P',tick=F)
