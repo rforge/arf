@@ -338,6 +338,7 @@ function(arfmodel,options=loadOptions(arfmodel))
 	theta[((1:.model.regions(arfmodel))*10)]=regressAmplitudes(arfmodel,'start')
 	
 	#save startingvalues
+	.model.startval(arfmodel) <- theta	
 	saveStart(.model.startval(arfmodel),arfmodel)
 	
 	#save startmap
