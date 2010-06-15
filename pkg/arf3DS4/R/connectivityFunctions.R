@@ -368,7 +368,14 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 			avgdata = readData(.model.avgdatfile(arfmodel))
 			
 			for(blob in 1:.fmri.data.dims(roidata)[5]) {
-				NN = matrix(.fmri.data.datavec(avgdata)[roi[[blob]]],,1)%*%matrix(.fmri.data.datavec(avgdata)[roi[[blob]]],1,)
+				timebyvox = matrix(NA,.fmri.data.dims(funcdata)[5],length(roi[[blob]]))
+				
+				for(tm in 1:.fmri.data.dims(funcdata)[5]) {
+					timebyvox[tm,] = as.vector(funcvolume[,,,tm])[roi[[blob]]]
+				}
+				
+				#NN = matrix(.fmri.data.datavec(avgdata)[roi[[blob]]],,1)%*%matrix(.fmri.data.datavec(avgdata)[roi[[blob]]],1,)
+				NN = t(timebyvox)%*%timebyvox
 				eigenvec[[blob]] = eigen(NN)$vectors[,1]
 				
 			}
@@ -405,6 +412,122 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 	return(out)
 }
 
-
+makeRawTimeseries <- 
+function(arfmodel,sefilename='single_events')
+#make single trial estimates
+{
+	#get Header info from avgdatfile
+	headinf <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))
+	
+	#open functional file
+	filelist <- .model.betafiles(arfmodel)
+	path <- .model.funcDir(arfmodel)
+	sp <- .Platform$file.sep
+	
+	datavec = rawvec = numeric(0)
+	totdim = 0
+	
+	for(filename in filelist) {
+		if(file.exists(filename)) {
+			
+			info <- getFileInfo(filename)
+			dirname <- .nifti.fileinfo.filename(info)
+			
+			func <- loadRda(paste(path,sp,dirname,sp,.data.funcRda(arfmodel),sep=''))
+			timings <- .functional.timings(func)
+			
+			#make array of fmri volume
+			fmrivolume = readData(paste(.functional.fullpath(func),sp,.functional.functionaldata(func),sep=''))
+			funcvolume = .fmri.data.datavec(fmrivolume)
+			dim(funcvolume) = c(.fmri.data.dims(fmrivolume)[2],.fmri.data.dims(fmrivolume)[3],.fmri.data.dims(fmrivolume)[4],.fmri.data.dims(fmrivolume)[5])
+			n = .fmri.data.dims(fmrivolume)[2]*.fmri.data.dims(fmrivolume)[3]*.fmri.data.dims(fmrivolume)[4]
+			
+			#create timeseries in seconds and create double gamma
+			tslen = round(.fmri.data.dims(fmrivolume)[5] * .fmri.data.pixdim(fmrivolume)[5])
+			stick = rep(0,tslen)
+			hrf <- gamma.fmri(1:tslen) 
+			stick[round(timings)]=1
+			vecnums = which(stick==1)
+			
+			#define design matrices and outputs
+			X = matrix(NA,.fmri.data.dims(fmrivolume)[5],length(vecnums))
+			beta = matrix(0,n,length(vecnums))
+			raw = matrix(0,n,length(seq(1,tslen,.fmri.data.pixdim(fmrivolume)[5])))
+			
+			#create single-trial columns in design matrix
+			for(i in 1:length(vecnums)) {
+				st_protocol = rep(0,tslen)
+				st_protocol[vecnums[i]]=1
+				bold = convol.fmri(hrf,st_protocol)
+				bold = bold[seq(1,tslen,.fmri.data.pixdim(fmrivolume)[5])]
+				X[,i] = bold 
+			}
+			
+			#Solve the LS equation for each voxel (on DEMEANED data)
+			Xp = solve(t(X)%*%X)%*%t(X)
+			
+			i=1;
+			for(z in 1:.fmri.data.dims(fmrivolume)[4]) {
+				for(y in 1:.fmri.data.dims(fmrivolume)[3]) {
+					for(x in 1:.fmri.data.dims(fmrivolume)[2]) {
+						if(.model.mask(arfmodel)[i]==1) {
+							dat = as.vector(funcvolume[x,y,z,])
+							dat = dat-mean(dat)
+							beta[i,] = as.vector(Xp%*%dat)
+						}
+						i=i+1;
+					}
+				}
+			}
+			
+			
+			
+			i=1;
+			for(z in 1:.fmri.data.dims(fmrivolume)[4]) {
+				for(y in 1:.fmri.data.dims(fmrivolume)[3]) {
+					for(x in 1:.fmri.data.dims(fmrivolume)[2]) {
+						if(.model.mask(arfmodel)[i]==1) {
+							
+							betas = stick
+							betas[which(betas==1)] = beta[i,]
+							
+							bold = convol.fmri(hrf,betas)
+							bold = bold[seq(1,tslen,.fmri.data.pixdim(fmrivolume)[5])]
+														
+							dat = as.vector(funcvolume[x,y,z,])
+							dat = dat-mean(dat)
+						
+							raw[i,] = dat-bold
+						}
+						i=i+1;
+					}
+				}
+			}
+			
+			cat('finished trial\n')
+			
+			#concatenate datavecs and increase dimensions of volume
+			rawvec = c(rawvec,as.vector(raw))
+			
+			totdim = totdim + length(vecnums)
+			
+		}
+	}
+		
+	rawvolume = fmrivolume
+	
+	#make new file for filetered single events
+	.fmri.data.filename(rawvolume) = paste('rawseries_',sefilename,sep='')
+	.fmri.data.dims(rawvolume)[5] = totdim
+	.fmri.data.pixdim(rawvolume)[5] = 1
+	.fmri.data.datavec(rawvolume) = rawvec
+	.fmri.data.fullpath(rawvolume) = .model.funcDir(arfmodel)
+	writeData(rawvolume,.fmri.data.datavec(rawvolume))
+		
+	
+	return(rawvolume)
+	
+	
+}
 
 

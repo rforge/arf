@@ -1,5 +1,6 @@
 \name{makeSingleTrialEvents}
 \alias{makeSingleTrialEvents}
+\alias{makeRawTimeseries}
 
 \title{
 Estimate single-trial fMRI activity.
