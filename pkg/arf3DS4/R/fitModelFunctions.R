@@ -473,6 +473,8 @@ function(arfmodel,which='start')
 	
 	#make model design matrix
 	X = matrix(NA,n,length(regs))
+	
+	if(.model.modeltype(arfmodel)=='simple') .model.params(arfmodel)=10
 	if(which=='estimates') theta = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
 	if(which=='start') theta = matrix(.model.startval(arfmodel),.model.params(arfmodel))
 		
