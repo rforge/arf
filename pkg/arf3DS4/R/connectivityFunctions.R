@@ -408,7 +408,7 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 					timebyvox[tm,] = as.vector(funcvolume[,,,tm])[roi[[blob]]]
 				}
 				
-				b[blob,] = svd(timeybyvox)$u[,1]
+				b[blob,] = svd(timebyvox)$u[,1]
 				
 			}
 			
