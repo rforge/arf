@@ -4,7 +4,7 @@
 \title{calculate Connectivity with spatial averaging}
 \description{Calculates functional connectivity bases on the spatial average of the voxels with in the isoContours of the estimated model}
 \usage{
-roiConnectivity(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events.nii.gz',type=c('avg','ev'),evmodel=c('spatial','spatiotemporal'))
+roiConnectivity(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events.nii.gz',type=c('avg','ev'),evmodel=c('spatial','spatiotemporal','eigenvariate'))
 }
 
 \arguments{

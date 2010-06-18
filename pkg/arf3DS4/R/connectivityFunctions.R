@@ -327,7 +327,7 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 {
 	#match type argument
 	type = match.arg(type,c('avg','ev'))
-	evmodel = match.arg(evmodel,c('spatial','spatiotemporal'))
+	evmodel = match.arg(evmodel,c('spatial','spatiotemporal','eigenvariate'))
 	
 	#make isocontours of model estimates
 	roidataarray = fmri2array(roidata)
