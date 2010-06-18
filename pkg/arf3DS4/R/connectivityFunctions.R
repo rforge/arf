@@ -323,7 +323,7 @@ function(c1,c2,n1,n2=n1)
 
 
 roiConnectivity <-
-function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events.nii.gz',type=c('avg','ev'),evmodel=c('spatial','spatiotemporal'))
+function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events.nii.gz',type=c('avg','ev'),evmodel=c('spatial','spatiotemporal','eigenvariate'))
 {
 	#match type argument
 	type = match.arg(type,c('avg','ev'))
@@ -399,6 +399,19 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 			if(evmodel=='spatial') {
 				for(tm in 1:.fmri.data.dims(funcdata)[5]) b[blob,tm] = mean((as.vector(funcvolume[,,,tm])[roi[[blob]]])*eigenvec[[blob]])
 			}
+			
+			if(evmodel=='eigenvariate') {
+				
+				timebyvox = matrix(NA,.fmri.data.dims(funcdata)[5],length(roi[[blob]]))
+				
+				for(tm in 1:.fmri.data.dims(funcdata)[5]) {
+					timebyvox[tm,] = as.vector(funcvolume[,,,tm])[roi[[blob]]]
+				}
+				
+				b[blob,] = svd(timeybyvox)$u[,1]
+				
+			}
+			
 			
 		}
 		

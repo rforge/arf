@@ -437,7 +437,7 @@ function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,
 #calulate the multiple comparison correction on fmri data (uncorrected,bonferroni or FDR)
 {
 	veclen <- length(.fmri.data.datavec(fmridata))
-	if(adj.n) n <- length(.fmri.data.datavec(fmridata)[.fmri.data.datavec(fmridata)==0]) else n <- length(.fmri.data.datavec(fmridata))
+	if(adj.n) n <- length(.fmri.data.datavec(fmridata)[.fmri.data.datavec(fmridata)!=0]) else n <- length(.fmri.data.datavec(fmridata))
 	
 	pseq = seq(sig.steps,1,-1)
 	
@@ -453,7 +453,11 @@ function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,
 	if(which=='FDR') {
 		fdr.value = sort(1-pt(.fmri.data.datavec(fmridata),df))
 		i = 1
-		while(fdr.value[i]<=((i*q)/(n*cv))) i = i + 1
+		while(fdr.value[i]<=((i*q)/(n*cv))) {
+			i = i + 1
+			if(i==length(fdr.value)) break()		
+		}
+		
 		i = max(i-1,i)
 		fdr=fdr.value[i]
 		pvec = fdr / seq(1,sig.steps)

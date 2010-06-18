@@ -29,7 +29,7 @@ setMethod('show','experiment',
 
 #### FMRI DATA METHODS ####
 setMethod('plot',signature(x='fmri.data',y='missing'),
-	function(x,y,zerotol=1e-3,what=c('all','pos','neg'),col=c('rgb','gray'),volume=1,slices=1:x@dims[4],max.asp=2,...) {
+	function(x,y,zerotol=1e-3,what=c('all','pos','neg'),col=c('rgb','gray'),volume=1,slices=1:x@dims[4],max.asp=NULL,...) {
 		
 		dimx <- x@dims[2]
 		dimy <- x@dims[3]
@@ -54,7 +54,7 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		col = match.arg(col)
 		
 		asp = dimy/dimx
-		if(asp>max.asp) asp=max.asp
+		if(!is.null(max.asp)) asp=max.asp
 		
 		if(what=='pos') data[data<0]=0
 		if(what=='neg') data[data>0]=0
