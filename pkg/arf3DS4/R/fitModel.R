@@ -107,7 +107,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	}
 	
 	#make progressWindow
-	progress = newProgressWindow(arfmodel)
+	#progress = newProgressWindow(arfmodel)
 	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
@@ -231,7 +231,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	if(.model.modeltype(arfmodel)!='simple') stop('Called fit to simple model for non-simple model object.')
 	if(.model.params(arfmodel)!=5) stop('Modeltype - parameter mismatch!')
 	.model.valid(arfmodel) <- TRUE
-	progress = 'progresswatcher'
+	#progress = 'progresswatcher'
 	
 	#start_time
 	st_time <- Sys.time()
@@ -287,7 +287,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	}
 	
 	#make progressWindow
-	progress = newProgressWindow(arfmodel)
+	#progress = newProgressWindow(arfmodel)
 	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(

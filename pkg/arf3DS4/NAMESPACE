@@ -93,8 +93,7 @@ exportMethods(
 
 import(
 	methods,
-	graphics,
-	tcltk
+	graphics
 )
 
 useDynLib(
