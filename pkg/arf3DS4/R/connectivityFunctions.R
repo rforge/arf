@@ -376,7 +376,13 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 				
 				#NN = matrix(.fmri.data.datavec(avgdata)[roi[[blob]]],,1)%*%matrix(.fmri.data.datavec(avgdata)[roi[[blob]]],1,)
 				NN = t(timebyvox)%*%timebyvox
-				eigenvec[[blob]] = eigen(NN)$vectors[,1]
+				ev1 = eigen(NN)$vectors[,1]
+				
+				rev1 = range(ev1)
+				wrev1 = which.max(abs(rev1))
+				if(wrev1==1 & rev1[wrev1]<0) ev1=ev1*-1
+				
+				eigenvec[[blob]] = ev1
 				
 			}
 		}
