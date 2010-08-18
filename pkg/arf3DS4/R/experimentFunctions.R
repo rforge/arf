@@ -310,9 +310,10 @@ function(path=getwd(),method=c('fast','set','rda'))
 	}  
 	
 	#save experiments
-	save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))
-	load(paste(path,.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
-	file.remove(paste(path,.Platform$file.sep,'temp.Rda',sep=''))
+	#save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))
+	#load(paste(path,.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
+	#file.remove(paste(path,.Platform$file.sep,'temp.Rda',sep=''))
+	assign('.experiment',.experiment,envir=.GlobalEnv)
 	save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
 		
 	#return loaded info 
