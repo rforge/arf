@@ -16,7 +16,8 @@
 #headToName
 #getIntent
 #fmri2array
-
+#bin2dec
+#xyzt_convert
 
 getFileInfo <- 
 function(filename)
@@ -565,4 +566,39 @@ fmri2array <- function(fmridat)
 	
 	return(out)
 }
+
+bin2dec <- 
+function(binvec) 
+#calculate decimal value for a binary vector
+{
+	value = as.integer(binvec[1])
+	if(length(binvec)>1) {
+		
+		for(i in 2:(length(binvec))) {
+			temp = value
+			value = temp*2+as.integer(binvec[i])
+		}
+		
+	}
+	return(as.integer(value))
+}
+
+xyzt2char <-
+function(char) 
+#convert a xyzt_unit raw element to space and time
+{
+	
+	if(!is.character(char)) return(paste('xyzt_units not decipherable.'))
+	
+	bitvec = rawToBits(charToRaw(char))
+	space = rev(bitvec[1:3])
+	time = rev(bitvec[4:6])
+	
+	space_int = bin2dec(space)
+	time_int = bin2dec(time)*8
+	
+	return(paste('space units:',space_int,'- time units:',time_int,'\n',sep=''))
+
+}
+
 

@@ -128,7 +128,7 @@ setMethod('show','fmri.data',
 			cat('\n')
 			cat('<dimensions>\n')
 			#cat('dim_info:       ',object@dim_info,'\n')
-			cat('xyzt units:     ',object@xyzt_units,'\n') 
+			cat('xyzt units:     ',xyzt2char(object@xyzt_units),'\n') 
 			cat('pixel dims:     ',object@pixdim,'\n') 			#voxel dimensions
 			cat('dimensions:     ',object@dims,'\n')
 			cat('q form code:    ',object@qform_code,'\n') 
