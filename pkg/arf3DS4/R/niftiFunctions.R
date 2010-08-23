@@ -189,7 +189,8 @@ function(fileinf)
 			.nifti.header.scl_inter(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #116, float, DATA SCALING: INTERCEPT
 			.nifti.header.slice_end (headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))         #120, short, LAST SLICE INDEX
 			.nifti.header.slice_code(headinf) <- readBin(con,integer(),size=1,n=1,signed=T,endian=.nifti.header.endian(headinf))         #122, integer[1], SLICE TIMING ORDER
-			.nifti.header.xyzt_units(headinf) <- readBin(con,integer(),size=1,n=1,signed=T,endian=.nifti.header.endian(headinf))         #123, integer[1], UNITS OF PIXDIM
+			#.nifti.header.xyzt_units(headinf) <- readBin(con,integer(),size=1,n=1,signed=T,endian=.nifti.header.endian(headinf))        #123, raw[1], UNITS OF PIXDIM
+			.nifti.header.xyzt_units(headinf) <- rawToChar(readBin(con,raw(),n=1))        												 #123, raw[1], UNITS OF PIXDIM	
 			.nifti.header.cal_max(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                      #124, float, MAX DISPLAY INTENSITY
 			.nifti.header.cal_min(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                      #128, float, MIN DISPLAY INTENSITY
 			.nifti.header.slice_duration(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))               #132, float, TIME FOR 1 SLICE
@@ -406,7 +407,8 @@ function(con,headinf)
 		writeBin(as.double(.nifti.header.scl_inter(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #116, float, DATA SCALING: INTERCEPT
 		writeBin(as.integer(.nifti.header.slice_end (headinf)),con,size=2,endian=.nifti.header.endian(headinf))        #120, short, LAST SLICE INDEX
 		writeBin(as.integer(.nifti.header.slice_code(headinf)),con,size=1,endian=.nifti.header.endian(headinf))        #122, integer[1], SLICE TIMING ORDER
-		writeBin(as.integer(.nifti.header.xyzt_units(headinf)),con,size=1,endian=.nifti.header.endian(headinf))        #123, integer[1], UNITS OF PIXDIM
+		#writeBin(as.integer(.nifti.header.xyzt_units(headinf)),con,size=1,endian=.nifti.header.endian(headinf))        #123, integer[1], UNITS OF PIXDIM
+		writeBin(charToRaw(.nifti.header.xyzt_units(headinf)),con,endian=.nifti.header.endian(headinf))       			#123, integer[1], UNITS OF PIXDIM	
 		writeBin(as.double(.nifti.header.cal_max(headinf)),con,size=4,endian=.nifti.header.endian(headinf))            #124, float, MAX DISPLAY INTENSITY
 		writeBin(as.double(.nifti.header.cal_min(headinf)),con,size=4,endian=.nifti.header.endian(headinf))            #128, float, MIN DISPLAY INTENSITY
 		writeBin(as.double(.nifti.header.slice_duration(headinf)),con,size=4,endian=.nifti.header.endian(headinf))     #132, float, TIME FOR 1 SLICE

@@ -30,9 +30,9 @@ setClass(
 	),
 	prototype=prototype(
 		version=2,
-		build=0,
-		update=17,
-		svnrev=143
+		build=1,
+		update=0,
+		svnrev=144
 	),
 	package='arf3DS4'
 )
@@ -269,7 +269,7 @@ setClass(
 		scl_inter = 'numeric',
 		slice_end = 'numeric',
 		slice_code = 'numeric',
-		xyzt_units = 'numeric',
+		xyzt_units = 'character',
 		cal_max = 'numeric',
 		cal_min = 'numeric',
 		slice_duration = 'numeric',
@@ -316,7 +316,7 @@ setClass(
 		scl_inter = 0,
 		slice_end = 0,
 		slice_code = 0,
-		xyzt_units = 10,
+		xyzt_units = '\n',
 		cal_max = 0,
 		cal_min = 0,
 		slice_duration = 0,
