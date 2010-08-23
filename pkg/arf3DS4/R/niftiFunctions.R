@@ -17,7 +17,8 @@
 #getIntent
 #fmri2array
 #bin2dec
-#xyzt_convert
+#xyzt2char
+
 
 getFileInfo <- 
 function(filename)
@@ -597,7 +598,23 @@ function(char)
 	space_int = bin2dec(space)
 	time_int = bin2dec(time)*8
 	
-	return(paste('space units:',space_int,'- time units:',time_int,'\n',sep=''))
+	space_char = 'unknown'
+	if(space_int==1) space_char = 'meters'
+	if(space_int==2) space_char = 'millimeters'
+	if(space_int==3) space_char = 'micrometers'
+	
+	int = 'unknown'
+	if(time_int==8)  time_char = 'seconds'
+	if(time_int==16) time_char = 'milliseconds'
+	if(time_int==24) time_char = 'microseconds'
+	if(time_int==32) time_char = 'Hertz'
+	if(time_int==40) time_char = 'ppm'
+	if(time_int==48) time_char = 'rad/sec'
+	
+	
+	cat(paste('xyz in ',space_char,' | time in ',time_char,'\n',sep=''))
+	
+	return(invisible(list(xyz=space_int,t=time_int)))
 
 }
 
