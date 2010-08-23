@@ -611,10 +611,7 @@ function(char)
 	if(time_int==40) time_char = 'ppm'
 	if(time_int==48) time_char = 'rad/sec'
 	
-	
-	cat(paste('xyz in ',space_char,' | time in ',time_char,'\n',sep=''))
-	
-	return(invisible(list(xyz=space_int,t=time_int)))
+	return(paste('xyz in ',space_char,' | time in ',time_char,'\n',sep=''))
 
 }
 
