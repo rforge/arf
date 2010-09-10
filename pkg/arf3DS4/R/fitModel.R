@@ -107,7 +107,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	}
 	
 	#make progressWindow
-	#progress = newProgressWindow(arfmodel)
+	progress = newProgressWindow(arfmodel)
 	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(

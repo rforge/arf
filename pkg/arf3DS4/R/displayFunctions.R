@@ -127,6 +127,7 @@ newProgressWindow <-
 function(arfmodel)
 #make a new Progress Window, return an object of class progress (S3)
 {
+	library(tcltk)
 	
 	tt <- tktoplevel()
 	mt = .model.modeltype(arfmodel)
