@@ -206,3 +206,35 @@ function(arfmodel)
 	
 }
 
+newProgressText <-
+function(arfmodel)
+#make a new Progress Window, return an object of class progress (S3)
+{
+	library(tcltk)
+	
+	tt <- tktoplevel()
+	mt = .model.modeltype(arfmodel)
+	nr = .model.regions(arfmodel)
+	tktitle(tt) <- paste('ARF Progress [ ',mt,' @ ',nr,' ]',sep='')
+	scr <- tkscrollbar(tt, repeatinterval=5,command=function(...)tkyview(txt,...))
+	txt <- tktext(tt,bg="white",font="courier",yscrollcommand=function(...)tkset(scr,...))
+	tkgrid(txt,scr)
+	tkgrid.configure(scr,sticky="ns")
+	
+	tkinsert(txt,"end",paste("Initializing..."))
+	tkconfigure(txt, state="disabled")
+	tkfocus(txt)
+	
+	#make progress object (S3)
+	progress = list(tt=tt,txt=txt)
+	attr(progress,'class') <- 'progress'
+	
+	#assign global counters
+	assign('.gradit',0,envir=.GlobalEnv)
+	assign('.objit',1,envir=.GlobalEnv)
+	assign('.gradval',0,envir=.GlobalEnv)
+	
+	
+	return(progress)
+	
+}

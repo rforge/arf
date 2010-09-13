@@ -42,13 +42,26 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	olgrad = get('.gradit',envir=.GlobalEnv)
 	gradobj = round(olgrad-ssqdat,6)
 	assign('.gradit',ssqdat,envir=.GlobalEnv)
-	
-	tclvalue(progress$grad.val.tkobj) = gradobj 
-	tclvalue(progress$ssq.val.tkobj) = paste(round(ssqdat))
-	tclvalue(progress$ssq.it.tkobj) = as.character(.objit)
 	assign('.objit',.objit+1,envir=.GlobalEnv)
 	
+	txt = progress$txt
+	tkconfigure(txt, state="normal")
+	tkdelete(txt,"0.0","end")
 	
+	tkinsert(txt,"end",paste("Iteration :  ",.objit,"\n"))
+	tkinsert(txt,"end",paste("Minimium  :  ",round(ssqdat),"\n"))
+	tkinsert(txt,"end",paste("Decrease  :  ",gradobj,"\n"))
+	
+	gradvec = matrix(get('.gradval',envir=.GlobalEnv),10)
+	tkinsert(txt,"end",paste("Norm      :  ",round(sqrt(sum(gradvec[,1]^2)),6),"\n"))	
+	if(dim(gradvec)[2]>1) {
+		for(i in 2:dim(gradvec)[2]) {
+			tkinsert(txt,"end",paste("          :  ",round(sqrt(sum(gradvec[,i]^2)),6),"\n"))	
+		}
+	}
+	
+	tkconfigure(txt, state="disabled")
+	tkfocus(txt)
 	
 	return(invisible(ssqdat))	
 	
@@ -79,7 +92,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	} else grad=rep(1e+12,np) 
 	
 	#progress Watcher
-	tclvalue(progress$grad.it.tkobj) = as.character(round(sqrt(sum(grad^2))))
+	assign('.gradval',grad,envir=.GlobalEnv)
 	
 	return(grad)
 
