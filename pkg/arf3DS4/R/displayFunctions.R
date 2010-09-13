@@ -221,7 +221,7 @@ function(arfmodel)
 	tkgrid(txt,scr)
 	tkgrid.configure(scr,sticky="ns")
 	
-	tkinsert(txt,"end",paste("Initializing..."))
+	tkinsert(txt,"end",paste('ARF [',.model.name(arfmodel),'] ',as.character(Sys.time()),sep=''))
 	tkconfigure(txt, state="disabled")
 	tkfocus(txt)
 	
