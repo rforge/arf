@@ -217,7 +217,7 @@ function(arfmodel)
 	nr = .model.regions(arfmodel)
 	tktitle(tt) <- paste('ARF Progress [ ',mt,' @ ',nr,' ]',sep='')
 	scr <- tkscrollbar(tt, repeatinterval=5,command=function(...)tkyview(txt,...))
-	txt <- tktext(tt,bg="white",font="courier",yscrollcommand=function(...)tkset(scr,...))
+	txt <- tktext(tt,bg="white",font="courier",yscrollcommand=function(...)tkset(scr,...),height=50,width=45)
 	tkgrid(txt,scr)
 	tkgrid.configure(scr,sticky="ns")
 	

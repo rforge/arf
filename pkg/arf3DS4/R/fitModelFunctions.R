@@ -40,7 +40,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 		
 	#Progress Watcher
 	olgrad = get('.gradit',envir=.GlobalEnv)
-	gradobj = round(olgrad-ssqdat,6)
+	gradobj = round(olgrad-ssqdat,0)
 	assign('.gradit',ssqdat,envir=.GlobalEnv)
 	assign('.objit',.objit+1,envir=.GlobalEnv)
 	
@@ -50,13 +50,18 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	
 	tkinsert(txt,"end",paste("Iteration :  ",.objit,"\n"))
 	tkinsert(txt,"end",paste("Minimium  :  ",round(ssqdat),"\n"))
-	tkinsert(txt,"end",paste("Decrease  :  ",gradobj,"\n"))
+	tkinsert(txt,"end",paste("Decrease  :  ",gradobj,"\n\n"))
+	tkinsert(txt,"end",paste("Region Information\n"))
 	
-	gradvec = matrix(get('.gradval',envir=.GlobalEnv),10)
-	tkinsert(txt,"end",paste("Norm      :  ",round(sqrt(sum(gradvec[,1]^2)),6),"\n"))	
-	if(dim(gradvec)[2]>1) {
-		for(i in 2:dim(gradvec)[2]) {
-			tkinsert(txt,"end",paste("          :  ",round(sqrt(sum(gradvec[,i]^2)),6),"\n"))	
+	gradmat = matrix(get('.gradval',envir=.GlobalEnv),10)
+	estvec = matrix(theta,10)
+	svec = sprintf('  [%3.0f] (%5.2f %5.2f %5.2f) |%8.0f|',1,estvec[7,1],estvec[8,1],estvec[9,1],sqrt(sum(gradmat[,1]^2)))
+	tkinsert(txt,"end",paste(svec,"\n"))	
+	
+	if(dim(gradmat)[2]>1) {
+		for(i in 2:dim(gradmat)[2]) {
+			svec = sprintf('  [%3.0f] (%5.2f %5.2f %5.2f) |%8.0f|',i,estvec[7,i],estvec[8,i],estvec[9,i],sqrt(sum(gradmat[,i]^2)))
+			tkinsert(txt,"end",paste(svec,"\n"))
 		}
 	}
 	
