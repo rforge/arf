@@ -46,14 +46,18 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	
 	txt = progress$txt
 	tkconfigure(txt, state="normal")
-	tkdelete(txt,"0.0","end")
+	tkdelete(txt,"1.0","end")
 	
-	tkinsert(txt,"end",paste("Iteration :  ",.objit,"\n"))
-	tkinsert(txt,"end",paste("Minimium  :  ",round(ssqdat),"\n"))
-	tkinsert(txt,"end",paste("Decrease  :  ",gradobj,"\n\n"))
+	tkinsert(txt,"end",paste("Activated Region Fitting \n"))
+	tkinsert(txt,"end",paste("Iteration     :  ",.objit,"\n"))
+	tkinsert(txt,"end",paste("Minimium      :  ",round(ssqdat),"\n"))
+	tkinsert(txt,"end",paste("Decrease      :  ",gradobj,"\n"))
+	gradvec = get('.gradval',envir=.GlobalEnv)
+	tkinsert(txt,"end",paste("Gradient norm : ",round(sqrt(sum(gradvec^2))),"\n"))
+	tkinsert(txt,"end",paste("\n"))
 	tkinsert(txt,"end",paste("Region Information\n"))
 	
-	gradmat = matrix(get('.gradval',envir=.GlobalEnv),10)
+	gradmat = matrix(gradvec,10)
 	estvec = matrix(theta,10)
 	svec = sprintf('  [%3.0f] (%5.2f %5.2f %5.2f) |%8.0f|',1,estvec[7,1],estvec[8,1],estvec[9,1],sqrt(sum(gradmat[,1]^2)))
 	tkinsert(txt,"end",paste(svec,"\n"))	

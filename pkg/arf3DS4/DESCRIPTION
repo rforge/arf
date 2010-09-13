@@ -1,7 +1,7 @@
 Package: arf3DS4
 Type: Package
 Title: Activated Region Fitting, fMRI data analysis (3D).
-Version: 2.1-7
+Version: 2.1-8
 Date:  2010-09-13
 Author: Wouter D. Weeda
 Maintainer: Wouter D. Weeda <w.d.weeda@gmail.com>
@@ -10,4 +10,4 @@ Description: Activated Region Fitting (ARF) is an analysis method for fMRI data.
 URL: http://arf.r-forge.r-project.org/
 License: GPL-2
 LazyLoad: yes
-Packaged: Mon Sep 13 13:43:39 2010
+Packaged: Mon Sep 13 14:33:54 2010
