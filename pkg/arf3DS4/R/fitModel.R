@@ -110,6 +110,11 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	#progress = newProgressWindow(arfmodel)
 	progress = newProgressText(arfmodel)	
 
+	#assign global variables
+	assign('.gradient_latest',NA,envir=.GlobalEnv)
+	assign('.theta_latest',NA,envir=.GlobalEnv)
+	assign('.persistent_error',numeric(0),envir=.GlobalEnv)
+	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
 						.model.startval(arfmodel),
@@ -202,15 +207,30 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			
 		
 	} else {
-		.model.convergence(arfmodel) <- 'Internal error, no convergence.'
-		.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim internal error: ',gsub('\n','',optim.output),sep=''))
-		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
-		.model.valid(arfmodel) <- FALSE
+		.model.estimates(arfmodel) <- get('.theta_latest',envir=.GlobalEnv)
+		.model.gradient(arfmodel) <- get('.gradient_latest',envir=.GlobalEnv)
+		pers <- get('.persistent_error',envir=.GlobalEnv)
+		
+		if(length(pers)==0) {
+			.model.convergence(arfmodel) <- 'Internal error, no convergence.'
+			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim internal error: ',gsub('\n','',optim.output),sep=''))
+			.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
+			.model.valid(arfmodel) <- FALSE
+		} else {
+			.model.convergence(arfmodel) <- 'Persistent boundary error, no convergence.'
+			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] Persistent boundaries on regions:',paste(pers,collapse=','),sep=''))
+			.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
+			.model.valid(arfmodel) <- FALSE
+		}
+		
 		
 	}
 		
 	if(!.model.valid(arfmodel)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),.model.convergence(arfmodel)) 
 	
+	#clean up
+	rm('.theta_latest','.gradient_latest','.gradit','.gradval','.objit','.bounded','.persistent_error',envir=.GlobalEnv)
+		
 	#save the modelInfo
 	saveModel(arfmodel)
 	

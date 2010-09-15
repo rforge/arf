@@ -122,90 +122,6 @@ function(slicedata,colors)
 
 
 
-
-newProgressWindow <-
-function(arfmodel)
-#make a new Progress Window, return an object of class progress (S3)
-{
-	library(tcltk)
-	
-	tt <- tktoplevel()
-	mt = .model.modeltype(arfmodel)
-	nr = .model.regions(arfmodel)
-	tktitle(tt) <- paste('ARF Progress [ ',mt,' @ ',nr,' ]',sep='')
-	
-	#create heading
-	text.heading <- tclVar(paste(.model.name(arfmodel),'process started',as.character(Sys.time())))
-	label.heading <- tklabel(tt,width='50')
-	tkconfigure(label.heading,textvariable=text.heading)
-		
-	#create shared comps
-	text.1 <- tclVar('value')
-	label.1 <- tklabel(tt,width=12)
-	tkconfigure(label.1,textvariable=text.1)
-	
-	text.2 <- tclVar('iterate')
-	label.2 <- tklabel(tt,width=12)
-	tkconfigure(label.2,textvariable=text.2)
-	
-	text.3 <- tclVar('decrease')
-	label.3 <- tklabel(tt,width=12)
-	tkconfigure(label.3,textvariable=text.3)
-	
-	text.4 <- tclVar('norm')
-	label.4 <- tklabel(tt,width=12)
-	tkconfigure(label.4,textvariable=text.4)
-	
-	#create ssq
-	text.ssq <- tclVar('objective')
-	label.ssq <- tklabel(tt,width=12)
-	tkconfigure(label.ssq,textvariable=text.ssq)
-	
-	text.ssq.val <- tclVar('0')
-	label.ssq.val <- tklabel(tt,width=12)
-	tkconfigure(label.ssq.val,textvariable=text.ssq.val)
-	
-	text.ssq.it <- tclVar('0')
-	label.ssq.it <- tklabel(tt,width=12)
-	tkconfigure(label.ssq.it,textvariable=text.ssq.it)
-		
-	#create gradient
-	text.grad <- tclVar('gradient')
-	label.grad <- tklabel(tt,width=12)
-	tkconfigure(label.grad,textvariable=text.grad)
-	
-	text.grad.val <- tclVar('0')
-	label.grad.val <- tklabel(tt,width=12)
-	tkconfigure(label.grad.val,textvariable=text.grad.val)
-	
-	text.grad.it <- tclVar('0')
-	label.grad.it <- tklabel(tt,width=12)
-	tkconfigure(label.grad.it,textvariable=text.grad.it)
-	
-
-	#place at grid
-	tkgrid(label.heading,columnspan=3)
-	tkgrid(label.ssq, label.1, label.ssq.val)
-	tkgrid(label.2, label.ssq.it,columnspan=2)
-	tkgrid(label.3, label.grad.val,columnspan=2)
-	tkgrid(label.grad, label.4, label.grad.it)
-	
-	tkgrid.configure(label.ssq, label.grad, sticky='e')
-	tkgrid.configure(label.2, label.4, sticky='e')
-	tkgrid.configure(label.ssq.val, label.ssq.it, label.grad.val, label.grad.it, sticky='w')
-	
-	#make progress object (S3)
-	progress = list(ssq.val.tkobj=text.ssq.val,ssq.it.tkobj=text.ssq.it,grad.val.tkobj=text.grad.val,grad.it.tkobj=text.grad.it)
-	attr(progress,'class') <- 'progress'
-	
-	#assign global counters
-	assign('.gradit',0,envir=.GlobalEnv)
-	assign('.objit',1,envir=.GlobalEnv)
-	
-	return(progress)
-	
-}
-
 newProgressText <-
 function(arfmodel)
 #make a new Progress Window, return an object of class progress (S3)
@@ -225,16 +141,60 @@ function(arfmodel)
 	tkconfigure(txt, state="disabled")
 	tkfocus(txt)
 	
+	
+	opts = loadOptions(arfmodel)
+		
 	#make progress object (S3)
-	progress = list(tt=tt,txt=txt)
+	progress = list(tt=tt,txt=txt,lower=.options.opt.lower(opts),upper=.options.opt.upper(opts))
 	attr(progress,'class') <- 'progress'
 	
 	#assign global counters
 	assign('.gradit',0,envir=.GlobalEnv)
 	assign('.objit',1,envir=.GlobalEnv)
 	assign('.gradval',0,envir=.GlobalEnv)
-	
+	assign('.bounded',rep(0,.model.regions(arfmodel)),envir=.GlobalEnv)
 	
 	return(progress)
 	
+}
+
+writeProgress <-
+function(ssqdat,theta,objit,gradobj,gradvec,progress) 
+#write down the progress of the iterations
+{
+	txt = progress$txt
+	tkconfigure(txt, state="normal")
+	tkdelete(txt,"1.0","end")
+	
+	tkinsert(txt,"end",paste(as.character(Sys.time()),'\n',sep=''))
+	tkinsert(txt,"end",paste("\n"))
+	tkinsert(txt,"end",paste("Iteration     : ",objit,"\n"))
+	tkinsert(txt,"end",paste("Minimium      : ",round(ssqdat),"\n"))
+	tkinsert(txt,"end",paste("Decrease      : ",gradobj,"\n"))
+	
+	tkinsert(txt,"end",paste("Gradient norm : ",round(sqrt(sum(gradvec^2))),"\n"))
+	tkinsert(txt,"end",paste("\n"))
+	tkinsert(txt,"end",paste("Region Information\n\n"))
+	
+	gradmat = matrix(gradvec,10)
+	estvec = matrix(theta,10)
+	svec = sprintf('  [%3.0f] (%5.2f %5.2f %5.2f) |%8.0f|',1,estvec[7,1],estvec[8,1],estvec[9,1],sqrt(sum(gradmat[,1]^2)))
+	
+	if(any(estvec[c(7,8,9),1]<mean(progress$lower[c(7,8,9)])/1.05) | any(estvec[c(7,8,9),1]>mean(progress$upper[c(7,8,9)]))/1.05) svec=paste(svec,'*',sep='')
+	if(any(estvec[c(7,8,9),1]==mean(progress$lower[c(7,8,9)])) | any(estvec[c(7,8,9),1]==mean(progress$upper[c(7,8,9)]))) svec=paste(svec,'*!',sep='')
+	
+	tkinsert(txt,"end",paste(svec,"\n"))	
+	
+	if(dim(gradmat)[2]>1) {
+		for(i in 2:dim(gradmat)[2]) {
+			svec = sprintf('  [%3.0f] (%5.2f %5.2f %5.2f) |%8.0f|',i,estvec[7,i],estvec[8,i],estvec[9,i],sqrt(sum(gradmat[,i]^2)))
+			if(any(estvec[c(7,8,9),i]<mean(progress$lower[c(7,8,9)])/1.05) | any(estvec[c(7,8,9),i]>mean(progress$upper[c(7,8,9)]))/1.05) svec=paste(svec,'*',sep='')
+			if(any(estvec[c(7,8,9),i]<=mean(progress$lower[c(7,8,9)])) | any(estvec[c(7,8,9),i]>=mean(progress$upper[c(7,8,9)]))) svec=paste(svec,'*!',sep='')
+			
+			tkinsert(txt,"end",paste(svec,"\n"))
+		}
+	}
+	
+	tkconfigure(txt, state="disabled")
+	tkfocus(txt)
 }

@@ -38,40 +38,26 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	
 	if(is.nan(ssqdat) | ssqdat==Inf | is.na(ssqdat) | ssqdat==-Inf) ssqdat=ss_data
 		
-	#Progress Watcher
+	assign('.theta_latest',theta,envir=.GlobalEnv)
+	
+	#get iteration data
 	olgrad = get('.gradit',envir=.GlobalEnv)
 	gradobj = round(olgrad-ssqdat,0)
-	assign('.gradit',ssqdat,envir=.GlobalEnv)
-	assign('.objit',.objit+1,envir=.GlobalEnv)
+	objit = get('.objit',envir=.GlobalEnv)
+	gradval = get('.gradval',envir=.GlobalEnv)
+		
+	#Progress Watcher
+	writeProgress(ssqdat,theta,objit,gradobj,gradval,progress)
 	
-	txt = progress$txt
-	tkconfigure(txt, state="normal")
-	tkdelete(txt,"1.0","end")
-	
-	tkinsert(txt,"end",paste(as.character(Sys.time()),'\n',sep=''))
-	tkinsert(txt,"end",paste("\n"))
-	tkinsert(txt,"end",paste("Iteration     : ",.objit,"\n"))
-	tkinsert(txt,"end",paste("Minimium      : ",round(ssqdat),"\n"))
-	tkinsert(txt,"end",paste("Decrease      : ",gradobj,"\n"))
-	gradvec = get('.gradval',envir=.GlobalEnv)
-	tkinsert(txt,"end",paste("Gradient norm : ",round(sqrt(sum(gradvec^2))),"\n"))
-	tkinsert(txt,"end",paste("\n"))
-	tkinsert(txt,"end",paste("Region Information\n"))
-	
-	gradmat = matrix(gradvec,10)
-	estvec = matrix(theta,10)
-	svec = sprintf('  [%3.0f] (%5.2f %5.2f %5.2f) |%8.0f|',1,estvec[7,1],estvec[8,1],estvec[9,1],sqrt(sum(gradmat[,1]^2)))
-	tkinsert(txt,"end",paste(svec,"\n"))	
-	
-	if(dim(gradmat)[2]>1) {
-		for(i in 2:dim(gradmat)[2]) {
-			svec = sprintf('  [%3.0f] (%5.2f %5.2f %5.2f) |%8.0f|',i,estvec[7,i],estvec[8,i],estvec[9,i],sqrt(sum(gradmat[,i]^2)))
-			tkinsert(txt,"end",paste(svec,"\n"))
-		}
+	#boundary checker
+	boundvec = persistentBound(theta,progress$lower,progress$upper)
+	if(length(boundvec)>0) {
+		ssqdat='killoptim'
+		assign('.persistent_error',boundvec,envir=.GlobalEnv)
 	}
 	
-	tkconfigure(txt, state="disabled")
-	tkfocus(txt)
+	assign('.gradit',ssqdat,envir=.GlobalEnv)
+	assign('.objit',objit+1,envir=.GlobalEnv)
 	
 	return(invisible(ssqdat))	
 	
@@ -101,8 +87,11 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 		grad <- .C('dfssq',as.integer(np),as.integer(brain),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[10]]
 	} else grad=rep(1e+12,np) 
 	
-	#progress Watcher
+	assign('.gradient_latest',grad,envir=.GlobalEnv)
+	
+	#progress Watcher (only assign gradients)
 	assign('.gradval',grad,envir=.GlobalEnv)
+	
 	
 	return(grad)
 
@@ -119,9 +108,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	if(is.nan(ssqdat) | ssqdat==Inf | is.na(ssqdat) | ssqdat==-Inf) ssqdat=ss_data
 	
 	#progress Watcher
-	#tclvalue(progress$ssq.val.tkobj) = paste(round(ssqdat))
-	#tclvalue(progress$ssq.it.tkobj) = as.character(.objit)
-	#assign('.objit',.objit+1,envir=.GlobalEnv)
+	
 	
 	return(invisible(ssqdat))	
 	
@@ -152,9 +139,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	} else grad=rep(1e+12,np) 
 
 	#Progress Watcher
-	#tclvalue(progress$grad.val.tkobj) = paste(round(sqrt(sum(grad^2))))
-	#tclvalue(progress$grad.it.tkobj) = as.character(.gradit)
-	#assign('.gradit',.gradit+1,envir=.GlobalEnv)
+	
 	
 	return(grad)
 	
@@ -860,4 +845,24 @@ function(arfmodel,conf.int=95)
 	
 	return(arfdat)
 	
+}
+
+persistentBound <-
+function(theta,lower,upper,itlim=10)
+{
+	bounded = get('.bounded',envir=.GlobalEnv)
+	
+	estvec = matrix(theta,10)
+		
+	for(i in 1:dim(estvec)[2]) {
+		if(any(estvec[c(7,8,9),i]<=mean(lower[c(7,8,9)])) | any(estvec[c(7,8,9),i]>=mean(upper[c(7,8,9)]))) {
+			bounded[i] = bounded[i]+1
+		} else {
+			bounded[i] = 0			
+		}
+	}
+	
+	assign('.bounded',bounded,envir=.GlobalEnv)
+	
+	return(which(bounded>itlim))
 }
