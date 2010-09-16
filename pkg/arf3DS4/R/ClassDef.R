@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=2,
 		build=2,
-		update=1,
-		svnrev=154
+		update=2,
+		svnrev=155
 	),
 	package='arf3DS4'
 )
@@ -207,7 +207,7 @@ setClass(
 		opt.lower=c(rep(0,3),rep(0.1,3),rep(-.90,3),-Inf),	#L-BFGS-U lower bound
 		opt.upper=c(rep(Inf,3),rep(1,3),rep(.90,3),Inf),	#L-BFGS-U upper bound
 		min.analyticalgrad=T, 	#use analytical gradient
-		min.iterlim=8000,		#iteration limit
+		min.iterlim=2000,		#iteration limit
 		min.routine=c('optim','vpv'),	#which routine
 		start.method='use',	
 		start.maxfac=1,

@@ -8,7 +8,7 @@
 #makeColors
 #sliceColor
 #makeDiscreteImage
-#newprogressWindow
+#newprogressElement
 
 makeDiscreteImage <-
 function(datavec,zerotol=1e-03)
@@ -122,8 +122,8 @@ function(slicedata,colors)
 
 
 
-newProgressText <-
-function(arfmodel)
+newProgressElement <-
+function(arfmodel,options,lower,upper)
 #make a new Progress Window, return an object of class progress (S3)
 {
 	library(tcltk)
@@ -141,11 +141,8 @@ function(arfmodel)
 	tkconfigure(txt, state="disabled")
 	tkfocus(txt)
 	
-	
-	opts = loadOptions(arfmodel)
-		
 	#make progress object (S3)
-	progress = list(tt=tt,txt=txt,lower=.options.opt.lower(opts),upper=.options.opt.upper(opts))
+	progress = list(tt=tt,txt=txt,lower=lower,upper=upper,iterlim=.options.min.iterlim(options),perslim=.options.min.iterlim(options)/100)
 	attr(progress,'class') <- 'progress'
 	
 	#assign global counters
@@ -159,7 +156,7 @@ function(arfmodel)
 }
 
 writeProgress <-
-function(ssqdat,theta,objit,gradobj,gradvec,progress) 
+function(ssqdat,theta,objit,gradobj,gradvec,progress,bounded) 
 #write down the progress of the iterations
 {
 	txt = progress$txt
@@ -168,29 +165,28 @@ function(ssqdat,theta,objit,gradobj,gradvec,progress)
 	
 	tkinsert(txt,"end",paste(as.character(Sys.time()),'\n',sep=''))
 	tkinsert(txt,"end",paste("\n"))
-	tkinsert(txt,"end",paste("Iteration     : ",objit,"\n"))
-	tkinsert(txt,"end",paste("Minimium      : ",round(ssqdat),"\n"))
-	tkinsert(txt,"end",paste("Decrease      : ",gradobj,"\n"))
-	
-	tkinsert(txt,"end",paste("Gradient norm : ",round(sqrt(sum(gradvec^2))),"\n"))
+	tkinsert(txt,"end",sprintf("Iteration       : %10.0f\n",objit))
+	tkinsert(txt,"end",sprintf("Iteration limit : %10.0f\n",progress$iterlim))
+	tkinsert(txt,"end",sprintf("Boundary limit  : %10.0f\n",progress$perslim))
+	tkinsert(txt,"end",sprintf("Objective value : %10.0f\n",round(ssqdat)))
+	tkinsert(txt,"end",sprintf("Decrease        : %10.0f\n",gradobj))
+	tkinsert(txt,"end",sprintf("Gradient norm   : %10.0f\n",round(sqrt(sum(gradvec^2)))))
 	tkinsert(txt,"end",paste("\n"))
-	tkinsert(txt,"end",paste("Region Information\n\n"))
+	tkinsert(txt,"end",paste("Region Information\n"))
+	tkinsert(txt,"end",paste("Bounded regions (",paste(which(bounded>0),collapse=','),")\n",sep=''))
+	tkinsert(txt,"end",paste("\n"))
 	
 	gradmat = matrix(gradvec,10)
 	estvec = matrix(theta,10)
+	
 	svec = sprintf('  [%3.0f] (%5.2f %5.2f %5.2f) |%8.0f|',1,estvec[7,1],estvec[8,1],estvec[9,1],sqrt(sum(gradmat[,1]^2)))
-	
-	if(any(estvec[c(7,8,9),1]<mean(progress$lower[c(7,8,9)])/1.05) | any(estvec[c(7,8,9),1]>mean(progress$upper[c(7,8,9)]))/1.05) svec=paste(svec,'*',sep='')
-	if(any(estvec[c(7,8,9),1]==mean(progress$lower[c(7,8,9)])) | any(estvec[c(7,8,9),1]==mean(progress$upper[c(7,8,9)]))) svec=paste(svec,'*!',sep='')
-	
+	if(bounded[1]>0) svec=paste(svec,'*',sep='')
 	tkinsert(txt,"end",paste(svec,"\n"))	
 	
 	if(dim(gradmat)[2]>1) {
 		for(i in 2:dim(gradmat)[2]) {
 			svec = sprintf('  [%3.0f] (%5.2f %5.2f %5.2f) |%8.0f|',i,estvec[7,i],estvec[8,i],estvec[9,i],sqrt(sum(gradmat[,i]^2)))
-			if(any(estvec[c(7,8,9),i]<mean(progress$lower[c(7,8,9)])/1.05) | any(estvec[c(7,8,9),i]>mean(progress$upper[c(7,8,9)]))/1.05) svec=paste(svec,'*',sep='')
-			if(any(estvec[c(7,8,9),i]<=mean(progress$lower[c(7,8,9)])) | any(estvec[c(7,8,9),i]>=mean(progress$upper[c(7,8,9)]))) svec=paste(svec,'*!',sep='')
-			
+			if(bounded[i]>0) svec=paste(svec,'*',sep='')
 			tkinsert(txt,"end",paste(svec,"\n"))
 		}
 	}

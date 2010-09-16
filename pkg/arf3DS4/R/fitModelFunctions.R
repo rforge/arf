@@ -27,6 +27,7 @@
 #checkGradientReturn
 #checkNonSigReturn
 #setIsoContour
+#persistentBound
 
 ssq.gauss <- 
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
@@ -45,15 +46,23 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	gradobj = round(olgrad-ssqdat,0)
 	objit = get('.objit',envir=.GlobalEnv)
 	gradval = get('.gradval',envir=.GlobalEnv)
-		
+	bounded = get('.bounded',envir=.GlobalEnv)
+	
+	
 	#Progress Watcher
-	writeProgress(ssqdat,theta,objit,gradobj,gradval,progress)
+	writeProgress(ssqdat,theta,objit,gradobj,gradval,progress,bounded)
 	
 	#boundary checker
-	boundvec = persistentBound(theta,progress$lower,progress$upper)
+	boundvec = persistentBound(theta,progress$lower,progress$upper,progress$perslim)
 	if(length(boundvec)>0) {
 		ssqdat='killoptim'
-		assign('.persistent_error',boundvec,envir=.GlobalEnv)
+		assign('.arf_error',list(errtype='persbound',data=boundvec),envir=.GlobalEnv)
+	}
+	
+	#iterlimchecker
+	if(objit>progress$iterlim) {
+		ssqdat = 'killoptim'
+		assign('.arf_error',list(errtype='iterlim',data=objit),envir=.GlobalEnv)
 	}
 	
 	assign('.gradit',ssqdat,envir=.GlobalEnv)
@@ -848,20 +857,23 @@ function(arfmodel,conf.int=95)
 }
 
 persistentBound <-
-function(theta,lower,upper,itlim=10)
+function(theta,lower,upper,itlim)
+#check for persistent boundary violation of theta 7,8,9
 {
-	bounded = get('.bounded',envir=.GlobalEnv)
-	
+	oldbounds = get('.bounded',envir=.GlobalEnv)
+
 	estvec = matrix(theta,10)
-		
-	for(i in 1:dim(estvec)[2]) {
-		if(any(estvec[c(7,8,9),i]<=mean(lower[c(7,8,9)])) | any(estvec[c(7,8,9),i]>=mean(upper[c(7,8,9)]))) {
-			bounded[i] = bounded[i]+1
-		} else {
-			bounded[i] = 0			
-		}
+	bounded = rep(NA,length(oldbounds))
+	
+	bmat = matrix(NA,10,length(theta)/10)
+	for(param in 1:dim(estvec)[1]) {
+		bmat[param,] = as.numeric(estvec[param,]<=lower[param] | estvec[param,]>=upper[param])
 	}
 	
+	newbounds = as.numeric(apply(bmat,2,any))
+	
+	for(i in 1:length(oldbounds)) if(newbounds[i]>0) bounded[i]=oldbounds[i]+newbounds[i] else bounded[i]=0
+	cat(bounded,'\n\n')	
 	assign('.bounded',bounded,envir=.GlobalEnv)
 	
 	return(which(bounded>itlim))

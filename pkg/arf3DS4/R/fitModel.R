@@ -106,14 +106,13 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		return(arfmodel)
 	}
 	
-	#make progressWindow
-	#progress = newProgressWindow(arfmodel)
-	progress = newProgressText(arfmodel)	
+	#make progressElements
+	progress = newProgressElement(arfmodel,options,lowbound,upbound)	
 
 	#assign global variables
 	assign('.gradient_latest',NA,envir=.GlobalEnv)
 	assign('.theta_latest',NA,envir=.GlobalEnv)
-	assign('.persistent_error',numeric(0),envir=.GlobalEnv)
+	assign('.arf_error',numeric(0),envir=.GlobalEnv)
 	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
@@ -142,11 +141,11 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	
 	# check for internal errors and set relevant arf model values
 	if(is.null(attr(optim.output,'class'))) {
-		if(optim.output$convergence==0) .model.convergence(arfmodel) <- paste('Optim converged in ',optim.output$counts[1],' iterations.',sep='')
-		if(optim.output$convergence==1) {.model.convergence(arfmodel) <- 'Iteration limit exceeded. No convergence.';.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim did not converge.',sep=''))}
-		if(optim.output$convergence==10) .model.convergence(arfmodel) <- 'Degeneracy of the Nelder-Mead Simplex'
-		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('BFGS raises warning:',gsub('\n','',optim.output$message),sep='')
-		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('BFGS raises error:',gsub('\n','',optim.output$message),sep='')
+		if(optim.output$convergence==0) .model.convergence(arfmodel) <- paste('[optim] Optim converged in ',optim.output$counts[1],' iterations.',sep='')
+		if(optim.output$convergence==1) {.model.convergence(arfmodel) <- '[optim] Iteration limit exceeded. No convergence.';.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim did not converge.',sep=''))}
+		if(optim.output$convergence==10) .model.convergence(arfmodel) <- '[optim] Degeneracy of the Nelder-Mead Simplex'
+		if(optim.output$convergence==51) .model.convergence(arfmodel) <- paste('[optim] BFGS raises warning:',gsub('\n','',optim.output$message),sep='')
+		if(optim.output$convergence==52) .model.convergence(arfmodel) <-  paste('[optim] BFGS raises error:',gsub('\n','',optim.output$message),sep='')
 		
 		if(optim.output$convergence == 0) .model.valid(arfmodel) <- TRUE else .model.valid(arfmodel) <- FALSE
 	
@@ -209,27 +208,35 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	} else {
 		.model.estimates(arfmodel) <- get('.theta_latest',envir=.GlobalEnv)
 		.model.gradient(arfmodel) <- get('.gradient_latest',envir=.GlobalEnv)
-		pers <- get('.persistent_error',envir=.GlobalEnv)
+		pers <- get('.arf_error',envir=.GlobalEnv)
 		
 		if(length(pers)==0) {
-			.model.convergence(arfmodel) <- 'Internal error, no convergence.'
+			.model.convergence(arfmodel) <- '[optim] Internal error, no convergence.'
 			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] optim internal error: ',gsub('\n','',optim.output),sep=''))
 			.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
 			.model.valid(arfmodel) <- FALSE
 		} else {
-			.model.convergence(arfmodel) <- 'Persistent boundary error, no convergence.'
-			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] Persistent boundaries on regions:',paste(pers,collapse=','),sep=''))
-			.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
-			.model.valid(arfmodel) <- FALSE
+			if(pers$errtype=='persbound') {
+				.model.convergence(arfmodel) <- '[arf] Persistent boundary error, no convergence.'
+				.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] Persistent boundaries on regions: ',paste(pers$data,collapse=','),sep=''))
+				.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
+				.model.valid(arfmodel) <- FALSE
+				arfmodel <- saveModelBin(arfmodel)
+			}
+			if(pers$errtype=='iterlim') {
+				.model.convergence(arfmodel) <- '[arf] Iteration limit reached (ARF), no convergence.'
+				.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[min] Iteration limit reached after ',paste(pers$data,collapse=','),' iterations.',sep=''))
+				.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
+				.model.valid(arfmodel) <- FALSE
+				arfmodel <- saveModelBin(arfmodel)
+			}
 		}
-		
-		
 	}
 		
 	if(!.model.valid(arfmodel)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),.model.convergence(arfmodel)) 
 	
 	#clean up
-	rm('.theta_latest','.gradient_latest','.gradit','.gradval','.objit','.bounded','.persistent_error',envir=.GlobalEnv)
+	rm('.theta_latest','.gradient_latest','.gradit','.gradval','.objit','.bounded','.arf_error',envir=.GlobalEnv)
 		
 	#save the modelInfo
 	saveModel(arfmodel)
