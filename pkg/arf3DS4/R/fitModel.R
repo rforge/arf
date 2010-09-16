@@ -236,7 +236,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	if(!.model.valid(arfmodel)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),.model.convergence(arfmodel)) 
 	
 	#clean up
-	rm('.theta_latest','.gradient_latest','.gradit','.gradval','.objit','.bounded','.arf_error',envir=.GlobalEnv)
+	rm('.theta_latest','.gradient_latest','.gradit','.gradval','.objit','.bounded','.arf_error','.oldobj',envir=.GlobalEnv)
 		
 	#save the modelInfo
 	saveModel(arfmodel)

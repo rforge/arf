@@ -146,7 +146,8 @@ function(arfmodel,options,lower,upper)
 	attr(progress,'class') <- 'progress'
 	
 	#assign global counters
-	assign('.gradit',0,envir=.GlobalEnv)
+	assign('.gradit',1,envir=.GlobalEnv)
+	assign('.oldobj',0,envir=.GlobalEnv)
 	assign('.objit',1,envir=.GlobalEnv)
 	assign('.gradval',0,envir=.GlobalEnv)
 	assign('.bounded',rep(0,.model.regions(arfmodel)),envir=.GlobalEnv)
@@ -156,7 +157,7 @@ function(arfmodel,options,lower,upper)
 }
 
 writeProgress <-
-function(ssqdat,theta,objit,gradobj,gradvec,progress,bounded) 
+function(ssqdat,theta,objit,gradobj,gradvec,progress,bounded,gradit) 
 #write down the progress of the iterations
 {
 	txt = progress$txt
@@ -165,7 +166,8 @@ function(ssqdat,theta,objit,gradobj,gradvec,progress,bounded)
 	
 	tkinsert(txt,"end",paste(as.character(Sys.time()),'\n',sep=''))
 	tkinsert(txt,"end",paste("\n"))
-	tkinsert(txt,"end",sprintf("Iteration       : %10.0f\n",objit))
+	tkinsert(txt,"end",sprintf("Iteration obj.  : %10.0f\n",objit))
+	tkinsert(txt,"end",sprintf("Iteration grad. : %10.0f\n",gradit))
 	tkinsert(txt,"end",sprintf("Iteration limit : %10.0f\n",progress$iterlim))
 	tkinsert(txt,"end",sprintf("Boundary limit  : %10.0f\n",progress$perslim))
 	tkinsert(txt,"end",sprintf("Objective value : %10.0f\n",round(ssqdat)))

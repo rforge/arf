@@ -42,15 +42,15 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	assign('.theta_latest',theta,envir=.GlobalEnv)
 	
 	#get iteration data
-	olgrad = get('.gradit',envir=.GlobalEnv)
+	olgrad = get('.oldobj',envir=.GlobalEnv)
 	gradobj = round(olgrad-ssqdat,0)
 	objit = get('.objit',envir=.GlobalEnv)
 	gradval = get('.gradval',envir=.GlobalEnv)
 	bounded = get('.bounded',envir=.GlobalEnv)
-	
+	gradit = get('.gradit',envir=.GlobalEnv)
 	
 	#Progress Watcher
-	writeProgress(ssqdat,theta,objit,gradobj,gradval,progress,bounded)
+	writeProgress(ssqdat,theta,objit,gradobj,gradval,progress,bounded,gradit)
 	
 	#boundary checker
 	boundvec = persistentBound(theta,progress$lower,progress$upper,progress$perslim)
@@ -65,7 +65,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 		assign('.arf_error',list(errtype='iterlim',data=objit),envir=.GlobalEnv)
 	}
 	
-	assign('.gradit',ssqdat,envir=.GlobalEnv)
+	assign('.oldobj',ssqdat,envir=.GlobalEnv)
 	assign('.objit',objit+1,envir=.GlobalEnv)
 	
 	return(invisible(ssqdat))	
@@ -98,9 +98,12 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	
 	assign('.gradient_latest',grad,envir=.GlobalEnv)
 	
+	
 	#progress Watcher (only assign gradients)
 	assign('.gradval',grad,envir=.GlobalEnv)
-	
+
+	gradit = get('.gradit',envir=.GlobalEnv)
+	assign('.gradit',gradit+1,envir=.GlobalEnv)
 	
 	return(grad)
 
