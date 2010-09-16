@@ -873,7 +873,7 @@ function(theta,lower,upper,itlim)
 	newbounds = as.numeric(apply(bmat,2,any))
 	
 	for(i in 1:length(oldbounds)) if(newbounds[i]>0) bounded[i]=oldbounds[i]+newbounds[i] else bounded[i]=0
-	cat(bounded,'\n\n')	
+
 	assign('.bounded',bounded,envir=.GlobalEnv)
 	
 	return(which(bounded>itlim))
