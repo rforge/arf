@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=2,
 		build=2,
-		update=4,
-		svnrev=157
+		update=5,
+		svnrev=158
 	),
 	package='arf3DS4'
 )
@@ -386,13 +386,15 @@ setClass(
 		funcDir='character',		#directory of functional volume
 		funcRda='character',		#filename of functional file
 		trials='numeric',			#number of trials
+		dataHeader='ANY',
 		version='ANY'
 	),
 	prototype=prototype(
 		version=new('version'),
 		avgdatfile='',
 		avgWfile='',
-		avgtstatFile=''
+		avgtstatFile='',
+		dataHeader=new('nifti.header')
 	),
 	package='arf3DS4'
 )

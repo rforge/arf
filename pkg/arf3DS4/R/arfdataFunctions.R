@@ -95,6 +95,8 @@ function(experiment,overwrite=F)
 				
 				if(file.exists(fn)) {
 					data <- loadRda(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.dataRda(experiment),sep=''))
+					data <- updateClass(data,dataHeader=new('nifti.header'))
+					
 				} else {
 					data <- new('data')
 					.data.name(data) <- paste(.experiment.subject.names(experiment)[subs],'-',.experiment.condition.names(experiment)[conds])
@@ -132,6 +134,9 @@ function(experiment,overwrite=F)
 			.data.avgWfile(data) <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.avgDir(experiment),sep=''),.experiment.avgWFile(experiment),full=T)
 			.data.avgtstatFile(data) <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.avgDir(experiment),sep=''),.experiment.avgtstatFile(experiment),full=T)			
 			
+			#load avgdata header in dataHeader
+			.data.dataHeader(data) <- readHeader(getFileInfo(.data.avgdatfile(data)))
+			
 			#checkFileIntegrity
 			if(!checkFiles(data)) {warning('checkFiles returns false. Check warnings!');allIsWell=F}
 						
@@ -153,9 +158,9 @@ function(experiment,overwrite=F)
 					for(mods in 1:length(mnames)) {
 						model <- loadRda(paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
 			
-						#version specific data to add to model (if not set by classDef, data prior to 1.3.0)
-						#model <- updateClass(model,logFile=.experiment.logFile(experiment),gradient=0,params=0,modeltype='undef',avgtstatFile='',n=0,mask=0,ss=0)
-				
+						#version specific data to add to model (if not set by classDef, data prior to 2.2.4)
+						model <- updateClass(model,dataHeader=.data.dataHeader(data))	
+			
 						.model.modelpath(model) <- paste(modelpath,sp,mnames[mods],sep='')
 						.model.modeldatapath(model) <- paste(modelpath,sp,mnames[mods],sp,.experiment.modeldatDir(experiment),sep='')
 						.model.fullpath(model) <- .data.fullpath(data)
@@ -171,6 +176,8 @@ function(experiment,overwrite=F)
 						.model.n(model) <- .data.n(data)
 						.model.mask(model) <- .data.mask(data)
 						.model.ss(model) <- .data.ss(data)
+						.model.dataHeader(model) <- .data.dataHeader(data)
+						
 						
 						save(model,file=paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
 						

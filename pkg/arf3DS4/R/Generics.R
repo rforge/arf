@@ -3057,6 +3057,17 @@ standMethod <- function(x, value) {x@trials<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'model'
+funcname <-'.model.dataHeader'
+standGen <- function(object) standardGeneric('.model.dataHeader')
+standMethod <- function(object) object@dataHeader
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.model.dataHeader<-'
+standGen <- function(x, value) standardGeneric('.model.dataHeader<-')
+standMethod <- function(x, value) {x@dataHeader<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'model'
 funcname <-'.model.version'
 standGen <- function(object) standardGeneric('.model.version')
 standMethod <- function(object) object@version
@@ -3230,6 +3241,17 @@ setMethod(funcname,classname,standMethod)
 slotreplace <-'.data.trials<-'
 standGen <- function(x, value) standardGeneric('.data.trials<-')
 standMethod <- function(x, value) {x@trials<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'data'
+funcname <-'.data.dataHeader'
+standGen <- function(object) standardGeneric('.data.dataHeader')
+standMethod <- function(object) object@dataHeader
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.data.dataHeader<-'
+standGen <- function(x, value) standardGeneric('.data.dataHeader<-')
+standMethod <- function(x, value) {x@dataHeader<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'data'

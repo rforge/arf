@@ -230,9 +230,19 @@ setMethod('[<-','fmri.data',
 setMethod('plot',signature(x='model',y='missing'),
 		function(x,y,...) {
 			
-			mod = readData(paste(x@modeldatapath,.Platform$file.sep,x@fullmodelDataFile,sep=''))
-			plot(mod,...)
+			fn = paste(x@modeldatapath,.Platform$file.sep,x@fullmodelDataFile,sep='')
 			
+			mod = try(readData(fn),silen=T)
+			
+			if(class(mod)=='try-error') {
+				mod = new('fmri.data',x@dataHeader)
+				if(length(x@estimates)==x@regions*x@params & is.numeric(x@estimates)) {
+					mod@datavec = model.gauss(x@estimates,x@regions*x@params,x@dataHeader@dims[2],x@dataHeader@dims[3],x@dataHeader@dims[4])
+					plot(mod,...)
+				}
+			} else {
+				plot(mod,...)	
+			}
 		}
 
 )
