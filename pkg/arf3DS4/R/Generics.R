@@ -945,6 +945,17 @@ standMethod <- function(x, value) {x@min.routine<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'options'
+funcname <-'.options.min.boundlim'
+standGen <- function(object) standardGeneric('.options.min.boundlim')
+standMethod <- function(object) object@min.boundlim
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.options.min.boundlim<-'
+standGen <- function(x, value) standardGeneric('.options.min.boundlim<-')
+standMethod <- function(x, value) {x@min.boundlim<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'options'
 funcname <-'.options.start.method'
 standGen <- function(object) standardGeneric('.options.start.method')
 standMethod <- function(object) object@start.method

@@ -60,46 +60,43 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 }
 
 
-processSequence <-
-function(modelname='defaultmodel',seedreg=10,subject='',condition='',grad=1000,bound=8,ns=T,alpha=.05,options=new('options'),overwrite=T,pr=T,printlevel=0,try.silen=T,experiment=NULL)
+processSeed <-
+function(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c('default','simple'),grad=NULL,bound=NULL,pval=NULL,options=new('options'),pr=T,printlevel=0,try.silen=T,overwrite=T,experiment=NULL)
 #process a sequence based on a seed number of regions
 {
 	
 	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
 	
-	if(pr) cat('[',modelname,'] @ seed',seedreg,'- started',as.character(Sys.time()),'\n\n')
+	if(pr) cat('[',modelname,'] with',seedreg,'seed region(s) started at',as.character(Sys.time()),'\n\n')
 	
-	#run a simple model
-	.options.start.method(options) = 'rect'
-	simple_model = newModel(paste('simple_',modelname,sep=''),regions=seedreg,subject=subject,condition=condition,type='simple',options=options,overwrite=overwrite,experiment=experiment)
-	
-	if(pr) cat(as.character(Sys.time()),'fitting simple model...')
-	simple_model = fitModel(simple_model)
-	if(pr) 	if(.model.valid(simple_model))	cat('ok\n') else cat('fail\n')
-	
-	if(.model.valid(simple_model)) .options.start.method(options) = 'use' else .options.start.method(options) = 'rect'
-	
-	#run a full model (with informed starts)
+	#make the model
 	full_model = newModel(paste('full_',modelname,sep=''),regions=seedreg,subject=subject,condition=condition,type='gauss',options=options,overwrite=overwrite,experiment=experiment)
 	
-	if(.model.valid(simple_model)) {
-		.model.startval(full_model) = .model.estimates(simple_model)
-		.model.startval(full_model)[.model.startval(full_model)==0]=.01
-		saveModel(full_model)
-		if(pr) cat(as.character(Sys.time()),'fitting full model...')
-		full_model = fitModel(full_model)
-		if(pr) 	if(.model.valid(full_model))	cat('ok\n') else cat('fail\n')
+	#use simple starts or defaults
+	start.method = match(start.method,c('default','simple'))
+	if(start.mehod=='simple') {	
+		#run a simple model
+		.options.start.method(options) = 'rect'
+		simple_model = newModel(paste('simple_',modelname,sep=''),regions=seedreg,subject=subject,condition=condition,type='simple',options=options,overwrite=overwrite,experiment=experiment)
 		
-	} else model = simple_model #no valid models 
-	
-	#run prune sequence
-	if(.model.valid(full_model)) {
-	
-		model = pruneModel(full_model,modelname,subject,condition,grad,bound,ns,alpha,options,overwrite,experiment)
+		if(pr) cat(as.character(Sys.time()),'fitting simple model...')
+		simple_model = fitModel(simple_model)
+		if(pr) 	if(.model.valid(simple_model))	cat('ok\n') else cat('fail\n')
 		
-		#if(pr) 	if(.model.valid(model))	cat('ok\n') else cat('fail\n')
-				
-	} else 	model = full_model #full_model not valid
+		if(.model.valid(simple_model)) {
+			.model.startval(full_model) = .model.estimates(simple_model)
+			.model.startval(full_model)[.model.startval(full_model)==0]=.01
+			saveModel(full_model)
+		} else if(pr) cat('simple model not valid, using normal starting values\n') 
+	} 
+	
+	#fit the model
+	full_model = fitModel(full_model,options=options)
+	
+	#check the model
+	if(!.model.valid(full_model)) {
+		model = pruneModel(full_model,modelname,subject,condition,grad,bound,pval,options,overwrite,experiment)
+	} else model = full_model 
 	
 	
 	return(model)

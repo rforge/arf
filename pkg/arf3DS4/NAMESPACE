@@ -34,7 +34,7 @@ export(
 	differenceCor,
 	partialCor,
 	processModel,
-	processSequence,
+	processSeed,
 	createAverages,
 	createAllAverages,
 	determineStartRect,

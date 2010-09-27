@@ -405,7 +405,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 
 pruneModel <- 
 #prune a given model until neat
-function(arfmodel,modelname='defaultmodel',subject='',condition='',grad=1000,bound=8,ns=T,alpha=.05,options=new('options'),overwrite=T,experiment=NULL)
+function(arfmodel,modelname='defaultmodel',subject='',condition='',grad=NULL,bound=NULL,pval=NULL,options=new('options'),overwrite=T,experiment=NULL)
 {
 	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
 	
@@ -419,6 +419,9 @@ function(arfmodel,modelname='defaultmodel',subject='',condition='',grad=1000,bou
 	while(stop_prune==FALSE) 
 	{
 		ests = matrix(.model.estimates(pruned_model),10)
+	
+		#check validness of model
+		if(.model.valid(pruned_model))
 		
 		b_del = checkSolutionReturn(pruned_model,thres=bound)
 		g_del = checkGradientReturn(pruned_model,absthres=grad)

@@ -92,6 +92,8 @@
 \alias{.model.weightFile<-,model-method}
 \alias{.model.weightfiles,model-method}
 \alias{.model.weightfiles<-,model-method}
+\alias{.model.dataHeader,model-method}
+\alias{.model.dataHeader<-,model-method}
 \alias{plot,model,missing-method}
 \alias{show,model-method}
 
@@ -146,6 +148,7 @@ Objects can be created by calls of the form \code{new("model", ...)}.
     \item{\code{regRda}:}{Name of the registration.Rda file.}
     \item{\code{funcDir}:}{Fullpath to the functional directory.}
     \item{\code{funcRda}:}{Name of the functional.Rda file.}
+    \item{\code{dataHeader}:}{Nifti header information from the avgdataFile.}
     \item{\code{trials}:}{Number of trials (= number of beta files).}
     \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }

@@ -30,6 +30,8 @@
 \alias{.data.ss<-,data-method}
 \alias{.data.trials,data-method}
 \alias{.data.trials<-,data-method}
+\alias{.data.dataHeader,data-method}
+\alias{.data.dataHeader<-,data-method}
 \alias{.data.version,data-method}
 \alias{.data.version<-,data-method}
 \alias{.data.weightfiles,data-method}
@@ -57,6 +59,7 @@ Objects can be created by calls of the form \code{new("data", ...)}.
     \item{\code{regRda}:}{Name of the registration.Rda file.}
     \item{\code{funcDir}:}{Fullpath to the functional directory.}
     \item{\code{funcRda}:}{Name of the functional.Rda file.}
+    \item{\code{dataHeader}:}{Nifti header information from the avgdataFile.}
     \item{\code{trials}:}{Number of trials (= number of beta files).}
     \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }

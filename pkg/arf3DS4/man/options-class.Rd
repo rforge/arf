@@ -12,6 +12,8 @@
 \alias{.options.min.analyticalgrad<-,options-method}
 \alias{.options.min.iterlim,options-method}
 \alias{.options.min.iterlim<-,options-method}
+\alias{.options.min.boundlim,options-method}
+\alias{.options.min.boundlim<-,options-method}
 \alias{.options.min.routine,options-method}
 \alias{.options.min.routine<-,options-method}
 \alias{.options.nlm.gradtol,options-method}
@@ -51,6 +53,7 @@ Objects can be created by calls of the form \code{new("options", ...)}.
     \item{\code{opt.upper}:}{<optim> Upperbound of parameters (for L-BFGS-B).}
     \item{\code{min.analyticalgrad}:}{Use analytical gradient in minimization? }
     \item{\code{min.iterlim}:}{Iteration limit.}
+    \item{\code{min.boundlim}:}{Persistent Boundary iteration limit.}
     \item{\code{min.routine}:}{Minimization routine (nlm or optim). }
     \item{\code{start.method}:}{Method of startingvalue calulation (use,load,or rect)}
     \item{\code{start.maxfac}:}{Width of smoothing kernel used in starting value calculation.}

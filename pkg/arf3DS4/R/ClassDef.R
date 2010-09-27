@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=2,
 		build=2,
-		update=6,
-		svnrev=159
+		update=7,
+		svnrev=160
 	),
 	package='arf3DS4'
 )
@@ -189,6 +189,7 @@ setClass(
 		min.analyticalgrad='logical', #use analytical gradient
 		min.iterlim='numeric',		#minimization iteration limit
 		min.routine='character',	#which routine is used
+		min.boundlim='numeric',		#number of iterations before exiting with persistent bound error	
 		start.method='character',	#which method of determining starting values is used ('rect','load','none')
 		start.maxfac='numeric',		#fallOff factor in the determination of region width
 		start.vector='numeric',		#vector containing startingvalues (if !start.method=='fixed' only t5 and t6 are used) vector is recycled for regions.
@@ -208,6 +209,7 @@ setClass(
 		opt.upper=c(rep(Inf,3),rep(1,3),rep(.90,3),Inf),	#L-BFGS-U upper bound
 		min.analyticalgrad=T, 	#use analytical gradient
 		min.iterlim=2000,		#iteration limit
+		min.boundlim=50,		#boundary iterations limit
 		min.routine=c('optim','vpv'),	#which routine
 		start.method='use',	
 		start.maxfac=1,

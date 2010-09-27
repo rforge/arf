@@ -142,7 +142,7 @@ function(arfmodel,options,lower,upper)
 	tkfocus(txt)
 	
 	#make progress object (S3)
-	progress = list(tt=tt,txt=txt,lower=lower,upper=upper,iterlim=.options.min.iterlim(options),perslim=.options.min.iterlim(options)/100)
+	progress = list(tt=tt,txt=txt,lower=lower,upper=upper,iterlim=.options.min.iterlim(options),perslim=.options.min.boundlim(options))
 	attr(progress,'class') <- 'progress'
 	
 	#assign global counters

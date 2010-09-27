@@ -3,7 +3,7 @@
 \title{Prune a model based on invalid gradients and bounded parameters.}
 \description{Prune model prunes an arfmodel according to the gradients and bounds to obtain a valid solution.}
 \usage{
-pruneModel(arfmodel, modelname = "defaultmodel", subject = "", condition = "", grad = 1000, bound = 8, ns = T, alpha = .05, options = new("options"), overwrite = T, experiment = NULL)
+pruneModel(arfmodel,modelname='defaultmodel',subject='',condition='',grad=NULL,bound=NULL,pval=NULL,options=new('options'),overwrite=T,experiment=NULL)
 }
 
 \arguments{
@@ -13,8 +13,7 @@ pruneModel(arfmodel, modelname = "defaultmodel", subject = "", condition = "", g
   \item{condition}{Name of the condition.}
   \item{grad}{Absolute threshold for gradient check.}
   \item{bound}{Number of digits used in equality check on the bound.}
-  \item{ns}{Prune non-significant regions?}
-  \item{alpha}{Nominal alpha to check for non-significant regions.}
+  \item{pval}{Prune non-significant regions?}
   \item{options}{An "options" object (class \code{\linkS4class{options}}).} 
   \item{overwrite}{Overwrite existing objects.}
   \item{experiment}{Experiment object (as default uses \code{.experiment}).}
