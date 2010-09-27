@@ -6,7 +6,7 @@
 
 #[CONTAINS]
 #processModel
-#processSequence
+#processSeed
 
 processModel <- 
 function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),pr=T,printlevel=0,try.silen=T) 
@@ -59,7 +59,6 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	return(invisible(arfmodel))
 }
 
-
 processSeed <-
 function(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c('default','simple'),grad=NULL,bound=NULL,pval=NULL,options=new('options'),pr=T,printlevel=0,try.silen=T,overwrite=T,experiment=NULL)
 #process a sequence based on a seed number of regions
@@ -73,8 +72,8 @@ function(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c(
 	full_model = newModel(paste('full_',modelname,sep=''),regions=seedreg,subject=subject,condition=condition,type='gauss',options=options,overwrite=overwrite,experiment=experiment)
 	
 	#use simple starts or defaults
-	start.method = match(start.method,c('default','simple'))
-	if(start.mehod=='simple') {	
+	startmethod = match.argument(startmethod[1],c('default','simple'))
+	if(startmethod=='simple') {	
 		#run a simple model
 		.options.start.method(options) = 'rect'
 		simple_model = newModel(paste('simple_',modelname,sep=''),regions=seedreg,subject=subject,condition=condition,type='simple',options=options,overwrite=overwrite,experiment=experiment)

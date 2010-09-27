@@ -416,16 +416,16 @@ function(arfmodel,modelname='defaultmodel',subject='',condition='',grad=NULL,bou
 	
 	cat(as.character(Sys.time()),'pruning model with',.model.regions(arfmodel),'regions\n')
 	
-	while(stop_prune==FALSE) 
+	while(!stop_prune) 
 	{
 		ests = matrix(.model.estimates(pruned_model),10)
 	
 		#check validness of model
-		if(.model.valid(pruned_model))
+		if(.model.valid(pruned_model)) stop_prune = TRUE
 		
-		b_del = checkSolutionReturn(pruned_model,thres=bound)
-		g_del = checkGradientReturn(pruned_model,absthres=grad)
-		if(ns) ns_del = checkNonSigReturn(pruned_model,alpha=alpha) else ns_del=numeric(0)
+		if(!is.null(bound)) b_del = checkSolutionReturn(pruned_model,thres=bound) else b_del=numeric(0)
+		if(!is.null(grad)) g_del = checkGradientReturn(pruned_model,absthres=grad) else g_del=numeric(0)
+		if(!is.null(pval)) ns_del = checkNonSigReturn(pruned_model,alpha=pval) else ns_del=numeric(0)
 		
 		del = unique(c(b_del,g_del,ns_del))
 		
@@ -439,10 +439,10 @@ function(arfmodel,modelname='defaultmodel',subject='',condition='',grad=NULL,bou
 				.model.startval(pruned_model) = ests 
 				saveModel(pruned_model)
 				cat(as.character(Sys.time()),'*fitting pruned model with',.model.regions(pruned_model),'regions\n')
-				pruned_model = fitModel(pruned_model)
+				pruned_model = fitModel(pruned_model,options=options)
 			} else {
 				model = pruned_model
-				cat(as.character(Sys.time()),'Pruned all regions\n')
+				cat(as.character(Sys.time()),'Pruned all regions (no regions left)\n')
 				stop_prune = TRUE
 			}
 			
