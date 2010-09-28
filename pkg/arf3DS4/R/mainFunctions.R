@@ -72,7 +72,7 @@ function(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c(
 	full_model = newModel(paste('full_',modelname,sep=''),regions=seedreg,subject=subject,condition=condition,type='gauss',options=options,overwrite=overwrite,experiment=experiment)
 	
 	#use simple starts or defaults
-	startmethod = match.argument(startmethod[1],c('default','simple'))
+	startmethod = match(startmethod[1],c('default','simple'))
 	if(startmethod=='simple') {	
 		#run a simple model
 		.options.start.method(options) = 'rect'
