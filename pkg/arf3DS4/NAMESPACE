@@ -55,6 +55,7 @@ export(
 	loadRda,
 	loadData,
 	loadModel,
+	version,
 	clearWarnings,
 	makeDiscreteImage,
 	makeDerivs,
