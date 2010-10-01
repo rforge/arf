@@ -320,6 +320,21 @@ setMethod('show','mnames',
 		}
 )
 
-
+#### ARF OPTIONS METHODS ####
+setMethod('show','options',
+		function(object) {
+			cat('[ ARF options ]\n')
+			cat(' start-value method:    ',object@start.method,'\n')
+			cat(' start-value factor:    ',object@start.maxfac,'\n')
+			cat(' iteration limit:       ',object@min.iterlim,'\n')
+			cat(' boundary limit:        ',object@min.boundlim,'\n')
+			cat(' minimization function: ',object@min.routine[1],'\n')
+			cat(' optim-method:          ',object@opt.method,'\n')
+			cat(' optim-lower-limit:     ',paste(object@opt.lower,collapse=', '),'\n')
+			cat(' optim-upper-limit:     ',paste(object@opt.upper,collapse=', '),'\n')
+			cat(' sandwich-method:       ',object@sw.type,'\n')
+			cat('\n')
+		}
+)
 
 

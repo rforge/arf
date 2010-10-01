@@ -90,7 +90,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		#set location to maximal dim
 		max_loc = c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4])
 	
-		#set width parameters to maxdim divided by tphe value given in the options
+		#set width parameters to maxdim divided by the value given in the options
 		max_width =  c(.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4]) / c(.options.opt.upper(options)[4],.options.opt.upper(options)[5],.options.opt.upper(options)[6])
 		
 		upbound = rep(c(max_loc,max_width,.options.opt.upper(options)[7:10]),.model.regions(arfmodel))
