@@ -10,8 +10,9 @@
 #chngRootExp
 #setExp
 #loadExp
-#getFSLdata
 #checkVersion
+#getFSLdata
+#prettytime
 
 checkExp <- 
 function(experiment) 
@@ -560,3 +561,5 @@ function(pstime)
 	
 	
 }
+
+

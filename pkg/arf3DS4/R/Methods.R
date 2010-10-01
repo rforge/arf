@@ -327,7 +327,8 @@ setMethod('show','options',
 			cat(' start-value method:    ',object@start.method,'\n')
 			cat(' start-value factor:    ',object@start.maxfac,'\n')
 			cat(' iteration limit:       ',object@min.iterlim,'\n')
-			cat(' boundary limit:        ',object@min.boundlim,'\n')
+			bl = try(cat(' boundary limit:        ',object@min.boundlim,'\n'),silen=T)
+			if(class(bl)=='try-error') cat(' boundary limit:         not available\n')
 			cat(' minimization function: ',object@min.routine[1],'\n')
 			cat(' optim-method:          ',object@opt.method,'\n')
 			cat(' optim-lower-limit:     ',paste(object@opt.lower,collapse=', '),'\n')
@@ -337,4 +338,15 @@ setMethod('show','options',
 		}
 )
 
+#### ARF VERSION METHODS ####
+setMethod('show','version',
+		function(object) {
+			cat('Activated Region Fitting version ',object@version,'.',object@build,'-',object@update,' (rev. ',object@svnrev,')\n',sep='')
+		}
+)
 
+#show version of an arf-object
+version <- function(object) {
+	cat(attr(class(object),'package'),' ',class(object),' version ',object@version@version,'-',object@version@build,'.',object@version@update,'\n',sep='')
+	
+}
