@@ -823,3 +823,17 @@ function(arfmodel,registration)
 	}
 	return(centers)
 }
+
+loadReg <-
+function(subject, condition, run, experiment = NULL)
+{
+	
+	
+}
+
+saveReg <-
+function(registration)
+{
+	
+	
+}

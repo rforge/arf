@@ -292,14 +292,12 @@ setMethod('show','model',
 setMethod('show','data',
 		function(object) {
 			cat('[ ARF data ]\n')
-			cat('name:          ',toupper(object@name),'\n')
-			cat('path:          ',object@fullpath,'\n')
-			cat('betafiles:     ',length(object@betafiles),'\n')
-			cat('weightfiles:   ',length(object@betafiles),'\n')
-			cat('avgbetafile:   ')
-			if(length(object@avgdatfile)>0)	if(!file.exists(object@avgdatfile)) cat('not available\n') else cat('exists\n')
-			cat('avgweightfile: ')
-			if(length(object@avgWfile)>0) if(!file.exists(object@avgWfile)) cat('not available\n') else cat('exists\n')
+			cat(' name:       ',toupper(object@name),'\n')
+			cat(' data path:  ',object@fullpath,'\n')
+			cat(' runs:       ',object@trials,'\n')
+			cat(' voxels:      ',object@n,' (',length(object@mask[object@mask!=0]),')\n',sep='')
+			cat(' dimensions: ',paste(object@dataHeader@dims[2:5],collapse='x'),'\n')
+			
 			
 		}
 )

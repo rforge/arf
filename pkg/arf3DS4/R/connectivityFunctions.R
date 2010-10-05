@@ -87,9 +87,12 @@ function(arfmodel,sefilename='single_events')
 			info <- getFileInfo(filename)
 			dirname <- .nifti.fileinfo.filename(info)
 			
+			#get functional information
 			func <- loadRda(paste(path,sp,dirname,sp,.data.funcRda(arfmodel),sep=''))
 			timings <- .functional.timings(func)
-		
+			stimlen <- attr(.functional.timings(func),'stimlen')
+			if(is.null(stimlen)) stimlen = rep(1,length(timings))
+			
 			#make array of fmri volume
 			fmrivolume = readData(paste(.functional.fullpath(func),sp,.functional.functionaldata(func),sep=''))
 			funcvolume = .fmri.data.datavec(fmrivolume)
@@ -102,21 +105,23 @@ function(arfmodel,sefilename='single_events')
 			hrf <- gamma.fmri(1:tslen) 
 			stick[round(timings)]=1
 			vecnums = which(stick==1)
-	
+			
 			#define design matrices and outputs
 			X = matrix(NA,.fmri.data.dims(fmrivolume)[5],length(vecnums))
 			beta = matrix(0,n,length(vecnums))
-			
+		
 			#create single-trial columns in design matrix
 			for(i in 1:length(vecnums)) {
 				st_protocol = rep(0,tslen)
-				st_protocol[vecnums[i]]=1
+				len = round(stimlen[i])
+				if(len<=0) len = 1
+				stvec = vecnums[i]:(vecnums[i]+len-1)
+				st_protocol[stvec]=1
 				bold = convol.fmri(hrf,st_protocol)
 				bold = bold[seq(1,tslen,.fmri.data.pixdim(fmrivolume)[5])]
 				X[,i] = bold 
-	
 			}
-			
+	
 			#Solve the LS equation for each voxel (on DEMEANED data)
 			Xp = solve(t(X)%*%X)%*%t(X)
 				
@@ -434,123 +439,7 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 	return(out)
 }
 
-makeRawTimeseries <- 
-function(arfmodel,sefilename='single_events')
-#make single trial estimates
-{
-	#get Header info from avgdatfile
-	headinf <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))
-	
-	#open functional file
-	filelist <- .model.betafiles(arfmodel)
-	path <- .model.funcDir(arfmodel)
-	sp <- .Platform$file.sep
-	
-	datavec = rawvec = numeric(0)
-	totdim = 0
-	
-	for(filename in filelist) {
-		if(file.exists(filename)) {
-			
-			info <- getFileInfo(filename)
-			dirname <- .nifti.fileinfo.filename(info)
-			
-			func <- loadRda(paste(path,sp,dirname,sp,.data.funcRda(arfmodel),sep=''))
-			timings <- .functional.timings(func)
-			
-			#make array of fmri volume
-			fmrivolume = readData(paste(.functional.fullpath(func),sp,.functional.functionaldata(func),sep=''))
-			funcvolume = .fmri.data.datavec(fmrivolume)
-			dim(funcvolume) = c(.fmri.data.dims(fmrivolume)[2],.fmri.data.dims(fmrivolume)[3],.fmri.data.dims(fmrivolume)[4],.fmri.data.dims(fmrivolume)[5])
-			n = .fmri.data.dims(fmrivolume)[2]*.fmri.data.dims(fmrivolume)[3]*.fmri.data.dims(fmrivolume)[4]
-			
-			#create timeseries in seconds and create double gamma
-			tslen = round(.fmri.data.dims(fmrivolume)[5] * .fmri.data.pixdim(fmrivolume)[5])
-			stick = rep(0,tslen)
-			hrf <- gamma.fmri(1:tslen) 
-			stick[round(timings)]=1
-			vecnums = which(stick==1)
-			
-			#define design matrices and outputs
-			X = matrix(NA,.fmri.data.dims(fmrivolume)[5],length(vecnums))
-			beta = matrix(0,n,length(vecnums))
-			raw = matrix(0,n,length(seq(1,tslen,.fmri.data.pixdim(fmrivolume)[5])))
-			
-			#create single-trial columns in design matrix
-			for(i in 1:length(vecnums)) {
-				st_protocol = rep(0,tslen)
-				st_protocol[vecnums[i]]=1
-				bold = convol.fmri(hrf,st_protocol)
-				bold = bold[seq(1,tslen,.fmri.data.pixdim(fmrivolume)[5])]
-				X[,i] = bold 
-			}
-			
-			#Solve the LS equation for each voxel (on DEMEANED data)
-			Xp = solve(t(X)%*%X)%*%t(X)
-			
-			i=1;
-			for(z in 1:.fmri.data.dims(fmrivolume)[4]) {
-				for(y in 1:.fmri.data.dims(fmrivolume)[3]) {
-					for(x in 1:.fmri.data.dims(fmrivolume)[2]) {
-						if(.model.mask(arfmodel)[i]==1) {
-							dat = as.vector(funcvolume[x,y,z,])
-							dat = dat-mean(dat)
-							beta[i,] = as.vector(Xp%*%dat)
-						}
-						i=i+1;
-					}
-				}
-			}
-			
-			
-			
-			i=1;
-			for(z in 1:.fmri.data.dims(fmrivolume)[4]) {
-				for(y in 1:.fmri.data.dims(fmrivolume)[3]) {
-					for(x in 1:.fmri.data.dims(fmrivolume)[2]) {
-						if(.model.mask(arfmodel)[i]==1) {
-							
-							betas = stick
-							betas[which(betas==1)] = beta[i,]
-							
-							bold = convol.fmri(hrf,betas)
-							bold = bold[seq(1,tslen,.fmri.data.pixdim(fmrivolume)[5])]
-														
-							dat = as.vector(funcvolume[x,y,z,])
-							dat = dat-mean(dat)
-						
-							raw[i,] = dat-bold
-						}
-						i=i+1;
-					}
-				}
-			}
-			
-			cat('finished trial\n')
-			
-			#concatenate datavecs and increase dimensions of volume
-			rawvec = c(rawvec,as.vector(raw))
-			
-			totdim = totdim + length(vecnums)
-			
-		}
-	}
-		
-	rawvolume = fmrivolume
-	
-	#make new file for filetered single events
-	.fmri.data.filename(rawvolume) = paste('rawseries_',sefilename,sep='')
-	.fmri.data.dims(rawvolume)[5] = totdim
-	.fmri.data.pixdim(rawvolume)[5] = 1
-	.fmri.data.datavec(rawvolume) = rawvec
-	.fmri.data.fullpath(rawvolume) = .model.funcDir(arfmodel)
-	writeData(rawvolume,.fmri.data.datavec(rawvolume))
-		
-	
-	return(rawvolume)
-	
-	
-}
+
 
 createFuncs <- 
 function(arfdata) 
@@ -592,7 +481,7 @@ function(arfdata)
 
 
 setFuncFiles <- 
-function(experiment=NULL,func_data='filtered_func_data.nii.gz') 
+function(func_data='filtered_func_data.nii.gz',experiment=NULL) 
 ###
 {
 	#check experiment
@@ -605,14 +494,19 @@ function(experiment=NULL,func_data='filtered_func_data.nii.gz')
 		spath <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,.experiment.subject.names(experiment)[sdirs],sep='')
 		
 		for(cdirs in 1:.experiment.condition.num(experiment)) {
+			
+			dat = loadData(.experiment.subject.names(experiment)[sdirs],.experiment.condition.names(experiment)[cdirs])
+			createFuncs(dat)
+			
 			cpath <- paste(spath,sp,.experiment.conditionDir(experiment),sp,.experiment.condition.names(experiment)[cdirs],sp,.experiment.dataDir(experiment),sp,.experiment.funcDir(experiment),sep='')
 			
 			funcdirs <- list.files(cpath)
+			funcdirs <- funcdirs[which(file.info(list.files(cpath,full=T))$isdir)]
 			
 			for(trs in 1:length(funcdirs)) {
+								
+				if(length(func_data)!=length(funcdirs)) func_data = rep(func_data[1],length(funcdirs))
 				
-				
-				if(length(func_data)!=length(funcdirs)) stop('Functional data names vector should match number of functional.Rda\'s')
 				functional <- loadRda(paste(cpath,sp,funcdirs[trs],sp,.experiment.funcRda(experiment),sep=''))
 				
 				if(length(functional)>0) {
@@ -629,3 +523,69 @@ function(experiment=NULL,func_data='filtered_func_data.nii.gz')
 		
 	}
 }
+
+setFuncTimings <-
+function(subject, condition, run, timings, func_data=NULL, experiment=NULL) 
+#set the timings of a functional volume
+{
+	#load the appropriate functional file
+	functional = loadFunc(subject,condition,run,experiment=experiment)
+	
+	#set the timings
+	.functional.timings(functional) = timings
+	
+	#if func_data is given, also change funcdata
+	if(!is.null(func_data)) .functional.functionaldata(functional) <- func_data
+	
+	#save functional.Rda
+	saveFunc(functional)
+	
+	#return
+	return(functional)
+	
+}
+
+readTimings <-
+function(bfslfile) 
+#read timings from a bfslfile
+{
+	dat = read.table(bfslfile)
+	
+	timings = dat[,1]
+	attr(timings,'stimlen') = dat[,2]
+
+	return(timings)
+}		
+
+loadFunc <-
+function(subject, condition, run, experiment = NULL)
+#load a functionalfile
+{
+	#check experiment
+	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	
+	#set separator
+	sp <- .Platform$file.sep
+	cpath <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.dataDir(experiment),sp,.experiment.funcDir(experiment),sep='')
+
+	funcdirs <- list.files(cpath,full=T)
+	funcdirs <- funcdirs[which(file.info(list.files(cpath,full=T))$isdir)]
+	
+	functional=NULL
+	
+	#check run
+	if(is.numeric(run)) functional = loadRda(paste(funcdirs[run],sp,.experiment.funcRda(experiment),sep=''))
+	if(is.character(run)) functional = loadRda(paste(cpath,sp,run,sp,.experiment.funcRda(experiment),sep=''))
+	
+	return(functional)
+	
+}
+
+saveFunc <-
+function(functional)
+#save a functional file
+{
+	save(functional,file=.functional.filename(functional))
+	
+}
+		
