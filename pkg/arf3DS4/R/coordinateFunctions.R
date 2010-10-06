@@ -461,7 +461,10 @@ function(arfdata,experiment=NULL)
 {
 	
 	#check experiment
-	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	if(is.null(experiment)) {
+		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
+	}
 	
 	#get trials from dataDir
 	trials = list.files(.data.regDir(arfdata),full=F)
@@ -524,7 +527,10 @@ function(arfmodel,experiment=NULL)
 #make average of low_resolution structural image from multiple lowres images (and save in modeldir)
 {
 	#check experiment
-	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	if(is.null(experiment)) {
+		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
+	}
 	
 	sp = .Platform$file.sep
 	

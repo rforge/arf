@@ -26,7 +26,10 @@ function(modelname='defaultmodel',regions=1,subject='',condition='',type=c('gaus
 #newModel makes a modeldirectory based on data and experiment information and a modelname
 {
 	#check experiment
-	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	if(is.null(experiment)) {
+		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
+	}
 	
 	#set separator
 	sp <- .Platform$file.sep
@@ -251,7 +254,10 @@ function(modelname,subject=NA,condition,experiment=NULL)
 {
 
 	#check experiment
-	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	if(is.null(experiment)) {
+		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
+	}
 	
 	if(class(modelname)=='mnames') {
 		if(is.na(subject)) num = 1 else num = subject
@@ -284,7 +290,10 @@ function(subject,condition,experiment=NULL)
 {
 	
 	#check experiment
-	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	if(is.null(experiment)) {
+		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
+	}
 	
 	sp <- .Platform$file.sep
 	modname = paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.modelDir(experiment),sp,.experiment.modelnamesRda(experiment),sep='')

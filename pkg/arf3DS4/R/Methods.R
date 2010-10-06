@@ -344,7 +344,7 @@ setMethod('show','version',
 )
 
 #show version of an arf-object
-version <- function(object) {
+arfversion <- function(object) {
 	cat(attr(class(object),'package'),' ',class(object),' version ',object@version@version,'-',object@version@build,'.',object@version@update,'\n',sep='')
 	
 }

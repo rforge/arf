@@ -56,13 +56,16 @@ function(arfmodel,funcfilename='single_events.nii.gz')
 		p=p+1
 	}
 	
+	#get correlations
+	arfcor <- new('arfcorrelation')
+	.arfcorrelation.timebyregion(arfcor) <- t(b)
+	arfcor <- correlationTest(arfcor)
 	
-	#make correlation matrix and return matrices
-	cmat <- cor.test.matrix(t(b),alpha=.05,bonf=F) 
-	out <- list(ts=b,cor=cmat$cor,p=cmat$p)
-	attr(out,'class') <- 'arfcorrelation'
+	#save correlations
+	fn = paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.fmri.data.filename(funcdata),'.Rda',sep='')
+	save(arfcor,file=fn)
 		
-	return(out)
+	return(arfcor)
 	
 }
 
@@ -204,20 +207,18 @@ function(hrf, prot, ...)
 	return(conv)
 }
 
-cor.test.matrix <- 
-function(data,alpha=.05,bonf=T) 
+correlationTest <- 
+function(arfcor) 
 #calculate correlation test of a matrix
 {
 	
+	data = .arfcorrelation.timebyregion(arfcor)
+	
 	pmat = matrix(0,ncol(data),ncol(data))
 	cormat = matrix(1,ncol(data),ncol(data))
-	sigmat = matrix(0,ncol(data),ncol(data))
 	numcors = (ncol(data)*ncol(data)-ncol(data))/2
-	siglist = matrix(NA,numcors,4)
-	colnames(siglist) = c('row','col','est','p')
-	
-	if(bonf) p = alpha/numcors else p=alpha
-	#cat('p-value:',p,'\n')
+		
+	.arfcorrelation.number.correlations(arfcor) = numcors
 	
 	i=1;
 	for(row in 1:(ncol(data)-1)) {
@@ -226,10 +227,6 @@ function(data,alpha=.05,bonf=T)
 				ct = cor.test(data[,row],data[,col])
 				cormat[row,col] = cormat[col,row] = ct$estimate
 				pmat[row,col] = pmat[col,row] = ct$p.value
-				if(ct$p.value<p) {
-					sigmat[row,col]=1
-					siglist[i,] = c(row,col,ct$estimate,ct$p.value)
-				}
 				i = i + 1
 			}	
 		}
@@ -237,14 +234,12 @@ function(data,alpha=.05,bonf=T)
 	
 	pcor = partialCor(cormat,ncol(data))
 	
-	delsig = which(is.na(siglist[,1]))
-	if(length(delsig)>0) siglist = siglist[-delsig,]
-	#o = order(abs(siglist[,3]),decreasing=T)
-	#siglist = siglist[o,]
+	.arfcorrelation.correlation(arfcor) = cormat
+	.arfcorrelation.correlation.pval(arfcor) = pmat
+	.arfcorrelation.partial.correlation(arfcor) = pcor$pcor
+	.arfcorrelation.partial.correlation.pval(arfcor) = pcor$p
 	
-	corlist= list(cor=cormat,p=pmat,sig=sigmat,pcor=pcor,siglist=siglist)
-	
-	return(corlist)
+	return(arfcor)
 }
 
 
@@ -431,12 +426,17 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 		
 	}
 	
-	#make correlation matrix and return matrices
-	cmat <- cor.test.matrix(t(b),alpha=.05,bonf=F) 
-	out <- list(ts=b,cor=cmat$cor,p=cmat$p)
-	attr(out,'class') <- 'arfcorrelation'
+	#get correlations
+	arfcor <- new('arfcorrelation')
+	.arfcorrelation.timebyregion(arfcor) <- t(b)
+	arfcor <- correlationTest(arfcor)
 	
-	return(out)
+	#save correlations
+	fn = paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.fmri.data.filename(funcdata),'_',type,'.Rda',sep='')
+	save(arfcor,file=fn)
+	
+	return(arfcor)
+	
 }
 
 
@@ -485,7 +485,10 @@ function(func_data='filtered_func_data.nii.gz',experiment=NULL)
 ###
 {
 	#check experiment
-	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	if(is.null(experiment)) {
+		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
+	}
 	
 	#set separator
 	sp <- .Platform$file.sep
@@ -562,7 +565,10 @@ function(subject, condition, run, experiment = NULL)
 #load a functionalfile
 {
 	#check experiment
-	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	if(is.null(experiment)) {
+		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
+	}
 	
 	#set separator
 	sp <- .Platform$file.sep

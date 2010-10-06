@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=2,
 		build=3,
-		update=1,
-		svnrev=169
+		update=2,
+		svnrev=170
 	),
 	package='arf3DS4'
 )
@@ -478,4 +478,17 @@ setClass(
 		package='arf3DS4'
 )
 
-
+## arf correlation class, contains correlations and partial correlations
+setClass(
+		Class='arfcorrelation',
+		representation=representation(
+				timebyregion='numeric',
+				correlation='numeric',
+				correlation.pval='numeric',
+				partial.correlation='numeric',
+				partial.correlation.pval='numeric',
+				number.correlations='numeric'
+				
+		),
+		package='arf3DS4'
+)

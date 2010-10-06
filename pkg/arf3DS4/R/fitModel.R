@@ -259,7 +259,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	if(.model.modeltype(arfmodel)!='simple') stop('Called fit to simple model for non-simple model object.')
 	if(.model.params(arfmodel)!=5) stop('Modeltype - parameter mismatch!')
 	.model.valid(arfmodel) <- TRUE
-	#progress = 'progresswatcher'
+
 	
 	#start_time
 	st_time <- Sys.time()
@@ -315,7 +315,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	}
 	
 	#make progressWindow
-	#progress = newProgressWindow(arfmodel)
+	progress = NULL
 	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
@@ -407,7 +407,10 @@ pruneModel <-
 #prune a given model until neat
 function(arfmodel,modelname='defaultmodel',subject='',condition='',grad=NULL,bound=NULL,pval=NULL,options=new('options'),overwrite=T,experiment=NULL)
 {
-	if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
+	if(is.null(experiment)) {
+		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
+	}
 	
 	stop_prune = FALSE
 	prune_num = 1

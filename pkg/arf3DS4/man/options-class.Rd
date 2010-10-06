@@ -38,6 +38,8 @@
 \alias{.options.sw.type<-,options-method}
 \alias{.options.version,options-method}
 \alias{.options.version<-,options-method}
+\alias{show,options-method}
+
 
 \title{arf3DS4 "options" class  }
 \description{The arf3DS4 "options" class contains the options of the minimization procedure (including starting value calculation, and (co)variance estimation). Mostly used by arf3DS4 "model" objects (see \code{\linkS4class{model}})}

@@ -10,6 +10,7 @@
 \alias{.version.update<-,version-method}
 \alias{.version.version,version-method}
 \alias{.version.version<-,version-method}
+\alias{show,version-method}
 
 \title{arf3DS4 "version" class}
 \description{The "version" class contains information on the version of the arf3DS4 objects. Each arf3DS4 object contains this class. }
