@@ -3387,68 +3387,68 @@ standMethod <- function(x, value) {x@mnames<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'arfcorrelation'
-funcname <-'.arfcorrelation.timebyregion'
-standGen <- function(object) standardGeneric('.arfcorrelation.timebyregion')
-standMethod <- function(object) object@timebyregion
+funcname <-'.arfcorrelation.timebyreg'
+standGen <- function(object) standardGeneric('.arfcorrelation.timebyreg')
+standMethod <- function(object) object@timebyreg
 setGeneric(funcname,standGen,package='arf3DS4')
 setMethod(funcname,classname,standMethod)
-slotreplace <-'.arfcorrelation.timebyregion<-'
-standGen <- function(x, value) standardGeneric('.arfcorrelation.timebyregion<-')
-standMethod <- function(x, value) {x@timebyregion<- value;x}
+slotreplace <-'.arfcorrelation.timebyreg<-'
+standGen <- function(x, value) standardGeneric('.arfcorrelation.timebyreg<-')
+standMethod <- function(x, value) {x@timebyreg<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'arfcorrelation'
-funcname <-'.arfcorrelation.correlation'
-standGen <- function(object) standardGeneric('.arfcorrelation.correlation')
-standMethod <- function(object) object@correlation
+funcname <-'.arfcorrelation.corr'
+standGen <- function(object) standardGeneric('.arfcorrelation.corr')
+standMethod <- function(object) object@corr
 setGeneric(funcname,standGen,package='arf3DS4')
 setMethod(funcname,classname,standMethod)
-slotreplace <-'.arfcorrelation.correlation<-'
-standGen <- function(x, value) standardGeneric('.arfcorrelation.correlation<-')
-standMethod <- function(x, value) {x@correlation<- value;x}
+slotreplace <-'.arfcorrelation.corr<-'
+standGen <- function(x, value) standardGeneric('.arfcorrelation.corr<-')
+standMethod <- function(x, value) {x@corr<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'arfcorrelation'
-funcname <-'.arfcorrelation.correlation.pval'
-standGen <- function(object) standardGeneric('.arfcorrelation.correlation.pval')
-standMethod <- function(object) object@correlation.pval
+funcname <-'.arfcorrelation.corr.pval'
+standGen <- function(object) standardGeneric('.arfcorrelation.corr.pval')
+standMethod <- function(object) object@corr.pval
 setGeneric(funcname,standGen,package='arf3DS4')
 setMethod(funcname,classname,standMethod)
-slotreplace <-'.arfcorrelation.correlation.pval<-'
-standGen <- function(x, value) standardGeneric('.arfcorrelation.correlation.pval<-')
-standMethod <- function(x, value) {x@correlation.pval<- value;x}
+slotreplace <-'.arfcorrelation.corr.pval<-'
+standGen <- function(x, value) standardGeneric('.arfcorrelation.corr.pval<-')
+standMethod <- function(x, value) {x@corr.pval<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'arfcorrelation'
-funcname <-'.arfcorrelation.partial.correlation'
-standGen <- function(object) standardGeneric('.arfcorrelation.partial.correlation')
-standMethod <- function(object) object@partial.correlation
+funcname <-'.arfcorrelation.pacorr'
+standGen <- function(object) standardGeneric('.arfcorrelation.pacorr')
+standMethod <- function(object) object@pacorr
 setGeneric(funcname,standGen,package='arf3DS4')
 setMethod(funcname,classname,standMethod)
-slotreplace <-'.arfcorrelation.partial.correlation<-'
-standGen <- function(x, value) standardGeneric('.arfcorrelation.partial.correlation<-')
-standMethod <- function(x, value) {x@partial.correlation<- value;x}
+slotreplace <-'.arfcorrelation.pacorr<-'
+standGen <- function(x, value) standardGeneric('.arfcorrelation.pacorr<-')
+standMethod <- function(x, value) {x@pacorr<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'arfcorrelation'
-funcname <-'.arfcorrelation.partial.correlation.pval'
-standGen <- function(object) standardGeneric('.arfcorrelation.partial.correlation.pval')
-standMethod <- function(object) object@partial.correlation.pval
+funcname <-'.arfcorrelation.pacorr.pval'
+standGen <- function(object) standardGeneric('.arfcorrelation.pacorr.pval')
+standMethod <- function(object) object@pacorr.pval
 setGeneric(funcname,standGen,package='arf3DS4')
 setMethod(funcname,classname,standMethod)
-slotreplace <-'.arfcorrelation.partial.correlation.pval<-'
-standGen <- function(x, value) standardGeneric('.arfcorrelation.partial.correlation.pval<-')
-standMethod <- function(x, value) {x@partial.correlation.pval<- value;x}
+slotreplace <-'.arfcorrelation.pacorr.pval<-'
+standGen <- function(x, value) standardGeneric('.arfcorrelation.pacorr.pval<-')
+standMethod <- function(x, value) {x@pacorr.pval<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'arfcorrelation'
-funcname <-'.arfcorrelation.number.correlations'
-standGen <- function(object) standardGeneric('.arfcorrelation.number.correlations')
-standMethod <- function(object) object@number.correlations
+funcname <-'.arfcorrelation.num.corr'
+standGen <- function(object) standardGeneric('.arfcorrelation.num.corr')
+standMethod <- function(object) object@num.corr
 setGeneric(funcname,standGen,package='arf3DS4')
 setMethod(funcname,classname,standMethod)
-slotreplace <-'.arfcorrelation.number.correlations<-'
-standGen <- function(x, value) standardGeneric('.arfcorrelation.number.correlations<-')
-standMethod <- function(x, value) {x@number.correlations<- value;x}
+slotreplace <-'.arfcorrelation.num.corr<-'
+standGen <- function(x, value) standardGeneric('.arfcorrelation.num.corr<-')
+standMethod <- function(x, value) {x@num.corr<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)

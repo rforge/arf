@@ -64,8 +64,16 @@ function(path=getwd(),name='default_experiment',subjectind=1,conditionind=1,sett
 	if(path=='') path=paste(getwd(),sp,name,sep='') else path=paste(path,sp,name,sep='')
 	
 	if(file.exists(path)) {
-		warning('Directory already exists!')
-		file.remove(list.files(path,'.Rda'))	
+		
+		valAns=F
+		while(!valAns) {
+			answ = readline('Directory already exists, overwrite? [y/n] ')
+			if(tolower(answ)=='y' | tolower(answ)=='n') valAns=T
+		}
+		
+		if(tolower(answ)=='y') file.remove(list.files(path,'.Rda',full=T))	
+		if(tolower(answ)=='n') stop('User stop: not overwriting directory.')
+				
 	}
 	
 	if(!file.exists(path)) dir.create(path,recursive=T)
@@ -240,6 +248,9 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 	#make uniform weights when no weights exist
 	if(createWeights) makeWeights(experiment)
 	
+	#create functional files
+	setFuncFiles(experiment=experiment)
+		
 	#setAllObjects
 	setAllObjects(experiment,overwrite)
 	
@@ -248,11 +259,9 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 		save(experiment,file=paste(.experiment.path(experiment),.settings.expRda(settings),sep=''))
 		cat('Experiment correctly set. Experiment saved to',paste(.experiment.path(experiment),.settings.expRda(settings),sep=''),'\n')
 		if(load) loadExp(paste(.experiment.path(experiment),sep=''))
-		
-		.experiment <- experiment
-		save('.experiment',file=paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''))
-		load(paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
-		file.remove(paste(.experiment.path(experiment),.Platform$file.sep,'temp.Rda',sep=''))
+				
+		assign('.experiment',experiment,envir=.GlobalEnv)
+		save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
 
 	} else {
 		stop('Experiment structure not valid,check warnings.')
@@ -311,9 +320,6 @@ function(path=getwd(),method=c('fast','set','rda'))
 	}  
 	
 	#save experiments
-	#save('.experiment',file=paste(path,.Platform$file.sep,'temp.Rda',sep=''))
-	#load(paste(path,.Platform$file.sep,'temp.Rda',sep=''),envir=.GlobalEnv)
-	#file.remove(paste(path,.Platform$file.sep,'temp.Rda',sep=''))
 	assign('.experiment',.experiment,envir=.GlobalEnv)
 	save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
 		

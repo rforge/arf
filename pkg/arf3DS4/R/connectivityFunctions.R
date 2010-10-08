@@ -6,17 +6,19 @@
 
 #[CONTAINS]
 #fitConnectivity
+#makeSingleTrialEvents
 #gamma.fmri
 #convol.fmri
-#makeSingleTrialEvents
-#tscor
+#correlationTest
+#tsCor
 #partialCor
-#cor.test.matrix
-#processCorrelations
+#differenceCor
 #roiConnectivity
 #createFuncs
-#setFuncFile
-
+#setFuncFiles
+#setFuncTimings
+#loadFunc
+#saveFunc
 
 fitConnectivity <- 
 function(arfmodel,funcfilename='single_events.nii.gz')
@@ -58,7 +60,7 @@ function(arfmodel,funcfilename='single_events.nii.gz')
 	
 	#get correlations
 	arfcor <- new('arfcorrelation')
-	.arfcorrelation.timebyregion(arfcor) <- t(b)
+	.arfcorrelation.timebyreg(arfcor) <- t(b)
 	arfcor <- correlationTest(arfcor)
 	
 	#save correlations
@@ -70,15 +72,17 @@ function(arfmodel,funcfilename='single_events.nii.gz')
 }
 
 makeSingleTrialEvents <- 
-function(arfmodel,sefilename='single_events')
+function(subject,condition,sefilename='single_events',hrf.control=list(a1=6,a2=12,b1=0.9,b2=0.9,ce=0.35),experiment=NULL)
 #make single trial estimates
 {
+	arfdata = loadData(subject,condition,experiment)
+	
 	#get Header info from avgdatfile
-	headinf <- readHeader(getFileInfo(.model.avgdatfile(arfmodel)))
+	headinf <- readHeader(getFileInfo(.data.avgdatfile(arfdata)))
 	
 	#open functional file
-	filelist <- .model.betafiles(arfmodel)
-	path <- .model.funcDir(arfmodel)
+	filelist <- .data.betafiles(arfdata)
+	path <- .data.funcDir(arfdata)
 	sp <- .Platform$file.sep
 	
 	datavec = numeric(0)
@@ -91,7 +95,7 @@ function(arfmodel,sefilename='single_events')
 			dirname <- .nifti.fileinfo.filename(info)
 			
 			#get functional information
-			func <- loadRda(paste(path,sp,dirname,sp,.data.funcRda(arfmodel),sep=''))
+			func <- loadRda(paste(path,sp,dirname,sp,.data.funcRda(arfdata),sep=''))
 			timings <- .functional.timings(func)
 			stimlen <- attr(.functional.timings(func),'stimlen')
 			if(is.null(stimlen)) stimlen = rep(1,length(timings))
@@ -105,7 +109,7 @@ function(arfmodel,sefilename='single_events')
 			#create timeseries in seconds and create double gamma
 			tslen = round(.fmri.data.dims(fmrivolume)[5] * .fmri.data.pixdim(fmrivolume)[5])
 			stick = rep(0,tslen)
-			hrf <- gamma.fmri(1:tslen) 
+			hrf <- gamma.fmri(1:tslen,a1=hrf.control$a1,a2=hrf.control$a2,b1=hrf.control$b1,b2=hrf.control$b2,ce=hrf.control$ce) 
 			stick[round(timings)]=1
 			vecnums = which(stick==1)
 			
@@ -132,7 +136,7 @@ function(arfmodel,sefilename='single_events')
 			for(z in 1:.fmri.data.dims(fmrivolume)[4]) {
 				for(y in 1:.fmri.data.dims(fmrivolume)[3]) {
 					for(x in 1:.fmri.data.dims(fmrivolume)[2]) {
-						if(.model.mask(arfmodel)[i]==1) {
+						if(.data.mask(arfdata)[i]==1) {
 							dat = as.vector(funcvolume[x,y,z,])
 							dat = dat-mean(dat)
 							beta[i,] = as.vector(Xp%*%dat)
@@ -212,13 +216,13 @@ function(arfcor)
 #calculate correlation test of a matrix
 {
 	
-	data = .arfcorrelation.timebyregion(arfcor)
+	data = .arfcorrelation.timebyreg(arfcor)
 	
 	pmat = matrix(0,ncol(data),ncol(data))
 	cormat = matrix(1,ncol(data),ncol(data))
 	numcors = (ncol(data)*ncol(data)-ncol(data))/2
 		
-	.arfcorrelation.number.correlations(arfcor) = numcors
+	.arfcorrelation.num.corr(arfcor) = numcors
 	
 	i=1;
 	for(row in 1:(ncol(data)-1)) {
@@ -234,10 +238,10 @@ function(arfcor)
 	
 	pcor = partialCor(cormat,ncol(data))
 	
-	.arfcorrelation.correlation(arfcor) = cormat
-	.arfcorrelation.correlation.pval(arfcor) = pmat
-	.arfcorrelation.partial.correlation(arfcor) = pcor$pcor
-	.arfcorrelation.partial.correlation.pval(arfcor) = pcor$p
+	.arfcorrelation.corr(arfcor) = cormat
+	.arfcorrelation.corr.pval(arfcor) = pmat
+	.arfcorrelation.pacorr(arfcor) = pcor$pcor
+	.arfcorrelation.pacorr.pval(arfcor) = pcor$p
 	
 	return(arfcor)
 }
@@ -498,7 +502,8 @@ function(func_data='filtered_func_data.nii.gz',experiment=NULL)
 		
 		for(cdirs in 1:.experiment.condition.num(experiment)) {
 			
-			dat = loadData(.experiment.subject.names(experiment)[sdirs],.experiment.condition.names(experiment)[cdirs])
+			dat = loadData(.experiment.subject.names(experiment)[sdirs],.experiment.condition.names(experiment)[cdirs],experiment)
+			
 			createFuncs(dat)
 			
 			cpath <- paste(spath,sp,.experiment.conditionDir(experiment),sp,.experiment.condition.names(experiment)[cdirs],sp,.experiment.dataDir(experiment),sp,.experiment.funcDir(experiment),sep='')

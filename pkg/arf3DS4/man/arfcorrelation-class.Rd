@@ -2,18 +2,18 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{arfcorrelation-class}
-\alias{.arfcorrelation.correlation,arfcorrelation-method}
-\alias{.arfcorrelation.correlation.pval,arfcorrelation-method}
-\alias{.arfcorrelation.correlation.pval<-,arfcorrelation-method}
-\alias{.arfcorrelation.correlation<-,arfcorrelation-method}
-\alias{.arfcorrelation.number.correlations,arfcorrelation-method}
-\alias{.arfcorrelation.number.correlations<-,arfcorrelation-method}
-\alias{.arfcorrelation.partial.correlation,arfcorrelation-method}
-\alias{.arfcorrelation.partial.correlation.pval,arfcorrelation-method}
-\alias{.arfcorrelation.partial.correlation.pval<-,arfcorrelation-method}
-\alias{.arfcorrelation.partial.correlation<-,arfcorrelation-method}
-\alias{.arfcorrelation.timebyregion,arfcorrelation-method}
-\alias{.arfcorrelation.timebyregion<-,arfcorrelation-method}
+\alias{.arfcorrelation.corr,arfcorrelation-method}
+\alias{.arfcorrelation.corr.pval,arfcorrelation-method}
+\alias{.arfcorrelation.corr.pval<-,arfcorrelation-method}
+\alias{.arfcorrelation.corr<-,arfcorrelation-method}
+\alias{.arfcorrelation.num.corr,arfcorrelation-method}
+\alias{.arfcorrelation.num.corr<-,arfcorrelation-method}
+\alias{.arfcorrelation.pacorr,arfcorrelation-method}
+\alias{.arfcorrelation.pacorr.pval,arfcorrelation-method}
+\alias{.arfcorrelation.pacorr.pval<-,arfcorrelation-method}
+\alias{.arfcorrelation.pacorr<-,arfcorrelation-method}
+\alias{.arfcorrelation.timebyreg,arfcorrelation-method}
+\alias{.arfcorrelation.timebyreg<-,arfcorrelation-method}
 
 \title{Class "arfcorrelation"}
 \description{ ARF Correlation class holds correlations between regions of the model over trials.}
@@ -22,12 +22,12 @@ Objects can be created by calls of the form \code{new("arfcorrelation", ...)}.
 }
 \section{Slots}{
   \describe{
-    \item{\code{timebyregion}:}{Trial-by-trial amplitude estimates per region (time x nreg)}
-    \item{\code{correlation}:}{Correlation matrix.}
-    \item{\code{correlation.pval}:}{P-values of the correlations}
-    \item{\code{partial.correlation}:}{Partial correlation matrix (corrected for all other regions).}
-    \item{\code{partial.correlation.pval}:}{P-values of partial correlations}
-    \item{\code{number.correlations}:}{Number of correlations testes}
+    \item{\code{timebyreg}:}{Trial-by-trial amplitude estimates per region (time x nreg)}
+    \item{\code{corr}:}{Correlation matrix.}
+    \item{\code{corr.pval}:}{P-values of the correlations}
+    \item{\code{pacorr}:}{Partial correlation matrix (corrected for all other regions).}
+    \item{\code{pacorr.pval}:}{P-values of partial correlations}
+    \item{\code{num.corr}:}{Number of correlations testes}
   }
 }
 
