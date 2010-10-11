@@ -158,7 +158,7 @@ function(subject,condition,sefilename='single_events',hrf.control=list(a1=6,a2=1
 	.fmri.data.dims(fmrivolume)[5] = totdim
 	.fmri.data.pixdim(fmrivolume)[5] = 1
 	.fmri.data.datavec(fmrivolume) = datavec
-	.fmri.data.fullpath(fmrivolume) = .model.funcDir(arfmodel)
+	.fmri.data.fullpath(fmrivolume) = .model.funcDir(arfdata)
 	writeData(fmrivolume,.fmri.data.datavec(fmrivolume))
 	
 	return(fmrivolume)
@@ -432,7 +432,7 @@ function(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events
 	
 	#get correlations
 	arfcor <- new('arfcorrelation')
-	.arfcorrelation.timebyregion(arfcor) <- t(b)
+	.arfcorrelation.timebyreg(arfcor) <- t(b)
 	arfcor <- correlationTest(arfcor)
 	
 	#save correlations
