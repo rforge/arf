@@ -1,0 +1,10 @@
+export(
+	makeExample
+)
+
+exportPattern("^[\\.]")
+
+import(
+	arf3DS4
+)
+
