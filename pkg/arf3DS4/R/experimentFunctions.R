@@ -248,11 +248,11 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 	#make uniform weights when no weights exist
 	if(createWeights) makeWeights(experiment)
 	
-	#create functional files
-	setFuncFiles(experiment=experiment)
-		
 	#setAllObjects
 	setAllObjects(experiment,overwrite)
+
+	#create functional files
+	setFuncFiles(func_data='',experiment=experiment)
 	
 	#check the experiment dirs, if good save and exit. if not good stop
 	if(checkExp(experiment)) {

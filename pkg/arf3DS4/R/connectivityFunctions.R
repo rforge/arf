@@ -501,7 +501,7 @@ function(func_data='filtered_func_data.nii.gz',experiment=NULL)
 		spath <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,.experiment.subject.names(experiment)[sdirs],sep='')
 		
 		for(cdirs in 1:.experiment.condition.num(experiment)) {
-			
+
 			dat = loadData(.experiment.subject.names(experiment)[sdirs],.experiment.condition.names(experiment)[cdirs],experiment)
 			
 			createFuncs(dat)

@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=2,
 		build=3,
-		update=4,
-		svnrev=172
+		update=5,
+		svnrev=173
 	),
 	package='arf3DS4'
 )

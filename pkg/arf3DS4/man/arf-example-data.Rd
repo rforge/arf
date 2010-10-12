@@ -1,10 +1,9 @@
-\name{arf-example-data}
+\name{arf-full-data}
 \docType{data}
-\alias{makeExample}
 \alias{.example}
-\title{Activated Region Fitting Example Dataset}
+\title{Activated Region Fitting FULL Example Dataset}
 \description{
-  Simulated dataset for the ARF3DS4 package. Run \code{makeExample(path)} to create an ARF directory structure. The experiment is automatically loaded. 
+  Full simulated dataset for the ARF3DS4 package. Run \code{makeExample(path)} to create an ARF directory structure. The experiment is automatically loaded. 
 }
 \usage{makeExample(path)}
 \format{An ARF experiment for one subject, and two conditions.}
