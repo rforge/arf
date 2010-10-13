@@ -106,3 +106,57 @@ function(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c(
 }
 
 
+searchRange <-
+function(subject,condition,range=c(10,50),initial.splits=4,max.depth=4,modeltype=c('gauss','simple'),modelprefix='searchmodel',options=new('options'),BIC.adjust=T,experiment=NULL)
+#search a range of models for the one with the lowest BIC
+{
+	#experiment
+	if(is.null(experiment)) {
+		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
+	}
+	
+	#check for correct startmethod
+	if(.options.start.method!='rect' | .options.start.method!='simple') stop('Search range only works with rect/simple startingvalues')
+	
+	#matches
+	modeltype= match.arg(modeltype[1],c('gauss','simple'))
+		
+	#make intial range
+	if(initial.splits>=(range[2]-range[1])) stop('Too many splits for range')
+	range.steps = seq(range[1],range[2],(range[2]-range[1])/initial.splits)
+	
+	#set new sequence
+	sequence = new('sequence')
+	.sequence.regions(sequence) = seq(range[1],range[2])
+	.sequence.fit(sequence) = as.numeric(rep(NA,length(.sequence.regions(sequence))))
+	names(.sequence.fit(sequence)) = seq(range[1],range[2])
+	.sequence.valid(sequence) = rep(FALSE,length(.sequence.regions(sequence)))
+	.sequence.minimum(sequence) = as.numeric(NA)
+
+	
+	#set intial depth and runs
+	depth=0
+	while(depth<=max.depth) {
+		
+		#perform range models
+		for(numreg in range.steps) {
+			model = newModel(paste(modelprefix,'_',numreg,'regs',sep=''),numreg,subject,condition,type=modeltype,options=options,experiment=experiment)
+			model = processModel(model,options=options)
+			.sequence.fit(sequence)[numreg] = .model.fit(model)[1]
+			.sequence.valid(sequence)[numreg] = .model.valid(model)
+		}
+				
+		#get the minimum and set a new range 
+		minmod = as.numeric(names(which.min(.sequence.fit(sequence)[.sequence.valid(sequence)==TRUE])))
+		
+		
+		
+		depth = depth+1
+		brower()	
+	}
+	
+		
+}
+		
+

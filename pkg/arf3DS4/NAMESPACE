@@ -34,6 +34,7 @@ export(
 	differenceCor,
 	processModel,
 	processSeed,
+	searchRange,
 	createAverages,
 	createAllAverages,
 	determineStartRect,

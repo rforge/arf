@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=2,
 		build=3,
-		update=5,
-		svnrev=175
+		update=6,
+		svnrev=176
 	),
 	package='arf3DS4'
 )
@@ -457,7 +457,7 @@ setClass(
 				mnames='character',			#vector of names of models
 				fit='numeric',				#vector of fit measures (to evaluate best fit)
 				minimum='numeric',			#which region has the minimum
-				valid='numeric'				#vector of validity of solutions (all estimates and variances ok)
+				valid='logical'				#vector of validity of solutions (all estimates and variances ok)
 		),
 		prototype=prototype(
 				current=1,

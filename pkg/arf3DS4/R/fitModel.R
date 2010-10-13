@@ -30,6 +30,15 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		if(type=='simple') arfmodel <- determineStartRectSimple(arfmodel) 	
 	}
 	
+	if(.options.start.method(options)=='simple') {
+		startmodel <- arfmodel
+		.model.modeltype(startmodel)='simple'
+		.model.params(startmodel)=5
+		startmodel <- determineStartRectSimple(arfmodel)
+		startmodel = fitSimpleModelOptim(startmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen)
+		.model.startval(arfmodel) <- .model.estimates(startmodel)
+	}
+	
 	if(.options.start.method(options)=='load') .model.startval(arfmodel) <- loadStart(arfmodel)
 		
 	if(.options.min.routine(options)[1]=='optim') {
