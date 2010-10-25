@@ -240,6 +240,11 @@ loadOptions <-
 function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.optionsFile(arfmodel),sep='')))
 #loadOptions loads the options object
 
+saveOptions <- 
+function(options,arfmodel) save(options,file=paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.optionsFile(arfmodel),sep=''))
+#loadOptions loads the options object
+
+
 loadStart <- 
 function(arfmodel) return(loadRda(paste(.model.modelpath(arfmodel),.Platform$file.sep,.model.startFile(arfmodel),sep='')))
 #loadStart loads the Start object

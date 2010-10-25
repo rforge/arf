@@ -7,6 +7,8 @@
 #[CONTAINS]
 #processModel
 #processSeed
+#searchRange
+#minBIC
 
 processModel <- 
 function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),pr=T,printlevel=0,try.silen=T) 
@@ -158,5 +160,37 @@ function(subject,condition,range=c(10,50),initial.splits=4,max.depth=4,modeltype
 	
 		
 }
+
+
+minBIC <-
+function(subject,condition) 
+#show the minimal BIC 
+{
+	
+	modobject <- showModels(subject,condition)
+	modnames <- .mnames.mnames(modobject)
+	
+	minvec = svec = rvec =  numeric(length(modnames))
+	
+	names(minvec) = modnames
+
+	for(i in 1:length(minvec)) {
 		
+		mod = loadModel(modobject,i)
+		if(.model.valid(mod)) {
+			minvec[i] = .model.fit(mod)[1] 
+			svec[i] = .model.minimum(mod)
+			rvec[i] = .model.regions(mod)
+		} else {
+			minvec[i]=NA
+		}
+	}
+	
+	minvec = data.frame(BIC=round(minvec),minimum=round(svec),regions=rvec,optimal=character(length(minvec)),stringsAsFactors=F)
+	
+	minvec$optimal[which.min(minvec$BIC)]='***'
+	
+	return(minvec)
+	
+}
 
