@@ -98,7 +98,7 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		#set layout to one again
 		#and close graphics devices
 		if(names(dev.cur())!='X11') if(names(dev.cur())!='quartz') dev.off()
-		layout(1)	
+		#layout(1)	
 	}		
 )
 

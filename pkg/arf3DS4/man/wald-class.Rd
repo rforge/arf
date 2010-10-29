@@ -2,8 +2,8 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{wald-class}
-\alias{.wald.design,wald-method}
-\alias{.wald.design<-,wald-method}
+\alias{.wald.consts,wald-method}
+\alias{.wald.consts<-,wald-method}
 \alias{.wald.df1,wald-method}
 \alias{.wald.df1<-,wald-method}
 \alias{.wald.df2,wald-method}
@@ -20,7 +20,7 @@ Objects can be created by calls of the form \code{new("wald", ...)}.
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{design}:}{The #regions by #hypothesis design matrix.}
+    \item{\code{consts}:}{The #regions by #hypothesis matrix defining the constants used for testing.}
     \item{\code{stats}:}{The #regions by #hypothesis matrix of wald statistics.}
     \item{\code{df1}:}{Vector of the Degrees of Freedom of the model.}
     \item{\code{df2}:}{Vector of the Degrees of Freedom of the error. }

@@ -365,7 +365,7 @@ function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel))
 	if(.model.valid(arfmodel)) {
 		
 		#if no design matrix is specified in the waldobject, make the default matrix (zero-filled) 
-		if(dim(.wald.design(waldobject))[1]==0) .wald.design(waldobject) <- matrix(0,.model.regions(arfmodel),5)
+		if(dim(.wald.consts(waldobject))[1]==0) .wald.consts(waldobject) <- matrix(0,.model.regions(arfmodel),5)
 		
 		# get dimensions (set number of voxels)
 		n <- .model.n(arfmodel) 
@@ -385,7 +385,7 @@ function(arfmodel,waldobject=new('wald'),options=loadOptions(arfmodel))
 			sigma <- detSigmaDeriv(theta[4:9])
 			
 			#define the a matrix (containing hypotheses), uses info from the designmatrix
-			a <- c(theta[1]-.wald.design(waldobject)[region,1],theta[2]-.wald.design(waldobject)[region,2],theta[3]-.wald.design(waldobject)[region,3],sigma$value-.wald.design(waldobject)[region,4],theta[10]-.wald.design(waldobject)[region,5])
+			a <- c(theta[1]-.wald.consts(waldobject)[region,1],theta[2]-.wald.consts(waldobject)[region,2],theta[3]-.wald.consts(waldobject)[region,3],sigma$value-.wald.consts(waldobject)[region,4],theta[10]-.wald.consts(waldobject)[region,5])
 
 			#define the A matrix (containing the derivatives of a)
 			A <- matrix(0,5,10)

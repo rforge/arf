@@ -2463,14 +2463,14 @@ standMethod <- function(x, value) {x@version<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'wald'
-funcname <-'.wald.design'
-standGen <- function(object) standardGeneric('.wald.design')
-standMethod <- function(object) object@design
+funcname <-'.wald.consts'
+standGen <- function(object) standardGeneric('.wald.consts')
+standMethod <- function(object) object@consts
 setGeneric(funcname,standGen,package='arf3DS4')
 setMethod(funcname,classname,standMethod)
-slotreplace <-'.wald.design<-'
-standGen <- function(x, value) standardGeneric('.wald.design<-')
-standMethod <- function(x, value) {x@design<- value;x}
+slotreplace <-'.wald.consts<-'
+standGen <- function(x, value) standardGeneric('.wald.consts<-')
+standMethod <- function(x, value) {x@consts<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'wald'
