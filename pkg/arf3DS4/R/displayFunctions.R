@@ -128,21 +128,30 @@ function(arfmodel,options,lower,upper)
 {
 	library(tcltk)
 	
-	tt <- tktoplevel()
-	mt = .model.modeltype(arfmodel)
-	nr = .model.regions(arfmodel)
-	tktitle(tt) <- paste('ARF Progress [ ',mt,' @ ',nr,' ]',sep='')
-	scr <- tkscrollbar(tt, repeatinterval=5,command=function(...)tkyview(txt,...))
-	txt <- tktext(tt,bg="white",font="courier",yscrollcommand=function(...)tkset(scr,...),height=50,width=45)
-	tkgrid(txt,scr)
-	tkgrid.configure(scr,sticky="ns")
+	if(.options.output.mode(options)=='none') disabled = T else disabled = F
 	
-	tkinsert(txt,"end",paste('ARF [',.model.name(arfmodel),'] ',as.character(Sys.time()),sep=''))
-	tkconfigure(txt, state="disabled")
-	tkfocus(txt)
+	if(!disabled) {
+	 	tt <- tktoplevel()
+		mt = .model.modeltype(arfmodel)
+		nr = .model.regions(arfmodel)
+		tktitle(tt) <- paste('ARF Progress [ ',mt,' @ ',nr,' ]',sep='')
+		scr <- tkscrollbar(tt, repeatinterval=5,command=function(...)tkyview(txt,...))
+		txt <- tktext(tt,bg="white",font="courier",yscrollcommand=function(...)tkset(scr,...),height=50,width=45)
+		tkgrid(txt,scr)
+		tkgrid.configure(scr,sticky="ns")
+		
+		tkinsert(txt,"end",paste('ARF [',.model.name(arfmodel),'] ',as.character(Sys.time()),sep=''))
+		tkconfigure(txt, state="disabled")
+		tkfocus(txt)
+	}
 	
 	#make progress object (S3)
-	progress = list(tt=tt,txt=txt,lower=lower,upper=upper,iterlim=.options.min.iterlim(options),perslim=.options.min.boundlim(options))
+	if(!disabled) {
+		progress = list(disabled=disabled,tt=tt,txt=txt,lower=lower,upper=upper,iterlim=.options.min.iterlim(options),perslim=.options.min.boundlim(options))
+	} else {
+		progress = list(disabled=disabled,tt=NULL,txt=NULL,lower=lower,upper=upper,iterlim=.options.min.iterlim(options),perslim=.options.min.boundlim(options))
+	}
+	
 	attr(progress,'class') <- 'progress'
 	
 	#assign global counters

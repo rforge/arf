@@ -332,6 +332,9 @@ setMethod('show','options',
 			cat(' optim-lower-limit     (@opt.lower)   :  ',paste(object@opt.lower,collapse=', '),'\n')
 			cat(' optim-upper-limit     (@opt.upper)   :  ',paste(object@opt.upper,collapse=', '),'\n')
 			cat(' sandwich-method       (@sw.type)     :  ',object@sw.type,'\n')
+			cat(' output-mode           (@output.mode) :  ',object@output.mode,'\n')
+			
+			
 			cat('\n')
 		}
 )

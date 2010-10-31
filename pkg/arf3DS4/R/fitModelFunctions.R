@@ -50,7 +50,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	gradit = get('.gradit',envir=.GlobalEnv)
 	
 	#Progress Watcher
-	writeProgress(ssqdat,theta,objit,gradobj,gradval,progress,bounded,gradit)
+	if(!progress$disabled) writeProgress(ssqdat,theta,objit,gradobj,gradval,progress,bounded,gradit)
 	
 	#boundary checker
 	boundvec = persistentBound(theta,progress$lower,progress$upper,progress$perslim)

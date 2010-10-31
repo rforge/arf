@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=2,
 		build=3,
-		update=8,
-		svnrev=178
+		update=9,
+		svnrev=179
 	),
 	package='arf3DS4'
 )
@@ -217,7 +217,7 @@ setClass(
 		chk.method='imagedim',
 		chk.range=c(0,0,0,0,0,0,-.95,-.95,-.95,-1e+64,0,0,0,0,0,0,.95,.95,.95,1e+64),
 		sw.type='diag',
-		output.mode=c('log','screen','progress'),
+		output.mode=c('progress'),
 		version=new('version')
 	),
 	package='arf3DS4'
