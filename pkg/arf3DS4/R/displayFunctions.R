@@ -155,11 +155,11 @@ function(arfmodel,options,lower,upper)
 	attr(progress,'class') <- 'progress'
 	
 	#assign global counters
-	assign('.gradit',1,envir=.GlobalEnv)
-	assign('.oldobj',0,envir=.GlobalEnv)
-	assign('.objit',1,envir=.GlobalEnv)
-	assign('.gradval',0,envir=.GlobalEnv)
-	assign('.bounded',rep(0,.model.regions(arfmodel)),envir=.GlobalEnv)
+	assign('.gradit',1,envir=.arfInternal)
+	assign('.oldobj',0,envir=.arfInternal)
+	assign('.objit',1,envir=.arfInternal)
+	assign('.gradval',0,envir=.arfInternal)
+	assign('.bounded',rep(0,.model.regions(arfmodel)),envir=.arfInternal)
 	
 	return(progress)
 	

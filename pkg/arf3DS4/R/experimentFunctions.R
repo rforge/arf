@@ -260,7 +260,7 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 		cat('Experiment correctly set. Experiment saved to',paste(.experiment.path(experiment),.settings.expRda(settings),sep=''),'\n')
 		if(load) loadExp(paste(.experiment.path(experiment),sep=''))
 				
-		assign('.experiment',experiment,envir=.GlobalEnv)
+		assign('.experiment',experiment,envir=.arfInternal)
 		save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
 
 	} else {
@@ -269,6 +269,15 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 	
 	return(invisible(experiment))
 	
+}
+
+getExp <-
+function()
+#return the experiment-object
+{
+	experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+	if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
+	return(experiment)
 }
 
 
@@ -320,7 +329,7 @@ function(path=getwd(),method=c('fast','set','rda'))
 	}  
 	
 	#save experiments
-	assign('.experiment',.experiment,envir=.GlobalEnv)
+	assign('.experiment',.experiment,envir=.arfInternal)
 	save(experiment,file=paste(.experiment.path(experiment),sp,.experiment.expRda(experiment),sep=''))
 		
 	#return loaded info 

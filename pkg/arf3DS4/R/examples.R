@@ -35,8 +35,8 @@ makeExample <- function(path) {
 	ex = loadExp(paste(path,p,expname,sep=''),'set')
 	createAllAverages(ex)
 	
-	#assign .experiment to the .GlobalEnv  
-	assign('.experiment',ex,envir=.GlobalEnv)
+	#assign .experiment to the .arfInternal  
+	assign('.experiment',ex,envir=.arfInternal)
 	
 	return(invisible(ex))
 	

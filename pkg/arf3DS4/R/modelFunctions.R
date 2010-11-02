@@ -27,7 +27,7 @@ function(modelname='defaultmodel',regions=1,subject='',condition='',type=c('gaus
 {
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -260,7 +260,7 @@ function(modelname,subject=NA,condition,experiment=NULL)
 
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -296,7 +296,7 @@ function(subject,condition,experiment=NULL)
 	
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	

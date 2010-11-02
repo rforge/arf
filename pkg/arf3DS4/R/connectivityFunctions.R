@@ -490,7 +490,7 @@ function(func_data='filtered_func_data.nii.gz',experiment=NULL)
 {
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -571,7 +571,7 @@ function(subject, condition, run, experiment = NULL)
 {
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	

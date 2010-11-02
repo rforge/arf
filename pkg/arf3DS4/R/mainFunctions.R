@@ -67,7 +67,7 @@ function(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c(
 {
 	
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -114,7 +114,7 @@ function(subject,condition,range=c(10,50),initial.splits=4,max.depth=4,modeltype
 {
 	#experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	

@@ -39,15 +39,15 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	
 	if(is.nan(ssqdat) | ssqdat==Inf | is.na(ssqdat) | ssqdat==-Inf) ssqdat=ss_data
 		
-	assign('.theta_latest',theta,envir=.GlobalEnv)
+	assign('.theta_latest',theta,envir=.arfInternal)
 	
 	#get iteration data
-	olgrad = get('.oldobj',envir=.GlobalEnv)
+	olgrad = get('.oldobj',envir=.arfInternal)
 	gradobj = round(olgrad-ssqdat,0)
-	objit = get('.objit',envir=.GlobalEnv)
-	gradval = get('.gradval',envir=.GlobalEnv)
-	bounded = get('.bounded',envir=.GlobalEnv)
-	gradit = get('.gradit',envir=.GlobalEnv)
+	objit = get('.objit',envir=.arfInternal)
+	gradval = get('.gradval',envir=.arfInternal)
+	bounded = get('.bounded',envir=.arfInternal)
+	gradit = get('.gradit',envir=.arfInternal)
 	
 	#Progress Watcher
 	if(!progress$disabled) writeProgress(ssqdat,theta,objit,gradobj,gradval,progress,bounded,gradit)
@@ -56,17 +56,17 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	boundvec = persistentBound(theta,progress$lower,progress$upper,progress$perslim)
 	if(length(boundvec)>0) {
 		ssqdat='killoptim'
-		assign('.arf_error',list(errtype='persbound',data=boundvec),envir=.GlobalEnv)
+		assign('.arf_error',list(errtype='persbound',data=boundvec),envir=.arfInternal)
 	}
 	
 	#iterlimchecker
 	if(objit>progress$iterlim) {
 		ssqdat = 'killoptim'
-		assign('.arf_error',list(errtype='iterlim',data=objit),envir=.GlobalEnv)
+		assign('.arf_error',list(errtype='iterlim',data=objit),envir=.arfInternal)
 	}
 	
-	assign('.oldobj',ssqdat,envir=.GlobalEnv)
-	assign('.objit',objit+1,envir=.GlobalEnv)
+	assign('.oldobj',ssqdat,envir=.arfInternal)
+	assign('.objit',objit+1,envir=.arfInternal)
 	
 	return(invisible(ssqdat))	
 	
@@ -96,14 +96,14 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 		grad <- .C('dfssq',as.integer(np),as.integer(brain),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[10]]
 	} else grad=rep(1e+12,np) 
 	
-	assign('.gradient_latest',grad,envir=.GlobalEnv)
+	assign('.gradient_latest',grad,envir=.arfInternal)
 	
 	
 	#progress Watcher (only assign gradients)
-	assign('.gradval',grad,envir=.GlobalEnv)
+	assign('.gradval',grad,envir=.arfInternal)
 
-	gradit = get('.gradit',envir=.GlobalEnv)
-	assign('.gradit',gradit+1,envir=.GlobalEnv)
+	gradit = get('.gradit',envir=.arfInternal)
+	assign('.gradit',gradit+1,envir=.arfInternal)
 	
 	return(grad)
 
@@ -165,7 +165,7 @@ function(arfdat,experiment=NULL)
 	#check experiment
 	#if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -247,7 +247,7 @@ function(experiment=NULL)
 	
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -870,7 +870,7 @@ persistentBound <-
 function(theta,lower,upper,itlim)
 #check for persistent boundary violation of theta 7,8,9
 {
-	oldbounds = get('.bounded',envir=.GlobalEnv)
+	oldbounds = get('.bounded',envir=.arfInternal)
 
 	estvec = matrix(theta,10)
 	bounded = rep(NA,length(oldbounds))
@@ -884,7 +884,7 @@ function(theta,lower,upper,itlim)
 	
 	for(i in 1:length(oldbounds)) if(newbounds[i]>0) bounded[i]=oldbounds[i]+newbounds[i] else bounded[i]=0
 
-	assign('.bounded',bounded,envir=.GlobalEnv)
+	assign('.bounded',bounded,envir=.arfInternal)
 	
 	return(which(bounded>itlim))
 }

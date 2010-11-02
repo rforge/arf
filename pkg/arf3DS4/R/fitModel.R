@@ -119,9 +119,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	progress = newProgressElement(arfmodel,options,lowbound,upbound)	
 
 	#assign global variables
-	assign('.gradient_latest',NA,envir=.GlobalEnv)
-	assign('.theta_latest',NA,envir=.GlobalEnv)
-	assign('.arf_error',numeric(0),envir=.GlobalEnv)
+	assign('.gradient_latest',NA,envir=.arfInternal)
+	assign('.theta_latest',NA,envir=.arfInternal)
+	assign('.arf_error',numeric(0),envir=.arfInternal)
 	
 	#runoptim	
 	optim.output <- try(suppressWarnings(optim(
@@ -215,9 +215,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			
 		
 	} else {
-		.model.estimates(arfmodel) <- get('.theta_latest',envir=.GlobalEnv)
-		.model.gradient(arfmodel) <- get('.gradient_latest',envir=.GlobalEnv)
-		pers <- get('.arf_error',envir=.GlobalEnv)
+		.model.estimates(arfmodel) <- get('.theta_latest',envir=.arfInternal)
+		.model.gradient(arfmodel) <- get('.gradient_latest',envir=.arfInternal)
+		pers <- get('.arf_error',envir=.arfInternal)
 		
 		if(length(pers)==0) {
 			.model.convergence(arfmodel) <- '[optim] Internal error, no convergence.'
@@ -245,7 +245,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	if(!.model.valid(arfmodel)) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),.model.convergence(arfmodel)) 
 	
 	#clean up
-	rm('.theta_latest','.gradient_latest','.gradit','.gradval','.objit','.bounded','.arf_error','.oldobj',envir=.GlobalEnv)
+	rm('.theta_latest','.gradient_latest','.gradit','.gradval','.objit','.bounded','.arf_error','.oldobj',envir=.arfInternal)
 		
 	#save the modelInfo
 	saveModel(arfmodel)
@@ -417,7 +417,7 @@ pruneModel <-
 function(arfmodel,modelname='defaultmodel',subject='',condition='',grad=NULL,bound=NULL,pval=NULL,options=new('options'),overwrite=T,experiment=NULL)
 {
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.GlobalEnv),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
