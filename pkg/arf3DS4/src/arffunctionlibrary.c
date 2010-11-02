@@ -754,7 +754,7 @@ void innerSWbwfast(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv
 {
 
 	int i,j,k,l, Brow, Bcol,loc;
-	FILE *fderiv, *fresid, *fweight, *fmeanres;
+	FILE *fderiv, *fresid, *fweight; // *fmeanres;
 	double *Fv,*Ft, *Rv, *Wv, *Mr, s, Bm[*p][*p], *mrv;
 
 	Fv = (double *) R_alloc(*n,sizeof(double));

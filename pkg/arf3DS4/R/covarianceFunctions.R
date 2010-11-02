@@ -32,8 +32,12 @@ function(arfmodel)
 		fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
 		
 		#calculate and write the derivatives
-		invisible(.C('dfgaussFile',as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.mask(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(.model.estimates(arfmodel)),as.character(fn)))
-	
+		derivs = .C('dfgauss',as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.mask(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(.model.estimates(arfmodel)),as.double(numeric(.model.regions(arfmodel)*.model.params(arfmodel)*length(which(.model.mask(arfmodel)!=0)))))[[7]]
+		
+		con = file(fn,'wb')
+		writeBin(derivs,con,double(),endian=.Platform$endian)
+		close(con)
+				
 		return(invisible(TRUE))
 	
 	} else return(invisible(FALSE))
@@ -64,7 +68,7 @@ function(arfmodel)
 			data = .fmri.data.datavec(readData(bfile))
 			if(length(nonbrain)>0) data = data[-nonbrain]
 			
-			writeBin(data-model,con,double())
+			writeBin(data-model,con,double(),endian=.Platform$endian)
 	
 		}
 		#close the connection
@@ -88,7 +92,7 @@ function(arfmodel)
 	if(length(rem)>0) weightdata = weightdata[-rem]
 	
 	con <- file(paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.weightFile(arfmodel),sep=''),'wb')
-	writeBin(weightdata,con,double())
+	writeBin(weightdata,con,double(),endian=.Platform$endian)
 	close(con)
 	
 }
@@ -212,14 +216,14 @@ function(arfmodel)
 	
 	
 	#remove derivatives and residuals
-	fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
-	if(file.exists(fn)) file.remove(fn)	
-	fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
-	if(file.exists(fn)) file.remove(fn)
-	fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.residualFile(arfmodel),sep='')
-	if(file.exists(fn)) file.remove(fn)
-	fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,'mean',.model.residualFile(arfmodel),sep='')
-	if(file.exists(fn)) file.remove(fn)
+	#fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
+	#if(file.exists(fn)) file.remove(fn)	
+	#fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
+	#if(file.exists(fn)) file.remove(fn)
+	#fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.residualFile(arfmodel),sep='')
+	#if(file.exists(fn)) file.remove(fn)
+	#fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,'mean',.model.residualFile(arfmodel),sep='')
+	#if(file.exists(fn)) file.remove(fn)
 
 	#save the modelInfo
 	saveModel(arfmodel)
@@ -486,13 +490,11 @@ function(arfmodel)
 	
 	fn = paste(.model.modeldatapath(arfmodel),sp,.model.fullmodelDataFile(arfmodel),sep='')
 	dat = readData(fn)
-	#n = .fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4]
-	n= sum(.model.mask(arfmodel))
+	
+	n = length(which(.model.mask(arfmodel)!=0))
 	rm(dat)
 	p = .model.regions(arfmodel)*.model.params(arfmodel)
 	fn = paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')
-
-	
 	
 	if(file.exists(fn)) {
 		con <- file(fn,open='rb')		

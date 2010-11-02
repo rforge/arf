@@ -97,8 +97,9 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		
 		#set layout to one again
 		#and close graphics devices
-		if(names(dev.cur())!='X11') if(names(dev.cur())!='quartz') dev.off()
-		#layout(1)	
+		if(names(dev.cur())=='pdf' | names(dev.cur())=='jpeg' | names(dev.cur())=='bmp' | names(dev.cur())=='png' | names(dev.cur())=='postscript' | names(dev.cur())=='tiff') dev.off()
+		
+		layout(1)
 	}		
 )
 
