@@ -1,23 +1,23 @@
 #############################################
 # arf3DS4 S4 CLASS DEFINITIONS				#
-# Copyright(c) 2009 Wouter D. Weeda			#
+# Wouter D. Weeda							#
 # University of Amsterdam					#
 #############################################
 
 #[CONTAINS]
-#version
-#settings
-#registration
-#functional
-#experiment
-#options
-#nifti.fileinfo
-#nifti.header
-#fmri.data
-#wald
-#data
-#model
-#sequence
+#version			[user]
+#settings			[user]
+#registration		[user]
+#functional			[user]
+#experiment			[user]
+#options			[user]
+#nifti.fileinfo		[user]
+#nifti.header		[user]
+#fmri.data			[user]
+#wald				[user]
+#data				[user]
+#model				[user]
+#sequence			[user] [nyi]
 
 ## arf version class (version is set here)
 setClass(
@@ -32,7 +32,7 @@ setClass(
 		version=2,
 		build=4,
 		update=1,
-		svnrev=182
+		svnrev=183
 	),
 	package='arf3DS4'
 )
