@@ -1,9 +1,9 @@
 \name{createAverages}
 \Rdversion{1.1}
 \alias{createAverages}
-\title{Create averages of trials for a condition.}
+\title{Create averages of runs for a condition.}
 \description{
-CreateAverages creates averages of trials for a condition in an arf-experiment.
+CreateAverages creates averages of runs for a condition in an arf-experiment.
 }
 \usage{
 createAverages(arfdat, experiment = NULL)

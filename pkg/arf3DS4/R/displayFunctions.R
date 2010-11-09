@@ -9,6 +9,7 @@
 #sliceColor
 #makeDiscreteImage
 #newprogressElement
+#writeProgress
 
 makeDiscreteImage <-
 function(datavec,zerotol=1e-03)

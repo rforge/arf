@@ -5,20 +5,19 @@
 #############################################
 
 #[CONTAINS]
-#newModel
-#updateModelNames
-#saveModel
-#saveModelBin
-#saveModelBinSimple
-#loadOptions
-#loadStart
-#saveStart
-#loadStart
-#loadReg
-#loadModel
+#newModel				[user]
+#updateModelNames	
+#saveModel				[user]
+#saveModelBin			[user]
+#saveModelBinSimple		[user]
+#loadOptions			[user]
+#loadStart				[user]
+#saveStart				[user]
+#loadStart				[user]
+#loadModel				[user]
 #updateClass
-#clearWarnings
-#showModels
+#clearWarnings			[user]
+#showModels				[user]
 
 
 newModel <- 

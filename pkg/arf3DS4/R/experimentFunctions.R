@@ -6,13 +6,14 @@
 
 #[CONTAINS]
 #checkExp
-#makeExpDirs
+#makeExpDirs		[user]
 #chngRootExp
-#setExp
-#loadExp
+#setExp			
+#getExp				[user]
+#loadExp			[user]
 #checkVersion
 #getFSLdata
-#prettytime
+
 
 checkExp <- 
 function(experiment) 
@@ -394,11 +395,11 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 	for(subj in 1:subjects) {
 			
 		dirs = list.files(fsldir,subjectlist[subj],full=T)
-		trials = length(dirs)
+		runs = length(dirs)
 				
-		func_file=reg_file=cope_file=vector(trials,mode='list')
+		func_file=reg_file=cope_file=vector(runs,mode='list')
 				
-		for(tri in 1:trials) {
+		for(tri in 1:runs) {
 		
 			#get functional data
 			func_file[[tri]] = list.files(dirs[tri],functional,full=T)
@@ -430,7 +431,7 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 			cope_file[[tri]] = list(copes=all_copes[-vcs],varcopes=all_copes[vcs])
 		}
 		
-		subinf[[subj]] = list(func_file=func_file,reg_file=reg_file,cope_file=cope_file,trials=trials,contrasts=length(cope_file[[1]]$copes),name=subjectlist[subj])
+		subinf[[subj]] = list(func_file=func_file,reg_file=reg_file,cope_file=cope_file,runs=runs,contrasts=length(cope_file[[1]]$copes),name=subjectlist[subj])
 	
 	}
 	cat('ok\n')
@@ -459,8 +460,8 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 			cn <- paste(subc,sp,.settings.conditionPrefix(settings),.experiment.condition.names(experiment)[cdirs],sep='')
 			dn <- paste(cn,sp,.settings.dataDir(settings),sep='')
 			
-			#get the trials for the conditions 
-			for(i in 1:subinf[[sdirs]]$trials) {
+			#get the runs for the conditions 
+			for(i in 1:subinf[[sdirs]]$runs) {
 				copefile = avgfile = readData(subinf[[sdirs]]$cope_file[[i]]$copes[cdirs])
 				varcopefile = readData(subinf[[sdirs]]$cope_file[[i]]$varcopes[cdirs])
 				tstat = .fmri.data.datavec(copefile)/sqrt(.fmri.data.datavec(varcopefile))
@@ -502,7 +503,7 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 				
 				filelist_reg = list.files(paste(dn,sp,.settings.regDir(settings),sep=''))
 					
-				for(i in 1:subinf[[sdirs]]$trials) {
+				for(i in 1:subinf[[sdirs]]$runs) {
 					
 					registration <- loadRda(paste(dn,sp,.settings.regDir(settings),sp,filelist_reg[i],sp,.settings.regRda(settings),sep=''))
 								
@@ -542,7 +543,7 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 			
 			filelist_func = list.files(paste(dn,sp,.settings.funcDir(settings),sep=''))
 			
-			for(i in 1:subinf[[sdirs]]$trials) {
+			for(i in 1:subinf[[sdirs]]$runs) {
 				functional <- loadRda(paste(dn,sp,.settings.funcDir(settings),sp,filelist_func[i],sp,.settings.funcRda(settings),sep=''))
 				fn = as.character(subinf[[sdirs]]$func_file[[i]][1])
 				fns = strsplit(fn,sp)[[1]]
@@ -566,15 +567,3 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 	
 	return(invisible(experiment))
 }
-
-
-prettyTime <- 
-function(pstime) 
-#Return time in pretty format
-{
-	
-	
-	
-}
-
-

@@ -262,7 +262,7 @@ void simplessqgauss(double *theta, double *dat, double *W, int *brain, int *np, 
 }
 
 
-void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, double *B)
+void innerSWdiag(int *n, int *p, int *runs, char **fnderiv, char **fnresid, char **fnweight, double *B)
 {
 
 	int i,j,k,l,m, Brow, Bcol;
@@ -276,7 +276,7 @@ void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
  	Mr = (double *) R_alloc(*n,sizeof(double));
 
  	fderiv=fopen(*fnderiv,"r"); //NxP derivs vector (n incr. fastest)
- 	fresid=fopen(*fnresid,"r"); //Nxtrial residual vector (n incr fastest)
+ 	fresid=fopen(*fnresid,"r"); //Nxrun residual vector (n incr fastest)
  	fweight=fopen(*fnweight,"r"); //N vector of weights
 
  	fread(Wv,sizeof(double),*n,fweight);
@@ -286,13 +286,13 @@ void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
  		*(Mr+m)=0e0;
  	}
 
-	for(l=0;l<(*trials);l++) { // make mean residual vectors
+	for(l=0;l<(*runs);l++) { // make mean residual vectors
 
 		fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
 		fread(Rv,sizeof(double),*n,fresid);
 
 		for(m=0;m<(*n);m++) {
-			*(Mr+m)=*(Mr+m)+((1/pow((double) *trials,2))**(Rv+m)**(Rv+m));
+			*(Mr+m)=*(Mr+m)+((1/pow((double) *runs,2))**(Rv+m)**(Rv+m));
 		}
 	}
 
@@ -369,7 +369,7 @@ void innerSWdiag(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 
 
 
-void innerSWfull(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, char **fnmeanresid, double *B)
+void innerSWfull(int *n, int *p, int *runs, char **fnderiv, char **fnresid, char **fnweight, char **fnmeanresid, double *B)
 {
 
 	int i,j,k,l, Brow, Bcol;
@@ -378,19 +378,19 @@ void innerSWfull(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 
 	Fv = (double *) R_alloc(*n,sizeof(double));
 	Ft = (double *) R_alloc(*n,sizeof(double));
-	Rv = (double *) R_alloc(*trials**n,sizeof(double));
+	Rv = (double *) R_alloc(*runs**n,sizeof(double));
  	Wv = (double *) R_alloc(*n,sizeof(double));
  	Mr = (double *) R_alloc((*n),sizeof(double));
  	mrv = (double *) R_alloc((int) 1,sizeof(double));
 
  	fderiv=fopen(*fnderiv,"r"); //NxP derivs vector (n incr. fastest)
- 	fresid=fopen(*fnresid,"r"); //Nxtrial residual vector (n incr fastest)
+ 	fresid=fopen(*fnresid,"r"); //Nxrun residual vector (n incr fastest)
  	fweight=fopen(*fnweight,"r"); //N vector of weights
 
  	fread(Wv,sizeof(double),*n,fweight);
  	fclose(fweight);
 
- 	fread(Rv,sizeof(double),*trials**n,fresid);
+ 	fread(Rv,sizeof(double),*runs**n,fresid);
  	fclose(fresid);
 
  	//make mean residuals
@@ -398,9 +398,9 @@ void innerSWfull(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 	for(i=0;i<(*n);i++) {
 		for(j=0;j<(*n);j++) {
 			mrv[0]=0e0;
-			for(l=0;l<(*trials);l++) { //trial loop
-				mrv[0] = mrv[0] + ((1/pow((double) *trials,2))**(Rv+i+l**n)**(Rv+j+l**n));
-			} //end trial loop
+			for(l=0;l<(*runs);l++) { //run loop
+				mrv[0] = mrv[0] + ((1/pow((double) *runs,2))**(Rv+i+l**n)**(Rv+j+l**n));
+			} //end run loop
 			fwrite(mrv,sizeof(double),1,fmeanres);
 		} //end row loop
 	} // end column loop
@@ -495,7 +495,7 @@ void innerSWfull(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 
 }
 
-void innerSWfast(int *n, int *p, int *trials, char **fnderiv, char **fnresid, char **fnweight, double *B)
+void innerSWfast(int *n, int *p, int *runs, char **fnderiv, char **fnresid, char **fnweight, double *B)
 {
 
 	int i,j,k,l,m, Brow, Bcol;
@@ -512,7 +512,7 @@ void innerSWfast(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
  	Mr = (double *) R_alloc((*n)*(*n),sizeof(double));
 
  	fderiv=fopen(*fnderiv,"r"); //NxP derivs vector (n incr. fastest)
- 	fresid=fopen(*fnresid,"r"); //Nxtrial residual vector (n incr fastest)
+ 	fresid=fopen(*fnresid,"r"); //Nxrun residual vector (n incr fastest)
  	fweight=fopen(*fnweight,"r"); //N vector of weights
 
  	fread(Wv,sizeof(double),*n,fweight);
@@ -525,17 +525,17 @@ void innerSWfast(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
  	}
 
  	//make mean residuals
-	for(l=0;l<(*trials);l++) { //trial loop
+	for(l=0;l<(*runs);l++) { //run loop
 
 		fseek(fresid,sizeof(double)*((l)**n),SEEK_SET);
 		fread(Rv,sizeof(double),*n,fresid);
 
 		for(i=0;i<(*n);i++) {
 			for(j=0;j<(*n);j++) {
-				*(Mr+j+i**n)=*(Mr+j+i**n)+((1/pow((double) *trials,2))**(Rv+i)**(Rv+j));
+				*(Mr+j+i**n)=*(Mr+j+i**n)+((1/pow((double) *runs,2))**(Rv+i)**(Rv+j));
 			} //end column loop
 		} //end row loop
- 	} // end trial loop
+ 	} // end run loop
 
  	//Rprintf("Made mean residual band vectors\n");
 
@@ -619,7 +619,7 @@ void innerSWfast(int *n, int *p, int *trials, char **fnderiv, char **fnresid, ch
 
 }
 
-void innerSWbw(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv, char **fnderiv, char **fnresid, char **fnweight, char **fnmeanresid, double *B)
+void innerSWbw(int *n, int *p, int *runs, int *bw, int *escapevar, int *Lv, char **fnderiv, char **fnresid, char **fnweight, char **fnmeanresid, double *B)
 {
 
 	int i,j,k,l, Brow, Bcol,loc;
@@ -628,7 +628,7 @@ void innerSWbw(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv, ch
 
 	Fv = (double *) R_alloc(*n,sizeof(double));
 	Ft = (double *) R_alloc(*n,sizeof(double));
-	Rv = (double *) R_alloc(*trials**n,sizeof(double));
+	Rv = (double *) R_alloc(*runs**n,sizeof(double));
  	Wv = (double *) R_alloc(*n,sizeof(double));
  	Mr = (double *) R_alloc((*n),sizeof(double));
  	mrv = (double *) R_alloc((int) 1,sizeof(double));
@@ -637,8 +637,8 @@ void innerSWbw(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv, ch
  	fread(Wv,sizeof(double),*n,fweight);
  	fclose(fweight);
 
- 	fresid=fopen(*fnresid,"r"); //Nxtrial residual vector (n incr fastest)
- 	fread(Rv,sizeof(double),*trials**n,fresid);
+ 	fresid=fopen(*fnresid,"r"); //Nxrun residual vector (n incr fastest)
+ 	fread(Rv,sizeof(double),*runs**n,fresid);
  	fclose(fresid);
 
   	fderiv=fopen(*fnderiv,"r"); //NxP derivs vector (n incr. fastest)
@@ -648,9 +648,9 @@ void innerSWbw(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv, ch
 	for(i=0;i<(*n);i++) {
 		for(j=0;j<(*n);j++) {
 			mrv[0]=0e0;
-			for(l=0;l<(*trials);l++) { //trial loop
-				mrv[0] = mrv[0] + ((1/pow((double) *trials,2))**(Rv+i+l**n)**(Rv+j+l**n));
-			} //end trial loop
+			for(l=0;l<(*runs);l++) { //run loop
+				mrv[0] = mrv[0] + ((1/pow((double) *runs,2))**(Rv+i+l**n)**(Rv+j+l**n));
+			} //end run loop
 			fwrite(mrv,sizeof(double),1,fmeanres);
 		} //end row loop
 	} // end column loop
@@ -750,7 +750,7 @@ void innerSWbw(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv, ch
 }
 
 
-void innerSWbwfast(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv, char **fnderiv, char **fnresid, char **fnweight, char **fnmeanresid, double *B)
+void innerSWbwfast(int *n, int *p, int *runs, int *bw, int *escapevar, int *Lv, char **fnderiv, char **fnresid, char **fnweight, char **fnmeanresid, double *B)
 {
 
 	int i,j,k,l, Brow, Bcol,loc;
@@ -759,7 +759,7 @@ void innerSWbwfast(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv
 
 	Fv = (double *) R_alloc(*n,sizeof(double));
 	Ft = (double *) R_alloc(*n,sizeof(double));
-	Rv = (double *) R_alloc(*trials**n,sizeof(double));
+	Rv = (double *) R_alloc(*runs**n,sizeof(double));
  	Wv = (double *) R_alloc(*n,sizeof(double));
  	Mr = (double *) R_alloc((*n),sizeof(double));
  	mrv = (double *) R_alloc((*n)**bw,sizeof(double));
@@ -769,8 +769,8 @@ void innerSWbwfast(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv
  	fread(Wv,sizeof(double),*n,fweight);
  	fclose(fweight);
 
- 	fresid=fopen(*fnresid,"r"); //Nxtrial residual vector (n incr fastest)
- 	fread(Rv,sizeof(double),*trials**n,fresid);
+ 	fresid=fopen(*fnresid,"r"); //Nxrun residual vector (n incr fastest)
+ 	fread(Rv,sizeof(double),*runs**n,fresid);
  	fclose(fresid);
 
   	fderiv=fopen(*fnderiv,"r"); //NxP derivs vector (n incr. fastest)
@@ -779,12 +779,12 @@ void innerSWbwfast(int *n, int *p, int *trials, int *bw, int *escapevar, int *Lv
 	//fmeanres = fopen(*fnmeanresid,"w");
 	for(i=0;i<(*n);i++) {
 		for(j=0;j<(*bw);j++) {
-			for(l=0;l<(*trials);l++) { //trial loop
+			for(l=0;l<(*runs);l++) { //run loop
 				loc = Lv[i+j**n];
 				//Rprintf("loc%d, i%d, j%d, l%d ijn%d\n",loc,i,j,l,i+j**n);
-				if(loc!=*escapevar)	*(mrv+i+j**n) = *(mrv+i+j**n) + ((1/pow((double) *trials,2))**(Rv+i+l**n)**(Rv+loc+l**n));
+				if(loc!=*escapevar)	*(mrv+i+j**n) = *(mrv+i+j**n) + ((1/pow((double) *runs,2))**(Rv+i+l**n)**(Rv+loc+l**n));
 				else *(mrv+i+j**n)=0;
-			} //end trial loop
+			} //end run loop
 
 			//fwrite(mrv,sizeof(double),1,fmeanres);
 		} //end row loop

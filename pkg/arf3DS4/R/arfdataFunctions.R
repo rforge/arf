@@ -5,9 +5,9 @@
 #############################################
 
 #[CONTAINS]
-#listNoHdr
-#loadRda
-#loadData
+#listNoHdr		
+#loadRda		[user]
+#loadData		[user]
 #setAllObjects
 #checkFiles
 #makeWeights
@@ -125,9 +125,9 @@ function(experiment,overwrite=F)
 			weightfiles <- listNoHdr(paste(path,sp,.experiment.dataDir(experiment),sp,.experiment.weightsDir(experiment),sep=''),full=T)
 			.data.weightfiles(data) <- weightfiles
 		
-			#set number of trials (warn if beta/weight mismatch)
+			#set number of runs (warn if beta/weight mismatch)
 			if(length(betafiles)!=length(weightfiles)) {warning('Betafiles - Weightfiles mismatch!');allIsWell=F}
-			.data.trials(data) <- length(betafiles)  		
+			.data.runs(data) <- length(betafiles)  		
 			
 			#make the averages if overwrite is TRUE
 			if(overwrite) data <- createAverages(data,experiment)

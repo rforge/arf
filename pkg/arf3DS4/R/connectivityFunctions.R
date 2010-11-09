@@ -5,20 +5,21 @@
 #############################################
 
 #[CONTAINS]
-#fitConnectivity
-#makeSingleTrialEvents
-#gamma.fmri
+#fitConnectivity			[user]
+#makeSingleTrialEvents		[user]
+#gamma.fmri					
 #convol.fmri
-#correlationTest
+#correlationTest			
 #tsCor
 #partialCor
-#differenceCor
-#roiConnectivity
-#createFuncs
-#setFuncFiles
-#setFuncTimings
-#loadFunc
-#saveFunc
+#differenceCor				[user]
+#roiConnectivity			[user]
+#createFuncs				
+#setFuncFiles			
+#setFuncTimings				[user]
+#readTimings				
+#loadFunc					[user]
+#saveFunc					[user]
 
 fitConnectivity <- 
 function(arfmodel,funcfilename='single_events.nii.gz')

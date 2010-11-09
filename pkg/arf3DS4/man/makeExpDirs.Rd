@@ -16,13 +16,13 @@ makeExpDirs(path = getwd(), name = "default_experiment", subjectind = 1, conditi
   \item{settings}{A "settings" object (see \code{\linkS4class{settings}}).}
 }
 \details{
-makeExpDirs only makes the directory structure, data files must be copied to the directories manually. After copying a call to \code{\link{setExp}} or to \code{\link{loadExp}} in mode 'set', will set the experiment.Rda.
+makeExpDirs only makes the directory structure, data files must be copied to the directories manually. After copying a call to \code{\link{loadExp}} in mode 'set', will set the experiment.Rda.
 }
 \value{
 Returns an "experiment" object, probably with a lot of warnings as no data is in the directories.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{settings}}, \code{\link{setExp}}, \code{\link{loadExp}}
+	\code{\linkS4class{settings}}, \code{\link{loadExp}}
 }
 \keyword{ models }

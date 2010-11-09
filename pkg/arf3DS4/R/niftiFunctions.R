@@ -8,14 +8,14 @@
 #getFileInfo
 #newFile
 #readHeader
-#readData
+#readData				[user]
 #writeHeader
-#writeData
+#writeData				[user]
 #writeHeaderPart
 #writeDataPart
 #headToName
 #getIntent
-#fmri2array
+#fmri2array				[user]
 #bin2dec
 #xyzt2char
 

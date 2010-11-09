@@ -295,7 +295,7 @@ setMethod('show','data',
 			cat('[ ARF data ]\n')
 			cat(' name:       ',toupper(object@name),'\n')
 			cat(' data path:  ',object@fullpath,'\n')
-			cat(' runs:       ',object@trials,'\n')
+			cat(' runs:       ',object@runs,'\n')
 			cat(' voxels:      ',object@n,' (',length(object@mask[object@mask!=0]),')\n',sep='')
 			cat(' dimensions: ',paste(object@dataHeader@dims[2:5],collapse='x'),'\n')
 			

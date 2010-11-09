@@ -28,8 +28,8 @@
 \alias{.data.regRda<-,data-method}
 \alias{.data.ss,data-method}
 \alias{.data.ss<-,data-method}
-\alias{.data.trials,data-method}
-\alias{.data.trials<-,data-method}
+\alias{.data.runs,data-method}
+\alias{.data.runs<-,data-method}
 \alias{.data.dataHeader,data-method}
 \alias{.data.dataHeader<-,data-method}
 \alias{.data.version,data-method}
@@ -39,7 +39,7 @@
 \alias{show,data-method}
 
 \title{arf3DS4 "data" class}
-\description{The "data" class contains all information on the fMRI data of one condition of a subject. Mostly the "data" class contains filenames of the datafiles (with full paths) with some basic information on the number of trials etc., the functional volumes, and registration files. Each instance of \code{\linkS4class{model}} class object inherits a "data" object. The "data" class uses some slots of the \code{\linkS4class{experiment}} class.}
+\description{The "data" class contains all information on the fMRI data of one condition of a subject. Mostly the "data" class contains filenames of the datafiles (with full paths) with some basic information on the number of runs etc., the functional volumes, and registration files. Each instance of \code{\linkS4class{model}} class object inherits a "data" object. The "data" class uses some slots of the \code{\linkS4class{experiment}} class.}
 \section{Objects}{
 Objects can be created by calls of the form \code{new("data", ...)}.
 }
@@ -60,7 +60,7 @@ Objects can be created by calls of the form \code{new("data", ...)}.
     \item{\code{funcDir}:}{Fullpath to the functional directory.}
     \item{\code{funcRda}:}{Name of the functional.Rda file.}
     \item{\code{dataHeader}:}{Nifti header information from the avgdataFile.}
-    \item{\code{trials}:}{Number of trials (= number of beta files).}
+    \item{\code{runs}:}{Number of runs (= number of beta files).}
     \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }
 }

@@ -5,25 +5,33 @@
 #############################################
 
 #[CONTAINS]
-#cropVolume
+#cropVolume					
 #cropVolumeAuto
-#makeROImask
+#makeROImask						[user]
 #readFSLmat
-#createRegs
-#createFuncs
-#setRegFiles
-#setRegParams
+#createRegs							[user]
+#setRegFiles						[user]
+#setRegParams						[user]
 #arf2MNI
 #MNI2arf
+#arf2high
 #MNI2atlas
-#setFuncFile
 #reqFlip
 #flipAxis
-#euclidDist
-#makeLowResStruct
-#makeLowResStructAvg
+#euclidDist							[user]
+#makeLowResStruct					[user]
+#makeLowResStructAvg				[user]
 #getTalairach
 #getHarvardOxford
+#getAtlasLabels						
+#calcHarvardOxfordProbs
+#calcTalairach
+#getModelAtlas						[user]
+#highresBlobs
+#loadReg							[user]
+#saveReg							[user]
+
+
 
 cropVolume <- 
 function(filename,resizeToDim,quiet=F) 
@@ -466,15 +474,15 @@ function(arfdata,experiment=NULL)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
-	#get trials from dataDir
-	trials = list.files(.data.regDir(arfdata),full=F)
+	#get runs from dataDir
+	runs = list.files(.data.regDir(arfdata),full=F)
 	
-	if(length(trials)==0) stop('No trial directories found found in',.data.regDir(arfdata),',please run registration.')
+	if(length(runs)==0) stop('No runs directories found found in',.data.regDir(arfdata),',please run registration.')
 	
-	for(trialdir in trials) {
+	for(rundir in runs) {
 		
 		#load registration parameters
-		registration = loadRda(paste(.data.regDir(arfdata),.Platform$file.sep,trialdir,.Platform$file.sep,.data.regRda(arfdata),sep=''))
+		registration = loadRda(paste(.data.regDir(arfdata),.Platform$file.sep,rundir,.Platform$file.sep,.data.regRda(arfdata),sep=''))
 		
 		#read in lowres + highresfiles
 		examp = readData(.registration.linkedfile(registration))
@@ -493,7 +501,7 @@ function(arfdata,experiment=NULL)
 		#make newfile and fill with zeroes
 		newdat = examp
 		.fmri.data.filename(newdat) = .experiment.lowresFile(experiment)
-		.fmri.data.fullpath(newdat) = paste(.data.regDir(arfdata),.Platform$file.sep,trialdir,sep='')
+		.fmri.data.fullpath(newdat) = paste(.data.regDir(arfdata),.Platform$file.sep,rundir,sep='')
 		newdatavec = rep(0,dimx*dimy*dimz)
 		dim(newdatavec) = c(dimx,dimy,dimz)		
 		
@@ -534,20 +542,20 @@ function(arfmodel,experiment=NULL)
 	
 	sp = .Platform$file.sep
 	
-	#get trial list
-	trials = list.files(.model.regDir(arfmodel),full=F)
+	#get run list
+	runs = list.files(.model.regDir(arfmodel),full=F)
 	
 	#set avg to zero
 	avgdat = 0
 		
 	#load and sum images
-	for(trialdir in trials) {
-		registration = loadRda(paste(.model.regDir(arfmodel),sp,trialdir,sp,.model.regRda(arfmodel),sep=''))
+	for(rundir in runs) {
+		registration = loadRda(paste(.model.regDir(arfmodel),sp,rundir,sp,.model.regRda(arfmodel),sep=''))
 		fn = list.files(path=.registration.fullpath(registration),pattern=.experiment.lowresFile(experiment),full=T)
 		lrdat = readData(fn[1])
 		avgdat = avgdat + .fmri.data.datavec(lrdat)
 	}
-	avgdat = avgdat / length(trials)
+	avgdat = avgdat / length(runs)
 	
 	#set parameters for newfile and save to modelpath
 	avgstruct = lrdat
@@ -768,12 +776,12 @@ function(xyz,talairach)
 }
 
 getModelAtlas <-
-function(arfmodel,regtrial=1,saveastext=F) 
+function(arfmodel,regrun=1,saveastext=F) 
 #wrapper for Atlas coordinates of model estimates
 {
 	sp <- .Platform$file.sep
-	trials = list.files(.model.regDir(arfmodel),full=F)[regtrial]
-	registration = loadRda(paste(.model.regDir(arfmodel),sp,trials,sp,.model.regRda(arfmodel),sep=''))
+	runs = list.files(.model.regDir(arfmodel),full=F)[regrun]
+	registration = loadRda(paste(.model.regDir(arfmodel),sp,runs,sp,.model.regRda(arfmodel),sep=''))
 	
 	estimates = matrix(.model.estimates(arfmodel),.model.params(arfmodel))
 	coors = t(round(estimates[c(1,2,3),]))

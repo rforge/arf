@@ -76,8 +76,8 @@
 \alias{.model.startFile<-,model-method}
 \alias{.model.startval,model-method}
 \alias{.model.startval<-,model-method}
-\alias{.model.trials,model-method}
-\alias{.model.trials<-,model-method}
+\alias{.model.runs,model-method}
+\alias{.model.runs<-,model-method}
 \alias{.model.valid,model-method}
 \alias{.model.valid<-,model-method}
 \alias{.model.varcov,model-method}
@@ -149,7 +149,7 @@ Objects can be created by calls of the form \code{new("model", ...)}.
     \item{\code{funcDir}:}{Fullpath to the functional directory.}
     \item{\code{funcRda}:}{Name of the functional.Rda file.}
     \item{\code{dataHeader}:}{Nifti header information from the avgdataFile.}
-    \item{\code{trials}:}{Number of trials (= number of beta files).}
+    \item{\code{runs}:}{Number of runs (= number of beta files).}
     \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }
 }

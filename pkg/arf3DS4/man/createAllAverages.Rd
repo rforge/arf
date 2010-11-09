@@ -1,9 +1,9 @@
 \name{createAllAverages}
 \Rdversion{1.1}
 \alias{createAllAverages}
-\title{Create Averages of trials for all conditions.}
+\title{Create Averages of runs for all conditions.}
 \description{
-CreateAllAverages creates averages of trials for all conditions in an arf-experiment. It calls \code{\link{createAverages}} for all known data-directories.
+CreateAllAverages creates averages of runs for all conditions in an arf-experiment. It calls \code{\link{createAverages}} for all known data-directories.
 }
 \usage{
 createAllAverages(experiment = NULL)

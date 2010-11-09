@@ -5,10 +5,10 @@
 #############################################
 
 #[CONTAINS]
-#processModel
-#processSeed
-#searchRange
-#minBIC
+#processModel		[user]
+#processSeed		[user]
+#searchRange		[user]
+#minBIC				[user]
 
 processModel <- 
 function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),pr=T,printlevel=0,try.silen=T) 
@@ -155,7 +155,7 @@ function(subject,condition,range=c(10,50),initial.splits=4,max.depth=4,modeltype
 		
 		
 		depth = depth+1
-		brower()	
+		browser()	
 	}
 	
 		

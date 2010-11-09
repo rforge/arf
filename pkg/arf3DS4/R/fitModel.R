@@ -5,10 +5,10 @@
 #############################################
 
 #[CONTAINS]
-#fitModel
+#fitModel					[user]
 #fitModelOptim
 #fitSimpleModelOptim
-#pruneModel
+#pruneModel					
 
 fitModel <- 
 function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(arfmodel)),weights=readData(.model.avgWfile(arfmodel)),printlevel=0,try.silen=T) 

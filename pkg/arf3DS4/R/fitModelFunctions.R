@@ -11,11 +11,11 @@
 #ssq.simple
 #model.simple
 #gradient.simple
-#createAverages
-#createAllAverages
-#determineStartRect
-#determineStartRectSimple
-#regressAmpitudes
+#createAverages					[user]
+#createAllAverages				[user]
+#determineStartRect				[user]
+#determineStartRectSimple		[user]
+#regressAmplitudes
 #isEdge
 #fallOff
 #fwhm.filter
@@ -26,7 +26,7 @@
 #checkSolutionReturn
 #checkGradientReturn
 #checkNonSigReturn
-#setIsoContour
+#setIsoContour					[user]
 #persistentBound
 
 ssq.gauss <- 
@@ -172,16 +172,16 @@ function(arfdat,experiment=NULL)
 	#set filesep
 	sp=.Platform$file.sep
 	
-	# add trial data to avgdat and weightdat
+	# add run data to avgdat and weightdat
 	avgdat <- avgweight <- 0
-	for(i in 1:.data.trials(arfdat)) {
+	for(i in 1:.data.runs(arfdat)) {
 		avgdat <- avgdat + .fmri.data.datavec(readData(.data.betafiles(arfdat)[i]))
 		avgweight <- avgweight + .fmri.data.datavec(readData(.data.weightfiles(arfdat)[i]))
 	}
 	
-	# divide avgdat by trialnumber and avgweight by trialnumber^2
-	avgdat <- avgdat / .data.trials(arfdat)
-	avgweight <- avgweight / .data.trials(arfdat)^2
+	# divide avgdat by runnumber and avgweight by runnumber^2
+	avgdat <- avgdat / .data.runs(arfdat)
+	avgweight <- avgweight / .data.runs(arfdat)^2
 	
 	# get header info of first file (or reference file id supplied)
 	headinf <- readHeader(getFileInfo(.data.betafiles(arfdat)[1])) 

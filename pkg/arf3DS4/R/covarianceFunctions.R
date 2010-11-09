@@ -5,19 +5,20 @@
 #############################################
 
 #[CONTAINS]
-#makeDerivs
+#makeDerivs				
 #makeResiduals
 #makeWeightsBin
-#varcov
-#BIC
-#RMSEA
+#varcov				[user]
+#BIC				[user]
+#RMSEA				[user]
 #detSigmaDeriv
-#wald
-#mcpCorrect
-#readDerivs
-#approxHessianR
-#makeBWlocs
+#wald				[user]
+#mcpCorrect			[user]
+#readDerivs			
+#approxHessianR		
 #getlocsquare
+#makeBWlocations		
+
 
 makeDerivs <- 
 function(arfmodel)
@@ -47,7 +48,7 @@ function(arfmodel)
 
 makeResiduals <- 
 function(arfmodel)
-#make residuals makes residuals for each trial
+#make residuals makes residuals for each run
 {
 	if(.model.valid(arfmodel)) {
 		#set separator
@@ -62,7 +63,7 @@ function(arfmodel)
 		nonbrain = which(.model.mask(arfmodel)==0)
 		if(length(nonbrain)>0) model = model[-nonbrain]
 		
-		#write the residuals per trial
+		#write the residuals per run
 		for(bfile in .model.betafiles(arfmodel)) {
 			
 			data = .fmri.data.datavec(readData(bfile))
@@ -124,9 +125,9 @@ function(arfmodel)
 			n = .model.n(arfmodel)
 			
 			#perform the inner_sandwich procedure
-			if(.model.sandwichmethod(arfmodel)[1]=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
-			if(.model.sandwichmethod(arfmodel)[1]=='fast') B <- try(.C('innerSWfast',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
-			if(.model.sandwichmethod(arfmodel)[1]=='full') B <- try(.C('innerSWfull',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[8]],silen=T)
+			if(.model.sandwichmethod(arfmodel)[1]=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
+			if(.model.sandwichmethod(arfmodel)[1]=='fast') B <- try(.C('innerSWfast',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
+			if(.model.sandwichmethod(arfmodel)[1]=='full') B <- try(.C('innerSWfull',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[8]],silen=T)
 			if(.model.sandwichmethod(arfmodel)[1]=='bw') {
 				#save original model values
 				old_n = .model.n(arfmodel)
@@ -147,7 +148,7 @@ function(arfmodel)
 				Lv = makeBWLocations(arfmodel,escapevar)	
 				
 				#run BandWidth SW
-				B <- try(.C('innerSWbw',as.integer(.model.n(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.integer(((bw*2)+1)^3),as.integer(escapevar),as.integer(Lv),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[11]],silen=T)
+				B <- try(.C('innerSWbw',as.integer(.model.n(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.integer(((bw*2)+1)^3),as.integer(escapevar),as.integer(Lv),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[11]],silen=T)
 				
 				#reset original values
 				.model.n(arfmodel) = old_n
@@ -174,7 +175,7 @@ function(arfmodel)
 				Lv = makeBWLocations(arfmodel,escapevar)	
 				
 				#run BandWidth SW
-				B <- try(.C('innerSWbwfast',as.integer(.model.n(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.trials(arfmodel)),as.integer(((bw*2)+1)^3),as.integer(escapevar),as.integer(Lv),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[11]],silen=T)
+				B <- try(.C('innerSWbwfast',as.integer(.model.n(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.integer(((bw*2)+1)^3),as.integer(escapevar),as.integer(Lv),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[11]],silen=T)
 				
 				#reset original values
 				.model.n(arfmodel) = old_n
@@ -306,10 +307,10 @@ function(arfmodel,options=loadOptions(arfmodel))
 		n <- .model.n(arfmodel) 
 			
 		#Hotellings T
-		HTs = .model.trials(arfmodel)*.model.minimum(arfmodel)
+		HTs = .model.runs(arfmodel)*.model.minimum(arfmodel)
 		
 		#noncentrality parameter	
-		ncp = max(c((HTs-((n-(.model.regions(arfmodel)*.model.params(arfmodel)))/.model.trials(arfmodel))),0))
+		ncp = max(c((HTs-((n-(.model.regions(arfmodel)*.model.params(arfmodel)))/.model.runs(arfmodel))),0))
 		
 		#check if ncp < 0
 		if(ncp<0) .model.warnings(arfmodel) <- c(.model.warnings(arfmodel),'Noncentrality parameter smaller than zero, ncp is set to zero')

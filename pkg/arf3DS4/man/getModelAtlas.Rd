@@ -6,11 +6,11 @@
 getModelAtlas fetches atlas labels for the center coordinates of all regions in a model.
 }
 \usage{
-getModelAtlas(arfmodel, regtrial = 1, saveastext = F)
+getModelAtlas(arfmodel, regrun = 1, saveastext = F)
 }
 \arguments{
   \item{arfmodel}{Object of class "model" (see \code{\linkS4class{model}}).}
-  \item{regtrial}{Which trial is used for the coordinate conversion?}
+  \item{regrun}{Which run is used for the coordinate conversion?}
   \item{saveastext}{Save a text file in the working directory with atlas information?}
 }
 \details{

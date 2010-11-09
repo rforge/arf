@@ -10,13 +10,13 @@ varcov(arfmodel)
   \item{arfmodel}{A valid arf model object.}
 }
 \details{
-Varcov needs first-order derivatives and residual matrices, if they do not exist, they are created by calls to \code{\link{makeDerivs}} and \code{\link{makeResiduals}}.
+Varcov needs first-order derivatives and residual matrices, if they do not exist, they are created automatically.
 }
 \value{
 Returns an object of class "model" with the appropriate slots.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{model}}, \code{\link{makeDerivs}}, \code{\link{makeResiduals}}
+	\code{\linkS4class{model}}, 
 }
 \keyword{ models }

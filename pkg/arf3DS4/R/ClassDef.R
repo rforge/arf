@@ -17,7 +17,7 @@
 #wald				[user]
 #data				[user]
 #model				[user]
-#sequence			[user] [nyi]
+#sequence			[user]
 
 ## arf version class (version is set here)
 setClass(
@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=2,
 		build=4,
-		update=1,
-		svnrev=183
+		update=2,
+		svnrev=184
 	),
 	package='arf3DS4'
 )
@@ -369,13 +369,13 @@ setClass(
 	package='arf3DS4'
 )
 
-## arf data class (containing info on the locations of the data and weightfiles, the dimensions, number of trials, and relevant nifti parameters.)
+## arf data class (containing info on the locations of the data and weightfiles, the dimensions, number of runs, and relevant nifti parameters.)
 setClass(
 	Class='data',
 	representation=representation(
 		name='character',			#indicator of data (subject,condition etc.)
 		fullpath='character',		#fullpath of files
-		betafiles='character',		#vector of char containing trial datafiles
+		betafiles='character',		#vector of char containing run datafiles
 		weightfiles='character',	#vector of char containing weight datafiles
 		avgdatfile='character',		#filename of average data
 		avgWfile='character',		#filename of average weights
@@ -387,7 +387,7 @@ setClass(
 		regRda='character',			#filename of registration file 
 		funcDir='character',		#directory of functional volume
 		funcRda='character',		#filename of functional file
-		trials='numeric',			#number of trials
+		runs='numeric',				#number of runs
 		dataHeader='ANY',
 		version='ANY'
 	),
