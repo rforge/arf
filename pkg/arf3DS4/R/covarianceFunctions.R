@@ -14,7 +14,7 @@
 #detSigmaDeriv
 #wald				[user]
 #mcpCorrect			[user]
-#readDerivs			
+#readDerivs			[user]
 #approxHessianR		
 #getlocsquare
 #makeBWlocations		

@@ -19,6 +19,7 @@ export(
 	loadReg,
 	saveReg,
 	makeDerivs,
+	readDerivs,
 	varcov,
 	BIC,
 	RMSEA,
