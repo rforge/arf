@@ -3332,6 +3332,17 @@ standMethod <- function(x, value) {x@minimum<- value;x}
 setGeneric(slotreplace,standGen)
 setReplaceMethod(funcname,classname,standMethod)
 classname <-'sequence'
+funcname <-'.sequence.best'
+standGen <- function(object) standardGeneric('.sequence.best')
+standMethod <- function(object) object@best
+setGeneric(funcname,standGen,package='arf3DS4')
+setMethod(funcname,classname,standMethod)
+slotreplace <-'.sequence.best<-'
+standGen <- function(x, value) standardGeneric('.sequence.best<-')
+standMethod <- function(x, value) {x@best<- value;x}
+setGeneric(slotreplace,standGen)
+setReplaceMethod(funcname,classname,standMethod)
+classname <-'sequence'
 funcname <-'.sequence.valid'
 standGen <- function(object) standardGeneric('.sequence.valid')
 standMethod <- function(object) object@valid

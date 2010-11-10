@@ -2,6 +2,8 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{sequence-class}
+\alias{.sequence.best,sequence-method}
+\alias{.sequence.best<-,sequence-method}
 \alias{.sequence.current,sequence-method}
 \alias{.sequence.current<-,sequence-method}
 \alias{.sequence.fit,sequence-method}
@@ -14,6 +16,7 @@
 \alias{.sequence.regions<-,sequence-method}
 \alias{.sequence.valid,sequence-method}
 \alias{.sequence.valid<-,sequence-method}
+\alias{show,sequence-method}
 
 \title{arf3DS4 "sequence" class}
 \description{The arf3DS4 "sequence" class contains information of a sequence of fitted models. It can be used to assess the relative fit between models and decide which model fits best.}
@@ -22,11 +25,12 @@ Objects can be created by calls of the form \code{new("sequence", ...)}.
 }
 \section{Slots}{
 	 \describe{
+    \item{\code{best}:}{Which model currently fits the best? }
     \item{\code{current}:}{The current model number in the sequence.}
     \item{\code{regions}:}{Vector of number-of-regions to be fitted in sequence.}
     \item{\code{mnames}:}{Vector of modelnames of the sequence.}
     \item{\code{fit}:}{Vector of fit indices for each model.}
-    \item{\code{minimum}:}{Which model currently fits the best? }
+    \item{\code{minimum}:}{Vector of minima for each model.}
     \item{\code{valid}:}{Logical vector indicating valid models.}
   }
 }

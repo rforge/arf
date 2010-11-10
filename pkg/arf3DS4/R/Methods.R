@@ -340,6 +340,33 @@ setMethod('show','options',
 		}
 )
 
+#### ARF SEQUENCE METHODS ####
+setMethod('show','sequence',
+		function(object) {
+			cat('[ ARF sequence ] \n\n')
+			cat(sprintf('                modelname   regions   minimum       BIC   valid   optimal\n\n'))
+		
+			vs = which(object@valid==TRUE)
+			if(length(vs)<=0) {
+				cat('No valid models\n');return(invisible(FALSE))
+			} else {
+				object@mnames=object@mnames[vs]
+				object@regions=object@regions[vs]
+				object@minimum=object@minimum[vs]
+				object@fit=object@fit[vs]
+				object@valid=object@valid[vs]
+				object@best=object@best[vs]
+			}
+		
+			for(i in 1:length(object@mnames)) {
+				cat(sprintf('%25s   %7d   %7.0f   %7.0f   %5s   %7s\n',object@mnames[i],object@regions[i],object@minimum[i],object@fit[i],object@valid[i],object@best[i]))
+			}
+			cat('\n')
+		}
+)
+
+
+
 #### ARF VERSION METHODS ####
 setMethod('show','version',
 		function(object) {

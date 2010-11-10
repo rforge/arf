@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=2,
 		build=4,
-		update=2,
-		svnrev=184
+		update=4,
+		svnrev=185
 	),
 	package='arf3DS4'
 )
@@ -452,16 +452,13 @@ setClass(
 setClass(
 		Class='sequence',
 		representation=representation(
-				current='numeric',			#current number of regions in model
+				current='numeric',			#current minimum
 				regions='numeric',			#vector of regions to fit (can be sequential or any other combination)
 				mnames='character',			#vector of names of models
 				fit='numeric',				#vector of fit measures (to evaluate best fit)
-				minimum='numeric',			#which region has the minimum
+				minimum='numeric',			#vector of minima for the fit functions 
+				best='logical',				#which model has the best fit
 				valid='logical'				#vector of validity of solutions (all estimates and variances ok)
-		),
-		prototype=prototype(
-				current=1,
-				minimum=0
 		),
 		package='arf3DS4'
 )

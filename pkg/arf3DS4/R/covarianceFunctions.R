@@ -5,7 +5,7 @@
 #############################################
 
 #[CONTAINS]
-#makeDerivs				
+#makeDerivs			[user]	
 #makeResiduals
 #makeWeightsBin
 #varcov				[user]
@@ -21,9 +21,11 @@
 
 
 makeDerivs <- 
-function(arfmodel)
+function(arfmodel,method=c('viaR','direct'))
 #make derivs calculates analytical first order derivatives based on the estimated model parameters
 {
+	
+	method=match.arg(method[1],c('viaR','direct'))
 	
 	if(.model.valid(arfmodel)) {
 		#load headinfo for dims
@@ -33,12 +35,17 @@ function(arfmodel)
 		fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
 		
 		#calculate and write the derivatives
-		derivs = .C('dfgauss',as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.mask(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(.model.estimates(arfmodel)),as.double(numeric(.model.regions(arfmodel)*.model.params(arfmodel)*length(which(.model.mask(arfmodel)!=0)))))[[7]]
+		if(method=='viaR') {
+			derivs = .C('dfgauss',as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.mask(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(.model.estimates(arfmodel)),as.double(numeric(.model.regions(arfmodel)*.model.params(arfmodel)*length(which(.model.mask(arfmodel)!=0)))))[[7]]
+  			con = file(fn,'wb')
+			writeBin(derivs,con,double(),endian=.Platform$endian)
+			close(con)
+		}
 		
-		con = file(fn,'wb')
-		writeBin(derivs,con,double(),endian=.Platform$endian)
-		close(con)
-				
+		if(method=='direct') {
+			invisible(.C('dfgaussFile',as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.mask(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(.model.estimates(arfmodel)),as.character(fn)))
+		}
+		
 		return(invisible(TRUE))
 	
 	} else return(invisible(FALSE))

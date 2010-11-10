@@ -160,10 +160,11 @@ function(experiment,overwrite=F)
 				#set correct dirs for each model
 					for(mods in 1:length(mnames)) {
 						model <- loadRda(paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
-			
-						#version specific data to add to model (if not set by classDef, data prior to 2.2.4)
+
+						#version specific data to add to model (if not set by classDef, data prior to 2.2.4 (dataHeader) or 2.4.2 (runs))
+						model <- updateClass(model,runs=.data.runs(data))			
 						model <- updateClass(model,dataHeader=.data.dataHeader(data))	
-			
+												
 						.model.modelpath(model) <- paste(modelpath,sp,mnames[mods],sep='')
 						.model.modeldatapath(model) <- paste(modelpath,sp,mnames[mods],sp,.experiment.modeldatDir(experiment),sep='')
 						.model.fullpath(model) <- .data.fullpath(data)

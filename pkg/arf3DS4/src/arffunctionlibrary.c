@@ -1022,10 +1022,23 @@ void dfgauss(int *np, int *brain, int *dimx, int *dimy, int *dimz, double *theta
 	void dftheta9();
 
 	int i,j,n=(*dimx)*(*dimy)*(*dimz), reg,p;
-	double *grad, *theta;
-	grad = (double *) R_alloc((n),sizeof(double));
+	double *theta,*grad0,*grad1,*grad2,*grad3,*grad4,*grad5,*grad6,*grad7,*grad8,*grad9;
+	//deriv = (double *) R_alloc((*np)*n,sizeof(double));
+	grad0 = (double *) R_alloc((n),sizeof(double));
+	grad1 = (double *) R_alloc((n),sizeof(double));
+	grad2 = (double *) R_alloc((n),sizeof(double));
+	grad3 = (double *) R_alloc((n),sizeof(double));
+	grad4 = (double *) R_alloc((n),sizeof(double));
+	grad5 = (double *) R_alloc((n),sizeof(double));
+	grad6 = (double *) R_alloc((n),sizeof(double));
+	grad7 = (double *) R_alloc((n),sizeof(double));
+	grad8 = (double *) R_alloc((n),sizeof(double));
+	grad9 = (double *) R_alloc((n),sizeof(double));
 	theta = (double *) R_alloc((10),sizeof(double));
 
+
+	p=0;
+	for(i=0;i<n;i++) p=p + brain[i];
 
 	for(reg=0;reg<(*np);reg=reg+10) {
 
@@ -1033,95 +1046,66 @@ void dfgauss(int *np, int *brain, int *dimx, int *dimy, int *dimz, double *theta
 			*(theta+i)=*(thetavec+reg+i);
 		}
 
-		dftheta0(theta,brain,dimx,dimy,dimz,grad);
-		p=0;
-		for(j=0;j<n;j++) {
-			if(brain[j]!=0) {
-				derivs[p+(0*n)+(n*reg)]=grad[p];
-				p++;
-			}
+		dftheta0(theta,brain,dimx,dimy,dimz,grad0);
+		for(j=0;j<p;j++) {
+			derivs[j+(0*n)+(n*reg)]=grad0[j];
 		}
+		Rprintf("%s","df0\n");
 
-		dftheta1(theta,brain,dimx,dimy,dimz,grad);
-		p=0;
-		for(j=0;j<n;j++) {
-			if(brain[j]!=0) {
-				derivs[p+(1*n)+(n*reg)]=grad[p];
-				p++;
-			}
+		dftheta1(theta,brain,dimx,dimy,dimz,grad1);
+		for(j=0;j<p;j++) {
+			derivs[j+(1*n)+(n*reg)]=grad1[j];
 		}
+		Rprintf("%s","df1\n");
 
-		dftheta2(theta,dimx,dimy,dimz,grad);
-		p=0;
-		for(j=0;j<n;j++) {
-			if(brain[j]!=0) {
-				derivs[p+(2*n)+(n*reg)]=grad[p];
-				p++;
-			}
+		dftheta2(theta,dimx,dimy,dimz,grad2);
+		for(j=0;j<p;j++) {
+			derivs[j+(2*n)+(n*reg)]=grad2[j];
 		}
+		Rprintf("%s","df2\n");
 
-		dftheta3(theta,brain,dimx,dimy,dimz,grad);
-		p=0;
-		for(j=0;j<n;j++) {
-			if(brain[j]!=0) {
-				derivs[p+(3*n)+(n*reg)]=grad[p];
-				p++;
-			}
+		dftheta3(theta,brain,dimx,dimy,dimz,grad3);
+		for(j=0;j<p;j++) {
+			derivs[j+(3*n)+(n*reg)]=grad3[j];
 		}
+		Rprintf("%s","df3\n");
 
-		dftheta4(theta,brain,dimx,dimy,dimz,grad);
-		p=0;
-		for(j=0;j<n;j++) {
-			if(brain[j]!=0) {
-				derivs[p+(4*n)+(n*reg)]=grad[p];
-				p++;
-			}
+		dftheta4(theta,brain,dimx,dimy,dimz,grad4);
+		for(j=0;j<p;j++) {
+			derivs[j+(4*n)+(n*reg)]=grad4[j];
 		}
+		Rprintf("%s","df4\n");
 
-		dftheta5(theta,brain,dimx,dimy,dimz,grad);
-		p=0;
-		for(j=0;j<n;j++) {
-			if(brain[j]!=0) {
-				derivs[p+(5*n)+(n*reg)]=grad[p];
-				p++;
-			}
+		dftheta5(theta,brain,dimx,dimy,dimz,grad5);
+		for(j=0;j<p;j++) {
+			derivs[j+(5*n)+(n*reg)]=grad5[j];
 		}
+		Rprintf("%s","df5\n");
 
-		dftheta6(theta,brain,dimx,dimy,dimz,grad);
-		p=0;
-		for(j=0;j<n;j++) {
-			if(brain[j]!=0) {
-				derivs[p+(6*n)+(n*reg)]=grad[p];
-				p++;
-			}
+		dftheta6(theta,brain,dimx,dimy,dimz,grad6);
+		for(j=0;j<p;j++) {
+			derivs[j+(6*n)+(n*reg)]=grad6[j];
 		}
+		Rprintf("%s","df6\n");
 
-		dftheta7(theta,brain,dimx,dimy,dimz,grad);
-		p=0;
-		for(j=0;j<n;j++) {
-			if(brain[j]!=0) {
-				derivs[p+(7*n)+(n*reg)]=grad[p];
-				p++;
-			}
+		dftheta7(theta,brain,dimx,dimy,dimz,grad7);
+		for(j=0;j<p;j++) {
+			derivs[j+(7*n)+(n*reg)]=grad7[j];
 		}
+		Rprintf("%s","df7\n");
 
-		dftheta8(theta,brain,dimx,dimy,dimz,grad);
-		p=0;
-		for(j=0;j<n;j++) {
-			if(brain[j]!=0) {
-				derivs[p+(8*n)+(n*reg)]=grad[p];
-				p++;
-			}
+		dftheta8(theta,brain,dimx,dimy,dimz,grad8);
+		for(j=0;j<p;j++) {
+			derivs[j+(8*n)+(n*reg)]=grad8[j];
 		}
+		Rprintf("%s","df8\n");
 
-		dftheta9(theta,brain,dimx,dimy,dimz,grad);
-		p=0;
-		for(j=0;j<n;j++) {
-			if(brain[j]!=0) {
-				derivs[p+(9*n)+(n*reg)]=grad[p];
-				p++;
-			}
+		dftheta9(theta,brain,dimx,dimy,dimz,grad9);
+		for(j=0;j<p;j++) {
+			derivs[j+(9*n)+(n*reg)]=grad9[j];
 		}
+		Rprintf("%s","df9\n");
+
 	}
 
 }

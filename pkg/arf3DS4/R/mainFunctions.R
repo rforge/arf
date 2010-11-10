@@ -108,8 +108,8 @@ function(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c(
 }
 
 
-searchRange <-
-function(subject,condition,range=c(10,50),initial.splits=4,max.depth=4,modeltype=c('gauss','simple'),modelprefix='searchmodel',options=new('options'),BIC.adjust=T,experiment=NULL)
+fitRange <-
+function(subject,condition,range,options=new('options'),modelprefix='searchmodel',modeltype=c('gauss','simple'),experiment=NULL)
 #search a range of models for the one with the lowest BIC
 {
 	#experiment
@@ -124,39 +124,26 @@ function(subject,condition,range=c(10,50),initial.splits=4,max.depth=4,modeltype
 	#matches
 	modeltype= match.arg(modeltype[1],c('gauss','simple'))
 		
-	#make intial range
-	if(initial.splits>=(range[2]-range[1])) stop('Too many splits for range')
-	range.steps = seq(range[1],range[2],(range[2]-range[1])/initial.splits)
-	
+		
 	#set new sequence
 	sequence = new('sequence')
-	.sequence.regions(sequence) = seq(range[1],range[2])
-	.sequence.fit(sequence) = as.numeric(rep(NA,length(.sequence.regions(sequence))))
-	names(.sequence.fit(sequence)) = seq(range[1],range[2])
+	.sequence.regions(sequence) = range
+	.sequence.fit(sequence) = .sequence.minimum(sequence) = as.numeric(rep(NA,length(.sequence.regions(sequence))))
 	.sequence.valid(sequence) = rep(FALSE,length(.sequence.regions(sequence)))
-	.sequence.minimum(sequence) = as.numeric(NA)
-
+	.sequence.best(sequence) = as.numeric(NA)
 	
-	#set intial depth and runs
-	depth=0
-	while(depth<=max.depth) {
-		
-		#perform range models
-		for(numreg in range.steps) {
-			model = newModel(paste(modelprefix,'_',numreg,'regs',sep=''),numreg,subject,condition,type=modeltype,options=options,experiment=experiment)
-			model = processModel(model,options=options)
-			.sequence.fit(sequence)[numreg] = .model.fit(model)[1]
-			.sequence.valid(sequence)[numreg] = .model.valid(model)
-		}
-				
-		#get the minimum and set a new range 
-		minmod = as.numeric(names(which.min(.sequence.fit(sequence)[.sequence.valid(sequence)==TRUE])))
-		
-		
-		
-		depth = depth+1
-		browser()	
+	#perform fit loop
+	for(numreg in range) {
+		model = newModel(paste(modelprefix,'_',numreg,'regs',sep=''),numreg,subject,condition,type=modeltype,options=options,experiment=experiment)
+		model = processModel(model,options=options)
+		.sequence.fit(sequence)[numreg] = .model.fit(model)[1]
+		.sequence.valid(sequence)[numreg] = .model.valid(model)
 	}
+				
+	#get the minimum 
+	minmod = as.numeric(names(which.min(.sequence.fit(sequence)[.sequence.valid(sequence)==TRUE])))
+	
+	return(sequence)
 	
 		
 }
@@ -164,33 +151,38 @@ function(subject,condition,range=c(10,50),initial.splits=4,max.depth=4,modeltype
 
 minBIC <-
 function(subject,condition) 
-#show the minimal BIC 
+#show the minimal BIC returns a sequence object
 {
-	
+	#load modelnames
 	modobject <- showModels(subject,condition)
 	modnames <- .mnames.mnames(modobject)
 	
-	minvec = svec = rvec =  numeric(length(modnames))
-	
-	names(minvec) = modnames
+	#make new sequence object
+	sequence = new('sequence')
+	.sequence.mnames(sequence) <- modnames
+	.sequence.fit(sequence) <- as.numeric(rep(NA,length(modnames)))
+	.sequence.valid(sequence) <- .sequence.best(sequence) <- rep(FALSE,length(modnames))
+	.sequence.current(sequence) <- .sequence.minimum(sequence) <- as.numeric(NA)
 
-	for(i in 1:length(minvec)) {
-		
+	#fill in sequence object
+	for(i in 1:length(modnames)) {
 		mod = loadModel(modobject,i)
+		
+		.sequence.regions(sequence)[i] = .model.regions(mod)
 		if(.model.valid(mod)) {
-			minvec[i] = .model.fit(mod)[1] 
-			svec[i] = .model.minimum(mod)
-			rvec[i] = .model.regions(mod)
+			.sequence.fit(sequence)[i] = .model.fit(mod)[1] 
+			.sequence.minimum(sequence)[i] = .model.minimum(mod)
+			.sequence.valid(sequence)[i]=TRUE
 		} else {
-			minvec[i]=NA
+			.sequence.valid(sequence)[i]=FALSE
 		}
 	}
 	
-	minvec = data.frame(BIC=round(minvec),minimum=round(svec),regions=rvec,optimal=character(length(minvec)),stringsAsFactors=F)
-	
-	minvec$optimal[which.min(minvec$BIC)]='***'
-	
-	return(minvec)
-	
+	#which of the valid models has the minimum
+	validfits = .sequence.fit(sequence)[which(.sequence.valid(sequence)==TRUE)]
+	minimum = which.min(validfits)
+	.sequence.best(sequence)[which(.sequence.valid(sequence)==TRUE)][minimum] = TRUE
+
+	return(sequence)
 }
 

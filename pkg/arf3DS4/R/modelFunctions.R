@@ -11,6 +11,7 @@
 #saveModelBin			[user]
 #saveModelBinSimple		[user]
 #loadOptions			[user]
+#saveOptions			[user]
 #loadStart				[user]
 #saveStart				[user]
 #loadStart				[user]
