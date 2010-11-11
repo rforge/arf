@@ -6,8 +6,8 @@
 #include<R.h>
 #include<Rmath.h>
 #include<R_ext/Utils.h>
-#include<math.h>
-#include<stdio.h>
+//#include<math.h>
+//#include<stdio.h>
 
 
 void gauss(double *theta, int *np, int *dimx, int *dimy, int *dimz, double *gx)
@@ -1023,8 +1023,6 @@ void dfgauss(int *np, int *brain, int *dimx, int *dimy, int *dimz, double *theta
 
 	int i,j,n=(*dimx)*(*dimy)*(*dimz), reg,p;
 	double *theta,*grad;
-
-
 	p=0;
 	for(i=0;i<n;i++) p = p + brain[i];
 
@@ -1048,7 +1046,7 @@ void dfgauss(int *np, int *brain, int *dimx, int *dimy, int *dimz, double *theta
 			derivs[j+(1*p)+(p*reg)]=grad[j];
 		}
 
-		dftheta2(theta,dimx,dimy,dimz,grad);
+		dftheta2(theta,brain,dimx,dimy,dimz,grad);
 		for(j=0;j<p;j++) {
 			derivs[j+(2*p)+(p*reg)]=grad[j];
 		}

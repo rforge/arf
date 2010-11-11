@@ -204,11 +204,14 @@ setMethod('[','fmri.data',
 		function(x,i,j,k,l,drop='missing') {
 			if(x@dims[1]>3) dat = array(x@datavec,dim=c(x@dims[2],x@dims[3],x@dims[4],x@dims[5])) else dat = array(x@datavec,dim=c(x@dims[2],x@dims[3],x@dims[4]))
 		
-			if(missing(i)) i = NULL
-			if(missing(j)) j = NULL
-			if(missing(k)) k = NULL
-			if(missing(l)) l = NULL
+			if(missing(i)) i = '' else i = paste('c(',paste(i,sep='',collapse=','),')',sep='')
+			if(missing(j)) j = '' else j = paste('c(',paste(j,sep='',collapse=','),')',sep='')
+			if(missing(k)) k = '' else k = paste('c(',paste(k,sep='',collapse=','),')',sep='')
 			
+			if(x@dims[1]>3) {
+				if(missing(l)) l = '' else  l = paste('c(',paste(l,sep='',collapse=','),')',sep='')
+			} 
+						
 			if(x@dims[1]>3) out = eval(parse(text=paste('dat[',i,',',j,',',k,',',l,']',sep=''))) else out = eval(parse(text=paste('dat[',i,',',j,',',k,']',sep='')))
 				
 			return(out)
@@ -219,15 +222,15 @@ setMethod('[<-','fmri.data',
 		function(x,i,j,k,l,value,drop='missing') {
 			if(x@dims[1]>3) dat = array(x@datavec,dim=c(x@dims[2],x@dims[3],x@dims[4],x@dims[5])) else dat = array(x@datavec,dim=c(x@dims[2],x@dims[3],x@dims[4]))
 			
-			if(missing(i)) i = NULL
-			if(missing(j)) j = NULL
-			if(missing(k)) k = NULL
+			if(missing(i)) i = '' else i = paste('c(',paste(i,sep='',collapse=','),')',sep='')
+			if(missing(j)) j = '' else j = paste('c(',paste(j,sep='',collapse=','),')',sep='')
+			if(missing(k)) k = '' else k = paste('c(',paste(k,sep='',collapse=','),')',sep='')
 			
 			if(x@dims[1]>3) {
-				if(missing(l)) l = NULL
+				if(missing(l)) l = '' else  l = paste('c(',paste(l,sep='',collapse=','),')',sep='')
 			} else value = l
 			
-			if(x@dims[1]>3) out = eval(parse(text=paste('dat[',i,',',j,',',k,',',l,']<-value',sep=''))) else out = eval(parse(text=paste('dat[',i,',',j,',',k,']<-value',sep='')))
+			if(x@dims[1]>3) out = eval(parse(text=paste('dat[',paste('c(',paste(i,sep='',collapse=','),')',sep=''),',',paste('c(',paste(j,sep='',collapse=','),')',sep=''),',',paste('c(',paste(k,sep='',collapse=','),')',sep=''),',',paste('c(',paste(l,sep='',collapse=','),')',sep=''),']<-value',sep=''))) else out = eval(parse(text=paste('dat[',i,',',j,',',k,']<-value',sep='')))
 			
 			x@datavec = as.vector(dat) 
 					
@@ -343,8 +346,7 @@ setMethod('show','options',
 #### ARF SEQUENCE METHODS ####
 setMethod('show','sequence',
 		function(object) {
-			cat('[ ARF sequence ] \n\n')
-			cat(sprintf('                modelname   regions   minimum       BIC   valid   optimal\n\n'))
+			cat(sprintf('<ARF sequence>  modelname   regions   minimum       BIC   valid   optimal\n\n'))
 		
 			vs = which(object@valid==TRUE)
 			if(length(vs)<=0) {

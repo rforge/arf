@@ -34,10 +34,11 @@ function(arfmodel,method=c('viaR','direct'))
 		#set the filename
 		fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.derivativeFile(arfmodel),sep='')
 		
+				
 		#calculate and write the derivatives
 		if(method=='viaR') {
 			derivs = .C('dfgauss',as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.mask(arfmodel)),as.integer(.nifti.header.dims(headinf)[2]),as.integer(.nifti.header.dims(headinf)[3]),as.integer(.nifti.header.dims(headinf)[4]),as.double(.model.estimates(arfmodel)),as.double(numeric(.model.regions(arfmodel)*.model.params(arfmodel)*length(which(.model.mask(arfmodel)!=0)))))[[7]]
-  			con = file(fn,'wb')
+ 			con = file(fn,'wb')
 			writeBin(derivs,con,double(),endian=.Platform$endian)
 			close(con)
 		}
@@ -75,7 +76,6 @@ function(arfmodel)
 			
 			data = .fmri.data.datavec(readData(bfile))
 			if(length(nonbrain)>0) data = data[-nonbrain]
-			
 			writeBin(data-model,con,double(),endian=.Platform$endian)
 	
 		}
@@ -128,7 +128,6 @@ function(arfmodel)
 		#check if hessian is good
 		if(is.null(attr(hessian,'class')))  {
 			weights <- readData(.model.avgWfile(arfmodel))
-			
 			n = .model.n(arfmodel)
 			
 			#perform the inner_sandwich procedure

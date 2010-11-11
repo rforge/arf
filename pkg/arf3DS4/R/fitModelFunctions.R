@@ -33,6 +33,7 @@ ssq.gauss <-
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 ##ssq.gauss returns the ssq of the full gauss model with an anlytical gradient attached
 {
+	
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
 		ssqdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
 	} else ssqdat=ss_data
@@ -67,7 +68,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	
 	assign('.oldobj',ssqdat,envir=.arfInternal)
 	assign('.objit',objit+1,envir=.arfInternal)
-	
+
 	return(invisible(ssqdat))	
 	
 }
@@ -76,6 +77,7 @@ model.gauss <-
 function(theta,np,dimx,dimy,dimz)
 #returns model estimate for full gaussmodel
 {
+	
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
 		model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[6]]
 	} else model=NA
@@ -88,16 +90,20 @@ gradient.gauss <-
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 #gradient returns the analytical gradient of the ssq to the thetaparameters
 {
+
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0) {
 		model <- .C('gauss',as.double(theta),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(rep(0,dimx*dimy*dimz)))[[6]]
+		#model = truncDouble(model)
 	} else model=NA
 	
 	if(length(model[is.na(model) | is.nan(model) | model==Inf | model==-Inf])==0) {
 		grad <- .C('dfssq',as.integer(np),as.integer(brain),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(theta),as.double(datavec),as.double(model),as.double(weightvec),as.double(vector('numeric',np)))[[10]]
+		#grad = truncDouble(grad)
 	} else grad=rep(1e+12,np) 
 	
-	assign('.gradient_latest',grad,envir=.arfInternal)
+	#if((length(grad[is.na(grad) | is.nan(grad) | grad==Inf | grad==-Inf])!=0)) grad=rep(1e+12,np) 
 	
+	assign('.gradient_latest',grad,envir=.arfInternal)
 	
 	#progress Watcher (only assign gradients)
 	assign('.gradval',grad,envir=.arfInternal)
@@ -109,10 +115,19 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 
 }
 
+truncDouble <- function(vec) 
+{
+	vec[vec > 0 & vec<.Machine$double.eps] = .Machine$double.eps
+	vec[vec < 0 & abs(vec)<.Machine$double.neg.eps] = .Machine$double.eps*-1
+	return(vec)
+}
+
+
 ssq.simple <- 
 function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,progress) 
 ##ssq.simple returns the ssq of the simple gauss model with an anlytical gradient attached
 {
+	
 	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
 		ssqdat <- .C('simplessqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(brain),as.integer(np),as.integer(dimx),as.integer(dimy),as.integer(dimz),as.double(vector('numeric',1)))[[9]]
 	} else ssqdat=ss_data
@@ -157,6 +172,7 @@ function(theta,datavec,weightvec,brain,np,dimx,dimy,dimz,ss_data,analyticalgrad,
 	
 }
 
+
 createAverages <- 
 function(arfdat,experiment=NULL) 
 # createAverages averages of the data and weightfiles, set n mask and ss_data 
@@ -169,7 +185,7 @@ function(arfdat,experiment=NULL)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
-	#set filesep
+	#set filesep 
 	sp=.Platform$file.sep
 	
 	# add run data to avgdat and weightdat

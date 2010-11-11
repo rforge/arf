@@ -15,6 +15,10 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 # fitModel is a wrapper for NLM and optim based on the options
 {
 	
+	cat('[',.model.modelname(arfmodel),']\n')
+	cat(' arf process for data',.model.name(arfmodel),'started',as.character(Sys.time()),'\n')
+	cat(' fitting',.model.regions(arfmodel),'region(s)\n')
+	
 	if(.model.modeltype(arfmodel)=='simple') {
 		type='simple'
 		if(.model.params(arfmodel)!=5) stop('Modeltype - parameter mismatch!')
@@ -45,7 +49,13 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		if(type=='simple')	arfmodel = fitSimpleModelOptim(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 		if(type=='gauss')	arfmodel = fitModelOptim(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen) 
 	}
-
+	
+	#after fitting
+	cat(' ',.model.convergence(arfmodel),'\n',sep='')
+	cat(' <modelfit>\n')
+	cat('  minimum:',round(.model.minimum(arfmodel)),'\n')
+	cat('    BIC  :',round(.model.fit(arfmodel)[1]),'\n')
+	cat('    RMSEA:',round(.model.fit(arfmodel)[2],1),'\n')
 	return(arfmodel)	
 }
 
@@ -147,7 +157,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 
 	#end_time
 	en_time <- Sys.time()
-	
+
 	# check for internal errors and set relevant arf model values
 	if(is.null(attr(optim.output,'class'))) {
 		if(optim.output$convergence==0) .model.convergence(arfmodel) <- paste('[optim] Optim converged in ',optim.output$counts[1],' iterations.',sep='')
@@ -165,6 +175,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		.model.iterates(arfmodel) <- optim.output$counts[1]
 		.model.sandwichmethod(arfmodel) <- .options.sw.type(options)
 		.model.proctime(arfmodel)[1,1] <- as.numeric(difftime(en_time,st_time,units='sec'))
+
 		if(.options.min.analyticalgrad(options)) .model.gradient(arfmodel) <- gradient.gauss(.model.estimates(arfmodel),.fmri.data.datavec(dat)[1:(.fmri.data.dims(dat)[2]*.fmri.data.dims(dat)[3]*.fmri.data.dims(dat)[4])],.fmri.data.datavec(weights)[1:(.fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(dat)[4])],.model.mask(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel),.fmri.data.dims(dat)[2],.fmri.data.dims(dat)[3],.fmri.data.dims(dat)[4],.model.ss(arfmodel),analyticalgrad=T,progress=progress)
 		
 		if(.model.valid(arfmodel)) {

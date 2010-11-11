@@ -18,22 +18,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	.model.warnings(arfmodel) <- character(0)
 	.model.convergence(arfmodel) <- character(0)
 				
-	if(pr) {
-		cat('[',.model.modelname(arfmodel),']\n')
-		cat(' arf process for data',.model.name(arfmodel),'started',as.character(Sys.time()),'\n')
-		cat(' fitting',.model.regions(arfmodel),'region(s)\n')
-	}
-	
 	arfmodel <- fitModel(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen)
 	
-	if(pr) cat(' ',.model.convergence(arfmodel),'\n',sep='')
-	
 	if(.model.valid(arfmodel)) {
-		
-		if(pr) cat(' <modelfit>\n')
-		if(pr) cat('  minimum:',round(.model.minimum(arfmodel)),'\n')
-		if(pr) cat('    BIC  :',round(.model.fit(arfmodel)[1]),'\n')
-		if(pr) cat('    RMSEA:',round(.model.fit(arfmodel)[2],1),'\n')
 		
 		if(pr) cat('\n calculating variance/covariance matrix...')
 		arfmodel = varcov(arfmodel)
@@ -49,6 +36,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 		}
 	
 	} 
+	cat('\n')
 	
 	#save the model
 	saveModel(arfmodel)
@@ -119,32 +107,41 @@ function(subject,condition,range,options=new('options'),modelprefix='searchmodel
 	}
 	
 	#check for correct startmethod
-	if(.options.start.method!='rect' | .options.start.method!='simple') stop('Search range only works with rect/simple startingvalues')
+	if(.options.start.method(options)=='load' | .options.start.method(options)=='use') stop('Search range only works with rect startingvalues')
 	
 	#matches
-	modeltype= match.arg(modeltype[1],c('gauss','simple'))
+	modeltype = match.arg(modeltype[1],c('gauss','simple'))
 		
 		
 	#set new sequence
 	sequence = new('sequence')
 	.sequence.regions(sequence) = range
 	.sequence.fit(sequence) = .sequence.minimum(sequence) = as.numeric(rep(NA,length(.sequence.regions(sequence))))
-	.sequence.valid(sequence) = rep(FALSE,length(.sequence.regions(sequence)))
-	.sequence.best(sequence) = as.numeric(NA)
+	.sequence.valid(sequence) = .sequence.best(sequence) = rep(FALSE,length(.sequence.regions(sequence)))
 	
 	#perform fit loop
+	p=1
 	for(numreg in range) {
 		model = newModel(paste(modelprefix,'_',numreg,'regs',sep=''),numreg,subject,condition,type=modeltype,options=options,experiment=experiment)
-		model = processModel(model,options=options)
-		.sequence.fit(sequence)[numreg] = .model.fit(model)[1]
-		.sequence.valid(sequence)[numreg] = .model.valid(model)
+		model = fitModel(model,options=options)
+		
+		.sequence.fit(sequence)[p] = .model.fit(model)[1]
+		.sequence.minimum(sequence)[p] = .model.minimum(model)
+		
+		if(.model.valid(model)) {
+			.sequence.mnames(sequence)[p] = .model.modelname(model)
+			.sequence.valid(sequence)[p] = .model.valid(model)
+		}
+		p=p+1
 	}
 				
-	#get the minimum 
-	minmod = as.numeric(names(which.min(.sequence.fit(sequence)[.sequence.valid(sequence)==TRUE])))
+	
+	#which of the valid models has the minimum
+	validfits = .sequence.fit(sequence)[which(.sequence.valid(sequence)==TRUE)]
+	minimum = which.min(validfits)
+	.sequence.best(sequence)[which(.sequence.valid(sequence)==TRUE)][minimum] = TRUE
 	
 	return(sequence)
-	
 		
 }
 
@@ -160,14 +157,13 @@ function(subject,condition)
 	#make new sequence object
 	sequence = new('sequence')
 	.sequence.mnames(sequence) <- modnames
-	.sequence.fit(sequence) <- as.numeric(rep(NA,length(modnames)))
+	.sequence.fit(sequence) <-  .sequence.minimum(sequence) <- as.numeric(rep(NA,length(modnames)))
 	.sequence.valid(sequence) <- .sequence.best(sequence) <- rep(FALSE,length(modnames))
-	.sequence.current(sequence) <- .sequence.minimum(sequence) <- as.numeric(NA)
+	.sequence.current(sequence) <- as.numeric(NA)
 
 	#fill in sequence object
 	for(i in 1:length(modnames)) {
 		mod = loadModel(modobject,i)
-		
 		.sequence.regions(sequence)[i] = .model.regions(mod)
 		if(.model.valid(mod)) {
 			.sequence.fit(sequence)[i] = .model.fit(mod)[1] 
