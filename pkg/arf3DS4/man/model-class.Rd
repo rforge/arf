@@ -98,7 +98,9 @@
 \alias{show,model-method}
 
 \title{arf3DS4 "model" class}
-\description{The arf3DS4 model class contains all information on a (fitted) model. It extends the "data" class directly, since it uses these files to fit the model. The "model" class contains information on file locations and filenames. More importantly it contains information on the fitted model: parameter estimates, parameter variance/covariance matrices, statistical test information, fit indices, convergence information, warnings, etc.}
+\description{The arf3DS4 model class contains all information on a (fitted) model. It extends the "data" class directly, since it uses the files specified there to fit the model. 
+The "model" class contains information on file locations and filenames. More importantly it contains information on the fitted model: parameter estimates, 
+parameter (co)variance matrix, statistical test information, fit indices, convergence information, warnings, etc.}
 \section{Objects}{
 Objects can be created by calls of the form \code{new("model", ...)}.
  
@@ -110,9 +112,9 @@ Objects can be created by calls of the form \code{new("model", ...)}.
     \item{\code{modeldatapath}:}{Full path to the model/data directory. }
     \item{\code{residualFile}:}{Name of the file containing model residuals. }
     \item{\code{derivativeFile}:}{Name of the file containing first order derivatives. }
-    \item{\code{weightFile}:}{Name of the file containing binary weights.}
-    \item{\code{modelDataFile}:}{Name of the file containing model predicitions. }
-    \item{\code{fullmodelDataFile}:}{Full name of the file containing model predicitions.}
+    \item{\code{weightFile}:}{Name of the binary file containing weights.}
+    \item{\code{modelDataFile}:}{Name of the file containing model predictions. }
+    \item{\code{fullmodelDataFile}:}{Full name of the file containing model predictions.}
     \item{\code{modelFile}:}{Name of the model.Rda file containing the model object.}
     \item{\code{optionsFile}:}{Name of the options.Rda file (used to specify options, see \code{\linkS4class{options}}).}
     \item{\code{startFile}:}{Name of the start.Rda file.}
@@ -121,28 +123,28 @@ Objects can be created by calls of the form \code{new("model", ...)}.
     \item{\code{iterates}:}{Number of iterates. }
     \item{\code{minimum}:}{Value of the objective function at the minimum. }
     \item{\code{estimates}:}{Parameter Estimates. }
-    \item{\code{gradient}:}{Gradient of the objective function to the parameters at the minimum. }
-    \item{\code{hessian}:}{Hessian matrix of the solution.}
+    \item{\code{gradient}:}{Gradient of the parameters at the minimum. }
+    \item{\code{hessian}:}{Hessian matrix of paramters.}
     \item{\code{params}:}{Number of parameters. }
     \item{\code{modeltype}:}{Type of model fitted.}
     \item{\code{sandwichmethod}:}{Method used to calculate Sandwich estimates.}
     \item{\code{varcov}:}{Variance/covariance matrix of the parameters. }
     \item{\code{warnings}:}{Warnings encountered during processing. }
     \item{\code{fit}:}{Fit of the model (BIC and RMSEA). }
-    \item{\code{wald}:}{Wald class object (containing model statistics, see \code{\linkS4class{wald}})}
-    \item{\code{regions}:}{Number of spatial models fitted.}
+    \item{\code{wald}:}{Wald class object (containing model statistics, see \code{\linkS4class{wald}}).}
+    \item{\code{regions}:}{Number of regions in the spatial model.}
     \item{\code{startval}:}{Starting values of the minimization procedure. }
-    \item{\code{proctime}:}{Processing time of minization and sandwich estimation.}
+    \item{\code{proctime}:}{Processing time of minimization and sandwich procedures.}
     \item{\code{valid}:}{Is the model valid?}
-    \item{\code{name}:}{Name of the data objec, usually 'subjectname - conditionname'. }
-	\item{\code{fullpath}:}{Fullpath to the data directory.}
-    \item{\code{betafiles}:}{Vector of filenames (full path) of the beta files (containing beta estimates).}
-    \item{\code{weightfiles}:}{Vector of filenames (full path) of the weight files (containing variances of the beta estimates).}
+    \item{\code{name}:}{Name of the data object, usually 'subjectname - conditionname'. }
+    \item{\code{fullpath}:}{Full path to the data directory.}
+    \item{\code{betafiles}:}{Vector of filenames (full paths) of the beta files (containing beta estimates).}
+    \item{\code{weightfiles}:}{Vector of filenames (full paths) of the weight files (containing variances of the beta estimates).}
     \item{\code{avgdatfile}:}{Filename of the averaged beta file.}
     \item{\code{avgWfile}:}{Filename of the averaged weight file.}
-    \item{\code{avgtstatFile}:}{Filename of the average t-statistics file (=avgbetafile/sqrt(avgweightfile)) }
+    \item{\code{avgtstatFile}:}{Filename of the average t-statistics (=avgbetafile/sqrt(avgweightfile)) file. }
     \item{\code{n}:}{Number of 'brain' voxels (excluding voxels not masked).}
-    \item{\code{mask}:}{Vector containing an (optional) mask for the data.}
+    \item{\code{mask}:}{Vector containing the mask for the data.}
     \item{\code{ss}:}{Sums-of-squares of the data.}
     \item{\code{regDir}:}{Fullpath to the registration directory.}
     \item{\code{regRda}:}{Name of the registration.Rda file.}
@@ -168,7 +170,7 @@ Class \code{\linkS4class{data}}, directly.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{data}},\code{\linkS4class{options}}, \code{\linkS4class{wald}}
+	\code{\linkS4class{data}}, \code{\linkS4class{options}}, \code{\linkS4class{wald}}
 }
 \examples{
 showClass("model")

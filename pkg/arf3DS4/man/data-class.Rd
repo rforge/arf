@@ -39,21 +39,23 @@
 \alias{show,data-method}
 
 \title{arf3DS4 "data" class}
-\description{The "data" class contains all information on the fMRI data of one condition of a subject. Mostly the "data" class contains filenames of the datafiles (with full paths) with some basic information on the number of runs etc., the functional volumes, and registration files. Each instance of \code{\linkS4class{model}} class object inherits a "data" object. The "data" class uses some slots of the \code{\linkS4class{experiment}} class.}
+\description{The "data" class contains all information on the fMRI data of one condition of a subject. Specifically it contains filenames of the datafiles (with full paths) 
+and some basic information of the data, the number of runs, and additional files used by ARF. Each instance of \code{\linkS4class{model}} class object inherits a "data" object. 
+The "data" class also uses some slots of the \code{\linkS4class{experiment}} class.}
 \section{Objects}{
 Objects can be created by calls of the form \code{new("data", ...)}.
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{name}:}{Name of the data objec, usually 'subjectname - conditionname'. }
-    \item{\code{fullpath}:}{Fullpath to the data directory.}
-    \item{\code{betafiles}:}{Vector of filenames (full path) of the beta files (containing beta estimates).}
+    \item{\code{name}:}{Name of the data object, usually 'subjectname - conditionname'. }
+    \item{\code{fullpath}:}{Full path to the data directory.}
+    \item{\code{betafiles}:}{Vector of filenames (full paths) of the beta files (containing beta estimates).}
     \item{\code{weightfiles}:}{Vector of filenames (full path) of the weight files (containing variances of the beta estimates).}
     \item{\code{avgdatfile}:}{Filename of the averaged beta file.}
     \item{\code{avgWfile}:}{Filename of the averaged weight file.}
-    \item{\code{avgtstatFile}:}{Filename of the average t-statistics file (=avgbetafile/sqrt(avgweightfile)) }
+    \item{\code{avgtstatFile}:}{Filename of the average t-statistics (=avgbetafile/sqrt(avgweightfile)) file. }
     \item{\code{n}:}{Number of 'brain' voxels (excluding voxels not masked).}
-    \item{\code{mask}:}{Vector containing an (optional) mask for the data.}
+    \item{\code{mask}:}{Vector containing the mask for the data.}
     \item{\code{ss}:}{Sums-of-squares of the data.}
     \item{\code{regDir}:}{Fullpath to the registration directory.}
     \item{\code{regRda}:}{Name of the registration.Rda file.}
@@ -64,17 +66,22 @@ Objects can be created by calls of the form \code{new("data", ...)}.
     \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }
 }
+\details{
+The "data" class contains information on the file-locations of the fMRI data. The fMRI data (outcomes of a GLM analysis) must be available in the \bold{/beta} and \bold{/weights} directories of each condition for each subject. 
+The data can be in the form of beta-values with associated squared standard errors or t-values with the standard errors set to 1. In the latter case the only files that have to be copied are the t-values to the \bold{/beta} directory,
+the weight-files are then created automatically. The average files are created after a call to \code{\link{createAverages}}.
+}
 \section{Methods}{
 Standard arf3DS4 accessor and replacement functions can be used to access and replace slots.  
   \describe{
     \item{access}{\code{.classname.slotname(object)}}
     \item{replace}{\code{.classname.slotname(object)<-}}
 	 }
-In this case classname is "data" and slotname is for example "avgstatfile". So to access the "avgtstatfile" slot of an r-object "mydata"  (of class "data") type \code{.settings.avgtstatfile(mydata)}.
+In this case classname is "data" and slotname is for example "avgstatFile". So to access the "avgtstatFile" slot of an r-object "mydata"  (of class "data") type \code{.settings.avgtstatFile(mydata)}.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{model}},\code{\linkS4class{experiment}}
+	\code{\linkS4class{model}}, \code{\linkS4class{experiment}}
 }
 \examples{
 showClass("data")

@@ -15,7 +15,7 @@ makeLowResStructAvg(arfmodel, experiment = NULL)
   \item{experiment}{An arf "experiment" object (see \code{\linkS4class{experiment}}.)}
 }
 \details{
-makeLowResStructAvg makes use of the images created by makeLowResStruct so this must be run first. makeLowResStruct has to be run only once for each condition. 
+makeLowResStructAvg makes use of the images created by makeLowResStruct so this must be called first. makeLowResStruct has to be run only once for each condition. 
 }
 \value{
 None.

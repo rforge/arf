@@ -42,28 +42,28 @@
 
 
 \title{arf3DS4 "options" class  }
-\description{The arf3DS4 "options" class contains the options of the minimization procedure (including starting value calculation, and (co)variance estimation). Mostly used by arf3DS4 "model" objects (see \code{\linkS4class{model}})}
+\description{The arf3DS4 "options" class contains the options of the minimization procedure (including starting value calculation, and (co)variance estimation). Mostly used by ARF "model" objects (see \code{\linkS4class{model}}).}
 \section{Objects}{
 Objects can be created by calls of the form \code{new("options", ...)}.
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{nlm.gradtol}:}{<nlm> Gradient tolerance. }
-    \item{\code{nlm.steptol}:}{<nlm> Step tolerance. }
-    \item{\code{opt.method}:}{<optim> Optim method (BFGS,L-BFGS-B,NelderMead,SANN). }
+    \item{\code{nlm.gradtol}:}{<nlm> Gradient tolerance (not used). }
+    \item{\code{nlm.steptol}:}{<nlm> Step tolerance (not used). }
+    \item{\code{opt.method}:}{<optim> Optim method (L-BFGS-B). }
     \item{\code{opt.lower}:}{<optim> Lowerbound of parameters (for L-BFGS-B).}
     \item{\code{opt.upper}:}{<optim> Upperbound of parameters (for L-BFGS-B).}
     \item{\code{min.analyticalgrad}:}{Use analytical gradient in minimization? }
     \item{\code{min.iterlim}:}{Iteration limit.}
     \item{\code{min.boundlim}:}{Persistent Boundary iteration limit.}
-    \item{\code{min.routine}:}{Minimization routine (nlm or optim). }
-    \item{\code{start.method}:}{Method of startingvalue calulation (use,load,or rect)}
+    \item{\code{min.routine}:}{Minimization routine (optim). }
+    \item{\code{start.method}:}{Method of startingvalue calculation (\code{'use'},\code{'load'},or \code{'rect'})}
     \item{\code{start.maxfac}:}{Width of smoothing kernel used in starting value calculation.}
     \item{\code{start.vector}:}{Starting value template (used for default values).}
-    \item{\code{chk.method}:}{Check method for minimized solution.}
-    \item{\code{chk.range}:}{Range of values to check minimized solution.}
-    \item{\code{sw.type}:}{Use diagnonal of residual matrix or full residual matrix in sandwich (co)variance calculation. }
-    \item{\code{output.mode}:}{Vector with output types. }
+    \item{\code{chk.method}:}{Check method for parameters of minimized solution.}
+    \item{\code{chk.range}:}{Range of values to check parameters of minimized solution.}
+    \item{\code{sw.type}:}{Use diagonal residual matrix or full residual matrix in sandwich (co)variance calculation. }
+    \item{\code{output.mode}:}{Vector with output types (\code{'none'} or \code{'progress'}).}
     \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
   }
 }

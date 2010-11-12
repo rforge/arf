@@ -31,8 +31,8 @@ setClass(
 	prototype=prototype(
 		version=2,
 		build=4,
-		update=6,
-		svnrev=187
+		update=7,
+		svnrev=188
 	),
 	package='arf3DS4'
 )
@@ -211,7 +211,7 @@ setClass(
 		min.iterlim=2000,		#iteration limit
 		min.boundlim=50,		#boundary iterations limit
 		min.routine=c('optim','vpv'),	#which routine
-		start.method='rect',	
+		start.method='use',	
 		start.maxfac=1,
 		start.vector=c(0,0,0,0,0,0,.05,.05,.05,10),
 		chk.method='imagedim',

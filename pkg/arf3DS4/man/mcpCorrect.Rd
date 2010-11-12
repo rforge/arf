@@ -14,7 +14,7 @@ mcpCorrect(fmridata, type = c("uncorrected", "bonferroni", "FDR"), alpha = 0.05,
   \item{alpha}{Nominal alpha level.}
   \item{q}{q parameter for FDR.}
   \item{cv}{Cv parameter for FDR.}
-  \item{df}{Degrees of freedom of the t values.}
+  \item{df}{Degrees of freedom of the t-values.}
   \item{sig.steps}{Number of steps to divide p-values in.}
   \item{adj.n}{Use only brain voxels when correcting?}
 }

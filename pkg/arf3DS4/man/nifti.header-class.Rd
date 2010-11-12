@@ -182,7 +182,7 @@ Class \code{"\linkS4class{nifti.fileinfo}"}, directly.
 \references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.}
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{nifti.header}},\code{\linkS4class{nifti.fileinfo}}
+	\code{\linkS4class{fmri.data}},\code{\linkS4class{nifti.fileinfo}}
 }
 \examples{
 showClass("nifti.header")

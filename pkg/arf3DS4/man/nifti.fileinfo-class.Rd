@@ -24,9 +24,9 @@ Objects can be created by calls of the form \code{new("nifti.fileinfo", ...)}.
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{fullpath}:}{Full path of datafile. }
-    \item{\code{filename}:}{Filename. }
-    \item{\code{filetype}:}{Type of file. }
+    \item{\code{fullpath}:}{Full path of fMRI datafile.}
+    \item{\code{filename}:}{Filename of the fMRI datafile. }
+    \item{\code{filetype}:}{Type of the fMRI datafile. }
     \item{\code{extension}:}{File extension. }
     \item{\code{gzipped}:}{Is the file gzipped? }
     \item{\code{endian}:}{Endianness of file. }
@@ -44,7 +44,7 @@ Objects can be created by calls of the form \code{new("nifti.fileinfo", ...)}.
 \references{ See the Nifti homepage (\url{http://nifti.nimh.nih.gov/}) for more information on the nifti filetype.}
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{nifti.header}},\code{\linkS4class{fmri.data}}
+	\code{\linkS4class{nifti.header}}, \code{\linkS4class{fmri.data}}
 }
 \examples{
 showClass("nifti.fileinfo")

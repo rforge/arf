@@ -1,7 +1,7 @@
 \name{getModelAtlas}
 \Rdversion{1.1}
 \alias{getModelAtlas}
-\title{ Get Atlas Labels for an arf model}
+\title{ Get Atlas Labels for an ARF model.}
 \description{
 getModelAtlas fetches atlas labels for the center coordinates of all regions in a model.
 }

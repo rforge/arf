@@ -18,17 +18,18 @@
 \alias{.functional.version<-,functional-method}
 
 \title{arf3DS4 "functional" class }
-\description{The arf3DS4 "functional" class contains information on the functional volume the fMRI beta-files are taken from. The functional volume can be used to create time-series for connectivity analyses.}
+\description{The arf3DS4 "functional" class contains information on the functional volume the fMRI beta-files based on. It links the data of the different runs with the raw time-series files, primarily for connectivity analysis. 
+To link runs to raw time-series call \code{\link{setFuncTimings}}.}
 \section{Objects}{
 Objects can be created by calls of the form \code{new("functional", ...)}.
 }
 \section{Slots}{
 	 \describe{
     \item{\code{fullpath}:}{Full path of the functional volume directory. }
-    \item{\code{functionaldata}:}{Filename of the functional volume.}
+    \item{\code{functionaldata}:}{Filename of the functional volume (raw time-series).}
     \item{\code{filename}:}{Filename of the functional.Rda file. }
-    \item{\code{linkedfiles}:}{Path to linked beta-file. }
-    \item{\code{timings}:}{Vector of stimulus timings. }
+    \item{\code{linkedfiles}:}{Path to linked beta-file.}
+    \item{\code{timings}:}{Vector of stimulus timings.}
   	\item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}}) }
   }
 }

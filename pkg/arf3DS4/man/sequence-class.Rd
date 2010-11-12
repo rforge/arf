@@ -26,8 +26,8 @@ Objects can be created by calls of the form \code{new("sequence", ...)}.
 \section{Slots}{
 	 \describe{
     \item{\code{best}:}{Which model currently fits the best? }
-    \item{\code{current}:}{The current model number in the sequence.}
-    \item{\code{regions}:}{Vector of number-of-regions to be fitted in sequence.}
+    \item{\code{current}:}{The current model number in the sequence (not used).}
+    \item{\code{regions}:}{Vector of number-of-regions to in the fitted sequence.}
     \item{\code{mnames}:}{Vector of modelnames of the sequence.}
     \item{\code{fit}:}{Vector of fit indices for each model.}
     \item{\code{minimum}:}{Vector of minima for each model.}
@@ -40,9 +40,12 @@ Objects can be created by calls of the form \code{new("sequence", ...)}.
  	\item{access}{\code{.classname.slotname(object)}}
     \item{replace}{\code{.classname.slotname(object)<-}}
  	 }
- In this case classname is "sequence" and slotname is for example "fit". So to access the "fit" slot of an r-object "mysequence"  (of class "sequence") type \code{.sequence.fit(mysequence)}.
+ In this case classname is "sequence" and slotname is for example "fit". So to access the "fit" slot of an r-object "mysequence" (of class "sequence") type \code{.sequence.fit(mysequence)}.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
+\seealso{
+	\code{\link{minBIC}}, \code{\link{fitRange}}
+}
 \examples{
 showClass("sequence")
 }

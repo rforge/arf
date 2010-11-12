@@ -16,7 +16,7 @@
 \alias{.arfcorrelation.timebyreg<-,arfcorrelation-method}
 
 \title{Class "arfcorrelation"}
-\description{ ARF Correlation class holds correlations between regions of the model over trials.}
+\description{ Object of class "arfcorrelation" hold information on correlations between regions of the spatial model. The functions \code{\link{fitConnectivity}} and \code{\link{roiConnectivity}} ouput an object of class "arfcorrelation".}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("arfcorrelation", ...)}.
 }
@@ -27,7 +27,7 @@ Objects can be created by calls of the form \code{new("arfcorrelation", ...)}.
     \item{\code{corr.pval}:}{P-values of the correlations}
     \item{\code{pacorr}:}{Partial correlation matrix (corrected for all other regions).}
     \item{\code{pacorr.pval}:}{P-values of partial correlations}
-    \item{\code{num.corr}:}{Number of correlations testes}
+    \item{\code{num.corr}:}{Number of correlations tested.}
   }
 }
 

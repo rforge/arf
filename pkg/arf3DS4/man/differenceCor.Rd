@@ -1,7 +1,7 @@
 \name{differenceCor}
 \alias{differenceCor}
 
-\title{Calculate if two correlations are different.}
+\title{Calculate if correlations differ.}
 \description{Calculate which correlations of two correlation matrices are different.}
 \usage{
 differenceCor(c1, c2, n1, n2 = n1)

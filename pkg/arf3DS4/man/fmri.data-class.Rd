@@ -119,7 +119,7 @@ Objects can be created by calls of the form \code{new("fmri.data", ...)}.
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{datavec}:}{Vector containing the fmri data. }
+    \item{\code{datavec}:}{Vector containing the actual fMRI data. }
     \item{\code{sizeof_hdr}:}{<nifti> Size of the header file.}
     \item{\code{data_type}:}{<nifti> Type of data (representation). }
     \item{\code{db_name}:}{<nifti> db_name.}

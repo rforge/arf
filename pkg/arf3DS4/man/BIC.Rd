@@ -1,21 +1,20 @@
 \name{BIC}
 \Rdversion{1.1}
 \alias{BIC}
-
 \title{Bayesian Information Criterion}
 \description{
-BIC calculates the Bayesian Information Criterion (model fit) for a valid arf-model. BIC requires a valid (converged) arf-model (\code{\linkS4class{model}} }
+BIC calculates the Bayesian Information Criterion (model fit) for a valid ARF model. BIC requires a valid (converged) arf-model (\code{\linkS4class{model}}). }
 \usage{
 BIC(arfmodel, options = loadOptions(arfmodel))
 }
 
 \arguments{
-  \item{arfmodel}{A fitted (and valid) arf-model object of class "model". }
-  \item{options}{An "options" object. The options object belonging to the arf-model is loaded by default.}
+  \item{arfmodel}{A fitted (and valid) arf-model object of class \code{\linkS4class{model}}. }
+  \item{options}{An "options" object. The options object belonging to the ARF model is loaded by default.}
 }
 
 \details{
-BIC calculates the BIC value using the "effective" number of voxels. That is, only the brain-voxels (Set by the \code{model@mask} slot), are counted.
+BIC calculates the BIC value using the number of brain voxels (Set by the \code{model@mask} slot).
 }
 
 \value{
@@ -24,6 +23,6 @@ Returns an object of class "model" with the slot \code{model@fit[1]} set to the 
 
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{model}},\code{\linkS4class{options}}
+	\code{\link{RMSEA}}, \code{\linkS4class{model}}, \code{\linkS4class{options}}
 }
 \keyword{ models }

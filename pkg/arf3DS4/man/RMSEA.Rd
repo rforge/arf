@@ -10,11 +10,11 @@ RMSEA(arfmodel, options = loadOptions(arfmodel))
 }
 \arguments{
   \item{arfmodel}{A fitted (and valid) arf-model object of class "model". }
-  \item{options}{An "options" object. The options object belonging to the arf-model is loaded by default.}
+  \item{options}{An "options" object. The options object belonging to the ARF model is loaded by default.}
 }
 
 \details{
-RMSEA calculates the RMSEA value using the "effective" number of voxels. That is, only the brain-voxels (Set by the \code{model@mask} slot), are counted.
+BIC calculates the BIC value using the number of brain voxels (Set by the \code{model@mask} slot).
 }
 
 \value{
@@ -23,7 +23,7 @@ Returns an object of class "model" with the slot \code{model@fit[2]} set to the 
 
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{model}},\code{\linkS4class{options}}
+	\code{\link{BIC}}, \code{\linkS4class{model}}, \code{\linkS4class{options}}
 }
 \keyword{ models }
 

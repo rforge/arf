@@ -2,9 +2,9 @@
 \Rdversion{1.1}
 \alias{euclidDist}
 
-\title{ Calculate euclidian distances of all regions in a model }
+\title{ Calculate Euclidian distances of all regions in a model. }
 \description{
-euclidDist calculates euclidian distances between the center locations of each region in an arf model. This can be used to assess if regions are close together.
+euclidDist calculates Euclidian distances between the center locations of each region in an ARF model. This can be used to assess if regions are close together.
 }
 \usage{
 euclidDist(arfmodel, thres = 5, quiet = T)
@@ -18,7 +18,7 @@ euclidDist(arfmodel, thres = 5, quiet = T)
 euclidDist only uses center location, no information on the extent of a region is used.
 }
 \value{
-Returns a lower triangular matrix with euclidian distances of all regions in the model.
+Returns a lower triangular matrix with Euclidian distances of all regions in the model.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

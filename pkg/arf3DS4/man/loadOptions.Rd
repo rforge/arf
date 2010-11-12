@@ -2,9 +2,9 @@
 \Rdversion{1.1}
 \alias{loadOptions}
 \alias{saveOptions}
-\title{ Save/load arf3DS4 Options }
+\title{ Save/load ARF Options }
 \description{
-Load an "options" object belonging to an arf model.
+Load or save an "options" object belonging to an ARF model.
 }
 \usage{
 loadOptions(arfmodel)
@@ -16,7 +16,7 @@ saveOptions(options,arfmodel)
   
 }
 \value{
-Returns an object of class \code{\linkS4class{options}}.
+loadOptions returns an object of class \code{\linkS4class{options}}.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

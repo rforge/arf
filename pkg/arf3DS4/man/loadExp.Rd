@@ -9,17 +9,17 @@ loadExp loads an arf3DS4 experiment.
 loadExp(path = getwd(), method = c("fast", "set", "rda"))
 }
 \arguments{
-  \item{path}{Path in which to search for the experiment directory.}
+  \item{path}{Path to the experiment directory.}
   \item{method}{Which method is used for loading.}
 }
 \details{
-If \code{method='fast'} the experiment.Rda is loaded without checks directly. Use this method to load an experiment which is unchanged (moved, added subjects, conditions etc.).
+If \code{method='fast'} (default) experiment.Rda is loaded without checks directly. Use this method to load an experiment which is unchanged (moved, added subjects, conditions etc.).
 If \code{method='set'} the experiment entirely build up by searching the directories of the experiment for subjects/conditions and models. Use this method if the experiment has changed (added subjects, moved to another directory etc.).
 If \code{method='rda'} the experiment is checked using the data in the experiment.Rda (except for the root-path). Use this method if the experiment has been moved (but the subjects/conditions have not changed).
-loadExp creates an object named \code{.experiment} in \code{.GlobalEnv}, this is to facilitate calls to arf3DS4 functions which have an 'experiment' object as input as all these functions by default use \code{.experiment}.
+loadExp creates an object named \code{.experiment} in the \code{.arfInternal} environment, this is to facilitate calls to functions which have an 'experiment' object as input. All ARF functions get the \code{.experiment} object from \code{.arfInternal}.
 }
 \value{
-Returns an object of class \code{\linkS4class{experiment}}.
+Returns an object of class \code{\linkS4class{experiment}} invisibly.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

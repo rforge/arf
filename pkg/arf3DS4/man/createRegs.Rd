@@ -1,10 +1,10 @@
 \name{createRegs}
 \Rdversion{1.1}
 \alias{createRegs}
-\title{ Create registration directories for runs of an arf condition.
+\title{ Create registration directories for runs of an ARF condition.
 }
 \description{
-createRegs creates registration directories for runs of an arf condition and sets the appropriate paths.
+createRegs creates registration directories for runs of an ARF condition and sets the appropriate paths.
 }
 \usage{
 createRegs(arfdata)
@@ -17,7 +17,7 @@ None
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{data}},\code{\linkS4class{registration}},\code{\link{setRegFiles}},\code{\link{setRegParams}}
+	\code{\linkS4class{data}}, \code{\linkS4class{registration}}, \code{\link{setRegFiles}}, \code{\link{setRegParams}}
 }
 
 \keyword{ methods }

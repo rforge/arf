@@ -85,7 +85,7 @@
 \alias{show,experiment-method}
 
 \title{arf3DS4 "experiment" class}
-\description{The "experiment" class is the backbone of the arf3DS4 package. The class contains information on the names of all relevant directories and files (these are inherited from an "settings" object (see \code{\linkS4class{experiment}})). Before running an ARF analysis an object of class "experiment" is loaded.}
+\description{The "experiment" class is the backbone of the arf3DS4 package. The class contains information on the names of all relevant directories and files (these are inherited from an "settings" object (see \code{\linkS4class{settings}})). Before running an ARF analysis an object of class "experiment" is loaded.}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("experiment", ...)}.
 	 ~~ describe objects here ~~ 
@@ -96,7 +96,7 @@ Objects can be created by calls of the form \code{new("experiment", ...)}.
     \item{\code{name}:}{Name of the experiment. }
     \item{\code{subject.num}:}{Number of subjects. }
     \item{\code{subject.names}:}{Vector of \code{length(subject.num)} containing subject names. }
-    \item{\code{condition.num}:}{Number of conidtions.}
+    \item{\code{condition.num}:}{Number of conditions.}
     \item{\code{condition.names}:}{Vector of \code{length(condition.num)} containing condition names. }
     \item{\code{expRda}:}{Name of the .Rda file containing the experiment information.}
     \item{\code{optionsRda}:}{Name of the .Rda file containing the options for fitting an ARF model.}
@@ -104,7 +104,7 @@ Objects can be created by calls of the form \code{new("experiment", ...)}.
     \item{\code{dataRda}:}{Name of the .Rda file containing the fMRI data location and information.}
     \item{\code{modelRda}:}{Name of the .Rda file containing the ARF model information.}
     \item{\code{statsRda}:}{Name of the .Rda file containing the statistics information of a model (not yet implemented).}
-    \item{\code{regRda}:}{Name of the .Rda file containing the registration information of fMRI data image.}
+    \item{\code{regRda}:}{Name of the .Rda file containing the registration information of an fMRI data image.}
     \item{\code{funcRda}:}{Name of the .Rda file containing the functional information of an fMRI data image. }
     \item{\code{subjectPrefix}:}{Prefix for the subject names. Defaults to empty.}
     \item{\code{conditionPrefix}:}{Prefix for the condition names. Defaults to empty. }
@@ -115,8 +115,8 @@ Objects can be created by calls of the form \code{new("experiment", ...)}.
     \item{\code{weightsDir}:}{Name of the weights directory (within conditions/data).}
     \item{\code{avgDir}:}{Name of the average data directory (within conditions/data).}
     \item{\code{regDir}:}{Name of the registration directory (within conditions/data).}
-    \item{\code{funcDir}:}{Name of the functional directories (within subjects and conditions)/data.}
-    \item{\code{betaDir}:}{Name of the beta directory (within conditions)/data.}
+    \item{\code{funcDir}:}{Name of the functional directories (within subjects and conditions/data).}
+    \item{\code{betaDir}:}{Name of the beta directory (within conditions/data).}
     \item{\code{modelDir}:}{Name of the model directory.}
     \item{\code{statsDir}:}{Name of the stats directory (not yet implemented).}
     \item{\code{modeldatDir}:}{Name of the data directory (within models).}
@@ -128,8 +128,8 @@ Objects can be created by calls of the form \code{new("experiment", ...)}.
     \item{\code{residualFile}:}{Name of the residuals file (binary).}
     \item{\code{derivativeFile}:}{Name of the derivatives file (binary).}
     \item{\code{weightFile}:}{Name of the weight file (binary).}
-    \item{\code{lowresFile}:}{Name of the lowres structural image.}
-    \item{\code{lowresAvg}:}{Name of the average lowres structural image.}
+    \item{\code{lowresFile}:}{Name of the low resolution structural image.}
+    \item{\code{lowresAvg}:}{Name of the average low resolution structural image.}
     \item{\code{logFile}:}{Name of the logFile (not yet implemented).}
     \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}}) }
   }
@@ -147,7 +147,7 @@ In this case classname is "experiment" and slotname is for example "avgdatfile".
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{settings}}
+	\code{\linkS4class{settings}}, \code{\link{makeExpDirs}}, \code{\link{loadExp}}, \code{\link{getExp}}
 }
 
 \examples{

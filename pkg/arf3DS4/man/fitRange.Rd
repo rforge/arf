@@ -1,21 +1,22 @@
 \name{fitRange}
 \alias{fitRange}
-\title{Fit a range of models}
-\description{Fit a range of models to search for an optimal one.}
+\title{Fit a range of models.}
+\description{fitRange performs model fits for a range of models.}
 \usage{
-fitRange(subject,condition,range,options=new('options'),modelprefix='searchmodel',modeltype=c('gauss','simple'),experiment=NULL)
+fitRange(subject,condition,range,options=new('options'),modelprefix='searchmodel',
+ modeltype=c('gauss','simple'),experiment=NULL)
 }
 \arguments{
-  \item{subject}{subject}
-  \item{condition}{condition}
-  \item{range}{range in which to fit}
-  \item{options}{An options object}
-  \item{modelprefix}{prefix (charachter) to append before modelname}
-  \item{modeltype}{Fit a gaussian or simple-gaussian model}
-  \item{experiment}{experiment}
+  \item{subject}{Name of the subject.}
+  \item{condition}{Name of the condition.}
+  \item{range}{Vector containing the different numbers of regions for the spatial model.}
+  \item{options}{An options object.}
+  \item{modelprefix}{Prefix to append before the model name.}
+  \item{modeltype}{Fit a full Gaussian or simple Gaussian model.}
+  \item{experiment}{Optional experiment object (by default uses \code{.experiment}).}
 }
 
-\value{Returns an object of sequence-class giving the model with the minimum BIC.}
+\value{Returns an object of class \code{\linkS4class{sequence}} holding information on the valid models (minimum, BIC value, number of regions).}
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
 	\code{\linkS4class{model}}, \code{\linkS4class{options}}, \code{\linkS4class{experiment}}

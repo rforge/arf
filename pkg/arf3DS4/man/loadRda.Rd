@@ -3,7 +3,7 @@
 \alias{loadRda}
 \title{Load an .Rda file into a specified object.}
 \description{
-loadRda loads a standard .Rda file, and returns this object (instead of loading it into the R workspace).
+loadRda loads a standard .Rda file, and returns this object (instead of loading it directly in the R workspace).
 }
 \usage{
 loadRda(file)

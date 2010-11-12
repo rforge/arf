@@ -2,25 +2,24 @@
 \alias{roiConnectivity}
 
 \title{calculate Connectivity with spatial averaging}
-\description{Calculates functional connectivity bases on the spatial average of the voxels with in the isoContours of the estimated model}
+\description{Calculates functional connectivity based on the spatial average of the voxels within the isoContours of the estimated model.}
 \usage{
 roiConnectivity(arfmodel,roidata=setIsoContour(arfmodel,95),funcfilename='single_events.nii.gz',type=c('avg','ev'),evmodel=c('spatial','spatiotemporal','eigenvariate'))
 }
 
 \arguments{
-  \item{arfmodel}{An arf model object (class \code{\linkS4class{model}})}
-  \item{roidata}{fmri.data object containing ROIs for each region (one per volume).}
-  \item{funcfilename}{Filename of the volume to extract the raw time-series.}
-  \item{type}{Average using no weighing (avg) or by weighing with the first spatial eigenvector.}
-  \item{evmodel}{Wich data tot use to calclate the first spatial eigenvector. Choose: Modelestimates, averaged data, roidata. }
-  
+  \item{arfmodel}{An ARF model object (class \code{\linkS4class{model}}).}
+  \item{roidata}{\code{\linkS4class{fmri.data}} object containing ROIs for each region (must contain a volume for each region), can be obtained via \code{\link{setIsoContour}}.}
+  \item{funcfilename}{Filename of the volume to extract the single-trial data.}
+  \item{type}{Average using no weighing (\code{'avg'}) or by weighing with the first spatial eigenvector (\code{'ev'}).}
+  \item{evmodel}{Which data is used to calculate the first spatial eigenvector: \code{'spatial'}, \code{'spatiotemporal'}, or \code{'eigenvariate'}. } 
 }
 
 \value{
-Returns an object of class "arfcorrelation" including the region by time matrix of amplitude time-series and the estimated correlations.
+Returns an object of class \code{\linkS4class{arfcorrelation}} including the region by time matrix of amplitude time-series and the estimated correlations.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{model}}
+	\code{\linkS4class{model}}, \code{\linkS4class{arfcorrelation}}, \code{\link{fitConnectivity}}, \code{\link{setIsoContour}}
 }
 \keyword{ models }

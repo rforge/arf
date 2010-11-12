@@ -1,18 +1,20 @@
 \name{arfversion}
 \alias{arfversion}
-
-\title{ Which version has an arf-object.}
+\title{ Check the version of ARF objects.}
 \description{
-Print the version of an arf-object.
+Print version information of an ARF object.
 }
 \usage{
 arfversion(object)
 }
 \arguments{
-  \item{object}{An arf object}
+  \item{object}{An arf object.}
  }
 \value{
-Prints the current version of the object.
+None. The function prints the current version of the object.
+}
+\seealso{
+	\code{\linkS4class{version}}
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \keyword{ models }

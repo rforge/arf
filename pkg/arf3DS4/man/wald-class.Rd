@@ -37,7 +37,7 @@ Objects can be created by calls of the form \code{new("wald", ...)}.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{model}}
+	\code{\linkS4class{model}}, \code{\link{wald}}
 }
 \examples{
 showClass("wald")

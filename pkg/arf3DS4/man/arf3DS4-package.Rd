@@ -4,85 +4,57 @@
 \alias{arf3DS4}
 \docType{package}
 \title{
-Activated Region Fitting (ARF), fMRI data analysis.
+Activated Region Fitting fMRI data analysis
 }
 \description{
-Activated Region Fitting (ARF) is an analysis method for fMRI data. The method uses Gaussian shaped spatial models to model active brain regions. Parameters of the spatial models are then used to test hypothesis on location, spatial extent, and amplitude of each region. ARF3DS4 uses the beta-values or t-values from a GLM analysis, these can be in NIFTI or ANALYZE format. The package is compatible with FSL (FMRIB), and FSLView. Details of the method can be found in the manual. 
+Activated Region Fitting (ARF) is an analysis method for fMRI data. The ARF method uses Gaussian shaped functions to model active brain regions. 
+An entire fMRI volume can be described by multiple `parameterized Gaussian regions of activation. This parameterization allows for hypotheses on the
+location of an active region, the spatial extent of an active region, and the amplitude of an active region. ARF can be invoked after standard GLM analysis, 
+and uses the beta-values or t-values from this analysis. In addition ARF can be used to estimate functional connectivity, for this the raw time-series
+(on which the GLM was performed) are also needed. 
+The arf3DS4 package can read and write fMRI data in Nifti format (\code{\linkS4class{fmri.data}}). It is build to be compatible with fMRI analysis packages (e.g. FSL or SPM). The package 
+uses a pre-defined directory- and file-structure to store its data. All objects (S4-class) and fMRI data files are stored in this directory- and file-structure.
+}
+\section{Quick start}{
+The main directory- and file-structure (termed an experiment) is handled by an object of class \code{\linkS4class{experiment}}. To make an empty experiment structure
+call \code{\link{makeExpDirs}}. This will create an directory- and file-structure to hold the fMRI data (which will have to be copied manually to the appropriate directories, see \code{\linkS4class{data}} for an overview of the data-directories ).
+Once this is done an experiment is loaded by calling \code{\link{loadExp}}. 
+To fit the ARF models (class \code{\linkS4class{model}}) to the data, first create a model using \code{\link{newModel}}, adjust the options of the model via the \code{\linkS4class{options}}-object using \code{\link{loadOptions}} and \code{\link{saveOptions}},
+and finally fit the model using \code{\link{fitModel}}. To perform hypothesis tests call \code{\link{varcov}} and \code{\link{wald}} to calculate the parameter (co)variance matrix and Wald statistics respectively.
+In addition to the hypothesis test connectivity between brain regions can be estimated (call \code{\link{fitConnectivity}} to perform this analysis). This function requires that the 
+raw time-series of the fMRI data are available and that single-trial estimates (call \code{\link{makeSingleTrialEvents}}) are calculated.
+}
+\section{Example data}{
+The package comes with an example dataset (load it using \code{data('arf-example-data')}). By then calling \code{\link{makeExample}}, a directory-structure containing
+the example data is then created and loaded. Call \code{\link{getExp}} to view the data within the experiment.
+}
+\references{
+\tabular{l}{
+Wouter D. Weeda, Lourens J. Waldorp, Ingrid Christoffels and Hilde M. Huizenga (2009). Activated Region Fitting: A robust high-power method of fMRI analysis using parameterized regions of activation. Human Brain Mapping, 30(8), 2595-2605.\cr
+Wouter D. Weeda, Lourens J. Waldorp, Raoul P.P.P. Grasman, Simong van Gaal and Hilde M. Huizenga (2011). Functional connectivity analysis of fmri data using parameterized regions of interest. Neuroimage, 54(1), 410-416.\cr
+Wouter D. Weeda, Frank de Vos, Lourens J. Waldorp, Raoul P.P.P. Grasman, and Hilde M. Huizenga (submitted). arf3DS4: an integrated framework for the localization and connectivity analysis of fMRI data.\cr 
+}
 }
 \details{
 \tabular{ll}{
 Package: \tab arf3DS4\cr
 Type: \tab Package\cr
-Version: \tab 2.4-6\cr
-Date: \tab 2010-11-11\cr
-Depends: \tab R (>= 2.11.1), methods\cr
+Version: \tab 2.4-7\cr
+Date: \tab 2010-11-12\cr
+Depends: \tab R (>= 2.12.0), methods\cr
 URL: \tab http://arf.r-forge.r-project.org/\cr
 License: \tab GNU (GPL)\cr
 LazyLoad: \tab yes\cr
 Repository: \tab R-Forge\cr
 Repository/R-Forge/Project: \tab arf\cr
-Repository/R-Forge/Revision: \tab 187\cr
-Publication: \tab 2010-11-11 10:28:28\cr
-Packaged: \tab 2010-11-11 10:28:28; rforge\cr
-Built: \tab R 2.11.1; universal-apple-darwin9.8.0; 2010-11-11 10:28:28; unix\cr
+Repository/R-Forge/Revision: \tab 188\cr
+Publication: \tab 2010-11-12 12:22:26\cr
+Packaged: \tab 2010-11-12 12:22:26; rforge\cr
+Built: \tab R 2.12.0; universal-apple-darwin9.8.0; 2010-11-12 12:22:26; unix\cr
 }
-To get a feeling of the arf3DS4 package, it is recommended to read the manual first. More details can also be found in the ARF paper (see reference section).
-arf3DS4 stores all its data in a predefined directory structure, this is mainly because of the size of fMRI data files. To save memory the data is often not stored directly in an R object, but the location where the files can be found is stored instead. 
-Information of the directory structure is stored in the S4 class experiment and can be customized (by adjusting the S4 settings class). The fmri data files are stored in the S4 class fmri.data (wich includes the classes nifti.header and nifti.fileinfo). A set of fmri data files belonging to one condition in the experiment are stored in the S4 class data. To this data an ARF model can be fitted, the model information is stored in the S4 class model. Setting the options of the model fitting procedure etc. is done via the S4 class options. A valid ARF model contains hypothesis tests of its parameters, these are in the S4 class wald. Finally an ARF model can be registered to standard MNI space via the S4 registration class and to the functional data via the S4 functional class. Slots of the classes can be accessed and replaced using standard accessor and replacement functions. The following functions are user-level: 
-\preformatted{
-*** ARF3DS4 USER LEVEL FUNCTIONS: ***
-Experiment functions:
-setExp              set an experiment based on files in the data directories
-makeExpDirs         make an ARF directory structure
-loadExp             load an ARF experiment
-getFSL              copy FSL data to an ARF experiment
-fMRI data functions:
-getFileInfo         get information of a NIFTI/ANALYZE file
-readData            read NIFTI/ANALYZE data
-writeData           write NIFTI/ANALYZE data
-cropVolume          crop a NIFIT/ANALYZE volume
-createRegs          create registration directories (for use with standard brain atlases)
-setRegFiles         set registration files (for use with standard brain atlases)
-setRegParams        set transformation matrices based on registration files (for use with standard brain atlases)
-createFuncs         create functional directories (not yet implemented)
-arfToMNI            convert ARF native coordinates to MNI standard coordinates
-ARF model functions:
-fitModelNlm         fit an ARF model with nlm()
-fitModelOptim       fit an ARF model with optim()
-fitModel            wrapper for fitModelNlm and fitModelOptim
-fitSimpleModelNlm   fit a simplified ARF model with nlm()
-fitSimpleModelOptim fit a simplified ARF model with optim()
-processModel        process an ARF model (determine start, fit, analyze)
-createAverages      create average maps based on run data
-createAllAverages   create all averages in an ARF experiment
-determineStartRect  determine starting values for ARF based on a rectangular search
-newModel            create a new ARF model based on ARF data
-saveModel           save the ARF model
-loadModel           load ARF model files
-Generic arf functions:
-loadOptions         load an ARF options file
-loadStart           load starting values from an ARF model
-loadReg             load registration files
-loadRda             load .Rda files	
-loadData            load ARF data files
-Variance/covariance, fit and statistics related functions:
-makeDerivs          make analytical derivatives
-makeResiduals       Make residuals
-varcov              calculate the variance/covariance matrix
-BIC                 calculate the BIC
-RMSEA               calculate the RMSEA
-mcpCorrect          calculate standard multiple comparison corrections 
-wald                calculate the wald statistics
-}
-}
-\note{
-arf3DS4 supersedes arfS4 and arfS4lite. 
 }
 \author{
 Wouter D. Weeda
 Maintainer: Wouter D. Weeda <w.d.weeda@gmail.com>
-}
-\references{
-Wouter D. Weeda, Lourens J. Waldorp, Ingrid Christoffels and Hilde M. Huizenga. (2009) Activated Region Fitting: A robust high-power method of fMRI analysis using parameterized regions of activation. Human Brain Mapping, 30(8), 2595-2605.
 }
 \keyword{ package }

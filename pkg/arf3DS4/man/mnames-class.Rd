@@ -19,7 +19,7 @@ Objects can be created by calls of the form \code{new("mnames", ...)}.
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{experiment}:}{Object of class "experiment" (see \code{\linkS4class{experiment}}}
+    \item{\code{experiment}:}{Object of class "experiment" (see \code{\linkS4class{experiment}}).}
     \item{\code{subject}:}{Subject name.}
     \item{\code{condition}:}{Condition name.}
     \item{\code{mnames}:}{Vector of modelnames within a subject/condition.}
