@@ -16,7 +16,7 @@ saveModelBinSimple(arfmodel)
   \item{type}{What to save: \code{'full'} = Full model (1 file), \code{'pos+neg'}= positive + negative regions (2 files), \code{'pos'} = Only positive regions (1 file), \code{'neg'} = Only negative regions (1 file), \code{'fpn'} = Full, positive and negative regions (3 files), \code{'separate'} = Individual files for each region (#R files), \code{'sig'} = Only significant regions (1 file).}
 }
 \details{
-When \code{type} is not \code{'all'}, model predictions are not corrected for overlapping regions. 
+When \code{type} is not \code{'full'}, model predictions are not corrected for overlapping regions. 
 }
 \value{
 Returns a model object.

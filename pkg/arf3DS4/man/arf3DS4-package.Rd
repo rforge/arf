@@ -8,16 +8,16 @@ Activated Region Fitting fMRI data analysis
 }
 \description{
 Activated Region Fitting (ARF) is an analysis method for fMRI data. The ARF method uses Gaussian shaped functions to model active brain regions. 
-An entire fMRI volume can be described by multiple `parameterized Gaussian regions of activation. This parameterization allows for hypotheses on the
+An entire fMRI volume can be described by multiple 'parameterized' Gaussian regions of activation. This parameterization allows for hypotheses on the
 location of an active region, the spatial extent of an active region, and the amplitude of an active region. ARF can be invoked after standard GLM analysis, 
 and uses the beta-values or t-values from this analysis. In addition ARF can be used to estimate functional connectivity, for this the raw time-series
 (on which the GLM was performed) are also needed. 
 The arf3DS4 package can read and write fMRI data in Nifti format (\code{\linkS4class{fmri.data}}). It is build to be compatible with fMRI analysis packages (e.g. FSL or SPM). The package 
-uses a pre-defined directory- and file-structure to store its data. All objects (S4-class) and fMRI data files are stored in this directory- and file-structure.
+uses a predefined directory- and file-structure to store its data. All objects (S4-class) and fMRI data files are stored in this directory- and file-structure.
 }
 \section{Quick start}{
 The main directory- and file-structure (termed an experiment) is handled by an object of class \code{\linkS4class{experiment}}. To make an empty experiment structure
-call \code{\link{makeExpDirs}}. This will create an directory- and file-structure to hold the fMRI data (which will have to be copied manually to the appropriate directories, see \code{\linkS4class{data}} for an overview of the data-directories ).
+call \code{\link{makeExpDirs}}. This will create a directory- and file-structure to hold the fMRI data (which will have to be copied manually to the appropriate directories, see \code{\linkS4class{data}} for an overview of the data-directories ).
 Once this is done an experiment is loaded by calling \code{\link{loadExp}}. 
 To fit the ARF models (class \code{\linkS4class{model}}) to the data, first create a model using \code{\link{newModel}}, adjust the options of the model via the \code{\linkS4class{options}}-object using \code{\link{loadOptions}} and \code{\link{saveOptions}},
 and finally fit the model using \code{\link{fitModel}}. To perform hypothesis tests call \code{\link{varcov}} and \code{\link{wald}} to calculate the parameter (co)variance matrix and Wald statistics respectively.
@@ -47,7 +47,7 @@ License: \tab GNU (GPL)\cr
 LazyLoad: \tab yes\cr
 Repository: \tab R-Forge\cr
 Repository/R-Forge/Project: \tab arf\cr
-Repository/R-Forge/Revision: \tab 189\cr
+Repository/R-Forge/Revision: \tab 190\cr
 Publication: \tab 2010-11-12 12:22:26\cr
 Packaged: \tab 2010-11-12 12:22:26; rforge\cr
 Built: \tab R 2.12.0; universal-apple-darwin9.8.0; 2010-11-12 12:22:26; unix\cr

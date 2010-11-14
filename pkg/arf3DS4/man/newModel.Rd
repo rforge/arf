@@ -24,7 +24,7 @@ newModel(modelname = "defaultmodel", regions = 1, subject = "",
 Calls to newModel save an instance of a file named model.Rda in the appropriate directory and return the model object.
 }
 \value{
-Returns an object of class "model" with the apriopriate slots.
+Returns an object of class "model" with the appropriate slots.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

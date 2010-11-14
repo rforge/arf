@@ -23,7 +23,7 @@ processModel(arfmodel, options = loadOptions(arfmodel),
 processModel calls \code{\link{fitModel}}, \code{\link{varcov}} and \code{\link{wald}}. The model is automatically saved.
 }
 \value{
-Returns an object of class "model" with the apropriate slots.
+Returns an object of class "model" with the appropriate slots.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

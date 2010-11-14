@@ -15,7 +15,7 @@ loadFunc(subject, condition, run, experiment = NULL)
 \arguments{
   \item{subject}{Subject name.}
   \item{condition}{Condition name.}
-  \item{run}{Which run (can be numeric, or a filename).}
+  \item{run}{Which run (can be numeric, or a directory name).}
   \item{experiment}{Optional experiment object.}
 }
 \value{

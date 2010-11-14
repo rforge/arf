@@ -3,7 +3,9 @@
 \title{Prune a model based on invalid gradients and bounded parameters.}
 \description{Prune model prunes an ARF model according to the gradients and bounds.}
 \usage{
-pruneModel(arfmodel,modelname='defaultmodel',subject='',condition='',grad=NULL,bound=NULL,pval=NULL,options=new('options'),overwrite=T,experiment=NULL)
+pruneModel(arfmodel,modelname='defaultmodel',subject='',
+ condition='',grad=NULL,bound=NULL,pval=NULL,
+ options=new('options'),overwrite=T,experiment=NULL)
 }
 
 \arguments{
@@ -19,7 +21,7 @@ pruneModel(arfmodel,modelname='defaultmodel',subject='',condition='',grad=NULL,b
   \item{experiment}{Optional experiment object.}
 }
 \value{
-Returns an object of class "model" with the apropriate slots.
+Returns an object of class "model" with the appropriate slots.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

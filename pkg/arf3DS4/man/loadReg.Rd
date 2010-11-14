@@ -11,7 +11,7 @@ loadReg(subject, condition, run, experiment = NULL)
 \arguments{
   \item{subject}{Subject.}
   \item{condition}{Condition.}
-  \item{run}{Which run (can be numeric, or a filename)}
+  \item{run}{Which run (can be numeric, or a directory name)}
   \item{experiment}{Optional experiment object.}
 }
 \value{

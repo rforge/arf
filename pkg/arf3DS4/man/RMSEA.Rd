@@ -14,7 +14,7 @@ RMSEA(arfmodel, options = loadOptions(arfmodel))
 }
 
 \details{
-BIC calculates the BIC value using the number of brain voxels (Set by the \code{model@mask} slot).
+RMSEA calculates the RMSEA value using the number of brain voxels (Set by the \code{model@mask} slot).
 }
 
 \value{
