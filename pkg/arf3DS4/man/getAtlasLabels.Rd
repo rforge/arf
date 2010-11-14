@@ -7,7 +7,8 @@
 getAtlasLabels finds anatomical atlas labels for a set of coordinates (either native ARF space or standard MNI space). It requires a working copy of FSL.
 }
 \usage{
-getAtlasLabels(coordinates, registration, coortype = c("arf", "mni"), atlas = c("both", "Talairach", "HarvardOxford"), ...)
+getAtlasLabels(coordinates, registration, coortype = c("arf", "mni"), 
+ atlas = c("both", "Talairach", "HarvardOxford"), ...)
 }
 \arguments{
   \item{coordinates}{Matrix with three columns (x,y,z) containing coordinates of a region. Multiple regions are in the rows of the matrix.}

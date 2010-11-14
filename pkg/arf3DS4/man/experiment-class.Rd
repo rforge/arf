@@ -85,10 +85,10 @@
 \alias{show,experiment-method}
 
 \title{arf3DS4 "experiment" class}
-\description{The "experiment" class is the backbone of the arf3DS4 package. The class contains information on the names of all relevant directories and files (these are inherited from an "settings" object (see \code{\linkS4class{settings}})). Before running an ARF analysis an object of class "experiment" is loaded.}
+\description{The "experiment" class is the backbone of the arf3DS4 package. The class contains information on the names of all relevant directories and files (these are inherited from an "settings" object (see \code{\linkS4class{settings}})). 
+Before running an ARF analysis an object of class "experiment" must be loaded (using \code{\link{loadExp}}). Experiment directories can be created using \code{\link{makeExpDirs}}. To view information on an experiment call \code{\link{getExp}}.}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("experiment", ...)}.
-	 ~~ describe objects here ~~ 
 }
 \section{Slots}{
 	 \describe{

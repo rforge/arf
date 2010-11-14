@@ -40,7 +40,7 @@
 
 \title{arf3DS4 "data" class}
 \description{The "data" class contains all information on the fMRI data of one condition of a subject. Specifically it contains filenames of the datafiles (with full paths) 
-and some basic information of the data, the number of runs, and additional files used by ARF. Each instance of \code{\linkS4class{model}} class object inherits a "data" object. 
+and some basic information of the data, the number of runs, and additional files used by ARF. Each instance of a \code{\linkS4class{model}} class object inherits a "data" object. 
 The "data" class also uses some slots of the \code{\linkS4class{experiment}} class.}
 \section{Objects}{
 Objects can be created by calls of the form \code{new("data", ...)}.
@@ -57,13 +57,13 @@ Objects can be created by calls of the form \code{new("data", ...)}.
     \item{\code{n}:}{Number of 'brain' voxels (excluding voxels not masked).}
     \item{\code{mask}:}{Vector containing the mask for the data.}
     \item{\code{ss}:}{Sums-of-squares of the data.}
-    \item{\code{regDir}:}{Fullpath to the registration directory.}
+    \item{\code{regDir}:}{Full path to the registration directory.}
     \item{\code{regRda}:}{Name of the registration.Rda file.}
-    \item{\code{funcDir}:}{Fullpath to the functional directory.}
+    \item{\code{funcDir}:}{Full path to the functional directory.}
     \item{\code{funcRda}:}{Name of the functional.Rda file.}
     \item{\code{dataHeader}:}{Nifti header information from the avgdataFile.}
     \item{\code{runs}:}{Number of runs (= number of beta files).}
-    \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}})}
+    \item{\code{version}:}{Object of class "version" (see \code{\linkS4class{version}}).}
   }
 }
 \details{

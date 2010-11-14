@@ -13,6 +13,6 @@ minBIC(subject, condition)
 \value{Returns an object of class \code{\linkS4class{sequence}} containing fit-information of all models.}
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{
-	\code{\linkS4class{fmri.data}}, code{\linkS4class{sequence}}
+	\code{\linkS4class{fmri.data}}, \code{\linkS4class{sequence}}
 }
 \keyword{ models }

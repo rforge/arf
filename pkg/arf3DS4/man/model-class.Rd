@@ -124,7 +124,7 @@ Objects can be created by calls of the form \code{new("model", ...)}.
     \item{\code{minimum}:}{Value of the objective function at the minimum. }
     \item{\code{estimates}:}{Parameter Estimates. }
     \item{\code{gradient}:}{Gradient of the parameters at the minimum. }
-    \item{\code{hessian}:}{Hessian matrix of paramters.}
+    \item{\code{hessian}:}{Hessian matrix of parameters.}
     \item{\code{params}:}{Number of parameters. }
     \item{\code{modeltype}:}{Type of model fitted.}
     \item{\code{sandwichmethod}:}{Method used to calculate Sandwich estimates.}
@@ -143,7 +143,7 @@ Objects can be created by calls of the form \code{new("model", ...)}.
     \item{\code{avgdatfile}:}{Filename of the averaged beta file.}
     \item{\code{avgWfile}:}{Filename of the averaged weight file.}
     \item{\code{avgtstatFile}:}{Filename of the average t-statistics (=avgbetafile/sqrt(avgweightfile)) file. }
-    \item{\code{n}:}{Number of 'brain' voxels (excluding voxels not masked).}
+    \item{\code{n}:}{Number of 'brain' voxels (i.e. the number of voxels excluding those where \code{@mask} is zero).}
     \item{\code{mask}:}{Vector containing the mask for the data.}
     \item{\code{ss}:}{Sums-of-squares of the data.}
     \item{\code{regDir}:}{Fullpath to the registration directory.}

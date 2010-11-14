@@ -8,10 +8,10 @@ writeData(headinf, datavec)
 }
 \arguments{
   \item{headinf}{An object of class "fmri.data".} 
-  \item{datavec}{An optional data-vector to be written to the nifti/analyze file. If no \code{datavec} is given the \code{@datavector} slot of the "fmri.data" class is used.}
+  \item{datavec}{An optional data-vector to be written to the nifti/analyze file. If no \code{datavec} is given the \code{@datavector} slot of the fmri.data-object is used.}
 }
 \details{
-All information on filetype \code{@filetype}, path \code{@fullpath}, and filename \code{@filename} are within the fmri.data object (also see \code{\linkS4class{nifti.fileinfo}}). 
+All information on filetype \code{@filetype}, path \code{@fullpath}, and filename \code{@filename} are within the fmri.data-object (also see \code{\linkS4class{nifti.fileinfo}}). 
 Changing these values will modify where and how the data are saved. 
 }
 \value{

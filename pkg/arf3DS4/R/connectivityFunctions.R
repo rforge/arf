@@ -1,6 +1,6 @@
 #############################################
 # arf3DS4 S4 CONNECTIVITY FUNCTIONS			#
-# Copyright(c) 2009 Wouter D. Weeda			#
+# Wouter D. Weeda			                #
 # University of Amsterdam					#
 #############################################
 

@@ -9,7 +9,8 @@ Estimate single-trial fMRI activity.
 makeSingleTrialEvents calculates single-trial fMRI activity using a double gamma HRF.
 }
 \usage{
-makeSingleTrialEvents(subject, condition, sefilename='single_events', hrf.control=list(a1=6,a2=12,b1=0.9,b2=0.9,ce=0.35), experiment=NULL)
+makeSingleTrialEvents(subject, condition, sefilename='single_events', 
+ hrf.control=list(a1=6,a2=12,b1=0.9,b2=0.9,ce=0.35), experiment=NULL)
 }
 
 \arguments{
@@ -26,7 +27,7 @@ done via object of class \code{\linkS4class{functional}} by calling \code{\link{
 Files are saved in the \bold{data/functional} directory using the filename specified in \code{sefilename}. The function also returns the single-trial data. 
 }
 \value{
-Returns a 4D nifti file (of class \code{\linkS4class{fmri.data}}) containing single-Trial events.
+Returns a 4D nifti file (of class \code{\linkS4class{fmri.data}}) containing the single-trial data.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

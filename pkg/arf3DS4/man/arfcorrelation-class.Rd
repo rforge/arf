@@ -16,7 +16,7 @@
 \alias{.arfcorrelation.timebyreg<-,arfcorrelation-method}
 
 \title{Class "arfcorrelation"}
-\description{ Object of class "arfcorrelation" hold information on correlations between regions of the spatial model. The functions \code{\link{fitConnectivity}} and \code{\link{roiConnectivity}} ouput an object of class "arfcorrelation".}
+\description{ Object of class "arfcorrelation" hold information on correlations between regions of the spatial model. The functions \code{\link{fitConnectivity}} and \code{\link{roiConnectivity}} have as output an object of class "arfcorrelation".}
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("arfcorrelation", ...)}.
 }

@@ -1,6 +1,6 @@
 #############################################
 # arf3DS4 ARFDATA FUNCTIONS					#
-# Copyright(c) 2009 Wouter D. Weeda			#
+# Wouter D. Weeda		   	                #
 # University of Amsterdam					#
 #############################################
 
@@ -162,9 +162,8 @@ function(experiment,overwrite=F)
 						model <- loadRda(paste(modelpath,sp,mnames[mods],sp,.experiment.modelRda(experiment),sep=''))
 
 						#version specific data to add to model (if not set by classDef, data prior to 2.2.4 (dataHeader) or 2.4.2 (runs))
-						model <- updateClass(model,runs=.data.runs(data))			
-						model <- updateClass(model,dataHeader=.data.dataHeader(data))	
-												
+						model <- updateClass(model,runs=.data.runs(data),dataHeader=.data.dataHeader(data))			
+																		
 						.model.modelpath(model) <- paste(modelpath,sp,mnames[mods],sep='')
 						.model.modeldatapath(model) <- paste(modelpath,sp,mnames[mods],sp,.experiment.modeldatDir(experiment),sep='')
 						.model.fullpath(model) <- .data.fullpath(data)

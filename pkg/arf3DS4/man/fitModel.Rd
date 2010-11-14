@@ -6,16 +6,22 @@
 
 \title{ Fit an ARF model.}
 \description{
-fitModel performs fit-procedure of an ARF model to the data. It uses the values in the \code{\linkS4class{options}} object to modify the behavior of the fit-procedure.
+fitModel performs the fit-procedure of an ARF model to the data. It uses the values in the \code{\linkS4class{options}} object to modify the behavior of the fit-procedure.
 By default \code{\link{optim}} (L-BFGS-B) is used for minimization. fitModel is a wrapper for \code{fitModelOptim} and \code{fitSimpleModelOptim}  
 }
 \usage{
-fitModel(arfmodel, options = loadOptions(arfmodel), dat = readData(.model.avgdatfile(arfmodel)), 
- weights = readData(.model.avgWfile(arfmodel)), printlevel = 0, try.silen = T)
-fitModelOptim(arfmodel, options = loadOptions(arfmodel), dat = readData(.model.avgdatfile(arfmodel)), 
- weights = readData(.model.avgWfile(arfmodel)), printlevel = 0, try.silen = T)
-fitSimpleModelOptim(arfmodel, options = loadOptions(arfmodel), dat = readData(.model.avgdatfile(arfmodel)), 
- weights = readData(.model.avgWfile(arfmodel)), printlevel = 0, try.silen = T)
+fitModel(arfmodel, options = loadOptions(arfmodel), 
+ dat = readData(.model.avgdatfile(arfmodel)), 
+ weights = readData(.model.avgWfile(arfmodel)), 
+ printlevel = 0, try.silen = T)
+fitModelOptim(arfmodel, options = loadOptions(arfmodel), 
+ dat = readData(.model.avgdatfile(arfmodel)), 
+ weights = readData(.model.avgWfile(arfmodel)), 
+ printlevel = 0, try.silen = T)
+fitSimpleModelOptim(arfmodel, options = loadOptions(arfmodel), 
+ dat = readData(.model.avgdatfile(arfmodel)), 
+ weights = readData(.model.avgWfile(arfmodel)), 
+ printlevel = 0, try.silen = T)
 
 }
 \arguments{

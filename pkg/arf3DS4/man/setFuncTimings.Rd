@@ -7,7 +7,8 @@ Set the timings of the stimuli (i.e. single trials) and link these timings to ra
 must be given for ARF to determine the single-trial data.
 }
 \usage{
-setFuncTimings(subject, condition, run, timings, func_data = NULL, experiment = NULL)
+setFuncTimings(subject, condition, run, timings, func_data = NULL, 
+ experiment = NULL)
 }
 \arguments{
   \item{subject}{Name of the subject.}

@@ -7,7 +7,10 @@ subsequently it runs a full model given the estimates of the simple model. It th
 bounded parameters.
 }
 \usage{
-processSeed(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c('default','simple'),grad=NULL,bound=NULL,pval=NULL,options=new('options'),pr=T,printlevel=0,try.silen=T,overwrite=T,experiment=NULL)
+processSeed(modelname='defaultmodel', seedreg, subject='', 
+ condition='', startmethod=c('default','simple'), grad=NULL, 
+ bound=NULL, pval=NULL, options=new('options'), pr=T, 
+ printlevel=0, try.silen=T, overwrite=T, experiment=NULL)
 }
 
 \arguments{

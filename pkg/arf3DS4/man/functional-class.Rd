@@ -18,7 +18,7 @@
 \alias{.functional.version<-,functional-method}
 
 \title{arf3DS4 "functional" class }
-\description{The arf3DS4 "functional" class contains information on the functional volume the fMRI beta-files based on. It links the data of the different runs with the raw time-series files, primarily for connectivity analysis. 
+\description{The arf3DS4 "functional" class contains information on the functional volume where the fMRI beta-files were estimated on. It links the data of the different runs with the raw time-series files, primarily for connectivity analysis. 
 To link runs to raw time-series call \code{\link{setFuncTimings}}.}
 \section{Objects}{
 Objects can be created by calls of the form \code{new("functional", ...)}.

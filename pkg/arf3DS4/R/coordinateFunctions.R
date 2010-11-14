@@ -1,6 +1,6 @@
 #############################################
 # arf3DS4 S4 COORDINATE FUNCTIONS			#
-# Copyright(c) 2009 Wouter D. Weeda			#
+# Wouter D. Weeda							#
 # University of Amsterdam					#
 #############################################
 
@@ -841,13 +841,32 @@ function(arfmodel,registration)
 loadReg <-
 function(subject, condition, run, experiment = NULL)
 {
+	#check experiment
+	if(is.null(experiment)) {
+		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
+	}
 	
+	#set separator
+	sp <- .Platform$file.sep
+	cpath <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sep='')
+	
+	regdirs <- list.files(cpath,full=T)
+	regdirs <- regdirs[which(file.info(list.files(cpath,full=T))$isdir)]
+	
+	reg=NULL
+	
+	#check run
+	if(is.numeric(run)) reg = loadRda(paste(regdirs[run],sp,.experiment.regRda(experiment),sep=''))
+	if(is.character(run)) reg = loadRda(paste(cpath,sp,run,sp,.experiment.regRda(experiment),sep=''))
+	
+	return(reg)
 	
 }
 
 saveReg <-
 function(registration)
 {
-	
+	save(registration,file=paste(.registration.fullpath(registration),.Platform$file.sep,.registration.filename(registration),sep=''))
 	
 }

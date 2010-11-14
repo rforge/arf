@@ -1,6 +1,6 @@
 #############################################
 # arf3DS4 S4 MODEL FUNCTIONS  	     		#
-# Copyright(c) 2009 Wouter D. Weeda			#
+# Wouter D. Weeda							#
 # University of Amsterdam					#
 #############################################
 
@@ -85,8 +85,6 @@ function(modelname='defaultmodel',regions=1,subject='',condition='',type=c('gaus
 	.model.modeltype(model) <- type
 	if(type=='simple') .model.params(model) <- 5
 	if(type=='gauss') .model.params(model) <- 10
-	
-	
 		
 	#set number of regions
 	.model.regions(model) <- regions

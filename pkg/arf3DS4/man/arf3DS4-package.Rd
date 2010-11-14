@@ -31,8 +31,8 @@ the example data is then created and loaded. Call \code{\link{getExp}} to view t
 \references{
 \tabular{l}{
 Wouter D. Weeda, Lourens J. Waldorp, Ingrid Christoffels and Hilde M. Huizenga (2009). Activated Region Fitting: A robust high-power method of fMRI analysis using parameterized regions of activation. Human Brain Mapping, 30(8), 2595-2605.\cr
-Wouter D. Weeda, Lourens J. Waldorp, Raoul P.P.P. Grasman, Simong van Gaal and Hilde M. Huizenga (2011). Functional connectivity analysis of fmri data using parameterized regions of interest. Neuroimage, 54(1), 410-416.\cr
-Wouter D. Weeda, Frank de Vos, Lourens J. Waldorp, Raoul P.P.P. Grasman, and Hilde M. Huizenga (submitted). arf3DS4: an integrated framework for the localization and connectivity analysis of fMRI data.\cr 
+Wouter D. Weeda, Lourens J. Waldorp, Raoul P.P.P. Grasman, Simon van Gaal and Hilde M. Huizenga (2011). Functional connectivity analysis of fmri data using parameterized regions of interest. Neuroimage, 54(1), 410-416.\cr
+Wouter D. Weeda, Frank de Vos, Lourens J. Waldorp, Raoul P.P.P. Grasman, and Hilde M. Huizenga (submitted). arf3DS4: an integrated framework for localization and connectivity analysis of fMRI data.\cr 
 }
 }
 \details{
@@ -47,14 +47,13 @@ License: \tab GNU (GPL)\cr
 LazyLoad: \tab yes\cr
 Repository: \tab R-Forge\cr
 Repository/R-Forge/Project: \tab arf\cr
-Repository/R-Forge/Revision: \tab 188\cr
+Repository/R-Forge/Revision: \tab 189\cr
 Publication: \tab 2010-11-12 12:22:26\cr
 Packaged: \tab 2010-11-12 12:22:26; rforge\cr
 Built: \tab R 2.12.0; universal-apple-darwin9.8.0; 2010-11-12 12:22:26; unix\cr
 }
 }
 \author{
-Wouter D. Weeda
-Maintainer: Wouter D. Weeda <w.d.weeda@gmail.com>
+Wouter D. Weeda <w.d.weeda@gmail.com>
 }
 \keyword{ package }

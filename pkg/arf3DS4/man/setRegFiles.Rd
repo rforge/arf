@@ -3,10 +3,14 @@
 \alias{setRegFiles}
 \title{Set registration files.}
 \description{
-Link the files necessary for registration to the appropriate slots in the registration object.Registration requires a working copy of FSL.
+Link the files necessary for registration to the appropriate slots in the registration object. Registration requires a working copy of FSL. Files must be copied from the FSL directory to the \bold{/registration} directory of the ARF experiment.
+By default the standard filenames used by FSL are used. 
 }
 \usage{
-setRegFiles(registration, examp2stand = "example_func2standard.mat", examp2high = "example_func2highres.mat", high2stand = "highres2standard.mat", example_func = "example_func.nii.gz", highres = "highres.nii.gz", standard = "standard.nii.gz")
+setRegFiles(registration, examp2stand = "example_func2standard.mat", 
+ examp2high = "example_func2highres.mat", high2stand = "highres2standard.mat", 
+ example_func = "example_func.nii.gz", highres = "highres.nii.gz", 
+ standard = "standard.nii.gz")
 }
 \arguments{
   \item{registration}{Object of class \code{\linkS4class{registration}} to link to.}

@@ -3,8 +3,9 @@
 \title{Fit a range of models.}
 \description{fitRange performs model fits for a range of models.}
 \usage{
-fitRange(subject,condition,range,options=new('options'),modelprefix='searchmodel',
- modeltype=c('gauss','simple'),experiment=NULL)
+fitRange(subject, condition, range, options=new('options'), 
+ modelprefix='searchmodel', modeltype=c('gauss','simple'), 
+ experiment=NULL)
 }
 \arguments{
   \item{subject}{Name of the subject.}

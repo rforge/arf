@@ -6,7 +6,8 @@
 makeExpDirs makes an ARF experiment directory structure.
 }
 \usage{
-makeExpDirs(path = getwd(), name = "default_experiment", subjectind = 1, conditionind = 1, settings = new("settings"))
+makeExpDirs(path = getwd(), name = "default_experiment", subjectind = 1, 
+ conditionind = 1, settings = new("settings"))
 }
 \arguments{
   \item{path}{Path in which to create the experiment directory.}

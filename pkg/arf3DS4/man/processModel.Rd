@@ -4,7 +4,10 @@
 \title{Process an ARF model.}
 \description{Run an entire processing pipeline for a given ARF model (minimization and statistics).}
 \usage{
-processModel(arfmodel, options = loadOptions(arfmodel), dat = readData(.model.avgdatfile(arfmodel)), weights = readData(.model.avgWfile(arfmodel)), pr = T, printlevel = 0, try.silen = T)
+processModel(arfmodel, options = loadOptions(arfmodel), 
+ dat = readData(.model.avgdatfile(arfmodel)), 
+ weights = readData(.model.avgWfile(arfmodel)), 
+ pr = T, printlevel = 0, try.silen = T)
 }
 \arguments{
   \item{arfmodel}{An arf model object (class \code{\linkS4class{model}}).}

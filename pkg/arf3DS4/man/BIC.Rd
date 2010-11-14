@@ -3,13 +3,13 @@
 \alias{BIC}
 \title{Bayesian Information Criterion}
 \description{
-BIC calculates the Bayesian Information Criterion (model fit) for a valid ARF model. BIC requires a valid (converged) arf-model (\code{\linkS4class{model}}). }
+BIC calculates the Bayesian Information Criterion (model fit) for a valid ARF model. BIC requires a valid (converged) ARF model (\code{\linkS4class{model}}). }
 \usage{
 BIC(arfmodel, options = loadOptions(arfmodel))
 }
 
 \arguments{
-  \item{arfmodel}{A fitted (and valid) arf-model object of class \code{\linkS4class{model}}. }
+  \item{arfmodel}{A fitted (and valid) ARF model object of class \code{\linkS4class{model}}. }
   \item{options}{An "options" object. The options object belonging to the ARF model is loaded by default.}
 }
 

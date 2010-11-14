@@ -1,13 +1,11 @@
-//Activated Region Fitting. Version 2 Build 2.
-//Copyright (c) 2009 Wouter Weeda.
+//Activated Region Fitting C-source.
+//Wouter D. Weeda.
 //Libary of functions for ARF
 
 
 #include<R.h>
 #include<Rmath.h>
 #include<R_ext/Utils.h>
-//#include<math.h>
-//#include<stdio.h>
 
 
 void gauss(double *theta, int *np, int *dimx, int *dimy, int *dimz, double *gx)
