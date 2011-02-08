@@ -159,7 +159,7 @@ function(subject,condition,sefilename='single_events',hrf.control=list(a1=6,a2=1
 	.fmri.data.dims(fmrivolume)[5] = totdim
 	.fmri.data.pixdim(fmrivolume)[5] = 1
 	.fmri.data.datavec(fmrivolume) = datavec
-	.fmri.data.fullpath(fmrivolume) = .model.funcDir(arfdata)
+	.fmri.data.fullpath(fmrivolume) = .data.funcDir(arfdata)
 	writeData(fmrivolume,.fmri.data.datavec(fmrivolume))
 	
 	return(fmrivolume)

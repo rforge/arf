@@ -8,7 +8,7 @@ Activated Region Fitting fMRI data analysis
 }
 \description{
 Activated Region Fitting (ARF) is an analysis method for fMRI data. The ARF method uses Gaussian shaped functions to model active brain regions. 
-An entire fMRI volume can be described by multiple 'parameterized' Gaussian regions of activation. This parameterization allows for hypotheses on the
+An entire fMRI volume can be described by multiple parameterized Gaussian regions of activation. This parameterization allows for hypotheses on the
 location of an active region, the spatial extent of an active region, and the amplitude of an active region. ARF can be invoked after standard GLM analysis, 
 and uses the beta-values or t-values from this analysis. In addition ARF can be used to estimate functional connectivity, for this the raw time-series
 (on which the GLM was performed) are also needed. 
@@ -25,25 +25,25 @@ In addition to the hypothesis test connectivity between brain regions can be est
 raw time-series of the fMRI data are available and that single-trial estimates (call \code{\link{makeSingleTrialEvents}}) are calculated.
 }
 \section{Example data}{
-The package comes with an example dataset (load it using \code{data('arf-example-data')}). By then calling \code{\link{makeExample}}, a directory-structure containing
+The package comes with an example dataset (load it using \code{data(arf-example-data)}). By then calling \code{\link{makeExample}}, a directory-structure containing
 the example data is then created and loaded. Call \code{\link{getExp}} to view the data within the experiment.
 }
 \references{
 \tabular{l}{
 Wouter D. Weeda, Lourens J. Waldorp, Ingrid Christoffels and Hilde M. Huizenga (2009). Activated Region Fitting: A robust high-power method of fMRI analysis using parameterized regions of activation. Human Brain Mapping, 30(8), 2595-2605.\cr
 Wouter D. Weeda, Lourens J. Waldorp, Raoul P.P.P. Grasman, Simon van Gaal and Hilde M. Huizenga (2011). Functional connectivity analysis of fmri data using parameterized regions of interest. Neuroimage, 54(1), 410-416.\cr
-Wouter D. Weeda, Frank de Vos, Lourens J. Waldorp, Raoul P.P.P. Grasman, and Hilde M. Huizenga (submitted). arf3DS4: an integrated framework for localization and connectivity analysis of fMRI data.\cr 
-}
-}
+Version: \tab 2.4-8\cr
+Date: \tab 2011-02-08\cr
+Depends: \tab R (>= 2.12.0), methods\cr
 \details{
 \tabular{ll}{
 Package: \tab arf3DS4\cr
 Type: \tab Package\cr
 Version: \tab 2.4-7\cr
-Date: \tab 2010-11-12\cr
-Depends: \tab R (>= 2.12.0), methods\cr
-URL: \tab http://arf.r-forge.r-project.org/\cr
-License: \tab GNU (GPL)\cr
+Repository/R-Forge/Revision: \tab 191\cr
+Publication: \tab 2011-02-08 14:12:40\cr
+Packaged: \tab 2011-02-08 14:12:40; rforge\cr
+Built: \tab R 2.12.0; universal-apple-darwin9.8.0; 2011-02-08 14:12:40; unix\cr
 LazyLoad: \tab yes\cr
 Repository: \tab R-Forge\cr
 Repository/R-Forge/Project: \tab arf\cr
