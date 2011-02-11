@@ -2,6 +2,7 @@ export(
 	loadRda,
 	loadData,
 	fitConnectivity,
+	fitConnectivityFromFiles,
 	makeSingleTrialEvents,
 	differenceCor,
 	roiConnectivity,
@@ -82,8 +83,7 @@ exportMethods(
 
 import(
 	methods,
-	graphics,
-	tcltk
+	graphics
 )
 
 useDynLib(

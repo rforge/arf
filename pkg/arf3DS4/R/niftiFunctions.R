@@ -169,7 +169,7 @@ function(fileinf)
 	if(con) {
 		
 		readin <- function(con,headinf) {
-			#read in all elements (independent of NIFTI or ANALYZE), strings with nuls are truncated	  	  											#byte offset, type, descr.
+			#read in all elements (independent of NIFTI or ANALYZE), strings with nulls are truncated	  	  											#byte offset, type, descr.
 			.nifti.header.sizeof_hdr(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))         #  0, int32,  MUST BE 348
 			.nifti.header.data_type(headinf) <- rawToChar(readBin(con,raw(),n=10))                                		  								#  4, char[10]
 			.nifti.header.db_name(headinf) <- rawToChar(readBin(con,raw(),n=18))                                  		  								# 14, char[18]
@@ -199,7 +199,7 @@ function(fileinf)
 			.nifti.header.toffset(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                      #136, float, TIME AXIS SHIFT
 			.nifti.header.glmax(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))              #140, int32
 			.nifti.header.glmin(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))              #144, int32
-			.nifti.header.descrip(headinf) <- rawToChar(readBin(con,raw(),n=80))                                  		  								#148, char[80], TEXT
+			.nifti.header.descrip(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=80))) 		  								#148, char[80], TEXT
 			.nifti.header.aux_file(headinf) <- rawToChar(readBin(con,raw(),n=24))                                 		  								#228, char[24], AUXILIARY FILENAME
 			.nifti.header.qform_code(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))         #252, short, NIFITXFORM CODE
 			.nifti.header.sform_code(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))         #254, short, NIFITXFORM CODE
@@ -615,4 +615,14 @@ function(char)
 
 }
 
+removeNullString <- function(raw) 
+#remove embedded and trailing nullstrings
+{
+	rm = which(raw==0)
+	
+	if(length(rm)>0) raw = raw[-rm]
+	
+	return(raw)
+	
+}
 

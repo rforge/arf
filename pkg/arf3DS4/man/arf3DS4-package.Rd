@@ -32,25 +32,21 @@ the example data is then created and loaded. Call \code{\link{getExp}} to view t
 \tabular{l}{
 Wouter D. Weeda, Lourens J. Waldorp, Ingrid Christoffels and Hilde M. Huizenga (2009). Activated Region Fitting: A robust high-power method of fMRI analysis using parameterized regions of activation. Human Brain Mapping, 30(8), 2595-2605.\cr
 Wouter D. Weeda, Lourens J. Waldorp, Raoul P.P.P. Grasman, Simon van Gaal and Hilde M. Huizenga (2011). Functional connectivity analysis of fmri data using parameterized regions of interest. Neuroimage, 54(1), 410-416.\cr
-Version: \tab 2.4-8\cr
-Date: \tab 2011-02-08\cr
-Depends: \tab R (>= 2.12.0), methods\cr
+}
+}
+
 \details{
 \tabular{ll}{
 Package: \tab arf3DS4\cr
 Type: \tab Package\cr
-Version: \tab 2.4-7\cr
-Repository/R-Forge/Revision: \tab 191\cr
-Publication: \tab 2011-02-08 14:12:40\cr
-Packaged: \tab 2011-02-08 14:12:40; rforge\cr
-Built: \tab R 2.12.0; universal-apple-darwin9.8.0; 2011-02-08 14:12:40; unix\cr
+Version: \tab 2.4-9\cr
+Date: \tab 2011-02-11\cr
+Depends: \tab R (>= 2.12.0), methods\cr
+Repository/R-Forge/Revision: \tab 192\cr
+Publication: \tab 2011-02-11 16:54:33\cr
+Packaged: \tab 2011-02-11 16:54:33; rforge\cr
+Built: \tab R 2.12.0; universal-apple-darwin9.8.0; 2011-02-11 16:54:33; unix\cr
 LazyLoad: \tab yes\cr
-Repository: \tab R-Forge\cr
-Repository/R-Forge/Project: \tab arf\cr
-Repository/R-Forge/Revision: \tab 190\cr
-Publication: \tab 2010-11-12 12:22:26\cr
-Packaged: \tab 2010-11-12 12:22:26; rforge\cr
-Built: \tab R 2.12.0; universal-apple-darwin9.8.0; 2010-11-12 12:22:26; unix\cr
 }
 }
 \author{

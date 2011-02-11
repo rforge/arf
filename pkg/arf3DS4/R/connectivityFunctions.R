@@ -601,3 +601,51 @@ function(functional)
 	
 }
 		
+
+fitConnectivityFromFiles <- 
+function(filelist,funcfilename='single_events.nii.gz')
+#make a connectivity estimate from a series of model files
+{
+	#get Header info from avgdatfile
+	headinf <- readHeader(getFileInfo(filelist[1]))
+	n = .nifti.header.dims(headinf)[2]*.nifti.header.dims(headinf)[3]*.nifti.header.dims(headinf)[4]
+	regs = 1:length(filelist)
+	
+	#make model design matrix
+	X = matrix(NA,n,length(regs))
+	
+	#set theta amplitudes to one (all)
+	p=1
+	for(i in regs) {
+		X[,p] = as.vector(.fmri.data.datavec(readData(filelist[p])))
+		X[,p] = X[,p]/max(abs(X[,p]))
+		X[,p] = sqrt(X[,p]^2)
+		p=p+1
+	}
+	
+	funcdata = readData(paste(funcfilename,sep=''))	
+	funcvolume = .fmri.data.datavec(funcdata)
+	dim(funcvolume) = c(.fmri.data.dims(funcdata)[2],.fmri.data.dims(funcdata)[3],.fmri.data.dims(funcdata)[4],.fmri.data.dims(funcdata)[5])
+	
+	b =  matrix(NA,length(regs),.fmri.data.dims(funcdata)[5])
+	Xp = solve(t(X)%*%X)%*%t(X)
+	
+	p=1
+	for(tm in 1:.fmri.data.dims(funcdata)[5]) {
+		y = as.vector(funcvolume[,,,tm])
+		b[,p] = Xp%*%y
+		p=p+1
+	}
+	
+	#get correlations
+	arfcor <- new('arfcorrelation')
+	.arfcorrelation.timebyreg(arfcor) <- t(b)
+	arfcor <- correlationTest(arfcor)
+	
+	#save correlations
+	fn = paste(.fmri.data.filename(funcdata),'.Rda',sep='')
+	save(arfcor,file=fn)
+	
+	return(arfcor)
+	
+}

@@ -127,9 +127,12 @@ newProgressElement <-
 function(arfmodel,options,lower,upper)
 #make a new Progress Window, return an object of class progress (S3)
 {
-	library(tcltk)
-	
-	if(.options.output.mode(options)=='none') disabled = T else disabled = F
+	if(.options.output.mode(options)=='none') {
+		disabled = T
+	} else {
+		disabled = F
+		library(tcltk)
+	}
 	
 	if(!disabled) {
 	 	tt <- tktoplevel()
