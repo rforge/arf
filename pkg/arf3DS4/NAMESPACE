@@ -50,6 +50,7 @@ export(
 	saveStart,
 	loadModel,
 	clearWarnings,
+	checkSolution,
 	showModels,
 	readData,
 	writeData,

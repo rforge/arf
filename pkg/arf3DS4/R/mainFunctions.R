@@ -85,12 +85,9 @@ function(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c(
 	#fit the model
 	full_model = fitModel(full_model,options=options)
 	
-	#check the model
-	if(!.model.valid(full_model)) {
-		model = pruneModel(full_model,modelname,subject,condition,grad,bound,pval,options,overwrite,experiment)
-	} else model = full_model 
-	
-	
+	#prune the model
+	model = pruneModel(full_model,modelname,subject,condition,grad,bound,pval,options,overwrite,experiment)
+		
 	return(model)
 	
 }
