@@ -732,6 +732,9 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 	}
 	
 	arfmodel = checkBound(arfmodel,lowbound,upbound,thres=thres)
+	regstodel = checkSolutionReturn(arfmodel,options,dat,thres)
+	
+	if(length(regstodel)>0) .model.valid(arfmodel) = FALSE
 	
 	return(arfmodel)
 

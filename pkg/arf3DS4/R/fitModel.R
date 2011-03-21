@@ -454,6 +454,9 @@ function(arfmodel,modelname='defaultmodel',subject='',condition='',grad=NULL,bou
 				saveModel(pruned_model)
 				cat(as.character(Sys.time()),'*fitting pruned model with',.model.regions(pruned_model),'regions\n')
 				pruned_model = fitModel(pruned_model,options=options)
+				pruned_model <- checkSolution(pruned_model,options,thres=bound)
+				
+				
 			} else {
 				model = pruned_model
 				cat(as.character(Sys.time()),'Pruned all regions (no regions left)\n')

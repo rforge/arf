@@ -17,8 +17,12 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 
 	.model.warnings(arfmodel) <- character(0)
 	.model.convergence(arfmodel) <- character(0)
-				
+	
+	#fit model
 	arfmodel <- fitModel(arfmodel,options=options,dat=dat,weights=weights,printlevel=printlevel,try.silen=try.silen)
+	
+	#check for bounded parameters
+	arfmodel <- checkSolution(arfmodel,options,dat,thres=8)
 	
 	if(.model.valid(arfmodel)) {
 		
@@ -63,7 +67,7 @@ function(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c(
 	
 	#make the model
 	full_model = newModel(paste('full_',modelname,sep=''),regions=seedreg,subject=subject,condition=condition,type='gauss',options=options,overwrite=overwrite,experiment=experiment)
-	
+		
 	#use simple starts or defaults
 	startmethod = match.arg(startmethod[1],c('default','simple'))
 	if(startmethod=='simple') {	
@@ -84,6 +88,7 @@ function(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c(
 	
 	#fit the model
 	full_model = fitModel(full_model,options=options)
+	full_model <- checkSolution(full_model,options,thres=bound)
 	
 	#prune the model
 	model = pruneModel(full_model,modelname,subject,condition,grad,bound,pval,options,overwrite,experiment)
@@ -121,6 +126,7 @@ function(subject,condition,range,options=new('options'),modelprefix='searchmodel
 	for(numreg in range) {
 		model = newModel(paste(modelprefix,'_',numreg,'regs',sep=''),numreg,subject,condition,type=modeltype,options=options,experiment=experiment)
 		model = fitModel(model,options=options)
+		model <- checkSolution(model,options,thres=8)
 		
 		.sequence.fit(sequence)[p] = .model.fit(model)[1]
 		.sequence.minimum(sequence)[p] = .model.minimum(model)
