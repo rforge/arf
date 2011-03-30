@@ -63,7 +63,7 @@ function(datavec,zerotol=1e-03)
 	
 	newdata[datavec==0]=0
 	
-	return(newdata)
+	return(list(newdata=newdata,minmax=c(min_dat,max_dat)))
 	
 }
 

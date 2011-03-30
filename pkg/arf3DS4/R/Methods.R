@@ -45,7 +45,7 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		
 		#make layout of slices
 		numslices=length(slices)
-		m <- round(sqrt(numslices+1)+.5)
+		m <- round(sqrt(numslices+2)+.5)
 		if(numslices==1) m=1
 		
 		if(!is.null(device)) eval(parse(text=device))
@@ -63,7 +63,8 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		if(what=='neg') data[data>0]=0
 		if(col=='gray') gray = TRUE else gray=FALSE
 		
-		newdata = makeDiscreteImage(as.vector(data),zerotol=zerotol)
+		newdisc = makeDiscreteImage(as.vector(data),zerotol=zerotol)
+		newdata = newdisc$newdata
 		colors = makeColors(newdata,gray)
 		dim(newdata) <- c(dimx,dimy,dimz)	
 	
@@ -89,10 +90,23 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		#only add if numslices is > 1
 		if(numslices>1) {
 			par(las=1,mar=c(2, 2, 1, 1) + 0.1,mgp=c(3,1,0))
-			image(x=c(1),y=colors$data,z=matrix(colors$data,1),axes=F,col=colors$colvec,xlab='',ylab='',asp=asp)
-			axis(2,at=c(min(colors$data),0,max(colors$data)),labels=c(round(min(data),2),0,round(max(data),2)),cex=1.5)
-		
-			if(((m*m-numslices)-1)>0) for(i in 1:((m*m-numslices)-1)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F,xlab='',ylab='')			
+			#browser()
+	
+			#plot pos
+			if(what=='all' | what=='pos') {
+				par(las=1,mar=c(2, 4, 1, 1) + 0.1,mgp=c(3,1,0))
+				image(x=1:4,y=colors$data[which(colors$data>0)],z=rbind(matrix(colors$data[which(colors$data>0)],1),matrix(NA,3,length(colors$data[which(colors$data>0)]))),axes=F,col=colors$pos[2,],xlab='',ylab='')
+				axis(2,at=c(min(colors$data[which(colors$data>0)]),max(colors$data[which(colors$data>0)])),labels=c(round(zerotol,2),round(newdisc$minmax[2],2)),cex=1.5)
+			}
+			#plot neg
+			if(what=='all' | what=='neg') {
+				par(las=1,mar=c(2, 2, 1, 4) + 0.1,mgp=c(3,1,0))
+				image(x=1:4,y=colors$data[which(colors$data<0)],z=rbind(matrix(NA,3,length(colors$data[which(colors$data<0)])),matrix(colors$data[which(colors$data<0)],1)),axes=F,col=colors$neg[2,],xlab='',ylab='')
+				axis(4,at=c(max(colors$data[which(colors$data<0)]),min(colors$data[which(colors$data<0)])),labels=c(round(zerotol,2)*-1,round(newdisc$minmax[1],2)),cex=1.5)
+			}
+			
+			#plot next
+			if(((m*m-numslices)-2)>0) for(i in 1:((m*m-numslices)-2)) plot(NA,NA,xlim=c(0,1),ylim=c(0,1),bty='n',axes=F,xlab='',ylab='')			
 		}
 		
 		#set layout to one again
