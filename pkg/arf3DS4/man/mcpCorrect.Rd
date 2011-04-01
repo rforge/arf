@@ -20,7 +20,7 @@ mcpCorrect(fmridata, type = c("uncorrected", "bonferroni", "FDR"),
   \item{adj.n}{Use only brain voxels when correcting?}
 }
 \value{
-Returns an object of class "fmri.data" with superthreshold voxels.
+Returns two object of class "fmri.data", one with suprathreshold voxels masked, one with only sigificant voxels used for overlay images.
 }
 \author{ Wouter D. Weeda - w.d.weeda@gmail.com }
 \seealso{

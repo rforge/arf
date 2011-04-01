@@ -59,6 +59,10 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 		asp = dimy/dimx
 		if(!is.null(max.asp)) asp=max.asp
 		
+		if(length(which(data<0))==0) what='pos'
+		if(length(which(data>0))==0) what='neg'
+		
+		
 		if(what=='pos') data[data<0]=0
 		if(what=='neg') data[data>0]=0
 		if(col=='gray') gray = TRUE else gray=FALSE
@@ -96,13 +100,13 @@ setMethod('plot',signature(x='fmri.data',y='missing'),
 			if(what=='all' | what=='pos') {
 				par(las=1,mar=c(2, 4, 1, 1) + 0.1,mgp=c(3,1,0))
 				image(x=1:4,y=colors$data[which(colors$data>0)],z=rbind(matrix(colors$data[which(colors$data>0)],1),matrix(NA,3,length(colors$data[which(colors$data>0)]))),axes=F,col=colors$pos[2,],xlab='',ylab='')
-				axis(2,at=c(min(colors$data[which(colors$data>0)]),max(colors$data[which(colors$data>0)])),labels=c(round(zerotol,2),round(newdisc$minmax[2],2)),cex=1.5)
+				axis(2,at=c(min(colors$data[which(colors$data>0)]),max(colors$data[which(colors$data>0)])),labels=c(round(newdisc$small[1],2),round(newdisc$minmax[2],2)),cex=1.5)
 			}
 			#plot neg
 			if(what=='all' | what=='neg') {
 				par(las=1,mar=c(2, 2, 1, 4) + 0.1,mgp=c(3,1,0))
 				image(x=1:4,y=colors$data[which(colors$data<0)],z=rbind(matrix(NA,3,length(colors$data[which(colors$data<0)])),matrix(colors$data[which(colors$data<0)],1)),axes=F,col=colors$neg[2,],xlab='',ylab='')
-				axis(4,at=c(max(colors$data[which(colors$data<0)]),min(colors$data[which(colors$data<0)])),labels=c(round(zerotol,2)*-1,round(newdisc$minmax[1],2)),cex=1.5)
+				axis(4,at=c(max(colors$data[which(colors$data<0)]),min(colors$data[which(colors$data<0)])),labels=c(round(newdisc$small[2],2)*-1,round(newdisc$minmax[1],2)),cex=1.5)
 			}
 			
 			#plot next

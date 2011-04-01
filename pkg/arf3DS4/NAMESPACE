@@ -2,7 +2,6 @@ export(
 	loadRda,
 	loadData,
 	fitConnectivity,
-	fitConnectivityFromFiles,
 	makeSingleTrialEvents,
 	differenceCor,
 	roiConnectivity,
@@ -83,6 +82,7 @@ exportMethods(
 )
 
 import(
+	tcltk,
 	methods,
 	graphics
 )

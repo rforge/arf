@@ -20,6 +20,11 @@ function(datavec,zerotol=1e-03)
 	
 	datavec[abs(datavec)<zerotol]=0
 		
+	wzero = datavec[-which(datavec==0)]
+	
+	if(length(which(wzero[wzero>0]))>0) pos_small = min(wzero[wzero>0]) else pos_small = 0
+	if(length(which(wzero[wzero<0]))>0) neg_small = min(abs(wzero[wzero<0])) else neg_small = 0
+		
 	max_dat = max(datavec)
 	min_dat = min(datavec)
 	total = abs(min_dat)+abs(max_dat)
@@ -63,7 +68,7 @@ function(datavec,zerotol=1e-03)
 	
 	newdata[datavec==0]=0
 	
-	return(list(newdata=newdata,minmax=c(min_dat,max_dat)))
+	return(list(newdata=newdata,minmax=c(min_dat,max_dat),small=c(pos_small,neg_small)))
 	
 }
 

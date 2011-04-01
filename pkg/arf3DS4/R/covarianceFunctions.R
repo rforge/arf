@@ -459,6 +459,9 @@ function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,
 		pvec = adj.p / seq(1,sig.steps)
 		sigvec = numeric(veclen)
 		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
+		thres.t = abs(qt(adj.p,df))
+		thres.p = adj.p
+		
 	}
 	
 	if(which=='FDR') {
@@ -473,19 +476,28 @@ function(fmridata,type=c('uncorrected','bonferroni','FDR'),alpha=.05,q=.05,cv=1,
 		fdr=fdr.value[i]
 		pvec = fdr / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-		for(i in 1:sig.steps) 	sigvec[pvec[i]>(dt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
+		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
+		thres.t = abs(qt(fdr,df))
+		thres.p = fdr
+		
 	}
 	
 	if(which=='uncorrected') {
 		adj.p = alpha
 		pvec = adj.p / seq(1,sig.steps)
 		sigvec = numeric(veclen)
-		for(i in 1:sig.steps) 	sigvec[pvec[i]>(dt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
+		for(i in 1:sig.steps) 	sigvec[pvec[i]>(1-pt(abs(.fmri.data.datavec(fmridata)),df))]=1/pseq[i]
+		thres.t = abs(qt(adj.p,df))
+		thres.p = adj.p
+		
 	}
 	
-	.fmri.data.datavec(fmridata) <- sigvec
-
-	return(fmridata)
+	#make masked and overlay
+	masked_fmridata <- overlay_fmridata <- fmridata
+	.fmri.data.datavec(overlay_fmridata) <- sigvec
+ 	.fmri.data.datavec(masked_fmridata)[sigvec==0] = 0 
+		
+	return(list(masked=masked_fmridata,overlay=overlay_fmridata,threshold=list(t=thres.t,p=thres.p)))
 	
 }
 
