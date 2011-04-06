@@ -22,8 +22,8 @@ function(datavec,zerotol=1e-03)
 		
 	wzero = datavec[-which(datavec==0)]
 	
-	if(length(which(wzero[wzero>0]))>0) pos_small = min(wzero[wzero>0]) else pos_small = 0
-	if(length(which(wzero[wzero<0]))>0) neg_small = min(abs(wzero[wzero<0])) else neg_small = 0
+	if(length(which(wzero[wzero>0]>0))) pos_small = min(wzero[wzero>0]) else pos_small = 0
+	if(length(which(wzero[wzero<0]>0))) neg_small = min(abs(wzero[wzero<0])) else neg_small = 0
 		
 	max_dat = max(datavec)
 	min_dat = min(datavec)

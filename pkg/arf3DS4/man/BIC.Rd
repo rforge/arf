@@ -14,7 +14,13 @@ BIC(arfmodel, options = loadOptions(arfmodel))
 }
 
 \details{
-BIC calculates the BIC value using the number of brain voxels (Set by the \code{model@mask} slot).
+BIC calculates the BIC value using the number of brain voxels (Set by the \code{model@mask} slot). Without constants the BIC equals:
+
+	\code{BIC = ln(S(theta)) + p * ln(n)} 
+
+where \code{p} is the number of parameters in the spatial model, \code{n} is the number of brain voxels, and \code{S(theta)} denotes the minimum of the objective function.
+
+
 }
 
 \value{
