@@ -39,13 +39,13 @@ Wouter D. Weeda, Lourens J. Waldorp, Raoul P.P.P. Grasman, Simon van Gaal and Hi
 \tabular{ll}{
 Package: \tab arf3DS4\cr
 Type: \tab Package\cr
-Version: \tab 2.4-9\cr
-Date: \tab 2011-02-11\cr
-Depends: \tab R (>= 2.12.0), methods\cr
-Repository/R-Forge/Revision: \tab 192\cr
-Publication: \tab 2011-02-11 16:54:33\cr
-Packaged: \tab 2011-02-11 16:54:33; rforge\cr
-Built: \tab R 2.12.0; universal-apple-darwin9.8.0; 2011-02-11 16:54:33; unix\cr
+Version: \tab 2.5-2\cr
+Date: \tab 2011-04-07\cr
+Depends: \tab R (>= 2.12.0), methods, graphics, tcltk\cr
+Repository/R-Forge/Revision: \tab 197\cr
+Publication: \tab 2011-04-07 12:38:50\cr
+Packaged: \tab 2011-04-07 12:38:50; rforge\cr
+Built: \tab R 2.12.0; universal-apple-darwin9.8.0; 2011-04-07 12:38:50; unix\cr
 LazyLoad: \tab yes\cr
 }
 }
