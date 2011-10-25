@@ -25,7 +25,7 @@ In addition to the hypothesis test connectivity between brain regions can be est
 raw time-series of the fMRI data are available and that single-trial estimates (call \code{\link{makeSingleTrialEvents}}) are calculated.
 }
 \section{Example data}{
-The package comes with an example dataset (load it using \code{data(arf-example-data)}). By then calling \code{\link{makeExample}}, a directory-structure containing
+The package comes with an example dataset (load it using \code{data("arf-example-data")}). By then calling \code{\link{makeExample}}, a directory-structure containing
 the example data is then created and loaded. Call \code{\link{getExp}} to view the data within the experiment.
 }
 \references{

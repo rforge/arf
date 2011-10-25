@@ -32,7 +32,7 @@ setClass(
 		version=2,
 		build=5,
 		update=2,
-		svnrev=197
+		svnrev=200
 	),
 	package='arf3DS4'
 )
