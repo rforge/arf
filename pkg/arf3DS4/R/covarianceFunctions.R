@@ -123,7 +123,7 @@ function(arfmodel)
 		st_time <- Sys.time()
 		
 		#try to invert hessian
-		hessian <- try(solve(.model.hessian(arfmodel)),silen=T)
+		hessian <- try(solve(.model.hessian(arfmodel)),silent=T)
 				
 		#check if hessian is good
 		if(is.null(attr(hessian,'class')))  {
@@ -131,9 +131,9 @@ function(arfmodel)
 			n = .model.n(arfmodel)
 			
 			#perform the inner_sandwich procedure
-			if(.model.sandwichmethod(arfmodel)[1]=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
-			if(.model.sandwichmethod(arfmodel)[1]=='fast') B <- try(.C('innerSWfast',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silen=T)
-			if(.model.sandwichmethod(arfmodel)[1]=='full') B <- try(.C('innerSWfull',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[8]],silen=T)
+			if(.model.sandwichmethod(arfmodel)[1]=='diag') B <- try(.C('innerSWdiag',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silent=T)
+			if(.model.sandwichmethod(arfmodel)[1]=='fast') B <- try(.C('innerSWfast',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[7]],silent=T)
+			if(.model.sandwichmethod(arfmodel)[1]=='full') B <- try(.C('innerSWfull',as.integer(n),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[8]],silent=T)
 			if(.model.sandwichmethod(arfmodel)[1]=='bw') {
 				#save original model values
 				old_n = .model.n(arfmodel)
@@ -154,7 +154,7 @@ function(arfmodel)
 				Lv = makeBWLocations(arfmodel,escapevar)	
 				
 				#run BandWidth SW
-				B <- try(.C('innerSWbw',as.integer(.model.n(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.integer(((bw*2)+1)^3),as.integer(escapevar),as.integer(Lv),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[11]],silen=T)
+				B <- try(.C('innerSWbw',as.integer(.model.n(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.integer(((bw*2)+1)^3),as.integer(escapevar),as.integer(Lv),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[11]],silent=T)
 				
 				#reset original values
 				.model.n(arfmodel) = old_n
@@ -181,7 +181,7 @@ function(arfmodel)
 				Lv = makeBWLocations(arfmodel,escapevar)	
 				
 				#run BandWidth SW
-				B <- try(.C('innerSWbwfast',as.integer(.model.n(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.integer(((bw*2)+1)^3),as.integer(escapevar),as.integer(Lv),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[11]],silen=T)
+				B <- try(.C('innerSWbwfast',as.integer(.model.n(arfmodel)),as.integer(.model.regions(arfmodel)*.model.params(arfmodel)),as.integer(.model.runs(arfmodel)),as.integer(((bw*2)+1)^3),as.integer(escapevar),as.integer(Lv),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.derivativeFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.residualFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,.model.weightFile(arfmodel),sep='')),as.character(paste(.model.modeldatapath(arfmodel),sp,'mean',.model.residualFile(arfmodel),sep='')),as.double(numeric((.model.regions(arfmodel)*.model.params(arfmodel))^2)))[[11]],silent=T)
 				
 				#reset original values
 				.model.n(arfmodel) = old_n
@@ -194,7 +194,7 @@ function(arfmodel)
 				dim(B) <- c(.model.regions(arfmodel)*.model.params(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel))
 				
 				#add the outer sandwich parts
-				SW <- try(solve(.5*.model.hessian(arfmodel))%*%B%*%solve(.5*.model.hessian(arfmodel)),silen=T)
+				SW <- try(solve(.5*.model.hessian(arfmodel))%*%B%*%solve(.5*.model.hessian(arfmodel)),silent=T)
 				
 				#check if outersandwich works
 				if(is.null(attr(SW,'class'))) {
@@ -257,7 +257,7 @@ function(arfmodel,options=loadOptions(arfmodel))
 		#check if determinant is valid
 		if(!is.na(dtm) & !is.nan(dtm)) {
 			if(is.numeric(try(log(n))) & is.numeric(try(log(dtm))) & is.numeric(log(.model.minimum(arfmodel)))) {
-				cons <- try((2*(((n/2)*log(2*pi))+((1/2)*log(dtm))+((1/2)*(.model.minimum(arfmodel))))),silen=T)
+				cons <- try((2*(((n/2)*log(2*pi))+((1/2)*log(dtm))+((1/2)*(.model.minimum(arfmodel))))),silent=T)
 				
 				if(cons!=0) { 
 					if(log(dtm)==-Inf) {

@@ -491,7 +491,7 @@ function(func_data='filtered_func_data.nii.gz',experiment=NULL)
 {
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -510,7 +510,7 @@ function(func_data='filtered_func_data.nii.gz',experiment=NULL)
 			cpath <- paste(spath,sp,.experiment.conditionDir(experiment),sp,.experiment.condition.names(experiment)[cdirs],sp,.experiment.dataDir(experiment),sp,.experiment.funcDir(experiment),sep='')
 			
 			funcdirs <- list.files(cpath)
-			funcdirs <- funcdirs[which(file.info(list.files(cpath,full=T))$isdir)]
+			funcdirs <- funcdirs[which(file.info(list.files(cpath,full.names=T))$isdir)]
 			
 			for(trs in 1:length(funcdirs)) {
 								
@@ -572,7 +572,7 @@ function(subject, condition, run, experiment = NULL)
 {
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -580,8 +580,8 @@ function(subject, condition, run, experiment = NULL)
 	sp <- .Platform$file.sep
 	cpath <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.dataDir(experiment),sp,.experiment.funcDir(experiment),sep='')
 
-	funcdirs <- list.files(cpath,full=T)
-	funcdirs <- funcdirs[which(file.info(list.files(cpath,full=T))$isdir)]
+	funcdirs <- list.files(cpath,full.names=T)
+	funcdirs <- funcdirs[which(file.info(list.files(cpath,full.names=T))$isdir)]
 	
 	functional=NULL
 	

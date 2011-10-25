@@ -753,13 +753,14 @@ void innerSWbwfast(int *n, int *p, int *runs, int *bw, int *escapevar, int *Lv, 
 
 	int i,j,k,l, Brow, Bcol,loc;
 	FILE *fderiv, *fresid, *fweight; // *fmeanres;
-	double *Fv,*Ft, *Rv, *Wv, *Mr, s, Bm[*p][*p], *mrv;
+	//double *Fv,*Ft, *Rv, *Wv, *Mr, s, Bm[*p][*p], *mrv;
+	double *Fv,*Ft, *Rv, *Wv, s, Bm[*p][*p], *mrv;
 
 	Fv = (double *) R_alloc(*n,sizeof(double));
 	Ft = (double *) R_alloc(*n,sizeof(double));
 	Rv = (double *) R_alloc(*runs**n,sizeof(double));
  	Wv = (double *) R_alloc(*n,sizeof(double));
- 	Mr = (double *) R_alloc((*n),sizeof(double));
+ 	//Mr = (double *) R_alloc((*n),sizeof(double));
  	mrv = (double *) R_alloc((*n)**bw,sizeof(double));
  	//mrv = (double *) R_alloc((int) 1,sizeof(double));
 
@@ -1953,7 +1954,8 @@ void dfsgtheta3(double *theta,int *dimx, int *dimy, int *dimz, double *grad) {
 }
 
 void dfsgtheta4(double *theta,int *dimx, int *dimy, int *dimz, double *grad) {
-	double ev[199],theta1,theta2,theta3,theta4,theta5;
+	//double ev[199],theta1,theta2,theta3,theta4,theta5;
+	double ev[199],theta1,theta2,theta3,theta4;
 	int x,y,z,p;
 
 	p=0;
@@ -1964,7 +1966,7 @@ void dfsgtheta4(double *theta,int *dimx, int *dimy, int *dimz, double *grad) {
 				 theta2=*(theta+1);
 				 theta3=*(theta+2);
 				 theta4=*(theta+3);
-				 theta5=*(theta+4);
+				 //theta5=*(theta+4);
 
 				 ev[6] = pow(sqrt(2 * M_PI),3) * sqrt(pow(theta4,6));
 				 ev[11] = pow(theta4,2);
@@ -1983,11 +1985,12 @@ void simTS(double *model, double *mb, double *snr, int *tslen, int *numvox, doub
 {
 
 	int c,r,p;
-	double *tsvec,sigma,tssum,varsum,signal_var,signal_mean,signal_sd,signal_se,signal_weight,sq_tslen;
+	//double *tsvec,sigma,tssum,varsum,signal_var,signal_mean,signal_sd,signal_se,signal_weight,sq_tslen;
+	double *tsvec,tssum,varsum,signal_var,signal_mean,signal_sd,signal_se,signal_weight,sq_tslen;
 
 	tsvec = (double *) R_alloc(*tslen,sizeof(double));
 
-	sigma = *mb / *snr;
+	//sigma = *mb / *snr;
 	sq_tslen = sqrt((double) *tslen - 1);
 
 	GetRNGstate();

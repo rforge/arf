@@ -99,7 +99,7 @@ function(betadir,quiet=T)
 	
 	
 	#determinesmallest
-	filelist <- list.files(betadir,full=T)
+	filelist <- list.files(betadir,full.names=T)
 	dims=matrix(NA,length(filelist),8)
 	for(i in 1:length(filelist)) {
 		
@@ -470,7 +470,7 @@ function(arfdata,experiment=NULL)
 	
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -536,7 +536,7 @@ function(arfmodel,experiment=NULL)
 {
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -551,7 +551,7 @@ function(arfmodel,experiment=NULL)
 	#load and sum images
 	for(rundir in runs) {
 		registration = loadRda(paste(.model.regDir(arfmodel),sp,rundir,sp,.model.regRda(arfmodel),sep=''))
-		fn = list.files(path=.registration.fullpath(registration),pattern=.experiment.lowresFile(experiment),full=T)
+		fn = list.files(path=.registration.fullpath(registration),pattern=.experiment.lowresFile(experiment),full.names=T)
 		lrdat = readData(fn[1])
 		avgdat = avgdat + .fmri.data.datavec(lrdat)
 	}
@@ -577,7 +577,7 @@ function(FSLDIR='/usr/local/fsl',which='2mm')
 	
 	#set atlaspath of FSL
 	atlaspath = paste(FSLDIR,sp,'data/atlases',sep='')
-	taldat = read.table(paste(atlaspath,sp,'talairach.xml',sep=''),fill=T,skip=15,sep='\n',strings=F)
+	taldat = read.table(paste(atlaspath,sp,'talairach.xml',sep=''),fill=T,skip=15,sep='\n',stringsAsFactors=F)
 	
 	talmat = matrix(NA,1106,6)
 	for(i in 1:1106) {
@@ -620,7 +620,7 @@ function(FSLDIR='/usr/local/fsl',which='2mm')
 		
 	#get cortical and subcortical data
 	atlaspath = paste(FSLDIR,sp,'data/atlases',sep='')
-	cortdat  = read.table(paste(atlaspath,sp,'HarvardOxford-Cortical.xml',sep=''),fill=T,skip=16,sep='\n',strings=F,quote="")
+	cortdat  = read.table(paste(atlaspath,sp,'HarvardOxford-Cortical.xml',sep=''),fill=T,skip=16,sep='\n',stringsAsFactors=F,quote="")
 	cortdat = apply(cortdat,2,function(x) gsub("\"",'',x))
 	
 	cortical = matrix(NA,48,2)
@@ -636,7 +636,7 @@ function(FSLDIR='/usr/local/fsl',which='2mm')
 		
 	}
 	
-	subdat = read.table(paste(atlaspath,sp,'HarvardOxford-Subcortical.xml',sep=''),fill=T,skip=16,sep='\n',strings=F,quote="")
+	subdat = read.table(paste(atlaspath,sp,'HarvardOxford-Subcortical.xml',sep=''),fill=T,skip=16,sep='\n',stringsAsFactors=F,quote="")
 	subdat = apply(subdat,2,function(x) gsub("\"",'',x))
 	
 	subcort = matrix(NA,21,2)
@@ -843,7 +843,7 @@ function(subject, condition, run, experiment = NULL)
 {
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -851,8 +851,8 @@ function(subject, condition, run, experiment = NULL)
 	sp <- .Platform$file.sep
 	cpath <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sp,subject,sp,.experiment.conditionDir(experiment),sp,condition,sp,.experiment.dataDir(experiment),sp,.experiment.regDir(experiment),sep='')
 	
-	regdirs <- list.files(cpath,full=T)
-	regdirs <- regdirs[which(file.info(list.files(cpath,full=T))$isdir)]
+	regdirs <- list.files(cpath,full.names=T)
+	regdirs <- regdirs[which(file.info(list.files(cpath,full.names=T))$isdir)]
 	
 	reg=NULL
 	

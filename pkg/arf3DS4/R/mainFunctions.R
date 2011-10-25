@@ -59,7 +59,7 @@ function(modelname='defaultmodel',seedreg,subject='',condition='',startmethod=c(
 {
 	
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -104,7 +104,7 @@ function(subject,condition,range,options=new('options'),modelprefix='searchmodel
 {
 	#experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	

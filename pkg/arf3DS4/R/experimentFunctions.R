@@ -72,7 +72,7 @@ function(path=getwd(),name='default_experiment',subjectind=1,conditionind=1,sett
 			if(tolower(answ)=='y' | tolower(answ)=='n') valAns=T
 		}
 		
-		if(tolower(answ)=='y') file.remove(list.files(path,'.Rda',full=T))	
+		if(tolower(answ)=='y') file.remove(list.files(path,'.Rda',full.names=T))	
 		if(tolower(answ)=='n') stop('User stop: not overwriting directory.')
 				
 	}
@@ -98,41 +98,41 @@ function(path=getwd(),name='default_experiment',subjectind=1,conditionind=1,sett
 	
 	#create subjects directory
 	subd <- paste(path,sp,.settings.subjectDir(settings),sep='')
-	dir.create(subd,show=F)
+	dir.create(subd,showWarnings=F)
 	
 	for(sdirs in 1:.experiment.subject.num(experiment)) {
 		
 		#create individual subject dirs
 		sn <- paste(subd,sp,.settings.subjectPrefix(settings),.experiment.subject.names(experiment)[sdirs],sep='')
-		dir.create(sn,show=F)
+		dir.create(sn,showWarnings=F)
 		
 		#create conditions dir
 		subc <- paste(sn,sp,.settings.conditionDir(settings),sep='')
-		dir.create(subc,show=F)		
+		dir.create(subc,showWarnings=F)		
 
 		#create funcDir
-		dir.create(paste(sn,sp,.settings.funcDir(settings),sep=''),show=F)
+		dir.create(paste(sn,sp,.settings.funcDir(settings),sep=''),showWarnings=F)
 		
 		for(cdirs in 1:.experiment.condition.num(experiment)) {
 			
 			#create individual condition dirs
 			cn <- paste(subc,sp,.settings.conditionPrefix(settings),.experiment.condition.names(experiment)[cdirs],sep='')
-			dir.create(cn,show=F)
+			dir.create(cn,showWarnings=F)
 			
 			#models dir and modelnamesfile
-			dir.create(paste(cn,sp,.settings.modelDir(settings),sep=''),show=F)
+			dir.create(paste(cn,sp,.settings.modelDir(settings),sep=''),showWarnings=F)
 			mnames=''
-			save(mnames,file=paste(cn,sp,.settings.modelDir(settings),sp,.settings.modelnamesRda(settings),sep=''),show=T)
+			save(mnames,file=paste(cn,sp,.settings.modelDir(settings),sp,.settings.modelnamesRda(settings),sep=''),showWarnings=T)
 			
 			#data,weights,avg
 			dn <- paste(cn,sp,.settings.dataDir(settings),sep='')
-			dir.create(dn,show=F)
+			dir.create(dn,showWarnings=F)
 						
-			dir.create(paste(dn,sp,.settings.betaDir(settings),sep=''),show=F)
-			dir.create(paste(dn,sp,.settings.weightsDir(settings),sep=''),show=F)
-			dir.create(paste(dn,sp,.settings.avgDir(settings),sep=''),show=F)
-			dir.create(paste(dn,sp,.settings.regDir(settings),sep=''),show=F)
-			dir.create(paste(dn,sp,.settings.funcDir(settings),sep=''),show=F)
+			dir.create(paste(dn,sp,.settings.betaDir(settings),sep=''),showWarnings=F)
+			dir.create(paste(dn,sp,.settings.weightsDir(settings),sep=''),showWarnings=F)
+			dir.create(paste(dn,sp,.settings.avgDir(settings),sep=''),showWarnings=F)
+			dir.create(paste(dn,sp,.settings.regDir(settings),sep=''),showWarnings=F)
+			dir.create(paste(dn,sp,.settings.funcDir(settings),sep=''),showWarnings=F)
 			
 		
 		}
@@ -158,8 +158,8 @@ function(path=getwd(),quiet=F)
 	sp <- .Platform$file.sep
 	
 	#check if one file is in the experiment root
-	if(length(list.files(path,'.Rda',full=T))!=1) stop('No experiment rda file found or multiple rda files found.')
-	experiment <- loadRda(list.files(path,'.Rda',full=T))
+	if(length(list.files(path,'.Rda',full.names=T))!=1) stop('No experiment rda file found or multiple rda files found.')
+	experiment <- loadRda(list.files(path,'.Rda',full.names=T))
 	
 	#set the correct path
 	path <- path.expand(path)
@@ -197,7 +197,7 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 	expname <- expname[length(expname)]
 	
 	#if experiment file exists open it, else create a new one
-	exp <-  list.files(path,pattern='Rda',full=T)
+	exp <-  list.files(path,pattern='Rda',full.names=T)
 	if(length(exp)==1 & overwrite==FALSE) settings <- loadRda(exp) else settings <- new('settings') 
 		
 	#create new experimentclass
@@ -209,7 +209,7 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 	#cat(' Experiment root:',path,'\n')
 	
 	#determine directories subjects
-	whichdirs <- file.info(list.files(.experiment.path(experiment),full=T))$isdir
+	whichdirs <- file.info(list.files(.experiment.path(experiment),full.names=T))$isdir
 	fileList <- list.files(.experiment.path(experiment),full=F)[whichdirs]
 	if(length(fileList)!=1) stop('Multiple subject directories found in rootdir') 
 		
@@ -219,14 +219,14 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 	
 	#get subjects data
 	subd <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sep='')
-	whichdirs <- file.info(list.files(subd,full=T))$isdir
+	whichdirs <- file.info(list.files(subd,full.names=T))$isdir
 	fileList <- list.files(subd,full=F)[whichdirs]
 	.experiment.subject.num(experiment) <- length(fileList)
 	.experiment.subject.names(experiment) <- fileList
 	
 	#go to the first subject		
 	sn <- paste(subd,sp,.experiment.subjectPrefix(experiment),.experiment.subject.names(experiment)[tempsub],sep='')
-	whichdirs <- file.info(list.files(sn,full=T))$isdir
+	whichdirs <- file.info(list.files(sn,full.names=T))$isdir
 	fileList <- list.files(sn,full=F)[whichdirs]
 	
 	#get conditions dirname
@@ -236,14 +236,14 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 			
 	#get condition data
 	subc <- paste(sn,sp,.experiment.conditionDir(experiment),sep='')
-	whichdirs <- which(file.info(list.files(subc,full=T))$isdir)
+	whichdirs <- which(file.info(list.files(subc,full.names=T))$isdir)
 	fileList <- list.files(subc,full=F)[whichdirs]
 	.experiment.condition.num(experiment) <- length(fileList)
 	.experiment.condition.names(experiment) <- fileList
 	
 	#go to first condition 	
 	cn <- paste(subc,sp,.experiment.conditionPrefix(experiment),.experiment.condition.names(experiment)[tempcond],sep='')
-	whichdirs <- which(file.info(list.files(cn,full=T))$isdir)
+	whichdirs <- which(file.info(list.files(cn,full.names=T))$isdir)
 	fileList <- list.files(cn,full=F)[whichdirs]
 		
 	#make uniform weights when no weights exist
@@ -276,7 +276,7 @@ getExp <-
 function()
 #return the experiment-object
 {
-	experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+	experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 	if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	return(experiment)
 }
@@ -309,7 +309,7 @@ function(path=getwd(),method=c('fast','set','rda'))
 	if(length(grep(sp,path))==0) path <- paste(getwd(),sp,path,sep='')
 	
 	#set filename and load experiment
-	filename <- list.files(path,'.Rda',full=T)
+	filename <- list.files(path,'.Rda',full.names=T)
 	if(length(filename)!=1) stop(paste('No experiment rda file found or multiple rda files found in ',path,sep=''))
 	.experiment <- experiment <- loadRda(filename)
 	
@@ -324,7 +324,7 @@ function(path=getwd(),method=c('fast','set','rda'))
 			#change root for the experiment-file to the current root
 			.experiment <- experiment <- chngRootExp(path,quiet=T)
 			#set and check all objects based on subjects/condition info and settings
-			allIsWell <- setAllObjects(experiment,over=overwrite) 
+			allIsWell <- setAllObjects(experiment,overwrite=overwrite) 
 		} else .experiment <- experiment <- setExp(path,1,1,TRUE,TRUE,TRUE,FALSE)
 		
 	}  
@@ -394,7 +394,7 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 	#get all subject files and info for copying
 	for(subj in 1:subjects) {
 			
-		dirs = list.files(fsldir,subjectlist[subj],full=T)
+		dirs = list.files(fsldir,subjectlist[subj],full.names=T)
 		runs = length(dirs)
 				
 		func_file=reg_file=cope_file=vector(runs,mode='list')
@@ -402,11 +402,11 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 		for(tri in 1:runs) {
 		
 			#get functional data
-			func_file[[tri]] = list.files(dirs[tri],functional,full=T)
+			func_file[[tri]] = list.files(dirs[tri],functional,full.names=T)
 			
 			#get registration data
 			rdir = paste(dirs[tri],sp,'reg',sep='')
-			reg_file[[tri]] = list(ex2stand=list.files(rdir,registration[1],full=T),ex2hi=list.files(rdir,registration[2],full=T),hi2st=list.files(rdir,registration[3],full=T),ex=list.files(rdir,registration[4],full=T),hi=list.files(rdir,registration[5],full=T),st=list.files(rdir,registration[6],full=T))
+			reg_file[[tri]] = list(ex2stand=list.files(rdir,registration[1],full.names=T),ex2hi=list.files(rdir,registration[2],full=T),hi2st=list.files(rdir,registration[3],full=T),ex=list.files(rdir,registration[4],full=T),hi=list.files(rdir,registration[5],full=T),st=list.files(rdir,registration[6],full=T))
 			
 			reg_file[[tri]]$hi = reg_file[[tri]]$hi[-1]
 			reg_file[[tri]]$st = reg_file[[tri]]$st[-c(1,2)]
@@ -414,7 +414,7 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 			
 			#get copes and varcopes
 			sdir = paste(dirs[tri],sp,'stats',sep='')
-			all_copes = list.files(sdir,cope,full=T)
+			all_copes = list.files(sdir,cope,full.names=T)
 			
 			use_cope=use_varcope=numeric(0)
 			

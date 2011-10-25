@@ -181,7 +181,7 @@ function(arfdat,experiment=NULL)
 	#check experiment
 	#if(is.null(experiment)) if(exists('.experiment')) experiment = .experiment else stop('Experiment not loaded. Run loadExp first.')
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -263,7 +263,7 @@ function(experiment=NULL)
 	
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	

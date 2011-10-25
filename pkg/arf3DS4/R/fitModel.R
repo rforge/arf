@@ -153,7 +153,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 						progress=progress,
 						control=list(trace=printlevel,maxit=.options.min.iterlim(options)),
 						hessian=T
-					)),silen=try.silen)
+					)),silent=try.silen)
 
 	#end_time
 	en_time <- Sys.time()
@@ -196,7 +196,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 			#	w_fn <- paste(.model.modeldatapath(arfmodel),.Platform$file.sep,.model.weightFile(arfmodel),sep='')
 			#	n = .fmri.data.dims(weights)[2]*.fmri.data.dims(weights)[3]*.fmri.data.dims(weights)[4]
 			#	p = .model.regions(arfmodel)*.model.params(arfmodel)
-			#	hessian <- try(.C('approxHessian',as.integer(p),as.integer(.model.n(arfmodel)),as.character(df_fn),as.character(w_fn),as.double(numeric(p*p))),silen=try.silen)
+			#	hessian <- try(.C('approxHessian',as.integer(p),as.integer(.model.n(arfmodel)),as.character(df_fn),as.character(w_fn),as.double(numeric(p*p))),silent=try.silen)
 			#	
 			#	if(is.null(attr(hessian,'class'))) {
 			#		hessian <- hessian[[5]]
@@ -348,7 +348,7 @@ function(arfmodel,options=loadOptions(arfmodel),dat=readData(.model.avgdatfile(a
 							progress=progress,
 							control=list(trace=printlevel,maxit=.options.min.iterlim(options)),
 							hessian=F
-					)),silen=try.silen)
+					)),silent=try.silen)
 	
 	#end_time
 	en_time <- Sys.time()
@@ -419,7 +419,7 @@ pruneModel <-
 function(arfmodel,modelname='defaultmodel',subject='',condition='',grad=NULL,bound=NULL,pval=NULL,options=new('options'),overwrite=T,experiment=NULL)
 {
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	

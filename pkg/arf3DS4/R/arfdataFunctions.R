@@ -18,7 +18,7 @@ function(path,pattern='',full=T)
 #listNoHdr lists files excluding .hdr files 
 {
 	nameslist <-  list.files(path,pattern=pattern,full.names=full)
-	whichhdr <- grep('.hdr',nameslist,value=F,ignore=T)
+	whichhdr <- grep('.hdr',nameslist,value=F,ignore.case=T)
 	
 	if(length(whichhdr)>1) 
 		return(nameslist[-whichhdr])
@@ -53,7 +53,7 @@ function(subject,condition,experiment=NULL)
 	
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -275,10 +275,10 @@ function(experiment)
 			nf <- paste(subc,sp,.experiment.conditionPrefix(experiment),.experiment.condition.names(experiment)[cdirs],sp,.experiment.dataDir(experiment),sp,.experiment.weightsDir(experiment),sep='')
 			
 			#list files in betadir
-			tempfiles <- list.files(cn,full=T)
+			tempfiles <- list.files(cn,full.names=T)
 		
 			#check if weightfiles exist
-			weightfiles <- list.files(nf,full=T)
+			weightfiles <- list.files(nf,full.names=T)
 			
 			#check if files already exist in the weightdir 
 			if(length(tempfiles)!=length(weightfiles)) {

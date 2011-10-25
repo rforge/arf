@@ -27,7 +27,7 @@ function(modelname='defaultmodel',regions=1,subject='',condition='',type=c('gaus
 {
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -63,11 +63,11 @@ function(modelname='defaultmodel',regions=1,subject='',condition='',type=c('gaus
 	
 	if(file.exists(path) & overwrite==F) stop('Model directory already exists')
 	
-	dir.create(path,show=F)
+	dir.create(path,showWarnings=F)
 	.model.modelpath(model) <- path
 	
 	#path to modeldatadir
-	dir.create(paste(path,sp,.experiment.modeldatDir(experiment),sep=''),show=F)
+	dir.create(paste(path,sp,.experiment.modeldatDir(experiment),sep=''),showWarnings=F)
 	.model.modeldatapath(model) <- paste(path,sp,.experiment.modeldatDir(experiment),sep='')
 	
 	#set filenames
@@ -110,7 +110,7 @@ function(path)
 		
 	#list all dirs in path (minus the modelnames file)
 	existingfiles <- list.files(path,full=F)
-	filename <- list.files(path,'.Rda',full=T)
+	filename <- list.files(path,'.Rda',full.names=T)
 	existingfiles <- existingfiles[-grep('.Rda',existingfiles)]
 
 	#save modelnames
@@ -258,7 +258,7 @@ function(modelname,subject=NA,condition,experiment=NULL)
 
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	
@@ -294,7 +294,7 @@ function(subject,condition,experiment=NULL)
 	
 	#check experiment
 	if(is.null(experiment)) {
-		experiment <- try(get('.experiment',envir=.arfInternal),silen=T)
+		experiment <- try(get('.experiment',envir=.arfInternal),silent=T)
 		if(attr(experiment,'class')=='try-error') stop('Experiment not loaded. Run loadExp first.')
 	}
 	

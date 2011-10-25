@@ -262,7 +262,7 @@ setMethod('plot',signature(x='model',y='missing'),
 			
 			fn = paste(x@modeldatapath,.Platform$file.sep,x@fullmodelDataFile,sep='')
 			
-			mod = try(readData(fn),silen=T)
+			mod = try(readData(fn),silent=T)
 			
 			if(class(mod)=='try-error') {
 				mod = new('fmri.data',x@dataHeader)
@@ -347,7 +347,7 @@ setMethod('show','options',
 			cat(' start-value method    (@start.method):  ',object@start.method,'\n')
 			cat(' start-value factor    (@start.maxfac):  ',object@start.maxfac,'\n')
 			cat(' iteration limit       (@min.iterlim) :  ',object@min.iterlim,'\n')
-   bl = try(cat(' boundary limit        (@min.bounlim) :  ',object@min.boundlim,'\n'),silen=T)
+   bl = try(cat(' boundary limit        (@min.bounlim) :  ',object@min.boundlim,'\n'),silent=T)
 			if(class(bl)=='try-error') cat(' boundary limit:         not available\n')
 			cat(' minimization function (@min.routine) :  ',object@min.routine[1],'\n')
 			cat(' optim-method          (@opt.method)  :  ',object@opt.method,'\n')
