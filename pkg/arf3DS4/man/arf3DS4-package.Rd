@@ -32,7 +32,7 @@ the example data is then created and loaded. Call \code{\link{getExp}} to view t
 \tabular{l}{
 Wouter D. Weeda, Lourens J. Waldorp, Ingrid Christoffels and Hilde M. Huizenga (2009). Activated Region Fitting: A Robust High-Power Method for fMRI Analysis Using Parameterized Regions of Activation. Human Brain Mapping, 30(8), 2595-2605.\cr
 Wouter D. Weeda, Lourens J. Waldorp, Raoul P.P.P. Grasman, Simon van Gaal and Hilde M. Huizenga (2011). Functional Connectivity Analysis of fMRI Data Using Parameterized Regions of Interest. NeuroImage, 54(1), 410-416.\cr
-Wouter D. Weeda, Frank de Vos, Lourens J. Waldorp, Raoul P.P.P. Grasman, Hilde M. Huizenga (2011). arf3DS4: An Integrated Framework for Localization and Connectivity Analysis of fMRI Data. Journal of Statistical Software, 44(14), 1-33. URL http://www.jstatsoft.org/v44/i14/. \cr
+Wouter D. Weeda, Frank de Vos, Lourens J. Waldorp, Raoul P.P.P. Grasman, Hilde M. Huizenga (2011). arf3DS4: An Integrated Framework for Localization and Connectivity Analysis of fMRI Data. Journal of Statistical Software, 44(14), 1-33. URL \url{http://www.jstatsoft.org/v44/i14/} \cr
 }
 }
 
@@ -40,13 +40,13 @@ Wouter D. Weeda, Frank de Vos, Lourens J. Waldorp, Raoul P.P.P. Grasman, Hilde M
 \tabular{ll}{
 Package: \tab arf3DS4\cr
 Type: \tab Package\cr
-Version: \tab 2.5-2\cr
-Date: \tab 2011-04-07\cr
+Version: \tab 2.5-4\cr
+Date: \tab 2011-10-28\cr
 Depends: \tab R (>= 2.12.0), methods, graphics, tcltk\cr
-Repository/R-Forge/Revision: \tab 197\cr
-Publication: \tab 2011-10-25 12:38:50\cr
-Packaged: \tab 2011-10-25 12:38:50; rforge\cr
-Built: \tab R 2.12.0; universal-apple-darwin9.8.0; 2011-10-25 12:38:50; unix\cr
+Repository/R-Forge/Revision: \tab 203\cr
+Publication: \tab 2011-10-28 12:38:50\cr
+Packaged: \tab 2011-10-28 12:38:50; rforge\cr
+Built: \tab R 2.12.0; universal-apple-darwin9.8.0; 2011-10-28 12:38:50; unix\cr
 LazyLoad: \tab yes\cr
 }
 }
