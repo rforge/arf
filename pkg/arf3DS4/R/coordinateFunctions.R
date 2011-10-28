@@ -475,7 +475,7 @@ function(arfdata,experiment=NULL)
 	}
 	
 	#get runs from dataDir
-	runs = list.files(.data.regDir(arfdata),full=F)
+	runs = list.files(.data.regDir(arfdata),full.names=F)
 	
 	if(length(runs)==0) stop('No runs directories found found in',.data.regDir(arfdata),',please run registration.')
 	
@@ -543,7 +543,7 @@ function(arfmodel,experiment=NULL)
 	sp = .Platform$file.sep
 	
 	#get run list
-	runs = list.files(.model.regDir(arfmodel),full=F)
+	runs = list.files(.model.regDir(arfmodel),full.names=F)
 	
 	#set avg to zero
 	avgdat = 0
@@ -780,7 +780,7 @@ function(arfmodel,regrun=1,saveastext=F)
 #wrapper for Atlas coordinates of model estimates
 {
 	sp <- .Platform$file.sep
-	runs = list.files(.model.regDir(arfmodel),full=F)[regrun]
+	runs = list.files(.model.regDir(arfmodel),full.names=F)[regrun]
 	registration = loadRda(paste(.model.regDir(arfmodel),sp,runs,sp,.model.regRda(arfmodel),sep=''))
 	
 	estimates = matrix(.model.estimates(arfmodel),.model.params(arfmodel))

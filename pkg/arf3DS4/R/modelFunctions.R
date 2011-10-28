@@ -109,7 +109,7 @@ function(path)
 {
 		
 	#list all dirs in path (minus the modelnames file)
-	existingfiles <- list.files(path,full=F)
+	existingfiles <- list.files(path,full.names=F)
 	filename <- list.files(path,'.Rda',full.names=T)
 	existingfiles <- existingfiles[-grep('.Rda',existingfiles)]
 

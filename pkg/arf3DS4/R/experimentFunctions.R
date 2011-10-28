@@ -210,7 +210,7 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 	
 	#determine directories subjects
 	whichdirs <- file.info(list.files(.experiment.path(experiment),full.names=T))$isdir
-	fileList <- list.files(.experiment.path(experiment),full=F)[whichdirs]
+	fileList <- list.files(.experiment.path(experiment),full.names=F)[whichdirs]
 	if(length(fileList)!=1) stop('Multiple subject directories found in rootdir') 
 		
 	#set subjectsdirname
@@ -220,14 +220,14 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 	#get subjects data
 	subd <- paste(.experiment.path(experiment),sp,.experiment.subjectDir(experiment),sep='')
 	whichdirs <- file.info(list.files(subd,full.names=T))$isdir
-	fileList <- list.files(subd,full=F)[whichdirs]
+	fileList <- list.files(subd,full.names=F)[whichdirs]
 	.experiment.subject.num(experiment) <- length(fileList)
 	.experiment.subject.names(experiment) <- fileList
 	
 	#go to the first subject		
 	sn <- paste(subd,sp,.experiment.subjectPrefix(experiment),.experiment.subject.names(experiment)[tempsub],sep='')
 	whichdirs <- file.info(list.files(sn,full.names=T))$isdir
-	fileList <- list.files(sn,full=F)[whichdirs]
+	fileList <- list.files(sn,full.names=F)[whichdirs]
 	
 	#get conditions dirname
 	if(length(fileList)!=1) fileList <- .experiment.conditionDir(experiment) 
@@ -237,14 +237,14 @@ function(path=getwd(),tempsub=1,tempcond=1,auto=TRUE,createWeights=TRUE,overwrit
 	#get condition data
 	subc <- paste(sn,sp,.experiment.conditionDir(experiment),sep='')
 	whichdirs <- which(file.info(list.files(subc,full.names=T))$isdir)
-	fileList <- list.files(subc,full=F)[whichdirs]
+	fileList <- list.files(subc,full.names=F)[whichdirs]
 	.experiment.condition.num(experiment) <- length(fileList)
 	.experiment.condition.names(experiment) <- fileList
 	
 	#go to first condition 	
 	cn <- paste(subc,sp,.experiment.conditionPrefix(experiment),.experiment.condition.names(experiment)[tempcond],sep='')
 	whichdirs <- which(file.info(list.files(cn,full.names=T))$isdir)
-	fileList <- list.files(cn,full=F)[whichdirs]
+	fileList <- list.files(cn,full.names=F)[whichdirs]
 		
 	#make uniform weights when no weights exist
 	if(createWeights) makeWeights(experiment)
@@ -406,7 +406,7 @@ getFSLdata <- function(fsldir=getwd(),subjectlist,contrastnums,expname='FSLtoARF
 			
 			#get registration data
 			rdir = paste(dirs[tri],sp,'reg',sep='')
-			reg_file[[tri]] = list(ex2stand=list.files(rdir,registration[1],full.names=T),ex2hi=list.files(rdir,registration[2],full=T),hi2st=list.files(rdir,registration[3],full=T),ex=list.files(rdir,registration[4],full=T),hi=list.files(rdir,registration[5],full=T),st=list.files(rdir,registration[6],full=T))
+			reg_file[[tri]] = list(ex2stand=list.files(rdir,registration[1],full.names=T),ex2hi=list.files(rdir,registration[2],full.names=T),hi2st=list.files(rdir,registration[3],full.names=T),ex=list.files(rdir,registration[4],full.names=T),hi=list.files(rdir,registration[5],full.names=T),st=list.files(rdir,registration[6],full.names=T))
 			
 			reg_file[[tri]]$hi = reg_file[[tri]]$hi[-1]
 			reg_file[[tri]]$st = reg_file[[tri]]$st[-c(1,2)]
