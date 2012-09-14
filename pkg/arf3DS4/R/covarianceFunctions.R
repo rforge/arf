@@ -125,6 +125,14 @@ function(arfmodel)
 		#try to invert hessian
 		hessian <- try(solve(.model.hessian(arfmodel)),silent=T)
 				
+		#if Hessian is not ok, try pseudoinverse
+		if(!is.null(attr(hessian,'class')))  {
+			library(corpcor)
+			hessian <- try(pseudoinverse(.model.hessian(arfmodel)),silent=T)
+			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[varcov] Using Pseudoinverse (hessian probably singular)',sep=''))
+			pseudo = T
+		} else { pseudo = F}
+				
 		#check if hessian is good
 		if(is.null(attr(hessian,'class')))  {
 			weights <- readData(.model.avgWfile(arfmodel))
@@ -194,7 +202,9 @@ function(arfmodel)
 				dim(B) <- c(.model.regions(arfmodel)*.model.params(arfmodel),.model.regions(arfmodel)*.model.params(arfmodel))
 				
 				#add the outer sandwich parts
-				SW <- try(solve(.5*.model.hessian(arfmodel))%*%B%*%solve(.5*.model.hessian(arfmodel)),silent=T)
+				if(!pseudo) SW <- try(solve(.5*.model.hessian(arfmodel))%*%B%*%solve(.5*.model.hessian(arfmodel)),silent=T)
+				if(pseudo) SW <- try(pseudoinverse(.5*.model.hessian(arfmodel))%*%B%*%pseudoinverse(.5*.model.hessian(arfmodel)),silent=T)
+				
 				
 				#check if outersandwich works
 				if(is.null(attr(SW,'class'))) {
