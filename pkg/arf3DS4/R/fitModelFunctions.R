@@ -655,7 +655,7 @@ function(arfmodel)
 			det_sig=det(sigma)
 			
 			if(!is.na(det_sig) & !is.nan(det_sig) & det_sig!=Inf & det_sig!=-Inf) {
-				if(det_sig<1 & det_sig>0) mess = c(mess,paste('[startval] Region ',reg,' has a small volume (',round(det_sig,2),').',sep=''))
+				#if(det_sig<1 & det_sig>0) mess = c(mess,paste('[startval] Region ',reg,' has a small volume (',round(det_sig,2),').',sep=''))
 				if(det_sig<=0) mess = c(mess,paste('[startval] Region ',reg,' has a zero volume (',round(det_sig,2),').',sep=''))
 				
 			} else {
