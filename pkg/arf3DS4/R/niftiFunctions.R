@@ -38,7 +38,8 @@ function(filename)
 	
 	#split filename into path, name and extensions
 	fn <- strsplit(filename,sp)[[1]][length(strsplit(filename,sp)[[1]])]
-	fsplit_name <- strsplit(tolower(fn),'\\.')[[1]]
+	#fsplit_name <- strsplit(tolower(fn),'\\.')[[1]]
+	fsplit_name <- strsplit(fn,'\\.')[[1]]
 	fsplit_path <- gsub(paste(sp,fn,sep=''),'',filename)
 	fname <- strsplit(fsplit_name[1],.Platform$file.sep)[[1]]	
 	
@@ -128,7 +129,8 @@ function(filename,templateHDR)
 	
 	#split filename into path, name and extensions
 	fn <- strsplit(filename,sp)[[1]][length(strsplit(filename,sp)[[1]])]
-	fsplit_name <- strsplit(tolower(fn),'\\.')[[1]]
+	#fsplit_name <- strsplit(tolower(fn),'\\.')[[1]]
+	fsplit_name <- strsplit(fn,'\\.')[[1]]
 	fsplit_path <- gsub(paste(sp,fn,sep=''),'',filename)
 	fname <- strsplit(fsplit_name[1],.Platform$file.sep)[[1]]	
 	
