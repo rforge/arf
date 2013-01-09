@@ -1,0 +1,27 @@
+export(
+	fitplot,
+	ellipse,
+	makeeye,
+	simHM
+)
+
+exportPattern("^[\\.]")
+
+exportClasses(
+	version
+)
+
+exportMethods(
+	show
+)
+
+import(
+	methods,
+	graphics
+)
+
+useDynLib(
+	etanalysis,
+	gauss,
+	ssqgauss
+)

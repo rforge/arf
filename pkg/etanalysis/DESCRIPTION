@@ -1,0 +1,12 @@
+Package: etanalysis
+Type: Package
+Title: Analysis of Eye-tracker data
+Version: 1.0.0
+Date:  2013-01-08
+Author: Wouter D. Weeda
+Maintainer: Wouter D. Weeda <w.d.weeda@gmail.com>
+Depends: R (>= 2.15.0), methods, graphics
+Description: Analysis of eye-tracking data
+License: GPL-2
+LazyLoad: yes
+Packaged: Tue Jan 8 12:38:50 2013
