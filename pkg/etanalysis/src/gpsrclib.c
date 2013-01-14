@@ -124,3 +124,155 @@ void ssqgauss(double *theta, double *dat, double *W, int *np, int *dimx, int *di
   ss[0]=g;
 
 }
+
+//(n*n) Outer product of vector length n
+void outerprod(int *n, double *ivec, double *out)
+{
+  //n is length of vector
+  //ivec is input vector
+  //output is the outerproduct n*n outerproduct
+
+
+  int row,col,i;
+  i=0;
+  for(col=0;col<(*n);col++) {
+    for(row=0;row<(*n);row++) {
+    	out[i]=ivec[row]*ivec[col];
+    	i++;
+	}
+  }
+
+}
+
+//(n*n) Outer product of vector length n (returns in diagonal form)
+void outerproddiagonal(int *n, double *ivec, double *diag)
+{
+  //n is length of vector
+  //ivec is input vector
+  //diag is vector of length n containing diagonals
+  //offdiag is vector of length n^2-n/2 containing lower trial offdiagonals
+
+  int i,j,a;
+  a=0;
+
+  //Create diagonals
+  a=0;
+  for(i=0;i<(*n);i++) {
+    diag[a]=ivec[i]*ivec[i];
+    a=a+1;
+  }
+}
+
+//(n*p) first order derivative matrix
+void fderiv(int *n, int *p, int *dimx, int *dimy, double *theta, double *F)
+{
+	//n is number of voxels
+	//p is number of parameters (is regions * 6)
+	//dimx/dimy are x-y dimensions
+	//THETA is vector op parameters (parameters arranged per region)
+	//F is vector of length (n*p)
+
+	int x, y, i, reg, row, col;
+	double Fmat[*n][*p];
+	double pi = 3.141593;
+
+	//region loop, increases by 6 for each region
+	for(reg=0;reg<(*p);reg=reg+6) {
+
+		//voxel loop, calculate derivative per voxel (x increases fastests, then y)
+		i=0;
+		for(y=1;y<(*dimy+1);y++) {
+			for(x=1;x<(*dimx+1);x++) {
+				Fmat[i][reg+0]= 0.5000000000e0 * theta[reg+5] / theta[reg+3] * (-0.1e1 * theta[reg+3] * x + theta[reg+3] * theta[reg+0] + theta[reg+4] * theta[reg+2] * y - 0.1e1 * theta[reg+4] * theta[reg+2] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1) / pi;
+				Fmat[i][reg+1]= -0.1591549430e0 * theta[reg+5] / theta[reg+2] * (theta[reg+2] * y - 0.1e1 * theta[reg+2] * theta[reg+1] - 0.1e1 * theta[reg+4] * theta[reg+3] * x + theta[reg+4] * theta[reg+3] * theta[reg+0]) * pow(theta[reg+3], -0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1);
+				Fmat[i][reg+2]= -0.1591549430e0 * (theta[reg+4] * theta[reg+4] * theta[reg+3] * theta[reg+2] * theta[reg+2] + theta[reg+4] * theta[reg+2] * y * theta[reg+0] - 0.1e1 * theta[reg+4] * theta[reg+2] * y * x - 0.1e1 * theta[reg+4] * theta[reg+2] * theta[reg+1] * theta[reg+0] + theta[reg+4] * theta[reg+2] * theta[reg+1] * x - 0.2e1 * theta[reg+3] * x * theta[reg+0] + theta[reg+3] * theta[reg+0] * theta[reg+0] - 0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] + theta[reg+3] * x * x) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * theta[reg+5] * pow(theta[reg+2], -0.3e1) / theta[reg+3] / (-0.1e1 + theta[reg+4] * theta[reg+4]) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1);
+				Fmat[i][reg+3]= 0.1591549430e0 * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * theta[reg+5] * (-0.1e1 * theta[reg+4] * theta[reg+4] * theta[reg+3] * theta[reg+3] * theta[reg+2] - 0.1e1 * theta[reg+4] * theta[reg+3] * x * theta[reg+1] + theta[reg+4] * theta[reg+3] * x * y + theta[reg+4] * theta[reg+3] * theta[reg+0] * theta[reg+1] - 0.1e1 * theta[reg+4] * theta[reg+3] * theta[reg+0] * y + 0.2e1 * theta[reg+2] * y * theta[reg+1] - 0.1e1 * theta[reg+2] * theta[reg+1] * theta[reg+1] + theta[reg+2] * theta[reg+3] * theta[reg+3] - 0.1e1 * theta[reg+2] * y * y) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) / theta[reg+2] * pow(theta[reg+3], -0.3e1);
+				Fmat[i][reg+4]= -0.1591549430e0 * (pow(theta[reg+4], 0.3e1) * theta[reg+3] * theta[reg+3] * theta[reg+2] * theta[reg+2] + theta[reg+3] * x * theta[reg+2] * theta[reg+1] * theta[reg+4] * theta[reg+4] - 0.1e1 * theta[reg+3] * theta[reg+0] * theta[reg+2] * theta[reg+1] * theta[reg+4] * theta[reg+4] - 0.1e1 * theta[reg+3] * x * theta[reg+2] * y * theta[reg+4] * theta[reg+4] + theta[reg+3] * theta[reg+0] * theta[reg+2] * y * theta[reg+4] * theta[reg+4] - 0.1e1 * theta[reg+4] * theta[reg+3] * theta[reg+3] * theta[reg+2] * theta[reg+2] + theta[reg+4] * theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + theta[reg+2] * theta[reg+2] * theta[reg+4] * theta[reg+1] * theta[reg+1] - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+4] * theta[reg+1] + theta[reg+4] * theta[reg+3] * theta[reg+3] * x * x + theta[reg+2] * theta[reg+2] * theta[reg+4] * y * y - 0.2e1 * x * theta[reg+4] * theta[reg+3] * theta[reg+3] * theta[reg+0] + theta[reg+3] * x * theta[reg+2] * theta[reg+1] - 0.1e1 * theta[reg+3] * theta[reg+0] * theta[reg+2] * theta[reg+1] - 0.1e1 * theta[reg+3] * x * theta[reg+2] * y + theta[reg+3] * theta[reg+0] * theta[reg+2] * y) * theta[reg+5] * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1) * pow(-0.1e1 + theta[reg+4] * theta[reg+4], -0.2e1) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1);
+				Fmat[i][reg+5]= 0.1591549430e0 * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1);
+				i=i+1;
+			}
+		}
+	}
+
+
+	//vectorize Fmat, and store in pointer to F
+	i=0;
+	for(col=0;col<(*p);col++) {
+		for(row=0;row<(*n);row++) {
+			F[i]=Fmat[row][col];
+			i=i+1;
+		}
+	}
+
+}
+
+//(p*p) Inner sandwich part of the Sandwich Variance Estimator
+void inner_sandwich(int *n, int *p, double *F, double *W, double *R, double *B)
+{
+
+	//n is number of voxels
+	//p is number of parameters (is regions * 6)
+	//F is vector of length (n*p) containing Jacobian
+	//W is vector of length (n) containing weights from SSQ
+	//Rdiag is diagonal of mean residual matrix
+	//Roffdiag are offdiagonals of mean resiudal matrix (lower triangle)
+	//B is vector of length p*p containing inner sandwich part
+
+	int row, col,i;
+	double *Fmat, *FW;
+
+	Fmat = (double *) R_alloc((*n)*(*p),sizeof(double));
+	FW = (double *) R_alloc((*n)*(*p),sizeof(double));
+
+
+	//zerofill FW (FW is F'W matrix product)
+	for(col=0;col<(*n);col++) {
+		for(row=0;row<(*p);row++) {
+			*(FW+(row+(col)*(*p))) = 0e0;
+		}
+	}
+
+
+	//zerofill Bmat (Bmat is p*p matrix with inner sandwich)
+	for(col=0;col<(*p);col++) {
+		for(row=0;row<(*p);row++) {
+			B[(row+(col)*(*p))]=0e0;
+		}
+	}
+
+
+	//Fill Fmat matrix with F vector
+	for(col=0;col<(*p);col++) {
+		for(row=0;row<(*n);row++) {
+			*(Fmat+(row+(col)*(*n))) = F[(row+(col)*(*n))];
+		}
+	}
+
+	//Create FW=W-1RW-1 (n*n weigthed Residual matrix)
+	for(col=0;col<(*n);col++) {
+		for(row=0;row<(*n);row++) {
+			R[(row+(col)*(*n))]=R[(row+(col)*(*n))]/(W[row]*W[col]);
+		}
+	}
+
+	//Create F'(WRW) matrix (with FW part)
+	for(col=0;col<(*n);col++) {
+		for(row=0;row<(*p);row++) {
+			for(i=0;i<(*n);i++) {
+				*(FW+(row+(col)*(*p)))=*(FW+(row+(col)*(*p)))+*(Fmat+(i+(row)*(*n)))*R[(i+(col)*(*n))];
+			}
+		}
+	}
+
+
+	//Create B=(F'WRW)F matrix
+	for(col=0;col<(*p);col++) {
+		for(row=0;row<(*p);row++) {
+			for(i=0;i<(*n);i++) {
+				B[(row+(col)*(*p))]=B[(row+(col)*(*p))]+*(FW+(row+(i)*(*p)))**(Fmat+(i+(col)*(*n)));
+			}
+		}
+	}
+
+}
+

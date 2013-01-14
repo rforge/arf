@@ -1,7 +1,10 @@
 export(
-	fitplot,
+	fitModel,
 	ellipse,
 	makeeye,
+	modelest,
+	heatplot,
+	calcBIC,
 	simHM
 )
 
@@ -23,5 +26,9 @@ import(
 useDynLib(
 	etanalysis,
 	gauss,
-	ssqgauss
+	ssqgauss,
+	outerprod,
+	outerproddiagonal,
+	fderiv,
+	inner_sandwich
 )
