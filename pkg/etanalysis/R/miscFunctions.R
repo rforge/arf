@@ -9,6 +9,6 @@ heatplot <- function(dat) {
 	
 	hmcols = colorRampPalette(c("blue","green","yellow","red"))(256)
 	
-	image(t(dat),col=hmcols)
+	image(1:dim(dat)[2],1:dim(dat)[1],t(dat),col=hmcols)
 
 }

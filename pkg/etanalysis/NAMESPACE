@@ -4,7 +4,14 @@ export(
 	makeeye,
 	modelest,
 	heatplot,
-	calcBIC,
+	calcFit,
+	residDiag,
+	residFull,
+	swDiag,
+	swFull,
+	derivatives,
+	wald,
+	dStart,
 	simHM
 )
 
@@ -30,5 +37,6 @@ useDynLib(
 	outerprod,
 	outerproddiagonal,
 	fderiv,
+	fderiv2,
 	inner_sandwich
 )

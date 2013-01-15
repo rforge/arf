@@ -178,7 +178,6 @@ void fderiv(int *n, int *p, int *dimx, int *dimy, double *theta, double *F)
 
 	//region loop, increases by 6 for each region
 	for(reg=0;reg<(*p);reg=reg+6) {
-
 		//voxel loop, calculate derivative per voxel (x increases fastests, then y)
 		i=0;
 		for(y=1;y<(*dimy+1);y++) {
@@ -205,6 +204,64 @@ void fderiv(int *n, int *p, int *dimx, int *dimy, double *theta, double *F)
 	}
 
 }
+
+//(n*p) first order derivative matrix
+void fderiv2(int *n, int *p, int *dimx, int *dimy, double *theta, double *F)
+{
+	//n is number of voxels
+	//p is number of parameters (is regions * 6)
+	//dimx/dimy are x-y dimensions
+	//THETA is vector op parameters (parameters arranged per region)
+	//F is vector of length (n*p)
+
+	int x, y, i, reg, row, col;
+	double pi = 3.141593;
+
+
+	//region loop, increases by 6 for each region
+	i=0;
+	for(reg=0;reg<(*p);reg=reg+6) {
+		//voxel loop, calculate derivative per voxel (x increases fastests, then y)
+		for(y=1;y<(*dimy+1);y++) {
+			for(x=1;x<(*dimx+1);x++) {
+				F[i] = 0.5000000000e0 * theta[reg+5] / theta[reg+3] * (-0.1e1 * theta[reg+3] * x + theta[reg+3] * theta[reg+0] + theta[reg+4] * theta[reg+2] * y - 0.1e1 * theta[reg+4] * theta[reg+2] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1) / pi;
+				i++;
+			}
+		}
+		for(y=1;y<(*dimy+1);y++) {
+			for(x=1;x<(*dimx+1);x++) {
+				F[i] = -0.1591549430e0 * theta[reg+5] / theta[reg+2] * (theta[reg+2] * y - 0.1e1 * theta[reg+2] * theta[reg+1] - 0.1e1 * theta[reg+4] * theta[reg+3] * x + theta[reg+4] * theta[reg+3] * theta[reg+0]) * pow(theta[reg+3], -0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1);
+				i++;
+			}
+		}
+		for(y=1;y<(*dimy+1);y++) {
+			for(x=1;x<(*dimx+1);x++) {
+				F[i] = -0.1591549430e0 * (theta[reg+4] * theta[reg+4] * theta[reg+3] * theta[reg+2] * theta[reg+2] + theta[reg+4] * theta[reg+2] * y * theta[reg+0] - 0.1e1 * theta[reg+4] * theta[reg+2] * y * x - 0.1e1 * theta[reg+4] * theta[reg+2] * theta[reg+1] * theta[reg+0] + theta[reg+4] * theta[reg+2] * theta[reg+1] * x - 0.2e1 * theta[reg+3] * x * theta[reg+0] + theta[reg+3] * theta[reg+0] * theta[reg+0] - 0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] + theta[reg+3] * x * x) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * theta[reg+5] * pow(theta[reg+2], -0.3e1) / theta[reg+3] / (-0.1e1 + theta[reg+4] * theta[reg+4]) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1);
+				i++;
+			}
+		}
+		for(y=1;y<(*dimy+1);y++) {
+			for(x=1;x<(*dimx+1);x++) {
+				F[i] = 0.1591549430e0 * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * theta[reg+5] * (-0.1e1 * theta[reg+4] * theta[reg+4] * theta[reg+3] * theta[reg+3] * theta[reg+2] - 0.1e1 * theta[reg+4] * theta[reg+3] * x * theta[reg+1] + theta[reg+4] * theta[reg+3] * x * y + theta[reg+4] * theta[reg+3] * theta[reg+0] * theta[reg+1] - 0.1e1 * theta[reg+4] * theta[reg+3] * theta[reg+0] * y + 0.2e1 * theta[reg+2] * y * theta[reg+1] - 0.1e1 * theta[reg+2] * theta[reg+1] * theta[reg+1] + theta[reg+2] * theta[reg+3] * theta[reg+3] - 0.1e1 * theta[reg+2] * y * y) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) / theta[reg+2] * pow(theta[reg+3], -0.3e1);
+				i++;
+			}
+		}
+		for(y=1;y<(*dimy+1);y++) {
+			for(x=1;x<(*dimx+1);x++) {
+				F[i] = -0.1591549430e0 * (pow(theta[reg+4], 0.3e1) * theta[reg+3] * theta[reg+3] * theta[reg+2] * theta[reg+2] + theta[reg+3] * x * theta[reg+2] * theta[reg+1] * theta[reg+4] * theta[reg+4] - 0.1e1 * theta[reg+3] * theta[reg+0] * theta[reg+2] * theta[reg+1] * theta[reg+4] * theta[reg+4] - 0.1e1 * theta[reg+3] * x * theta[reg+2] * y * theta[reg+4] * theta[reg+4] + theta[reg+3] * theta[reg+0] * theta[reg+2] * y * theta[reg+4] * theta[reg+4] - 0.1e1 * theta[reg+4] * theta[reg+3] * theta[reg+3] * theta[reg+2] * theta[reg+2] + theta[reg+4] * theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + theta[reg+2] * theta[reg+2] * theta[reg+4] * theta[reg+1] * theta[reg+1] - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+4] * theta[reg+1] + theta[reg+4] * theta[reg+3] * theta[reg+3] * x * x + theta[reg+2] * theta[reg+2] * theta[reg+4] * y * y - 0.2e1 * x * theta[reg+4] * theta[reg+3] * theta[reg+3] * theta[reg+0] + theta[reg+3] * x * theta[reg+2] * theta[reg+1] - 0.1e1 * theta[reg+3] * theta[reg+0] * theta[reg+2] * theta[reg+1] - 0.1e1 * theta[reg+3] * x * theta[reg+2] * y + theta[reg+3] * theta[reg+0] * theta[reg+2] * y) * theta[reg+5] * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1) * pow(-0.1e1 + theta[reg+4] * theta[reg+4], -0.2e1) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1);
+				i++;
+			}
+		}
+		for(y=1;y<(*dimy+1);y++) {
+			for(x=1;x<(*dimx+1);x++) {
+				F[i] = 0.1591549430e0 * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1);
+				i++;
+			}
+		}
+	}
+
+}
+
 
 //(p*p) Inner sandwich part of the Sandwich Variance Estimator
 void inner_sandwich(int *n, int *p, double *F, double *W, double *R, double *B)

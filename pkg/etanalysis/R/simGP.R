@@ -49,7 +49,7 @@ makeeye <- function()
 
 
 
-simHM <- function(dimx,dimy,duration,mode=c('random','normfocus'),posxlim=NULL,posylim=NULL,nlen=10,control.norm=list(mean=list(c(25,25),c(25,50)),sd=list(c(3,3),c(4,4)))) 
+simHM <- function(dimx,dimy,duration,mode=c('random','normfocus','unitfocus'),posxlim=NULL,posylim=NULL,nlen=10,control.norm=list(mean=list(c(25,25),c(25,50)),sd=list(c(3,3),c(4,4)))) 
 {
 
 	fourD = array(0,dim=c(dimy,dimx,duration))
@@ -72,6 +72,24 @@ simHM <- function(dimx,dimy,duration,mode=c('random','normfocus'),posxlim=NULL,p
 			fourD[(loc_y:(loc_y+dm[1]-1)),(loc_x:(loc_x+dm[2]-1)),i]=eye
 		}
 		
+		if(mode=='unitfocus') {
+			
+			for(j in 1:length(control.norm$mean)) {
+				loc_x = sample((control.norm$mean[[j]][1]-control.norm$sd[[j]][1]):(control.norm$mean[[j]][1]+control.norm$sd[[j]][1]),1)
+				loc_y = sample((control.norm$mean[[j]][2]-control.norm$sd[[j]][2]):(control.norm$mean[[j]][2]+control.norm$sd[[j]][2]),1)
+				
+				if(loc_x<posxlim[1]) loc_x = posxlim[1]
+				if(loc_x>posxlim[2]) loc_x = posxlim[2]
+				
+				if(loc_y<posylim[1]) loc_y = posylim[1]
+				if(loc_y>posylim[2]) loc_y = posylim[2]
+			
+				fourD[(loc_y:(loc_y+dm[1]-1)),(loc_x:(loc_x+dm[2]-1)),i]=eye
+
+			}
+			
+		}
+		
 		if(mode=='normfocus') {
 			
 			for(j in 1:length(control.norm$mean)) {
@@ -83,9 +101,9 @@ simHM <- function(dimx,dimy,duration,mode=c('random','normfocus'),posxlim=NULL,p
 				
 				if(loc_y<posylim[1]) loc_y = posylim[1]
 				if(loc_y>posylim[2]) loc_y = posylim[2]
-			
+				
 				fourD[(loc_y:(loc_y+dm[1]-1)),(loc_x:(loc_x+dm[2]-1)),i]=eye
-
+				
 			}
 			
 		}
