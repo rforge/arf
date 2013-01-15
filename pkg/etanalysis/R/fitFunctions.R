@@ -28,11 +28,12 @@ modelest <- function(mod)
 }
 
 
-fitModel <- function(datmap,reg,startval=NULL,iterlim=10000,trace=10)
+fitModel <- function(datmap,reg,startval=NULL,weights=NULL,iterlim=10000,trace=10)
 {
 	
 	dimx = dim(datmap)[2]
 	dimy = dim(datmap)[1]
+	if(is.null(weights)) weights = rep(1,dimx*dimy)
 	
 	if(is.null(startval)) startval <- rep(c(20,20,2,3,.05,100),reg)
 	
@@ -42,7 +43,7 @@ fitModel <- function(datmap,reg,startval=NULL,iterlim=10000,trace=10)
 							#lower=lowbound, 
 							#upper=upbound,
 							datavec=as.vector(t(datmap)), #data
-							weightvec=rep(1,dimx*dimy), #weight
+							weightvec=weights, #weight
 							nreg=reg*6, #numparam
 							dimx=dimx, #dimx
 							dimy=dimy, #dimy
@@ -51,7 +52,7 @@ fitModel <- function(datmap,reg,startval=NULL,iterlim=10000,trace=10)
 							hessian=T
 					)),silent=F)
 	
-	return(list(model=optim.output,data=datmap))
+	return(list(model=optim.output,data=datmap,weights=weights))
 	
 }
 
@@ -61,7 +62,7 @@ calcFit <- function(mod)
 	reg = length(mod$model$par)/6
 	n = dim(mod$data)[1]*dim(mod$data)[2]
 	minmod = mod$model$value
-	weights = rep(1,n)
+	weights = mod$weights
 	
 	#calculate the determinant of the weights
 	dtm <- prod(weights)
@@ -130,38 +131,6 @@ residDiag <- function(mod,datarr) {
 	
 }
 
-residFull<- function(mod,datarr) {
-	
-	
-	#open data for first trial to get dimensions and trial data
-	data <- as.vector(datarr[,,1])
-	tn <- dim(datarr)[3]
-	
-	#set dimensions and data
-	dimx <- dim(datarr)[2]
-	dimy <- dim(datarr)[1]
-	n <- dimx^2*dimy^2
-	
-	#calculate model based on parameter estimates
-	model <- .C('gauss',as.double(mod$model$par),as.integer(length(mod$model$par)),as.integer(dimx),as.integer(dimy),as.double(numeric(dimx*dimy)))[[5]]
-
-	#caluclate outerproduct of residuals
-	resids <- .C('outerprod',as.integer(dimx*dimy),as.double(data-model),as.double(vector('numeric',n)))[[3]]
-	
-	#calculate resids for second and further trials and sum
-	for(i in 2:tn) {
-		data <- datarr[,,i]
-		resids <- resids + .C('outerprod',as.integer(dimx*dimy),as.double(data-model),as.double(vector('numeric',n)))[[3]]	
-	}
-	
-	#divide resids by number of trials squared
-	resids <- resids/tn^2
-	
-	
-	return(invisible(resids))	
-	
-}
-
 swDiag <- function(mod,datarr) {
 	
 	R <- residDiag(mod,datarr)
@@ -169,7 +138,7 @@ swDiag <- function(mod,datarr) {
 	F <- matrix(derivatives(mod),,p) 
 		
 	#read in average weights (with dims)
-	weights <- rep(1,dim(datarr)[2]*dim(datarr)[1])
+	weights <- mod$weights
 		
 	n <- dim(datarr)[2]*dim(datarr)[1]
 	W <- weights
@@ -191,36 +160,6 @@ swDiag <- function(mod,datarr) {
 	return(invisible(varcov))
 	
 }
-
-swFull <- function(mod,datarr) {
-	
-	R <- residFull(mod,datarr)
-	p <- length(mod$model$par)
-	F <- matrix(derivatives(mod),,p) 
-	
-	#read in average weights (with dims)
-	weights <- rep(1,dim(datarr)[2]*dim(datarr)[1])
-	n <- dim(datarr)[2]*dim(datarr)[1]
-	W <- weights
-	rm(weights)
-	
-	#calculate the inner sandwich part B (in A-1BA-1)
-	B <- matrix(.C('inner_sandwich',as.integer(n),as.integer(p),as.double(F),as.double(W),as.double(R),as.double(rep(0,p*p)))[[6]],p,p)
-	
-	#calculate the sandwich estimator (using the Hessian returned by nlm)
-	SW <- try(solve(.5*mod$model$hessian)%*%B%*%solve(.5*mod$model$hessian),silen=T)
-	
-	#check if alll went well and add to the arfmodel object
-	if(is.null(attr(SW,'class'))) {
-		varcov <- SW
-	} else {
-		warning('Failed to calculate Sandwich estimate.')
-	}
-	
-	return(invisible(varcov))
-	
-}
-
 
 derivatives <- function(mod) {
 			
