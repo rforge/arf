@@ -1,9 +1,12 @@
 export(
 	fitModel,
+	fitModelFixSize,
+	fitModelFixAll,
 	ellipse,
 	makeeye,
 	modelest,
 	heatplot,
+	compareheat,
 	calcFit,
 	residDiag,
 	swDiag,

@@ -15,6 +15,47 @@ ssq <- function(theta,datavec,weightvec,nreg,dimx,dimy) {
 	
 }
 
+
+ssqfixsize <- function(theta,thetasize,datavec,weightvec,nreg,dimx,dimy) {
+	## ssq is the objective function (sums-of-squares)
+	## it calls the external C-funtion 'ssq'
+	## input are theta (paramters), datavec, weightvec, number of regions, and dim x and dim y
+	## output is a vector of parameter estimates (double)
+	
+	td = matrix(theta,,3,byrow=T)
+	ts = matrix(thetasize,,3,byrow=T)
+	
+	cm = cbind(td[,1],td[,2],ts,td[,3])
+	cm = as.vector(t(cm))
+	#cat('ssq\n')
+	#browser()
+	
+	nlmdat <- .C('ssqgauss',as.double(cm),as.double(datavec),as.double(weightvec),as.integer(nreg),as.integer(dimx),as.integer(dimy),as.double(vector('numeric',1)))
+	
+	return(invisible(nlmdat[[7]]))	
+	
+}
+
+ssqfixamp <- function(theta,thetasize,datavec,weightvec,nreg,dimx,dimy) {
+	## ssq is the objective function (sums-of-squares)
+	## it calls the external C-funtion 'ssq'
+	## input are theta (paramters), datavec, weightvec, number of regions, and dim x and dim y
+	## output is a vector of parameter estimates (double)
+	
+	td = matrix(theta,,1,byrow=T)
+	ts = matrix(thetasize,,5,byrow=T)
+	
+	cm = cbind(ts,td[,1])
+	cm = as.vector(t(cm))
+	#cat('ssq\n')
+	#browser()
+	
+	nlmdat <- .C('ssqgauss',as.double(cm),as.double(datavec),as.double(weightvec),as.integer(nreg),as.integer(dimx),as.integer(dimy),as.double(vector('numeric',1)))
+	
+	return(invisible(nlmdat[[7]]))	
+	
+}
+
 modelest <- function(mod)
 {
 	estimates <- mod$model$par
@@ -55,6 +96,70 @@ fitModel <- function(datmap,reg,startval=NULL,weights=NULL,iterlim=10000,trace=1
 	return(list(model=optim.output,data=datmap,weights=weights))
 	
 }
+
+fitModelFixSize <- function(datmap,reg,estim,weights=NULL,iterlim=10000,trace=10)
+{
+	
+	dimx = dim(datmap)[2]
+	dimy = dim(datmap)[1]
+	if(is.null(weights)) weights = rep(1,dimx*dimy)
+	
+	emat = matrix(estim,,6,byrow=T)
+	startval = as.vector(t(emat[,c(1,2,6)]))
+	thetasize = as.vector(t(emat[,c(3,4,5)]))
+
+	optim.output <- try(suppressWarnings(optim(
+							startval,
+							ssqfixsize, 	#objective function
+							#lower=lowbound, 
+							#upper=upbound,
+							thetasize=thetasize,
+							datavec=as.vector(t(datmap)), #data
+							weightvec=weights, #weight
+							nreg=reg*6, #numparam
+							dimx=dimx, #dimx
+							dimy=dimy, #dimy
+							method='BFGS',
+							control=list(trace=trace,maxit=iterlim), #control
+							hessian=T
+					)),silent=F)
+	
+	return(list(model=optim.output,data=datmap,weights=weights))
+	
+}
+
+fitModelFixAll <- function(datmap,reg,estim,weights=NULL,iterlim=10000,trace=10)
+{
+	
+	dimx = dim(datmap)[2]
+	dimy = dim(datmap)[1]
+	if(is.null(weights)) weights = rep(1,dimx*dimy)
+	
+	emat = matrix(estim,,6,byrow=T)
+	startval = as.vector(t(emat[,c(6)]))
+	thetasize = as.vector(t(emat[,c(1,2,3,4,5)]))
+	
+	optim.output <- try(suppressWarnings(optim(
+							startval,
+							ssqfixamp, 	#objective function
+							#lower=lowbound, 
+							#upper=upbound,
+							thetasize=thetasize,
+							datavec=as.vector(t(datmap)), #data
+							weightvec=weights, #weight
+							nreg=reg*6, #numparam
+							dimx=dimx, #dimx
+							dimy=dimy, #dimy
+							method='BFGS',
+							control=list(trace=trace,maxit=iterlim), #control
+							hessian=T
+					)),silent=F)
+	
+	return(list(model=optim.output,data=datmap,weights=weights))
+	
+}
+
+
 
 calcFit <- function(mod) 
 {
