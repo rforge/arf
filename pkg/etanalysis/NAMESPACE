@@ -10,6 +10,8 @@ export(
 	calcFit,
 	residDiag,
 	swDiag,
+	residFull,
+	swFull,
 	derivatives,
 	wald,
 	dStart,
