@@ -3,15 +3,19 @@
 # Wouter D. Weeda, University of Amsterdam
 ###############################################################################
 
-ssq <- function(theta,datavec,weightvec,nreg,dimx,dimy) {
+ssq <- function(theta,datavec,weightvec,nreg,dimx,dimy,ss_data) {
 	## ssq is the objective function (sums-of-squares)
 	## it calls the external C-funtion 'ssq'
 	## input are theta (paramters), datavec, weightvec, number of regions, and dim x and dim y
 	## output is a vector of parameter estimates (double)
+	if(length(theta[is.na(theta) | is.nan(theta) | theta==Inf | theta==-Inf])==0)  {
+		nlmdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(nreg),as.integer(dimx),as.integer(dimy),as.double(vector('numeric',1)))[[7]]	
+	} else nlmdat=ss_data
 	
-	nlmdat <- .C('ssqgauss',as.double(theta),as.double(datavec),as.double(weightvec),as.integer(nreg),as.integer(dimx),as.integer(dimy),as.double(vector('numeric',1)))
+	if(is.nan(nlmdat) | nlmdat==Inf | is.na(nlmdat) | nlmdat==-Inf) ssqdat=ss_data
 	
-	return(invisible(nlmdat[[7]]))	
+	
+	return(invisible(nlmdat))	
 	
 }
 
@@ -76,18 +80,19 @@ fitModel <- function(datmap,reg,startval=NULL,weights=NULL,iterlim=10000,trace=1
 	dimy = dim(datmap)[1]
 	if(is.null(weights)) weights = rep(1,dimx*dimy)
 	
-	if(is.null(startval)) startval <- rep(c(20,20,2,3,.05,100),reg)
+	if(is.null(startval)) startval <- rep(c(20,20,2,3,.05,1000),reg)
+	
+	ssdat = .C('ssqdata',as.double(as.vector(t(datmap))),as.double(weights),as.integer(dimx*dimy),as.double(numeric(1)))[[4]]
 	
 	optim.output <- try(suppressWarnings(optim(
 							startval,
 							ssq, 	#objective function
-							#lower=lowbound, 
-							#upper=upbound,
 							datavec=as.vector(t(datmap)), #data
 							weightvec=weights, #weight
 							nreg=reg*6, #numparam
 							dimx=dimx, #dimx
 							dimy=dimy, #dimy
+							ss_data=ssdat,
 							method='BFGS',
 							control=list(trace=trace,maxit=iterlim), #control
 							hessian=T

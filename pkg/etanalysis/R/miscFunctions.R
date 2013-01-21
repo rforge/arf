@@ -31,3 +31,12 @@ compareheat <- function(dat1,dat2,thres=1e-06,title='') {
 	
 	
 }
+
+perspcolors <- function(x, col=colorRampPalette(c("blue","green","yellow","red"))(256)) {
+	
+	x2 = (x[-1,-1] + x[-1,-(ncol(x)-1)] + x[-(nrow(x)-1),-1] + x[-(nrow(x)-1), -(ncol(x)-1)])/4
+	
+	cols = col[cut(x2,breaks=length(col),include.lowest=TRUE)]
+	
+	return(cols)
+}

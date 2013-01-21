@@ -125,6 +125,21 @@ void ssqgauss(double *theta, double *dat, double *W, int *np, int *dimx, int *di
 
 }
 
+void ssqdata(double *dat, double *W, int *n, double *ss)
+{
+
+	int i;
+	double g;
+
+	g=0e0;
+	for(i=0;i<(*n);i++) {
+		g=g+pow((dat[i]),2)*(1/W[i]);
+	}
+
+	ss[0]=g;
+}
+
+
 //(n*n) Outer product of vector length n
 void outerprod(int *n, double *ivec, double *out)
 {
