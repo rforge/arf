@@ -43,5 +43,8 @@ useDynLib(
 	outerproddiagonal,
 	fderiv,
 	fderiv2,
+	fderiv2theta1,
+	fderiv2theta2,
+	ssqgaussdisplace,
 	inner_sandwich
 )
