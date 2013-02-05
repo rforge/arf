@@ -138,16 +138,8 @@ void ssqgaussdisplace(double *theta, double *thetaadd, double *dat, double *W, i
 
 	//nreg is number of reg*p
 	int reg,x,y,p,n,par;
-	double f,g,theta_x,theta_y,sig_x,sig_y,sig_xy,det_sig,dif_x,dif_y, *deriv1, *deriv2;
+	double f,g,theta_x,theta_y,sig_x,sig_y,sig_xy,det_sig,dif_x,dif_y, deriv1, deriv2;
 	double pi = 3.141593;
-
-	par = 6;
-	n = (*dimx)*(*dimy);
-
-	double fmat[par];
-
-	void fderiv2theta1();
-	//void fderiv2theta2();
 
 
 	//theta 1,2 = x,y coordinates
@@ -166,17 +158,14 @@ void ssqgaussdisplace(double *theta, double *thetaadd, double *dat, double *W, i
 				theta_x=theta[reg+0];
 				theta_y=theta[reg+1];
 
-				//theta scale
-				theta[reg+2] = theta[reg+2]*(thetaadd[reg+2]);
-				theta[reg+3] = theta[reg+3]*(thetaadd[reg+2]);
-
 				//sigma matrix
-				sig_x=pow(theta[reg+2],2);
-				sig_xy=theta[reg+4]*theta[reg+2]*theta[reg+3];
-				sig_y=pow(theta[reg+3],2);
+				sig_x=pow(theta[reg+2]*thetaadd[reg+2],2);
+				sig_xy=theta[reg+4]*theta[reg+2]*thetaadd[reg+2]*theta[reg+3]*thetaadd[reg+2];
+				sig_y=pow(theta[reg+3]*thetaadd[reg+2],2);
 
-				fderiv2theta1(x, y, par, theta, fmat);
-				//fderiv2theta2(np, n, dimx, dimy, theta,*deriv2);
+
+				deriv1 = thetaadd[reg+0] * (0.5000000000e0 * theta[reg+5] / theta[reg+3] * (-0.1e1 * theta[reg+3] * x + theta[reg+3] * theta[reg+0] + theta[reg+4] * theta[reg+2] * y - 0.1e1 * theta[reg+4] * theta[reg+2] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1) / pi);
+				deriv2 = thetaadd[reg+1] * (-0.1591549430e0 * theta[reg+5] / theta[reg+2] * (theta[reg+2] * y - 0.1e1 * theta[reg+2] * theta[reg+1] - 0.1e1 * theta[reg+4] * theta[reg+3] * x + theta[reg+4] * theta[reg+3] * theta[reg+0]) * pow(theta[reg+3], -0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1));
 
 				//determinant of sigma
 				det_sig=sig_x*sig_y-sig_xy*sig_xy;
@@ -187,8 +176,10 @@ void ssqgaussdisplace(double *theta, double *thetaadd, double *dat, double *W, i
 				dif_y=(y-theta_y);
 
 				//add to f gaussian value for each region
-				 //f=f+ (theta[reg+5]*(1/(2*pi*sqrt(det_sig)))*exp(-.5*((dif_x*((dif_x*(sig_y/det_sig))-(dif_y*(sig_xy/det_sig))))+(dif_y*((dif_y*(sig_x/det_sig))-(dif_x*(sig_xy/det_sig)))))) + (deriv1[p]*(thetaadd[reg+0])) + (deriv2[p]*(thetaadd[reg+1])));
-				f=f+ (theta[reg+5]*(1/(2*pi*sqrt(det_sig)))*exp(-.5*((dif_x*((dif_x*(sig_y/det_sig))-(dif_y*(sig_xy/det_sig))))+(dif_y*((dif_y*(sig_x/det_sig))-(dif_x*(sig_xy/det_sig)))))));
+				f= f + (theta[reg+5]*(1/(2*pi*sqrt(det_sig)))*exp(-.5*((dif_x*((dif_x*(sig_y/det_sig))-(dif_y*(sig_xy/det_sig))))+(dif_y*((dif_y*(sig_x/det_sig))-(dif_x*(sig_xy/det_sig)))))));
+				f= f + deriv1 + deriv2;
+
+				//f=f+ (theta[reg+5]*(1/(2*pi*sqrt(det_sig)))*exp(-.5*((dif_x*((dif_x*(sig_y/det_sig))-(dif_y*(sig_xy/det_sig))))+(dif_y*((dif_y*(sig_x/det_sig))-(dif_x*(sig_xy/det_sig)))))));
 
 			}
 
@@ -201,6 +192,69 @@ void ssqgaussdisplace(double *theta, double *thetaadd, double *dat, double *W, i
   //set ss to g
   ss[0]=g;
 
+}
+
+//sums-of-squares function (including main shape function)
+void gaussdisplace(double *theta, double *thetaadd, int *np, int *dimx, int *dimy, double *gx)
+{
+
+	//Theta is vector of parameters (arranged per region)
+	//dat is data
+	//W is vector of weights (from SSQ)
+	//np is total number of parameters used (regions*6)
+	//dimx/dimy are x-y dimensions
+	//ss is sums-of-squares estimate
+
+	//nreg is number of reg*p
+	int reg,x,y,p,n,par;
+	double f,theta_x,theta_y,sig_x,sig_y,sig_xy,det_sig,dif_x,dif_y, deriv1, deriv2;
+	double pi = 3.141593;
+
+
+	//theta 1,2 = x,y coordinates
+	//theta 3,4 = sd's of x,y
+	//theta 5 = corr xy
+	//theta 6 = amplitude
+
+	p=0;
+	for(y=1;y<(*dimy+1);y++) {
+		for(x=1;x<(*dimx+1);x++) {
+
+			f=0; //f becomes the sum of all regions  (zeroed every region)
+			for(reg=0;reg<(*np);reg=reg+6) {
+
+				//parameter coordinates
+				theta_x=theta[reg+0];
+				theta_y=theta[reg+1];
+
+				//sigma matrix
+				sig_x=pow(theta[reg+2]*thetaadd[reg+2],2);
+				sig_xy=theta[reg+4]*theta[reg+2]*thetaadd[reg+2]*theta[reg+3]*thetaadd[reg+2];
+				sig_y=pow(theta[reg+3]*thetaadd[reg+2],2);
+
+				deriv1 = thetaadd[reg+0] * (0.5000000000e0 * theta[reg+5] / theta[reg+3] * (-0.1e1 * theta[reg+3] * x + theta[reg+3] * theta[reg+0] + theta[reg+4] * theta[reg+2] * y - 0.1e1 * theta[reg+4] * theta[reg+2] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1) / pi);
+				deriv2 = thetaadd[reg+1] * (-0.1591549430e0 * theta[reg+5] / theta[reg+2] * (theta[reg+2] * y - 0.1e1 * theta[reg+2] * theta[reg+1] - 0.1e1 * theta[reg+4] * theta[reg+3] * x + theta[reg+4] * theta[reg+3] * theta[reg+0]) * pow(theta[reg+3], -0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * x * x - 0.2e1 * x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * y + 0.2e1 * theta[reg+3] * x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * y * y - 0.2e1 * y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1));
+
+				//determinant of sigma
+				det_sig=sig_x*sig_y-sig_xy*sig_xy;
+				if(det_sig < 0) det_sig=0;
+
+				//(x-pc)
+				dif_x=(x-theta_x);
+				dif_y=(y-theta_y);
+
+				//add to f gaussian value for each region
+				f= f + (theta[reg+5]*(1/(2*pi*sqrt(det_sig)))*exp(-.5*((dif_x*((dif_x*(sig_y/det_sig))-(dif_y*(sig_xy/det_sig))))+(dif_y*((dif_y*(sig_x/det_sig))-(dif_x*(sig_xy/det_sig)))))));
+				f= f + deriv1 + deriv2;
+
+				//f=f+ (theta[reg+5]*(1/(2*pi*sqrt(det_sig)))*exp(-.5*((dif_x*((dif_x*(sig_y/det_sig))-(dif_y*(sig_xy/det_sig))))+(dif_y*((dif_y*(sig_x/det_sig))-(dif_x*(sig_xy/det_sig)))))));
+
+			}
+
+			gx[p]=f;
+			p++;
+		}
+	}
 }
 
 
@@ -356,49 +410,6 @@ void fderiv2(int *n, int *p, int *dimx, int *dimy, double *theta, double *F)
 
 }
 
-
-void fderiv2theta1(int *x, int *y, int *p, double *theta, double *F)
-{
-	//n is number of voxels
-	//p is number of parameters (is regions * 6)
-	//dimx/dimy are x-y dimensions
-	//THETA is vector op parameters (parameters arranged per region)
-	//F is vector of length (n*p)
-
-	int i, reg;
-	double pi = 3.141593;
-
-
-	//region loop, increases by 6 for each region
-	i=0;
-	for(reg=0;reg<(*p);reg=reg+6) {
-		//voxel loop, calculate derivative per voxel (x increases fastests, then y)
-		F[i] = 0.5000000000e0 * theta[reg+5] / theta[reg+3] * (-0.1e1 * theta[reg+3] * *x + theta[reg+3] * theta[reg+0] + theta[reg+4] * theta[reg+2] * *y - 0.1e1 * theta[reg+4] * theta[reg+2] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * *x * *x - 0.2e1 * *x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * *x * theta[reg+4] * theta[reg+2] * *y + 0.2e1 * theta[reg+3] * *x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * *y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * *y * *y - 0.2e1 * *y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1) / pi;
-		i++;
-	}
-}
-
-
-void fderiv2theta2(int *n, int *p, int *dimx, int *dimy, double *theta, double *F)
-{
-	//n is number of voxels
-	//p is number of parameters (is regions * 6)
-	//dimx/dimy are x-y dimensions
-	//THETA is vector op parameters (parameters arranged per region)
-	//F is vector of length (n*p)
-
-	int x, y, i, reg, row, col;
-	double pi = 3.141593;
-
-
-	//region loop, increases by 6 for each region
-	i=0;
-	for(reg=0;reg<(*p);reg=reg+6) {
-		//voxel loop, calculate derivative per voxel (x increases fastests, then y)
-		//F[i] = -0.1591549430e0 * theta[reg+5] / theta[reg+2] * (theta[reg+2] * *y - 0.1e1 * theta[reg+2] * theta[reg+1] - 0.1e1 * theta[reg+4] * theta[reg+3] * *x + theta[reg+4] * theta[reg+3] * theta[reg+0]) * pow(theta[reg+3], -0.2e1) / (-0.1e1 + theta[reg+4] * theta[reg+4]) * exp(0.5000000000e0 * (theta[reg+3] * theta[reg+3] * *x * *x - 0.2e1 * *x * theta[reg+3] * theta[reg+3] * theta[reg+0] - 0.2e1 * theta[reg+3] * *x * theta[reg+4] * theta[reg+2] * *y + 0.2e1 * theta[reg+3] * *x * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+3] * theta[reg+3] * theta[reg+0] * theta[reg+0] + 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * *y - 0.2e1 * theta[reg+3] * theta[reg+0] * theta[reg+4] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * *y * *y - 0.2e1 * *y * theta[reg+2] * theta[reg+2] * theta[reg+1] + theta[reg+2] * theta[reg+2] * theta[reg+1] * theta[reg+1]) * pow(theta[reg+2], -0.2e1) * pow(theta[reg+3], -0.2e1) / (theta[reg+4] - 0.1e1) / (theta[reg+4] + 0.1e1)) * pow(-0.1e1 * theta[reg+2] * theta[reg+2] * theta[reg+3] * theta[reg+3] * (-0.1e1 + theta[reg+4] * theta[reg+4]), -0.1e1 / 0.2e1);
-		i++;
-	}
-}
 
 //(p*p) Inner sandwich part of the Sandwich Variance Estimator
 void inner_sandwich(int *n, int *p, double *F, double *W, double *R, double *B)

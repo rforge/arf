@@ -60,6 +60,37 @@ ssqfixamp <- function(theta,thetasize,datavec,weightvec,nreg,dimx,dimy) {
 	
 }
 
+ssqdisplacement <- function(thetaadd,theta,datavec,weightvec,nreg,dimx,dimy) {
+	## ssq is the objective function (sums-of-squares)
+	## it calls the external C-funtion 'ssq'
+	## input are theta (paramters), datavec, weightvec, number of regions, and dim x and dim y
+	## output is a vector of parameter estimates (double)
+	
+	tm = matrix(theta,,6,byrow=T)
+	am = matrix(thetaadd,,4,byrow=T)
+	cm = matrix(0,dim(am)[1],6)
+	
+	
+	
+	cm[,1]=am[,1]
+	cm[,2]=am[,2]
+	cm[,3]=am[,3]
+	tm[,6] = am[,4]
+	
+	tm = as.vector(t(tm))
+	cm = as.vector(t(cm))
+	
+	#cat('ssq\n')
+	#browser()
+	
+	nlmdat <- .C('ssqgaussdisplace',as.double(tm),as.double(cm),as.double(datavec),as.double(weightvec),as.integer(nreg),as.integer(dimx),as.integer(dimy),as.double(vector('numeric',1)))
+	
+	return(invisible(nlmdat[[8]]))	
+	
+	
+}
+
+
 modelest <- function(mod)
 {
 	estimates <- mod$model$par
@@ -72,6 +103,28 @@ modelest <- function(mod)
 	return(model)
 }
 
+dpmodelest <- function(mod,theta)
+{
+	estimates <- matrix(mod$model$par,,4,byrow=T)
+	ests = matrix(0,dim(estimates)[1],6)
+	
+	ests[,1] = estimates[,1]
+	ests[,2] = estimates[,2]
+	ests[,3] = estimates[,3]
+	ests[,6] = estimates[,4]
+	
+	ests = as.vector(t(ests))
+	
+	dimx <- dim(mod$data)[2]
+	dimy <- dim(mod$data)[1]
+	
+	
+	
+	model <- .C('gaussdisplace',as.double(theta),as.double(ests),as.integer(length(estimates)),as.integer(dimx),as.integer(dimy),as.double(numeric(dimx*dimy)))[[6]]
+	model <- matrix(model,dimy,dimx,byrow=T)
+	
+	return(model)
+}
 
 fitModel <- function(datmap,reg,startval=NULL,weights=NULL,iterlim=10000,trace=10)
 {
@@ -164,7 +217,34 @@ fitModelFixAll <- function(datmap,reg,estim,weights=NULL,iterlim=10000,trace=10)
 	
 }
 
-
+fitModelFixDisplace <- function(datmap,reg,theta,estim,weights=NULL,iterlim=10000,trace=10)
+{
+	
+	dimx = dim(datmap)[2]
+	dimy = dim(datmap)[1]
+	if(is.null(weights)) weights = rep(1,dimx*dimy)
+	
+	startval = rep(estim,reg)
+	
+	optim.output <- try(suppressWarnings(optim(
+							startval,
+							ssqdisplacement, 	#objective function
+							#lower=lowbound, 
+							#upper=upbound,
+							theta=theta,
+							datavec=as.vector(t(datmap)), #data
+							weightvec=weights, #weight
+							nreg=reg*6, #numparam
+							dimx=dimx, #dimx
+							dimy=dimy, #dimy
+							method='BFGS',
+							control=list(trace=trace,maxit=iterlim), #control
+							hessian=T
+					)),silent=F)
+	
+	return(list(model=optim.output,data=datmap,weights=weights))
+	
+}
 
 calcFit <- function(mod) 
 {
