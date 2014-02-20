@@ -127,7 +127,7 @@ function(arfmodel)
 				
 		#if Hessian is not ok, try pseudoinverse
 		if(!is.null(attr(hessian,'class')))  {
-			library(corpcor)
+			#library(corpcor)
 			hessian <- try(pseudoinverse(.model.hessian(arfmodel)),silent=T)
 			.model.warnings(arfmodel) <- c(.model.warnings(arfmodel),paste('[varcov] Using Pseudoinverse (hessian probably singular)',sep=''))
 			pseudo = T
