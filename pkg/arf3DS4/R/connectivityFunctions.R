@@ -649,3 +649,82 @@ function(filelist,funcfilename='single_events.nii.gz')
 	return(arfcor)
 	
 }
+
+
+makeBetaSeries <- 
+function(funcdata,timingsfile,method='LS-S',hrf.control=list(a1=6,a2=12,b1=0.9,b2=0.9,ce=0.35)) {
+#extract Beta-series regression based on LS-S method of Mumford et al 2012
+
+	
+	#read in 3 col (fsf)
+	tinfo <- read.table(timingsfile,sep='\t',header=F)
+	timings <- tinfo[,1]
+	stimlen <- tinof[,2]
+	
+	#make array of fmri volume
+	fmrivolume = readData(funcdata)
+	funcvolume = .fmri.data.datavec(fmrivolume)
+	dim(funcvolume) = c(.fmri.data.dims(fmrivolume)[2],.fmri.data.dims(fmrivolume)[3],.fmri.data.dims(fmrivolume)[4],.fmri.data.dims(fmrivolume)[5])
+	n = .fmri.data.dims(fmrivolume)[2]*.fmri.data.dims(fmrivolume)[3]*.fmri.data.dims(fmrivolume)[4]
+	
+	#create timeseries in seconds and create double gamma
+	tslen = round(.fmri.data.dims(fmrivolume)[5] * .fmri.data.pixdim(fmrivolume)[5])
+	stick = rep(0,tslen)
+	hrf <- gamma.fmri(1:tslen,a1=hrf.control$a1,a2=hrf.control$a2,b1=hrf.control$b1,b2=hrf.control$b2,ce=hrf.control$ce) 
+	stick[round(timings)]=1
+	vecnums = which(stick==1)
+	
+	#define design matrices and outputs
+	X = matrix(NA,.fmri.data.dims(fmrivolume)[5],length(vecnums))
+	beta = matrix(0,n,length(vecnums))
+	
+	#create single-trial columns in design matrix
+	for(i in 1:length(vecnums)) {
+		st_protocol = rep(0,tslen)
+		len = round(stimlen[i])
+		if(len<=0) len = 1
+		stvec = vecnums[i]:(vecnums[i]+len-1)
+		st_protocol[stvec]=1
+		bold = convol.fmri(hrf,st_protocol)
+		bold = bold[seq(1,tslen,.fmri.data.pixdim(fmrivolume)[5])]
+		X[,i] = bold 
+	}
+	
+	#Solve the LS equation for each voxel (on DEMEANED data)
+	Xp = solve(t(X)%*%X)%*%t(X)
+	
+	i=1;
+	for(z in 1:.fmri.data.dims(fmrivolume)[4]) {
+		for(y in 1:.fmri.data.dims(fmrivolume)[3]) {
+			for(x in 1:.fmri.data.dims(fmrivolume)[2]) {
+				if(.data.mask(arfdata)[i]==1) {
+					dat = as.vector(funcvolume[x,y,z,])
+					dat = dat-mean(dat)
+					beta[i,] = as.vector(Xp%*%dat)
+				}
+				i=i+1;
+			}
+		}
+	}
+	
+	#concatenate datavecs and increase dimensions of volume
+	datavec = c(datavec,as.vector(beta))
+	totdim = totdim + length(vecnums)
+	#read in functional data
+	
+	#read in timings
+	
+	#for each stimulus create two BOLD regressors
+	
+	#append beta-estimates to functional data
+	
+	
+}
+
+extractBetaSeries <-
+function(betafunc,roi=NULL,avgMask=c('avg','max'),weightMask=TRUE) 
+#extract beta-series estimates for a ROI or all voxels (roi=NULL), returns a matrix.
+{
+	#extract the tim
+
+}

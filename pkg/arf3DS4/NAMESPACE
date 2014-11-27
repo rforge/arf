@@ -53,7 +53,9 @@ export(
 	showModels,
 	readData,
 	writeData,
-	fmri2array
+	fmri2array,
+	extractBetaSeries,
+	makeBetaSeries
 )
 
 exportPattern("^[\\.]")

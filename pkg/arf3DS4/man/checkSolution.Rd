@@ -5,7 +5,8 @@
 \description{
 Check the integrity of an ARF model for bounded parameters.}
 \usage{
-checkSolution(arfmodel, options = loadOptions(arfmodel), dat = readData(.model.avgdatfile(arfmodel)), thres = 6)
+checkSolution(arfmodel, options = loadOptions(arfmodel), 
+dat = readData(.model.avgdatfile(arfmodel)), thres = 6)
 }
 
 \arguments{
