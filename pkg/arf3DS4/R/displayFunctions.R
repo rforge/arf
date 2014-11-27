@@ -136,7 +136,7 @@ function(arfmodel,options,lower,upper)
 		disabled = T
 	} else {
 		disabled = F
-		#library(tcltk)
+		##library(tcltk)
 	}
 	
 	if(!disabled) {
