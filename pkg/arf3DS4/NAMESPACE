@@ -85,7 +85,6 @@ exportMethods(
 
 import(
 	corpcor,
-	tcltk,
 	methods,
 	graphics
 )
