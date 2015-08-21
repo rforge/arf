@@ -52,6 +52,8 @@ export(
 	checkSolution,
 	showModels,
 	readData,
+	readHeader,
+	getFileInfo,
 	writeData,
 	fmri2array,
 	extractBetaSeries,

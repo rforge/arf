@@ -94,22 +94,44 @@ function(filename)
 		headinfo=readHeader(fileinf)
 		
 		if(.nifti.header.sizeof_hdr(headinfo)!=348) {
-			#header is of incorrect size
-			stop('Header is not of size 348 (even after swapping endian). File might not be of the correct format.\n')
+			
+		  #header is of incorrect size check if it is NIFTI-2
+		  headinfo=readHeader(fileinf,type=2)
+		  
+		  #change endian again
+		  if(.nifti.fileinfo.endian(fileinf)=='big') .nifti.fileinfo.endian(fileinf) <- 'little' else .nifti.fileinfo.endian(fileinf) <- 'big'
+		  
+		  #check header again
+		  headinfo=readHeader(fileinf,type=2)
+		  
+		  if(.nifti.header.sizeof_hdr(headinfo)!=540) {
+		    #then I don't know  
+		    stop('Header is not of size 348 or 540 (even after swapping endian). File might not be of the correct format.\n')
+		  
+		  }
+		
 		}
 	}
+	
 	
 	#set filetype according to header info (not based on extension)
 	if(.nifti.header.magic(headinfo)=='n+1') {
 		.nifti.header.filetype(headinfo) <- 'nifti+1'
+	
 	} else	if(.nifti.header.magic(headinfo)=='ni1') {
 		.nifti.header.filetype(headinfo) <- 'nifti1'
 		
 	} else if(.nifti.header.magic(headinfo)=='') {
 		.nifti.header.filetype(headinfo) <- 'analyze'
 		
-	} else {
-		stop('Magicstring contains unknown characters. File might not be the correct format.\n')
+	} else if(.nifti.header.magic(headinfo)=='n+2\r\n\032\n') {
+	  .nifti.header.filetype(headinfo) <- 'nifti+2'
+	
+	 } else if(.nifti.header.magic(headinfo)=='ni2\r\n\032\n') {
+	   .nifti.header.filetype(headinfo) <- 'nifti2'
+	 } else {
+	  browser()
+	   stop('Magicstring contains unknown characters (',.nifti.header.magic(headinfo),').File might not be the correct format.\n')
 	}
 	
 	#Returns object of class nifti.header		
@@ -152,7 +174,7 @@ function(filename,templateHDR)
 }
 
 readHeader <- 
-function(fileinf) 
+function(fileinf,type=1) 
 # readHeader reads nifti header info from nii,img,hdr and gzipped exts.
 {
 	sp <- .Platform$file.sep
@@ -170,79 +192,158 @@ function(fileinf)
 	#if connection is open try and read header info (magicstring and headersize)
 	if(con) {
 		
-		readin <- function(con,headinf) {
-			#read in all elements (independent of NIFTI or ANALYZE), strings with nulls are truncated	  	  							 #byte offset, type, descr.
-			.nifti.header.sizeof_hdr(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))         #  0, int32,  MUST BE 348
-			.nifti.header.data_type(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=10)))                                	 #  4, char[10]
-			.nifti.header.db_name(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=18)))                                  	 # 14, char[18]
-			.nifti.header.extents(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))            # 32, int32
-			.nifti.header.session_error(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian =.nifti.header.endian(headinf))     # 36, short
-			.nifti.header.regular(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=1)))                                   	 # 38, char[1]
-			.nifti.header.dim_info(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=1)))                                  	 # 39, char[1], MRI SLICE ORDERING
-			.nifti.header.dims(headinf) <- readBin(con,integer(),n=8,size=2,signed=T,endian=.nifti.header.endian(headinf))               # 40, short[8], DATA ARRAY DIMENSIONS
-			.nifti.header.intent_p1(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    # 56, float, 1ST INTENT PARAMETER
-			.nifti.header.intent_p2(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    # 60, float, 2ND INTENT PARAMETER
-			.nifti.header.intent_p3(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    # 64, float, 3RD INTENT PARAMETER
-			.nifti.header.intent_code(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))        # 68, short, NIFITINTENT CODE
-			.nifti.header.datatype(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))           # 70, short, DEFINES DATA TYPE
-			.nifti.header.bitpix(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))             # 72, short, NUMBER BITS PER VOXEL
-			.nifti.header.slice_start(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))        # 74, short, FIRST SLICE INDEX
-			.nifti.header.pixdim(headinf) <- readBin(con,double(),n=8,size=4,endian=.nifti.header.endian(headinf))                       # 76, float[8], GRID SPACINGS
-			.nifti.header.vox_offset(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                   #108, float, OFFSET INTO .NII FILE
-			.nifti.header.scl_slope(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #112, float, DATA SCALING: SLOPE
-			.nifti.header.scl_inter(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #116, float, DATA SCALING: INTERCEPT
-			.nifti.header.slice_end (headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))         #120, short, LAST SLICE INDEX
-			.nifti.header.slice_code(headinf) <- readBin(con,integer(),size=1,n=1,signed=T,endian=.nifti.header.endian(headinf))         #122, integer[1], SLICE TIMING ORDER
-			#.nifti.header.xyzt_units(headinf) <- readBin(con,integer(),size=1,n=1,signed=T,endian=.nifti.header.endian(headinf))        #123, raw[1], UNITS OF PIXDIM
-			.nifti.header.xyzt_units(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=1)))									 #123, raw[1], UNITS OF PIXDIM	
-			.nifti.header.cal_max(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                      #124, float, MAX DISPLAY INTENSITY
-			.nifti.header.cal_min(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                      #128, float, MIN DISPLAY INTENSITY
-			.nifti.header.slice_duration(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))               #132, float, TIME FOR 1 SLICE
-			.nifti.header.toffset(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                      #136, float, TIME AXIS SHIFT
-			.nifti.header.glmax(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))              #140, int32
-			.nifti.header.glmin(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))              #144, int32
-			.nifti.header.descrip(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=80))) 		  								 #148, char[80], TEXT
-			.nifti.header.aux_file(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=24)))		  								 #228, char[24], AUXILIARY FILENAME
-			.nifti.header.qform_code(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))         #252, short, NIFITXFORM CODE
-			.nifti.header.sform_code(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))         #254, short, NIFITXFORM CODE
-			.nifti.header.quatern_b(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #256, float, QUATERNION B PARAM
-			.nifti.header.quatern_c(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #260, float, QUATERNION C PARAM
-			.nifti.header.quatern_d(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #264, float, QUATERNION D PARAM
-			.nifti.header.qoffset_x(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #268, float, QUATERNION X SHIFT
-			.nifti.header.qoffset_y(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #272, float, QUATERNION Y SHIFT
-			.nifti.header.qoffset_z(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #276, float, QUATERNION Z SHIFT
-			.nifti.header.srow_x(headinf) <- readBin(con,double(),n=4,size=4,endian=.nifti.header.endian(headinf))                       #280, float[4], 1ST ROW AFFINE TRANSFORM
-			.nifti.header.srow_y(headinf) <- readBin(con,double(),n=4,size=4,endian=.nifti.header.endian(headinf))                       #296, float[4], 2ND ROW AFFINE TRANSFORM
-			.nifti.header.srow_z(headinf) <- readBin(con,double(),n=4,size=4,endian=.nifti.header.endian(headinf))                       #312, float[4], 3RD ROW AFFINE TRANSFORM
-			.nifti.header.intent_name(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=16)))                              		  								#328, char[16], NAME OR MEANING OF DATA
-			.nifti.header.magic(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=4)))    																		#344, char[4], MAGICSTRING!
+	  readin <- function(con,headinf) {
+	    #read in all elements (independent of NIFTI or ANALYZE), strings with nulls are truncated	  	  							 #byte offset, type, descr.
+	    .nifti.header.sizeof_hdr(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))         #  0, int32,  MUST BE 348
+	    .nifti.header.data_type(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=10)))                                	 #  4, char[10]
+	    .nifti.header.db_name(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=18)))                                  	 # 14, char[18]
+	    .nifti.header.extents(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))            # 32, int32
+	    .nifti.header.session_error(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian =.nifti.header.endian(headinf))     # 36, short
+	    .nifti.header.regular(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=1)))                                   	 # 38, char[1]
+	    .nifti.header.dim_info(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=1)))                                  	 # 39, char[1], MRI SLICE ORDERING
+	    .nifti.header.dims(headinf) <- readBin(con,integer(),n=8,size=2,signed=T,endian=.nifti.header.endian(headinf))               # 40, short[8], DATA ARRAY DIMENSIONS
+	    .nifti.header.intent_p1(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    # 56, float, 1ST INTENT PARAMETER
+	    .nifti.header.intent_p2(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    # 60, float, 2ND INTENT PARAMETER
+	    .nifti.header.intent_p3(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    # 64, float, 3RD INTENT PARAMETER
+	    .nifti.header.intent_code(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))        # 68, short, NIFITINTENT CODE
+	    .nifti.header.datatype(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))           # 70, short, DEFINES DATA TYPE
+	    .nifti.header.bitpix(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))             # 72, short, NUMBER BITS PER VOXEL
+	    .nifti.header.slice_start(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))        # 74, short, FIRST SLICE INDEX
+	    .nifti.header.pixdim(headinf) <- readBin(con,double(),n=8,size=4,endian=.nifti.header.endian(headinf))                       # 76, float[8], GRID SPACINGS
+	    .nifti.header.vox_offset(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                   #108, float, OFFSET INTO .NII FILE
+	    .nifti.header.scl_slope(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #112, float, DATA SCALING: SLOPE
+	    .nifti.header.scl_inter(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #116, float, DATA SCALING: INTERCEPT
+	    .nifti.header.slice_end (headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))         #120, short, LAST SLICE INDEX
+	    .nifti.header.slice_code(headinf) <- readBin(con,integer(),size=1,n=1,signed=T,endian=.nifti.header.endian(headinf))         #122, integer[1], SLICE TIMING ORDER
+	    .nifti.header.xyzt_units(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=1)))									                   #123, raw[1], UNITS OF PIXDIM	
+	    .nifti.header.cal_max(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                      #124, float, MAX DISPLAY INTENSITY
+	    .nifti.header.cal_min(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                      #128, float, MIN DISPLAY INTENSITY
+	    .nifti.header.slice_duration(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))               #132, float, TIME FOR 1 SLICE
+	    .nifti.header.toffset(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                      #136, float, TIME AXIS SHIFT
+	    .nifti.header.glmax(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))              #140, int32
+	    .nifti.header.glmin(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))              #144, int32
+	    .nifti.header.descrip(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=80))) 		  								                 #148, char[80], TEXT
+	    .nifti.header.aux_file(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=24)))		  								                 #228, char[24], AUXILIARY FILENAME
+	    .nifti.header.qform_code(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))         #252, short, NIFITXFORM CODE
+	    .nifti.header.sform_code(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))         #254, short, NIFITXFORM CODE
+	    .nifti.header.quatern_b(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #256, float, QUATERNION B PARAM
+	    .nifti.header.quatern_c(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #260, float, QUATERNION C PARAM
+	    .nifti.header.quatern_d(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #264, float, QUATERNION D PARAM
+	    .nifti.header.qoffset_x(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #268, float, QUATERNION X SHIFT
+	    .nifti.header.qoffset_y(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #272, float, QUATERNION Y SHIFT
+	    .nifti.header.qoffset_z(headinf) <- readBin(con,double(),n=1,size=4,endian=.nifti.header.endian(headinf))                    #276, float, QUATERNION Z SHIFT
+	    .nifti.header.srow_x(headinf) <- readBin(con,double(),n=4,size=4,endian=.nifti.header.endian(headinf))                       #280, float[4], 1ST ROW AFFINE TRANSFORM
+	    .nifti.header.srow_y(headinf) <- readBin(con,double(),n=4,size=4,endian=.nifti.header.endian(headinf))                       #296, float[4], 2ND ROW AFFINE TRANSFORM
+	    .nifti.header.srow_z(headinf) <- readBin(con,double(),n=4,size=4,endian=.nifti.header.endian(headinf))                       #312, float[4], 3RD ROW AFFINE TRANSFORM
+	    .nifti.header.intent_name(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=16)))                              		 #328, char[16], NAME OR MEANING OF DATA
+	    .nifti.header.magic(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=4)))    																		   #344, char[4], MAGICSTRING!
+	    
+	    #close connection
+	    close(con)
+	    
+	    #set fmri data attributes for read in
+	    if(.nifti.header.datatype(headinf)==0) { .nifti.header.data.type(headinf)<-'none';.nifti.header.data.signed(headinf)<-TRUE } else
+	      if(.nifti.header.datatype(headinf)==1) { .nifti.header.data.type(headinf)<-'raw';.nifti.header.data.signed(headinf)<-TRUE } else
+	        if(.nifti.header.datatype(headinf)==2) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
+	          if(.nifti.header.datatype(headinf)==4) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
+	            if(.nifti.header.datatype(headinf)==8) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
+	              if(.nifti.header.datatype(headinf)==16) { .nifti.header.data.type(headinf)<-'double';.nifti.header.data.signed(headinf)<-TRUE } else
+	                if(.nifti.header.datatype(headinf)==32) { .nifti.header.data.type(headinf)<-'complex';.nifti.header.data.signed(headinf)<-TRUE } else
+	                  if(.nifti.header.datatype(headinf)==64) { .nifti.header.data.type(headinf)<-'double';.nifti.header.data.signed(headinf)<-TRUE } else
+	                    if(.nifti.header.datatype(headinf)==256) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
+	                      if(.nifti.header.datatype(headinf)==512) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
+	                        if(.nifti.header.datatype(headinf)==768) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
+	                          if(.nifti.header.datatype(headinf)==1024) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
+	                            if(.nifti.header.datatype(headinf)==1280) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
+	                              if(.nifti.header.datatype(headinf)==1536) { .nifti.header.data.type(headinf)<-'double';.nifti.header.data.signed(headinf)<-TRUE } else
+	                                if(.nifti.header.datatype(headinf)==1792) { .nifti.header.data.type(headinf)<-'complex';.nifti.header.data.signed(headinf)<-TRUE } else
+	                                  if(.nifti.header.datatype(headinf)==2048) { .nifti.header.data.type(headinf)<-'complex';.nifti.header.data.signed(headinf)<-TRUE } else { warning('Datatype is unknown!') }
+	    
+	    return(headinf)
+	  }
 		
-			#close connection
-			close(con)
+		readin2 <- function(con,headinf) {
+		  #read in all elements (independent of NIFTI-2 FORMAT), strings with nulls are truncated	  	  				  			                #byte offset, type, descr.
+		  .nifti.header.sizeof_hdr(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))          #  0, int32[1],  MUST BE 540
+		  .nifti.header.magic(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=8)))    																		    #  4, char[8], MAGICSTRING!
+		  .nifti.header.datatype(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))            # 12, int16_t[1], DEFINES DATA TYPE
+		  .nifti.header.bitpix(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))              # 14, int16_t[1], NUMBER BITS PER VOXEL
+		  .nifti.header.dims(headinf) <- readBin(con,integer(),n=8,size=8,signed=T,endian=.nifti.header.endian(headinf))                # 16, int64_t[8], DATA ARRAY DIMENSIONS
+		  .nifti.header.intent_p1(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     # 80, double[1], 1ST INTENT PARAMETER
+		  .nifti.header.intent_p2(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     # 88, double[1], 2ND INTENT PARAMETER
+		  .nifti.header.intent_p3(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     # 96, double[1], 3RD INTENT PARAMETER
+		  .nifti.header.pixdim(headinf) <- readBin(con,double(),n=8,size=8,endian=.nifti.header.endian(headinf))                        #104, double[8], GRID SPACINGS
+		  .nifti.header.vox_offset(headinf) <- readBin(con,integer(),n=1,size=8,endian=.nifti.header.endian(headinf))                   #168, int64_t[1], OFFSET INTO .NII FILE
+		  .nifti.header.scl_slope(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #176, double[1], DATA SCALING: SLOPE
+		  .nifti.header.scl_inter(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #184, double[1], DATA SCALING: INTERCEPT
+		  .nifti.header.cal_max(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                       #192, double[1], MAX DISPLAY INTENSITY
+		  .nifti.header.cal_min(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                       #200, double[1], MIN DISPLAY INTENSITY
+		  .nifti.header.slice_duration(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                #208, double[1], TIME FOR 1 SLICE
+		  .nifti.header.toffset(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                       #216, double[1], TIME AXIS SHIFT
+		  .nifti.header.slice_start(headinf) <- readBin(con,integer(),n=1,size=8,signed=T,endian=.nifti.header.endian(headinf))         #224, int64_t[1], FIRST SLICE INDEX
+		  .nifti.header.slice_end (headinf) <- readBin(con,integer(),n=1,size=8,signed=T,endian=.nifti.header.endian(headinf))          #232, int64_t[1], LAST SLICE INDEX
+		  .nifti.header.descrip(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=80))) 		  								                  #240, char[80], TEXT
+		  .nifti.header.aux_file(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=24)))		  								                  #320, char[24], AUXILIARY FILENAME
+		  .nifti.header.qform_code(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))          #344, int32[1], NIFITXFORM CODE
+		  .nifti.header.sform_code(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))          #348, int32[1], NIFITXFORM CODE
+		  .nifti.header.quatern_b(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #352, double[1], QUATERNION B PARAM
+		  .nifti.header.quatern_c(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #360, double[1], QUATERNION C PARAM
+		  .nifti.header.quatern_d(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #368, double[1], QUATERNION D PARAM
+		  .nifti.header.qoffset_x(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #376, double[1], QUATERNION X SHIFT
+		  .nifti.header.qoffset_y(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #384, double[1], QUATERNION Y SHIFT
+		  .nifti.header.qoffset_z(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #392, double[1], QUATERNION Z SHIFT
+		  .nifti.header.srow_x(headinf) <- readBin(con,double(),n=4,size=8,endian=.nifti.header.endian(headinf))                        #400, double[4], 1ST ROW AFFINE TRANSFORM
+		  .nifti.header.srow_y(headinf) <- readBin(con,double(),n=4,size=8,endian=.nifti.header.endian(headinf))                        #432, double[4], 2ND ROW AFFINE TRANSFORM
+		  .nifti.header.srow_z(headinf) <- readBin(con,double(),n=4,size=8,endian=.nifti.header.endian(headinf))                        #464, double[4], 3RD ROW AFFINE TRANSFORM
+		  .nifti.header.slice_code(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))          #496, int32[1], SLICE TIMING ORDER
+		  .nifti.header.xyzt_units(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))          #500, int32[1], UNITS OF PIXDIM
+		  .nifti.header.intent_code(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))         #504, int32[1], NIFITINTENT CODE
+		  .nifti.header.intent_name(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=16)))                              		  #508, char[16], NAME OR MEANING OF DATA
+  	  .nifti.header.dim_info(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=1)))                                  	    #524, char[1], MRI SLICE ORDERING
+		  unused_str <- rawToChar(removeNullString(readBin(con,raw(),n=15)))                                                            #525, cahr[15], UNUSED STRING (not stored fill with \0) 
 
-			#set fmri data attributes for read in
-			if(.nifti.header.datatype(headinf)==0) { .nifti.header.data.type(headinf)<-'none';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==1) { .nifti.header.data.type(headinf)<-'raw';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==2) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
-			if(.nifti.header.datatype(headinf)==4) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==8) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==16) { .nifti.header.data.type(headinf)<-'double';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==32) { .nifti.header.data.type(headinf)<-'complex';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==64) { .nifti.header.data.type(headinf)<-'double';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==256) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==512) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
-			if(.nifti.header.datatype(headinf)==768) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
-			if(.nifti.header.datatype(headinf)==1024) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==1280) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
-			if(.nifti.header.datatype(headinf)==1536) { .nifti.header.data.type(headinf)<-'double';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==1792) { .nifti.header.data.type(headinf)<-'complex';.nifti.header.data.signed(headinf)<-TRUE } else
-			if(.nifti.header.datatype(headinf)==2048) { .nifti.header.data.type(headinf)<-'complex';.nifti.header.data.signed(headinf)<-TRUE } else { stop('Datatype is unknown!') }
-			
-			return(headinf)
+		  #deprecated ANALYZE headers
+		  #DEPR. ANALYZE#
+		  .nifti.header.data_type(headinf) <- 'depr'      # 12, char[10]
+		  .nifti.header.db_name(headinf) <- 'depr'        # 14, char[18]
+		  .nifti.header.extents(headinf) <- 0             # 32, int32
+		  .nifti.header.session_error(headinf) <- 0       # 36, short
+		  .nifti.header.regular(headinf) <- 'd'           # 38, char[1]
+		  .nifti.header.glmax(headinf) <- 0               #140, int32
+		  .nifti.header.glmin(headinf) <- 0               #144, int32
+		  
+		  #browser()
+		  #close connection
+		  close(con)
+		  
+		  #set fmri data attributes for read in
+		  if(.nifti.header.datatype(headinf)==0) { .nifti.header.data.type(headinf)<-'none';.nifti.header.data.signed(headinf)<-TRUE } else
+		    if(.nifti.header.datatype(headinf)==1) { .nifti.header.data.type(headinf)<-'raw';.nifti.header.data.signed(headinf)<-TRUE } else
+		      if(.nifti.header.datatype(headinf)==2) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
+		        if(.nifti.header.datatype(headinf)==4) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
+		          if(.nifti.header.datatype(headinf)==8) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
+		            if(.nifti.header.datatype(headinf)==16) { .nifti.header.data.type(headinf)<-'double';.nifti.header.data.signed(headinf)<-TRUE } else
+		              if(.nifti.header.datatype(headinf)==32) { .nifti.header.data.type(headinf)<-'complex';.nifti.header.data.signed(headinf)<-TRUE } else
+		                if(.nifti.header.datatype(headinf)==64) { .nifti.header.data.type(headinf)<-'double';.nifti.header.data.signed(headinf)<-TRUE } else
+		                  if(.nifti.header.datatype(headinf)==256) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
+		                    if(.nifti.header.datatype(headinf)==512) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
+		                      if(.nifti.header.datatype(headinf)==768) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
+		                        if(.nifti.header.datatype(headinf)==1024) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-TRUE } else
+		                          if(.nifti.header.datatype(headinf)==1280) { .nifti.header.data.type(headinf)<-'integer';.nifti.header.data.signed(headinf)<-FALSE } else
+		                            if(.nifti.header.datatype(headinf)==1536) { .nifti.header.data.type(headinf)<-'double';.nifti.header.data.signed(headinf)<-TRUE } else
+		                              if(.nifti.header.datatype(headinf)==1792) { .nifti.header.data.type(headinf)<-'complex';.nifti.header.data.signed(headinf)<-TRUE } else
+		                                if(.nifti.header.datatype(headinf)==2048) { .nifti.header.data.type(headinf)<-'complex';.nifti.header.data.signed(headinf)<-TRUE } else { warning('Datatype is unknown!') }
+		
+		  return(headinf)
 		}
 		
-		#Read in Data with warning suppression	
-		headinf <- suppressWarnings(readin(con,headinf))
+		
+		#Read in Data with warning suppression (read nifti 1 and nifti 2)
+		if(type==2)  {
+		  headinf <- suppressWarnings(readin2(con,headinf))
+		} else {
+		  headinf <- suppressWarnings(readin(con,headinf))
+		}
 		
 	} else {
 		stop('Unable to open connection.\n')
@@ -262,8 +363,14 @@ function(filename)
 	sp <- .Platform$file.sep
 	
 	#obtain header info
-	headinf <- readHeader(getFileInfo(filename))
+	fi = getFileInfo(filename)
 	
+	if(.nifti.header.filetype(fi)=='nifti+2' | .nifti.header.filetype(fi)=='nifti2') {
+    headinf <- readHeader(getFileInfo(filename),type=2)
+	} else {
+	  headinf <- readHeader(getFileInfo(filename))
+	}
+
 	## set correct extension
 	if(.nifti.header.extension(headinf)=='hdr') extension='img' else extension <- .nifti.header.extension(headinf)
 	
@@ -283,9 +390,9 @@ function(filename)
 		
 		#read everthing before vox_offset
 		readBin(con,raw(),.nifti.header.vox_offset(headinf))
-		
+	
 		#read in data
-		.fmri.data.datavec(data) <- readBin(con, what=.nifti.header.data.type(headinf), n=n, size=(.nifti.header.bitpix(headinf)/8), signed=.nifti.header.data.signed(headinf), endian=.nifti.header.endian(headinf))
+	  .fmri.data.datavec(data) <- readBin(con, what=.nifti.header.data.type(headinf), n=n, size=(.nifti.header.bitpix(headinf)/8), signed=.nifti.header.data.signed(headinf), endian=.nifti.header.endian(headinf))
 		
 	} else stop('Unable to open connection') 	
 	
@@ -355,7 +462,13 @@ function(headinf,datavec=NULL)
 		
 	# for nii files write header and data in one connection (set offset of data as 352)
 	if(extension=='nii') {
-		.nifti.header.vox_offset(headinf) <- 352
+		
+	  if(.nifti.header.filetype(headinf)=='nifti+2' | .nifti.header.filetype(headinf)=='nifti2') {
+	    .nifti.header.vox_offset(headinf) <- 544
+	  } else {
+	    .nifti.header.vox_offset(headinf) <- 352  
+	  }
+	  
 		con <- writeHeaderPart(con,headinf)
 		con <- writeDataPart(con,headinf,datavec)
 		
@@ -385,62 +498,119 @@ function(con,headinf)
 	
 	#if connection is open try and read header info (magicstring and headersize)
 	if(con) {
-		#write all elements (independent of NIFTI or ANALYZE), watch String Truncation		  		  	  			   #byte offset, type, descr.
-		writeBin(as.integer(.nifti.header.sizeof_hdr(headinf)),con,size=4,endian=.nifti.header.endian(headinf))		   #  0, int32,  MUST BE 348
-		writeBin(charToRaw(.nifti.header.data_type(headinf)),con,endian=.nifti.header.endian(headinf))                 #  4, char[10]
-		writeBin(raw(10-nchar(.nifti.header.data_type(headinf))),con,endian=.nifti.header.endian(headinf)) 			
-		writeBin(charToRaw(.nifti.header.db_name(headinf)),con,endian=.nifti.header.endian(headinf))                   # 14, char[18]
-		writeBin(raw(18-nchar(.nifti.header.db_name(headinf))),con,endian=.nifti.header.endian(headinf)) 
-		writeBin(as.integer(.nifti.header.extents(headinf)),con,size=4,endian=.nifti.header.endian(headinf))           # 32, int32
-		writeBin(as.integer(.nifti.header.session_error(headinf)),con,size=2,endian=.nifti.header.endian(headinf))     # 36, short
-		writeBin(charToRaw(.nifti.header.regular(headinf)),con,endian=.nifti.header.endian(headinf))                   # 38, char[1]
-		writeBin(raw(1-nchar(.nifti.header.regular(headinf))),con,endian=.nifti.header.endian(headinf)) 
-		writeBin(charToRaw(.nifti.header.dim_info(headinf)),con,endian=.nifti.header.endian(headinf))                  # 39, char[1], MRI SLICE ORDERING
-		writeBin(raw(1-nchar(.nifti.header.dim_info(headinf))),con,endian=.nifti.header.endian(headinf)) 
-		writeBin(as.integer(.nifti.header.dims(headinf)),con,size=2,endian=.nifti.header.endian(headinf))              # 40, short[8], DATA ARRAY DIMENSIONS
-		writeBin(as.double(.nifti.header.intent_p1(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          # 56, float, 1ST INTENT PARAMETER
-		writeBin(as.double(.nifti.header.intent_p2(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          # 60, float, 2ND INTENT PARAMETER
-		writeBin(as.double(.nifti.header.intent_p3(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          # 64, float, 3RD INTENT PARAMETER
-		writeBin(as.integer(.nifti.header.intent_code(headinf)),con,size=2,endian=.nifti.header.endian(headinf))       # 68, short, NIFITINTENT CODE
-		writeBin(as.integer(.nifti.header.datatype(headinf)),con,size=2,endian=.nifti.header.endian(headinf))          # 70, short, DEFINES DATA TYPE
-		writeBin(as.integer(.nifti.header.bitpix(headinf)),con,size=2,endian=.nifti.header.endian(headinf))            # 72, short, NUMBER BITS PER VOXEL
-		writeBin(as.integer(.nifti.header.slice_start(headinf)),con,size=2,endian=.nifti.header.endian(headinf))       # 74, short, FIRST SLICE INDEX
-		writeBin(as.double(.nifti.header.pixdim(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             # 76, float[8], GRID SPACINGS
-		writeBin(as.double(.nifti.header.vox_offset(headinf)),con,size=4,endian=.nifti.header.endian(headinf))         #108, float, OFFSET INTO .NII FILE
-		writeBin(as.double(.nifti.header.scl_slope(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #112, float, DATA SCALING: SLOPE
-		writeBin(as.double(.nifti.header.scl_inter(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #116, float, DATA SCALING: INTERCEPT
-		writeBin(as.integer(.nifti.header.slice_end (headinf)),con,size=2,endian=.nifti.header.endian(headinf))        #120, short, LAST SLICE INDEX
-		writeBin(as.integer(.nifti.header.slice_code(headinf)),con,size=1,endian=.nifti.header.endian(headinf))        #122, integer[1], SLICE TIMING ORDER
-		#writeBin(as.integer(.nifti.header.xyzt_units(headinf)),con,size=1,endian=.nifti.header.endian(headinf))        #123, integer[1], UNITS OF PIXDIM
-		writeBin(charToRaw(.nifti.header.xyzt_units(headinf)),con,endian=.nifti.header.endian(headinf))       			#123, integer[1], UNITS OF PIXDIM	
-		writeBin(as.double(.nifti.header.cal_max(headinf)),con,size=4,endian=.nifti.header.endian(headinf))            #124, float, MAX DISPLAY INTENSITY
-		writeBin(as.double(.nifti.header.cal_min(headinf)),con,size=4,endian=.nifti.header.endian(headinf))            #128, float, MIN DISPLAY INTENSITY
-		writeBin(as.double(.nifti.header.slice_duration(headinf)),con,size=4,endian=.nifti.header.endian(headinf))     #132, float, TIME FOR 1 SLICE
-		writeBin(as.double(.nifti.header.toffset(headinf)),con,size=4,endian=.nifti.header.endian(headinf))            #136, float, TIME AXIS SHIFT
-		writeBin(as.integer(.nifti.header.glmax(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             #140, int32
-		writeBin(as.integer(.nifti.header.glmin(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             #144, int32
-		writeBin(charToRaw(.nifti.header.descrip(headinf)),con,endian=.nifti.header.endian(headinf))                   #148, char[80], TEXT
-		writeBin(raw(80-nchar(.nifti.header.descrip(headinf))),con,endian=.nifti.header.endian(headinf)) 
-		writeBin(charToRaw(.nifti.header.aux_file(headinf)),con,endian=.nifti.header.endian(headinf))                  #228, char[24], AUXILIARY FILENAME
-		writeBin(raw(24-nchar(.nifti.header.aux_file(headinf))),con,endian=.nifti.header.endian(headinf)) 
-		writeBin(as.integer(.nifti.header.qform_code(headinf)),con,size=2,endian=.nifti.header.endian(headinf))        #252, short, NIFITXFORM CODE
-		writeBin(as.integer(.nifti.header.sform_code(headinf)),con,size=2,endian=.nifti.header.endian(headinf))        #254, short, NIFITXFORM CODE
-		writeBin(as.double(.nifti.header.quatern_b(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #256, float, QUATERNION B PARAM
-		writeBin(as.double(.nifti.header.quatern_c(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #260, float, QUATERNION C PARAM
-		writeBin(as.double(.nifti.header.quatern_d(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #264, float, QUATERNION D PARAM
-		writeBin(as.double(.nifti.header.qoffset_x(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #268, float, QUATERNION X SHIFT
-		writeBin(as.double(.nifti.header.qoffset_y(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #272, float, QUATERNION Y SHIFT
-		writeBin(as.double(.nifti.header.qoffset_z(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #276, float, QUATERNION Z SHIFT
-		writeBin(as.double(.nifti.header.srow_x(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             #280, float[4], 1ST ROW AFFINE TRANSFORM
-		writeBin(as.double(.nifti.header.srow_y(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             #296, float[4], 2ND ROW AFFINE TRANSFORM
-		writeBin(as.double(.nifti.header.srow_z(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             #312, float[4], 3RD ROW AFFINE TRANSFORM
-		writeBin(charToRaw(.nifti.header.intent_name(headinf)),con,endian=.nifti.header.endian(headinf))               #328, char[16], NAME OR MEANING OF DATA
-		writeBin(raw(16-nchar(.nifti.header.intent_name(headinf))),con,endian=.nifti.header.endian(headinf)) 			
-		writeBin(charToRaw(.nifti.header.magic(headinf)),con,endian=.nifti.header.endian(headinf))      			   #344, char[4], MAGICSTRING!
-		writeBin(raw(4-nchar(.nifti.header.magic(headinf))),con,endian=.nifti.header.endian(headinf)) 
 		
-		if(.nifti.header.vox_offset(headinf)>348) for(i in 1:(.nifti.header.vox_offset(headinf)-348))  writeBin(as.integer(0),size=1,con,endian=.nifti.header.endian(headinf))
-	
+	  writein <- function(con,headinf) {
+  	  #write all elements (independent of NIFTI or ANALYZE), watch String Truncation		  		  	  			   #byte offset, type, descr.
+  		writeBin(as.integer(.nifti.header.sizeof_hdr(headinf)),con,size=4,endian=.nifti.header.endian(headinf))		   #  0, int32,  MUST BE 348
+  		writeBin(charToRaw(.nifti.header.data_type(headinf)),con,endian=.nifti.header.endian(headinf))                 #  4, char[10]
+  		writeBin(raw(10-nchar(.nifti.header.data_type(headinf))),con,endian=.nifti.header.endian(headinf)) 			
+  		writeBin(charToRaw(.nifti.header.db_name(headinf)),con,endian=.nifti.header.endian(headinf))                   # 14, char[18]
+  		writeBin(raw(18-nchar(.nifti.header.db_name(headinf))),con,endian=.nifti.header.endian(headinf)) 
+  		writeBin(as.integer(.nifti.header.extents(headinf)),con,size=4,endian=.nifti.header.endian(headinf))           # 32, int32
+  		writeBin(as.integer(.nifti.header.session_error(headinf)),con,size=2,endian=.nifti.header.endian(headinf))     # 36, short
+  		writeBin(charToRaw(.nifti.header.regular(headinf)),con,endian=.nifti.header.endian(headinf))                   # 38, char[1]
+  		writeBin(raw(1-nchar(.nifti.header.regular(headinf))),con,endian=.nifti.header.endian(headinf)) 
+  		writeBin(charToRaw(.nifti.header.dim_info(headinf)),con,endian=.nifti.header.endian(headinf))                  # 39, char[1], MRI SLICE ORDERING
+  		writeBin(raw(1-nchar(.nifti.header.dim_info(headinf))),con,endian=.nifti.header.endian(headinf)) 
+  		writeBin(as.integer(.nifti.header.dims(headinf)),con,size=2,endian=.nifti.header.endian(headinf))              # 40, short[8], DATA ARRAY DIMENSIONS
+  		writeBin(as.double(.nifti.header.intent_p1(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          # 56, float, 1ST INTENT PARAMETER
+  		writeBin(as.double(.nifti.header.intent_p2(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          # 60, float, 2ND INTENT PARAMETER
+  		writeBin(as.double(.nifti.header.intent_p3(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          # 64, float, 3RD INTENT PARAMETER
+  		writeBin(as.integer(.nifti.header.intent_code(headinf)),con,size=2,endian=.nifti.header.endian(headinf))       # 68, short, NIFITINTENT CODE
+  		writeBin(as.integer(.nifti.header.datatype(headinf)),con,size=2,endian=.nifti.header.endian(headinf))          # 70, short, DEFINES DATA TYPE
+  		writeBin(as.integer(.nifti.header.bitpix(headinf)),con,size=2,endian=.nifti.header.endian(headinf))            # 72, short, NUMBER BITS PER VOXEL
+  		writeBin(as.integer(.nifti.header.slice_start(headinf)),con,size=2,endian=.nifti.header.endian(headinf))       # 74, short, FIRST SLICE INDEX
+  		writeBin(as.double(.nifti.header.pixdim(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             # 76, float[8], GRID SPACINGS
+  		writeBin(as.double(.nifti.header.vox_offset(headinf)),con,size=4,endian=.nifti.header.endian(headinf))         #108, float, OFFSET INTO .NII FILE
+  		writeBin(as.double(.nifti.header.scl_slope(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #112, float, DATA SCALING: SLOPE
+  		writeBin(as.double(.nifti.header.scl_inter(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #116, float, DATA SCALING: INTERCEPT
+  		writeBin(as.integer(.nifti.header.slice_end (headinf)),con,size=2,endian=.nifti.header.endian(headinf))        #120, short, LAST SLICE INDEX
+  		writeBin(as.integer(.nifti.header.slice_code(headinf)),con,size=1,endian=.nifti.header.endian(headinf))        #122, integer[1], SLICE TIMING ORDER
+  		#writeBin(as.integer(.nifti.header.xyzt_units(headinf)),con,size=1,endian=.nifti.header.endian(headinf))        #123, integer[1], UNITS OF PIXDIM
+  		writeBin(charToRaw(.nifti.header.xyzt_units(headinf)),con,endian=.nifti.header.endian(headinf))       			#123, integer[1], UNITS OF PIXDIM	
+  		writeBin(as.double(.nifti.header.cal_max(headinf)),con,size=4,endian=.nifti.header.endian(headinf))            #124, float, MAX DISPLAY INTENSITY
+  		writeBin(as.double(.nifti.header.cal_min(headinf)),con,size=4,endian=.nifti.header.endian(headinf))            #128, float, MIN DISPLAY INTENSITY
+  		writeBin(as.double(.nifti.header.slice_duration(headinf)),con,size=4,endian=.nifti.header.endian(headinf))     #132, float, TIME FOR 1 SLICE
+  		writeBin(as.double(.nifti.header.toffset(headinf)),con,size=4,endian=.nifti.header.endian(headinf))            #136, float, TIME AXIS SHIFT
+  		writeBin(as.integer(.nifti.header.glmax(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             #140, int32
+  		writeBin(as.integer(.nifti.header.glmin(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             #144, int32
+  		writeBin(charToRaw(.nifti.header.descrip(headinf)),con,endian=.nifti.header.endian(headinf))                   #148, char[80], TEXT
+  		writeBin(raw(80-nchar(.nifti.header.descrip(headinf))),con,endian=.nifti.header.endian(headinf)) 
+  		writeBin(charToRaw(.nifti.header.aux_file(headinf)),con,endian=.nifti.header.endian(headinf))                  #228, char[24], AUXILIARY FILENAME
+  		writeBin(raw(24-nchar(.nifti.header.aux_file(headinf))),con,endian=.nifti.header.endian(headinf)) 
+  		writeBin(as.integer(.nifti.header.qform_code(headinf)),con,size=2,endian=.nifti.header.endian(headinf))        #252, short, NIFITXFORM CODE
+  		writeBin(as.integer(.nifti.header.sform_code(headinf)),con,size=2,endian=.nifti.header.endian(headinf))        #254, short, NIFITXFORM CODE
+  		writeBin(as.double(.nifti.header.quatern_b(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #256, float, QUATERNION B PARAM
+  		writeBin(as.double(.nifti.header.quatern_c(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #260, float, QUATERNION C PARAM
+  		writeBin(as.double(.nifti.header.quatern_d(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #264, float, QUATERNION D PARAM
+  		writeBin(as.double(.nifti.header.qoffset_x(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #268, float, QUATERNION X SHIFT
+  		writeBin(as.double(.nifti.header.qoffset_y(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #272, float, QUATERNION Y SHIFT
+  		writeBin(as.double(.nifti.header.qoffset_z(headinf)),con,size=4,endian=.nifti.header.endian(headinf))          #276, float, QUATERNION Z SHIFT
+  		writeBin(as.double(.nifti.header.srow_x(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             #280, float[4], 1ST ROW AFFINE TRANSFORM
+  		writeBin(as.double(.nifti.header.srow_y(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             #296, float[4], 2ND ROW AFFINE TRANSFORM
+  		writeBin(as.double(.nifti.header.srow_z(headinf)),con,size=4,endian=.nifti.header.endian(headinf))             #312, float[4], 3RD ROW AFFINE TRANSFORM
+  		writeBin(charToRaw(.nifti.header.intent_name(headinf)),con,endian=.nifti.header.endian(headinf))               #328, char[16], NAME OR MEANING OF DATA
+  		writeBin(raw(16-nchar(.nifti.header.intent_name(headinf))),con,endian=.nifti.header.endian(headinf)) 			
+  		writeBin(charToRaw(.nifti.header.magic(headinf)),con,endian=.nifti.header.endian(headinf))      			   #344, char[4], MAGICSTRING!
+  		writeBin(raw(4-nchar(.nifti.header.magic(headinf))),con,endian=.nifti.header.endian(headinf)) 
+  		
+  		if(.nifti.header.vox_offset(headinf)>348) for(i in 1:(.nifti.header.vox_offset(headinf)-348))  writeBin(as.integer(0),size=1,con,endian=.nifti.header.endian(headinf))
+	  }
+	  
+	  writein2 <- function(con,headinf) {
+	    writeBin(as.integer(.nifti.header.sizeof_hdr(headinf)),con,size=4,endian=.nifti.header.endian(headinf))         # 	    .nifti.header.sizeof_hdr(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))          #  0, int32[1],  MUST BE 540
+	    writeBin(charToRaw(.nifti.header.magic(headinf)),con,endian=.nifti.header.endian(headinf))                      # 	    .nifti.header.magic(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=8)))    																		    #  4, char[8], MAGICSTRING!
+	    writeBin(raw(8-nchar(.nifti.header.magic(headinf))),con,endian=.nifti.header.endian(headinf)) 
+	    writeBin(as.integer(.nifti.header.datatype(headinf)),con,size=2,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.datatype(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))            # 12, int16_t[1], DEFINES DATA TYPE
+	    writeBin(as.integer(.nifti.header.bitpix(headinf)),con,size=2,endian=.nifti.header.endian(headinf))             # 	    .nifti.header.bitpix(headinf) <- readBin(con,integer(),n=1,size=2,signed=T,endian=.nifti.header.endian(headinf))              # 14, int16_t[1], NUMBER BITS PER VOXEL
+	    writeBin(as.integer(.nifti.header.dims(headinf)),con,size=8,endian=.nifti.header.endian(headinf))               # 	    .nifti.header.dims(headinf) <- readBin(con,integer(),n=8,size=8,signed=T,endian=.nifti.header.endian(headinf))                # 16, int64_t[8], DATA ARRAY DIMENSIONS
+	    writeBin(as.double(.nifti.header.intent_p1(headinf)),con,size=8,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.intent_p1(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     # 80, double[1], 1ST INTENT PARAMETER
+	    writeBin(as.double(.nifti.header.intent_p2(headinf)),con,size=8,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.intent_p2(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     # 88, double[1], 2ND INTENT PARAMETER
+	    writeBin(as.double(.nifti.header.intent_p3(headinf)),con,size=8,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.intent_p3(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     # 96, double[1], 3RD INTENT PARAMETER
+	    writeBin(as.double(.nifti.header.pixdim(headinf)),con,size=8,endian=.nifti.header.endian(headinf))              # 	    .nifti.header.pixdim(headinf) <- readBin(con,double(),n=8,size=8,endian=.nifti.header.endian(headinf))                        #104, double[8], GRID SPACINGS
+	    writeBin(as.integer(.nifti.header.vox_offset(headinf)),con,size=8,endian=.nifti.header.endian(headinf))         # 	    .nifti.header.vox_offset(headinf) <- readBin(con,integer(),n=1,size=8,endian=.nifti.header.endian(headinf))                   #168, int64_t[1], OFFSET INTO .NII FILE
+	    writeBin(as.double(.nifti.header.scl_slope(headinf)),con,size=8,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.scl_slope(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #176, double[1], DATA SCALING: SLOPE
+	    writeBin(as.double(.nifti.header.scl_inter(headinf)),con,size=8,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.scl_inter(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #184, double[1], DATA SCALING: INTERCEPT
+	    writeBin(as.double(.nifti.header.cal_max(headinf)),con,size=8,endian=.nifti.header.endian(headinf))             # 	    .nifti.header.cal_max(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                       #192, double[1], MAX DISPLAY INTENSITY
+	    writeBin(as.double(.nifti.header.cal_min(headinf)),con,size=8,endian=.nifti.header.endian(headinf))             # 	    .nifti.header.cal_min(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                       #200, double[1], MIN DISPLAY INTENSITY
+	    writeBin(as.double(.nifti.header.slice_duration(headinf)),con,size=8,endian=.nifti.header.endian(headinf))      # 	    .nifti.header.slice_duration(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                #208, double[1], TIME FOR 1 SLICE
+	    writeBin(as.double(.nifti.header.toffset(headinf)),con,size=8,endian=.nifti.header.endian(headinf))             # 	    .nifti.header.toffset(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                       #216, double[1], TIME AXIS SHIFT
+	    writeBin(as.integer(.nifti.header.slice_start(headinf)),con,size=8,endian=.nifti.header.endian(headinf))        # 	    .nifti.header.slice_start(headinf) <- readBin(con,integer(),n=1,size=8,signed=T,endian=.nifti.header.endian(headinf))         #224, int64_t[1], FIRST SLICE INDEX
+	    writeBin(as.integer(.nifti.header.slice_end (headinf)),con,size=8,endian=.nifti.header.endian(headinf))         # 	    .nifti.header.slice_end (headinf) <- readBin(con,integer(),n=1,size=8,signed=T,endian=.nifti.header.endian(headinf))          #232, int64_t[1], LAST SLICE INDEX
+	    writeBin(charToRaw(.nifti.header.descrip(headinf)),con,endian=.nifti.header.endian(headinf))                    # 	    .nifti.header.descrip(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=80))) 		  								                  #240, char[80], TEXT
+	    writeBin(raw(80-nchar(.nifti.header.descrip(headinf))),con,endian=.nifti.header.endian(headinf))                
+	    writeBin(charToRaw(.nifti.header.aux_file(headinf)),con,endian=.nifti.header.endian(headinf))                   # 	    .nifti.header.aux_file(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=24)))		  								                  #320, char[24], AUXILIARY FILENAME
+	    writeBin(raw(24-nchar(.nifti.header.aux_file(headinf))),con,endian=.nifti.header.endian(headinf))               
+	    writeBin(as.integer(.nifti.header.qform_code(headinf)),con,size=4,endian=.nifti.header.endian(headinf))         # 	    .nifti.header.qform_code(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))          #344, int32[1], NIFITXFORM CODE
+	    writeBin(as.integer(.nifti.header.sform_code(headinf)),con,size=4,endian=.nifti.header.endian(headinf))         # 	    .nifti.header.sform_code(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))          #348, int32[1], NIFITXFORM CODE
+	    writeBin(as.double(.nifti.header.quatern_b(headinf)),con,size=8,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.quatern_b(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #352, double[1], QUATERNION B PARAM
+	    writeBin(as.double(.nifti.header.quatern_c(headinf)),con,size=8,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.quatern_c(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #360, double[1], QUATERNION C PARAM
+	    writeBin(as.double(.nifti.header.quatern_d(headinf)),con,size=8,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.quatern_d(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #368, double[1], QUATERNION D PARAM
+	    writeBin(as.double(.nifti.header.qoffset_x(headinf)),con,size=8,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.qoffset_x(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #376, double[1], QUATERNION X SHIFT
+	    writeBin(as.double(.nifti.header.qoffset_y(headinf)),con,size=8,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.qoffset_y(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #384, double[1], QUATERNION Y SHIFT
+	    writeBin(as.double(.nifti.header.qoffset_z(headinf)),con,size=8,endian=.nifti.header.endian(headinf))           # 	    .nifti.header.qoffset_z(headinf) <- readBin(con,double(),n=1,size=8,endian=.nifti.header.endian(headinf))                     #392, double[1], QUATERNION Z SHIFT
+	    writeBin(as.double(.nifti.header.srow_x(headinf)),con,size=8,endian=.nifti.header.endian(headinf))              # 	    .nifti.header.srow_x(headinf) <- readBin(con,double(),n=4,size=8,endian=.nifti.header.endian(headinf))                        #400, double[4], 1ST ROW AFFINE TRANSFORM
+	    writeBin(as.double(.nifti.header.srow_y(headinf)),con,size=8,endian=.nifti.header.endian(headinf))              # 	    .nifti.header.srow_y(headinf) <- readBin(con,double(),n=4,size=8,endian=.nifti.header.endian(headinf))                        #432, double[4], 2ND ROW AFFINE TRANSFORM
+	    writeBin(as.double(.nifti.header.srow_z(headinf)),con,size=8,endian=.nifti.header.endian(headinf))              # 	    .nifti.header.srow_z(headinf) <- readBin(con,double(),n=4,size=8,endian=.nifti.header.endian(headinf))                        #464, double[4], 3RD ROW AFFINE TRANSFORM
+	    writeBin(as.integer(.nifti.header.slice_code(headinf)),con,size=4,endian=.nifti.header.endian(headinf))         # 	    .nifti.header.slice_code(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))          #496, int32[1], SLICE TIMING ORDER
+	    writeBin(as.integer(.nifti.header.xyzt_units(headinf)),con,size=4,endian=.nifti.header.endian(headinf))         # 	    .nifti.header.xyzt_units(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))          #500, int32[1], UNITS OF PIXDIM
+	    writeBin(as.integer(.nifti.header.intent_code(headinf)),con,size=4,endian=.nifti.header.endian(headinf))        # 	    .nifti.header.intent_code(headinf) <- readBin(con,integer(),n=1,size=4,signed=T,endian=.nifti.header.endian(headinf))         #504, int32[1], NIFITINTENT CODE
+	    writeBin(charToRaw(.nifti.header.intent_name(headinf)),con,endian=.nifti.header.endian(headinf))                # 	    .nifti.header.intent_name(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=16)))                              		  #508, char[16], NAME OR MEANING OF DATA
+	    writeBin(raw(16-nchar(.nifti.header.intent_name(headinf))),con,endian=.nifti.header.endian(headinf))
+	    writeBin(charToRaw(.nifti.header.dim_info(headinf)),con,endian=.nifti.header.endian(headinf))                   # 	    .nifti.header.dim_info(headinf) <- rawToChar(removeNullString(readBin(con,raw(),n=1)))                                  	    #524, char[1], MRI SLICE ORDERING
+	    writeBin(raw(1-nchar(.nifti.header.dim_info(headinf))),con,endian=.nifti.header.endian(headinf))
+	    writeBin(raw(15),con,endian=.nifti.header.endian(headinf))                                                      # 	    unused_str <- rawToChar(removeNullString(readBin(con,raw(),n=15)))                                                            #525, cahr[15], UNUSED STRING (not stored fill with \0) 
+	    
+	    if(.nifti.header.vox_offset(headinf)>540) for(i in 1:(.nifti.header.vox_offset(headinf)-540))  writeBin(as.integer(0),size=1,con,endian=.nifti.header.endian(headinf))
+	  }
+	 
+	  #write nifti1 or nifti2
+	  if(.nifti.header.filetype(headinf)=='nifti+2' | .nifti.header.filetype(headinf)=='nifti2') {
+	    writein2(con,headinf)
+	  } else {
+	    writein(con,headinf)
+	  }
+	  
 		
 	} else {
 		stop('Unable to open connection.\n')
